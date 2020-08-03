@@ -3,7 +3,7 @@
      <b-container>
          <div class="card rounded-lg shadow p-3 mb-5 bg-white rounded">
          <div>
-             <h1>공지사항</h1>
+             <h1></h1>
          </div>
          <b-container>
             <b-row>
@@ -11,7 +11,7 @@
                 <b-col></b-col>
             <b-col>
                 <p>
-                작성자: 작성자 이름 |
+                작성자: |
                 <span class="text-muted ">작성시간: 2020-07-26</span>
                 </p>
             </b-col>
@@ -63,11 +63,16 @@
 </template>
 
 <script>
+import axios from 'axios'
+const BACK_URL = 'http://localhost:8080'
+
 export default {
     name:'QuestionDetail',
      data(){
         return {
-            writeComment: false
+            writeComment: false,
+            qpost_id: this.$route.params.qpost_id,
+            qPost:[],
         }
      },
     methods: {
@@ -77,7 +82,21 @@ export default {
         commentClose() {
             this.writeComment = false
         },
-    }
+        getQna() {
+            console.log(this.qPost)
+            axios.get(`${BACK_URL}/qna/question/${this.qpost_id}`)
+            .then(res => {
+                this.qPost = res.data
+                
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        },
+    },
+     created(){
+        this.getQna()
+        }
 }
 </script>
 

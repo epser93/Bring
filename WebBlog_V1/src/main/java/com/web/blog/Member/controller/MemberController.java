@@ -21,6 +21,7 @@ import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -53,6 +54,9 @@ public class MemberController {
     @ApiOperation(value = "회원 리스트 조회", notes = "모든 회원 조회")
     @GetMapping("/users")
     public ListResult<Member> findAllMember() {
+//        Sort sort;
+//        sort = sort.and(new Sort(Sort.Direction.ASC, "score"));
+//        return responseService.getListResult(repository.findAll(sort));
         return responseService.getListResult(repository.findAll());
     }
 
