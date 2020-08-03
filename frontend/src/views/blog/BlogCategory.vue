@@ -23,7 +23,7 @@
                       </div>
                     </div>
                   </div>
-                  <input type="text" id="input1-group3" v-model="editCategoryName" placeholder="새 카테고리 이름" class="form-control">
+                  <input type="text" id="input1-group3" v-model="editCategoryName.name" placeholder="새 카테고리 이름" class="form-control">
                 </div>
               </div>
             </div>
@@ -57,7 +57,7 @@
                       </div>
                     </div>
                   </div>
-                  <input type="text" id="input1-group3" v-model="newCategoryName" placeholder="새 카테고리 이름" class="form-control">
+                  <input type="text" id="input1-group3" v-model="newCategoryName.name" placeholder="새 카테고리 이름" class="form-control">
                 </div>
               </div>
             </div>
@@ -89,10 +89,14 @@ export default {
   },
   data() {
     return {
-      newCategoryName: '',
+      newCategoryName: {
+        name: ""
+      },
       nickname: this.$route.params.nickname,
       categoryList: [],
-      editCategoryName: '',
+      editCategoryName: {
+        name: ""
+      },
       categorySelected: '카테고리 선택',
     }
   },  
@@ -121,7 +125,7 @@ export default {
     },
     putCategory() {
       console.log(this.categorySelected)
-      console.log(this.editCategoryName)
+      console.log(this.editCategoryName.name)
       const config = {
           headers: {
             'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')

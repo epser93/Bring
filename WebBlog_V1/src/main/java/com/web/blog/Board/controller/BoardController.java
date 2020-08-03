@@ -3,6 +3,7 @@ package com.web.blog.Board.controller;
 import com.web.blog.Board.entity.Board;
 import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.entity.PostMember;
+import com.web.blog.Board.model.ParamBoard;
 import com.web.blog.Board.model.ParamPost;
 import com.web.blog.Board.repository.BoardRepository;
 import com.web.blog.Board.repository.PostMemberRepository;
@@ -33,7 +34,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-@Api(tags = {"5. Blog"})
+@Api(tags = {"5. Board"})
 @RequiredArgsConstructor
 @RestController
 public class BoardController {
@@ -51,14 +52,14 @@ public class BoardController {
     })
     @ApiOperation(value = "게시판 카테고리 생성", notes = "게시판 카테고리 생성")
     @PostMapping(value = "/blog/{nickname}/create")
-    public SingleResult<Board> createB(@RequestBody String name, @PathVariable String nickname) {
+    public SingleResult<Board> createB(@Valid @RequestBody ParamBoard paramBoard, @PathVariable String nickname) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Member member = (Member) principal;
         if (member.getNickname().equals(nickname)) {
-            Optional<Board> board = Optional.ofNullable(boardRepository.findByNameAndMember(name, member));
+            Optional<Board> board = Optional.ofNullable(boardRepository.findByNameAndMember(paramBoard.getName(), member));
             if (board.isPresent()) throw new CBoardExistException();
             String uid = member.getUid();
-            return responseService.getSingleResult(boardService.createBoard(uid, name));
+            return responseService.getSingleResult(boardService.createBoard(uid, paramBoard.getName()));
         }
         return null;
     }
@@ -75,14 +76,14 @@ public class BoardController {
     })
     @ApiOperation(value = "게시판 이름 수정", notes = "게시판 이름 수정")
     @PutMapping(value = "/blog/{nickname}/{boardName}")
-    public SingleResult<Board> updateBoard(@PathVariable String boardName, @Valid @RequestBody String name, @PathVariable String nickname) {
+    public SingleResult<Board> updateBoard(@PathVariable String boardName, @Valid @RequestBody ParamBoard paramBoard, @PathVariable String nickname) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Member member = (Member) principal;
         if (member.getNickname().equals(nickname)) {
-            Optional<Board> board = Optional.ofNullable(boardRepository.findByNameAndMember(name, member));
+            Optional<Board> board = Optional.ofNullable(boardRepository.findByNameAndMember(paramBoard.getName(), member)); //바꿀 이름을 가진 게시판이 있는지 체크
             if (board.isPresent()) throw new CBoardExistException();
-            Board brd = boardService.findBoard(boardName, member);
-            return responseService.getSingleResult(boardService.updateBoard(brd.getBoardId(), member.getUid(), name));
+            Board brd = boardService.findBoard(boardName, member); //기존 게시판 불러오기
+            return responseService.getSingleResult(boardService.updateBoard(brd.getBoardId(), member.getUid(), paramBoard.getName()));
         }
         return null;
     }
@@ -109,11 +110,10 @@ public class BoardController {
     //게시판 포스트 리스트
     @ApiOperation(value = "게시판 포스트 리스트", notes = "한 카테고리 내 모든 포스트 리스트")
     @GetMapping(value = "/blog/{nickname}/{boardName}/post_list")
-    public ListResult<Post> listPosts(@PathVariable String boardName, @PathVariable String nickname, @RequestParam int page, @RequestParam int size) {
+    public ListResult<Post> listPosts(@PathVariable String boardName, @PathVariable String nickname) {
         Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
         Board board = boardService.findBoard(boardName, member);
-        Page<Post> paging = boardService.CategoryPostList(board.getBoardId(), page, size);
-        List<Post> list = paging.getContent();
+        List<Post> list = boardService.CategoryPostList(board.getBoardId());
         if (member.getNickname().equals(nickname)) {
             return responseService.getListResult(list);
         } else return null;
