@@ -138,7 +138,7 @@ export default {
             this.getCategory()
           })
           .catch((err) => {
-            alert('카테고리를 선택해주세요')
+            alert('중복된 카테고리 이름이거나, 없는 카테고리를 변경 요청 하셨습니다.')
             console.error(err)
           })
     },
