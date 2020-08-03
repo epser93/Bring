@@ -94,12 +94,12 @@ const routes = [{
 
     // 지식인
     {
-        path: '/ask',
+        path: '/qna',
         name: 'Question',
         component: Question
     },
     {
-        path: '/ask/write',
+        path: '/qna/question',
         name: 'QuestionWrite',
         component: QuestionWrite
     },

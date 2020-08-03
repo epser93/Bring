@@ -31,7 +31,7 @@
                     <b-card-text>
                         This is a wider card with supporting text as a natural lead-in to additional content.
                         This content is a little bit longer.
-                        <!-- {{nickname.(게시글.text)}}-->
+                       
                     </b-card-text>
                     <b-button variant="primary"><router-link :to="{ name: 'QuestionDetail' }">카드 디테일로 가게끔</router-link></b-button>
                     </b-card-body>
@@ -61,8 +61,8 @@
 </template>
 
 <script>
-import axios from 'axios'
-const BACK_URL = 'http://localhost:8080'
+// import axios from 'axios'
+// const BACK_URL = 'http://localhost:8080'
 
 export default {
     name:'Question',
@@ -76,31 +76,31 @@ export default {
             articles:10,
             count:5,
             nickname: this.$route.params.nickname,
-            jisikinList:[],
+
+            qnaList:[],
       
       }
     },
-    methods:{
-        getAllJisikin() {
-            axios.get(`${BACK_URL}/Question/${this.nickname}/()`, {
-                params: {
-                    nickname: this.nickname,
-                }
-            })
-                .then(res => {
-                    this.jisikinList = res.data.list
-                    console.log(this.jisikinList)
-                })
-                .catch(err => {
-                    console.log(err)
-                })
-        },
-        },
-
+    // methods:{
+    //     getAllQna() {
+    //         axios.get(`${BACK_URL}/qna/qlist`)
+    //         .then(res => {
+    //             this.qnaList = res.data
+    //             console.log(this.qnaList)
+    //         })
+    //         .catch(err => {
+    //             console.log(err)
+    //         })
+    //     },
+    // created(){
+    //     this.getAllQna()
+    //     }
+    // },
+}
     
      
     
-}
+
 </script>
 
 <style>

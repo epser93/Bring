@@ -1,6 +1,6 @@
 <template>
   <!--제목-->
-  <div class="container mb-5 ">
+<div class="container mb-5 ">
     <b-container class="mt-5">
       <h2>글쓰기</h2>
       
@@ -10,20 +10,20 @@
         <label>제목</label>
       </b-col>
       <b-col sm="9">
-        <b-form-input v-model="questionData.title"></b-form-input>
+        <b-form-input v-model="questionData.subject"></b-form-input>
       </b-col>
     </b-row>
-  <v-md-editor class="text-left" v-model="questionData.text" height="600px"></v-md-editor>
-
+  <v-md-editor class="text-left" v-model="questionData.content" height="600px"></v-md-editor>
 
 <!--태그 추가-->
   <div>
-    <b-form-tags input-id="tags-basic" v-model="questionData.category" class="mb-2" label="파일 추가:" label-cols-sm="1"></b-form-tags>
+    <b-form-input v-model="questionData.tag" placeholder="Enter your name" label="파일 첨부 "></b-form-input>
+    <!-- <b-form-tags input-id="tags-basic" v-model="questionData.tag" class="mb-2" label="파일 추가:" label-cols-sm="1"></b-form-tags> -->
     <!-- <p>태그: {{ category }}</p> 이부분에 나오게 해야함 -->
   </div>
 
   <div>
-    <b-button @click="questionWrite" variant="outline-primary"> <router-link to="/ask">작성</router-link></b-button>
+    <b-button @click="qnaWrite" variant="outline-primary"> <router-link to="/qna">작성</router-link></b-button>
   </div>
   </b-container>
 </div>
@@ -38,17 +38,20 @@ export default {
     data() {
       return {
         questionData:{
-          title:"",
-          text:"",
-          category:[],
+          content:"",
+          subject:"",       
+          tag:"",
         },
       }
     },
     methods: {
-      // 로직 구현, 아직 백엔드 완성되자않아서 추후 수정해야함
-      questionWrite(questionData){
-        console.log(questionData)
-        axios.post(`${BACK_URL}/ /`,questionData)
+      qnaWrite(){
+        const config = {
+              headers: {
+                'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
+              }
+            }
+        axios.post(`${BACK_URL}/qna/question`,this.questionData,config)
         .then(res=>{
           console.log(res)
         })
@@ -57,6 +60,6 @@ export default {
         })
       }
     }
-  
-}
+      }
+
 </script>
