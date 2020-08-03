@@ -17,14 +17,22 @@
         <hr>
 
         <div class="container">
-            <ul>
-                <li v-for="qArticle in qPost" :key="`qArticle_${qArticle.id}`">
-                    {{qArticle.subject}}
+            <ul >
+                <li v-for="qArticle in qPost" :key="qArticle.qPost_id">
+                    제목: {{qArticle.subject}}
+                    <h5>내용: {{qArticle.content}}</h5>
+                    태그: {{qArticle.tag}}
+                    글쓴이: {{qArticle.writer}}
+                    조회수: {{qArticle.views}}
+                    
+                    <!--heart icon-->
+                <b-icon icon="heart" scale="1"></b-icon>
+                <p><button class="btn btn-primary">글 자세히</button></p>
                 </li>
+                
             </ul>
             
-             <!--heart icon-->
-                <b-icon icon="heart" scale="1"></b-icon>
+             
 
             <!--pagination-->
             <div class="mt-5 container">
@@ -64,19 +72,20 @@ export default {
     },
     methods:{
         getAllQna() {
+            console.log(this.qPost)
             axios.get(`${BACK_URL}/qna/question/qlist`)
             .then(res => {
-                this.qPost = res.data
-                console.log(this.qPost)
+                this.qPost = res.data.list
+                
             })
             .catch(err => {
                 console.log(err)
             })
         },
+    },
     created(){
         this.getAllQna()
         }
-    },
 }
     
      
