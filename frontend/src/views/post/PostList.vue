@@ -1,18 +1,20 @@
 !<template>
   <div class="wrapB container-fluid">
     <section v-if="mode==='blog'" class="cards row">
-      <div v-for="(post,index) in posts" :key="index" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-        <div class="img-section">
-          <a href=""></a>
-        </div>
-        <div class="contents">
-          <h4>{{ post.subject }}</h4>
-          <p>{{ post.content }}</p>
-          <p class="comment-date">{{ post.cratedAt}} · {{ post.replyCnt }}개의 댓글</p>
-        </div>
-        <div class="writer-info">
-          <p>{{ post.writer }}</p>
-          <p>♥ {{ post.likes}}</p>
+      <div v-for="post in orderedPosts" :key="post.post_id" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
+        <div class=cardwrap>
+          <div class="img-section">
+            <a href=""></a>
+          </div>
+          <div class="contents">
+            <h4>{{ post.subject }}</h4>
+            <p>{{ post.content }}</p>
+            <p class="comment-date">{{ post.cratedAt}} · {{ post.replyCnt }}개의 댓글</p>
+          </div>
+          <div class="writer-info">
+            <p>{{ post.writer }}</p>
+            <p>♥ {{ post.likes}}</p>
+          </div>
         </div>
       </div>
     </section>
@@ -153,11 +155,17 @@
 </template>
 
 <script>
+import _ from 'lodash'
 export default {
   name: 'PostList',
   props: {
     mode: String,
     posts: Array,
+  },
+  computed: {
+    orderedPosts () {
+      return _.orderBy(this.posts, 'cratedAt', 'desc')
+    }
   }
 }
 </script>

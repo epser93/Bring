@@ -16,6 +16,7 @@ import MyBlog from '../views/blog/MyBlog.vue'
 import MyList from '../views/blog/MyList.vue'
 import MyQuestions from '../views/blog/MyQuestions.vue'
 import MyAnswers from '../views/blog/MyAnswers.vue'
+import BlogCategory from '../views/blog/BlogCategory.vue'
 
 
 // 스택오버플로우
@@ -91,15 +92,21 @@ const routes = [{
         name: 'BlogEditor',
         component: Editor,
     },
+    // 블로그 카테고리
+    {
+        path: '/blog-category/:nickname',
+        name: 'BlogCategory',
+        component: BlogCategory,
+    },
 
     // 지식인
     {
-        path: '/ask',
+        path: '/qna',
         name: 'Question',
         component: Question
     },
     {
-        path: '/ask/write',
+        path: '/qna/question',
         name: 'QuestionWrite',
         component: QuestionWrite
     },

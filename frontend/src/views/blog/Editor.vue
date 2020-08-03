@@ -5,7 +5,7 @@
       <button type="button" @click="postText" class="btn btn-outline-success" style="width:80px;">발행</button>
     </div>
     <!-- 카테고리 생성 부분 -->
-    <BlogCategory :nickname="aboutText.nickname"/>
+    
     
     <!-- 카테고리 부분 -->
     <div class="row form-group">
@@ -36,7 +36,7 @@
 
 <script>
 import axios from 'axios'
-import BlogCategory from '../../components/blog/BlogCategory.vue'
+
 
 
 const BACK_URL = 'http://localhost:8080'
@@ -44,7 +44,7 @@ const BACK_URL = 'http://localhost:8080'
 export default {
   name: 'Editor',
   components: {
-      BlogCategory,  
+      
   },
   data() {
     return {

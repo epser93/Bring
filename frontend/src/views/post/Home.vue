@@ -3,8 +3,8 @@
     <div id="nav" class="mt-4">
       <router-link v-if="mode==='blog'" :to="{ name : 'Home' }"><h4 class="d-inline ml-5">최신글</h4></router-link> 
       <router-link v-if="mode==='blog'" :to="{ name: 'HotPost'}"><h4 class="d-inline ml-5"><b-icon class="mr-2" icon="graph-up" aria-hidden="true"></b-icon>트렌딩</h4></router-link> 
-      <router-link v-if="mode==='QnA'" to="#"><h4 class="d-inline ml-5">최신질문</h4></router-link> 
-      <router-link v-if="mode==='QnA'" to="#"><h4 class="d-inline ml-5">인기질문</h4></router-link>
+      <router-link v-if="mode==='QnA'" to=""><h4 class="d-inline ml-5">최신질문</h4></router-link> 
+      <router-link v-if="mode==='QnA'" to=""><h4 class="d-inline ml-5">인기질문</h4></router-link>
     </div>
     <hr>
     <router-view :mode="mode" :posts="posts"></router-view>
@@ -47,7 +47,7 @@ export default {
     return {
       mode: "blog",
       modeText : 'QnA',
-      posts: []
+      posts: [],
     }
   }
 }

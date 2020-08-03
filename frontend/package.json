@@ -12,6 +12,7 @@
     "axios": "^0.19.2",
     "bootstrap-vue": "^2.15.0",
     "core-js": "^3.6.5",
+    "lodash": "^4.17.19",
     "url-search-params-polyfill": "^8.1.0",
     "vue": "^2.6.11",
     "vue-cookies": "^1.7.3",
