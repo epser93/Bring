@@ -116,6 +116,18 @@ public class ExceptionAdvice {
         return responseService.getFailResult(Integer.valueOf(getMessage("youAskedQuestion.code")), getMessage("youAskedQuestion.msg"));
     }
 
+    @ExceptionHandler(CAlreadyFollowedException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public CommonResult ownerCannotLike(HttpServletRequest request, CAlreadyFollowedException e) {
+        return responseService.getFailResult(Integer.valueOf(getMessage("alreadyFollowed.code")), getMessage("alreadyFollowed.msg"));
+    }
+
+    @ExceptionHandler(CYouHaveNotFollowedThisBlogerEver.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public CommonResult ownerCannotLike(HttpServletRequest request, CYouHaveNotFollowedThisBlogerEver e) {
+        return responseService.getFailResult(Integer.valueOf(getMessage("youNeverFollowedThisBloger.code")), getMessage("youNeverFollowedThisBloger.msg"));
+    }
+
     private String getMessage(String code) {
         return getMessage(code, null);
     }
