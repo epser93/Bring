@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-@Api(tags = {"3. Follow"})
+@Api(tags = {"3. Subscribe"})
 @RequiredArgsConstructor
 @RestController
 public class FollowController {

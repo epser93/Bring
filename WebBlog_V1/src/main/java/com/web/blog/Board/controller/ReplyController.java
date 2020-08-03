@@ -27,10 +27,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.Optional;
 
-@Api(tags = {"6. Reply"})
+@Api(tags = {"6. Blog - Post&#039;s Reply"})
 @RequiredArgsConstructor
 @RestController
 public class ReplyController {
@@ -61,7 +62,7 @@ public class ReplyController {
     })
     @ApiOperation(value = "댓글 작성", notes = "댓글 작성")
     @PostMapping(value = "/reply/{postId}")
-    public SingleResult<Reply> answerTheQuestion(@PathVariable long postId, @RequestBody ParamReply paramReply, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
+    public SingleResult<Reply> answerTheQuestion(@PathVariable long postId, @Valid @RequestBody ParamReply paramReply, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
         Post post = boardService.getPost(postId);
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Member member = (Member) principal;
@@ -74,7 +75,7 @@ public class ReplyController {
     })
     @ApiOperation(value = "댓글 수정", notes = "댓글 수정")
     @PutMapping(value = "/reply/{replyId}")
-    public SingleResult<Reply> updateAnswer(@RequestBody ParamReply paramReply, @PathVariable long replyId, @RequestParam(value = "files", required = false) MultipartFile[] files, @RequestParam Boolean isSelected) throws IOException {
+    public SingleResult<Reply> updateAnswer(@Valid @RequestBody ParamReply paramReply, @PathVariable long replyId, @RequestParam(value = "files", required = false) MultipartFile[] files, @RequestParam Boolean isSelected) throws IOException {
         Reply reply = boardService.getOneReply(replyId);
         Post post = reply.getPost();
         return responseService.getSingleResult(boardService.updateReply(replyId, paramReply, files));

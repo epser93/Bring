@@ -57,7 +57,7 @@ public class QnaController {
         return responseService.getListResult(qnaService.getOnesAllQuestion(member));
     }
 
-    @ApiOperation(value = "QnA 특정 유저 질문 리스트", notes = "한 유저의 모든 질문글 리스트")
+    @ApiOperation(value = "QnA 특정 유저 답변 리스트", notes = "한 유저의 모든 답변글 리스트")
     @GetMapping("/question/{nickname}/alist")
     public ListResult<Apost> listUserAposts(@PathVariable String nickname) {
         Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
