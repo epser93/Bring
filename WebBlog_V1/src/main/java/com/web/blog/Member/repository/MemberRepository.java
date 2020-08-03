@@ -7,12 +7,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByUid(String email);
 
     Optional<Member> findByNickname(String nickname);
+
+    @Query(value = "select nickname, score from userinfo order by score desc", nativeQuery = true)
+    List<Map<String, Integer>> rank();
 
     @Modifying
     @Transactional

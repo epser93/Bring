@@ -1,5 +1,6 @@
 package com.web.blog.Member.controller;
 
+import com.web.blog.Common.advice.exception.CUserExistException;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
 import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
@@ -12,8 +13,11 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @Api(tags = {"3. Subscribe"})
 @RequiredArgsConstructor
@@ -30,9 +34,10 @@ public class FollowController {
     @ApiOperation(value = "팔로우 보내기", notes = "팔로우 보내기")
     @PostMapping(value = "/follow/{msrl}")
     public CommonResult sendFollow(@PathVariable long msrl) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Member member = (Member) principal;
-        long from = member.getMsrl();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> member = memberRepository.findByUid(uid);
+        long from = member.get().getMsrl();
         if (from != msrl) {
             Member fromm = memberRepository.findById(from).orElseThrow(CUserNotFoundException::new);
             Member tom = memberRepository.findById(msrl).orElseThrow(CUserNotFoundException::new);
@@ -48,9 +53,10 @@ public class FollowController {
     @ApiOperation(value = "언팔로우", notes = "팔로우 해제")
     @DeleteMapping(value = "/follow/{msrl}")
     public CommonResult sendUnfollow(@PathVariable long msrl) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Member member = (Member) principal;
-        long from = member.getMsrl();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> member = memberRepository.findByUid(uid);
+        long from = member.get().getMsrl();
         Member fromm = memberRepository.findById(from).orElseThrow(CUserNotFoundException::new);
         Member tom = memberRepository.findById(msrl).orElseThrow(CUserNotFoundException::new);
         followService.unFollow(fromm, tom);

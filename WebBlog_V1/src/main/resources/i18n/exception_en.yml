@@ -46,3 +46,9 @@ selectedAnswer:
 youAskedQuestion:
   code: "-5002"
   msg: "You asked this question. You cannot answer on your question."
+alreadyFollowed:
+  code: "-1005"
+  msg: "You already followed this bloger."
+youNeverFollowedThisBloger:
+  code: "-1006"
+  msg: "You have never been following this bloger."

@@ -46,3 +46,9 @@ selectedAnswer:
 youAskedQuestion:
   code: "-5002"
   msg: "질문 작성자는 답변할 수 없습니다."
+alreadyFollowed:
+  code: "-1005"
+  msg: "이미 팔로우 하셨습니다."
+youNeverFollowedThisBloger:
+  code: "-1006"
+  msg: "이 블로거를 팔로우한 적이 없습니다. 팔로우 해제가 불가능합니다."

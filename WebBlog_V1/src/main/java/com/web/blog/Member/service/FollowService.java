@@ -1,6 +1,8 @@
 package com.web.blog.Member.service;
 
+import com.web.blog.Common.advice.exception.CAlreadyFollowedException;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
+import com.web.blog.Common.advice.exception.CYouHaveNotFollowedThisBlogerEver;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.repository.FollowRepository;
 import com.web.blog.Member.repository.MemberRepository;
@@ -20,15 +22,18 @@ public class FollowService {
 
     //팔로우 기능
     public void followFunction(Member from, Member to) {
-        if (!isFollowed(from, to)) { //팔로우 요청 후 상대방 수락시
+        if (!isFollowed(from, to)) { //팔로우 한 적이 없을 시
             memberRepository.updateFollowing(from.getMsrl());
             memberRepository.updateFollower(to.getMsrl());
             followRepository.insertFollowing(from.getMsrl(), to.getMsrl());
-        }
+        } else throw new CAlreadyFollowedException();
     }
 
     //팔로우 해제 기능
     public void unFollow(Member from, Member to) {
+        if (!isFollowed(from, to)) {
+            throw new CYouHaveNotFollowedThisBlogerEver();
+        }
         memberRepository.updateUnfollowing(from.getMsrl());
         memberRepository.updateUnfollower(to.getMsrl());
         followRepository.unFollowing(from.getMsrl(), to.getMsrl());

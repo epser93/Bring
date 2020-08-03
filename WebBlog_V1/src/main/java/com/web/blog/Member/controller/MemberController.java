@@ -29,6 +29,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 
 @Api(tags = {"2. Member"})
 @RequiredArgsConstructor
@@ -50,11 +51,15 @@ public class MemberController {
     @ApiOperation(value = "회원 리스트 조회", notes = "모든 회원 조회")
     @GetMapping("/users")
     public ListResult<Member> findAllMember() {
-//        Sort sort;
-//        sort = sort.and(new Sort(Sort.Direction.ASC, "score"));
-//        return responseService.getListResult(repository.findAll(sort));
         return responseService.getListResult(repository.findAll());
     }
+
+    @ApiOperation(value = "회원 랭킹 조회", notes = "포인트 랭킹 조회")
+    @GetMapping("/rank")
+    public ListResult<Map<String, Integer>> rank() {
+        return responseService.getListResult(repository.rank());
+    }
+
 
     @ApiOperation(value = "회원 프로필 조회", notes = "닉네임으로 회원을 조회한다")
     @GetMapping(value = "/{nickname}/profile")
