@@ -60,7 +60,6 @@ export default {
       axios.get(`${BACK_URL}/member/user/${this.nickname}`)
         .then(res => {
           this.userInfo = res.data
-          
         })
         .catch(err => {
           alert('ID와 비밀번호를 다시 확인해주세요.')

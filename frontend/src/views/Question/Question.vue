@@ -28,7 +28,7 @@
                     
                     <!--heart icon-->
                 <b-icon icon="heart" scale="1"></b-icon>
-                <p><button class="btn btn-primary"><router-link :to="{ name: 'QuestionDetail' }">글 자세히</router-link></button></p>
+                <p><button class="btn btn-primary"><router-link :to="{ name: 'QuestionDetail', params: {qpostId: qArticle.qpost_id} }">글 자세히</router-link></button></p>
                 </li>
                 
             </ul>
