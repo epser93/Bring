@@ -1,6 +1,5 @@
 package com.web.blog.QnA.repository;
 
-import com.web.blog.Member.entity.Member;
 import com.web.blog.QnA.entity.Apost;
 import com.web.blog.QnA.entity.Qpost;
 import org.springframework.data.jpa.repository.JpaRepository;

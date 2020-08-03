@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.web.blog.Board.entity.CommonDateEntity;
-import com.web.blog.Member.entity.Member;
 import lombok.*;
 
 import javax.persistence.*;
@@ -31,9 +30,6 @@ public class Apost extends CommonDateEntity implements Serializable {
     @Column(columnDefinition = "LONGTEXT")
     private String answer;
 
-    @Column(length = 1000)
-    private String tag;
-
     @Column(columnDefinition = "integer default 0")
     private int likes;
 
@@ -49,9 +45,8 @@ public class Apost extends CommonDateEntity implements Serializable {
     @OneToMany(mappedBy = "apost", fetch = FetchType.EAGER)
     private List<ApostMember> apostMembers = new ArrayList<>();
 
-    public Apost setUpdate(String answer, String tag) {
+    public Apost setUpdate(String answer) {
         this.answer = answer;
-        this.tag = tag;
         return this;
     }
 }

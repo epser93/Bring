@@ -1,20 +1,16 @@
 package com.web.blog.QnA.service;
 
-import com.web.blog.Board.entity.Board;
-import com.web.blog.Board.entity.Post;
 import com.web.blog.Common.advice.exception.*;
 import com.web.blog.Common.service.FileService;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.repository.MemberRepository;
 import com.web.blog.QnA.entity.Apost;
-import com.web.blog.QnA.entity.ApostMember;
 import com.web.blog.QnA.entity.Qpost;
 import com.web.blog.QnA.model.ParamApost;
 import com.web.blog.QnA.model.ParamQpost;
 import com.web.blog.QnA.repository.ApostMemberRepository;
 import com.web.blog.QnA.repository.ApostRepository;
 import com.web.blog.QnA.repository.QpostRepository;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +19,6 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -51,17 +46,15 @@ public class QnaService {
     }
 
     //모든 질문글 검색
-    public List<Qpost> QuestionSearch(int which, long board_id, String keyword) { //검색: which = 1~5
-        if (which == 1) { //통합 검색
-            return qpostRepository.searchQuestions(keyword);
-        } else if (which == 2) { //제목 검색
+    public List<Qpost> QuestionSearch(int which, long board_id, String keyword) { //검색: which = 1~4
+        if (which == 1) { //제목 검색
             return qpostRepository.findBySubjectContaining(keyword);
-        } else if (which == 3) { //내용 검색
+        } else if (which == 2) { //내용 검색
             return qpostRepository.findByContentContaining(keyword);
-        } else if (which == 4) { //태그 검색
-            return qpostRepository.findByTagContaining(keyword);
-        } else { //작성자 검색
+        } else if (which == 3) { //작성자 검색
             return qpostRepository.findByWriterContaining(keyword);
+        } else { //통합검색
+            return qpostRepository.searchQuestions(keyword);
         }
     }
 
@@ -80,7 +73,6 @@ public class QnaService {
                 .writer(member.getNickname())
                 .subject(paramQpost.getSubject())
                 .content(paramQpost.getContent())
-                .tag(paramQpost.getTag())
                 .build();
         qpostRepository.save(qpost);
         qpostRepository.updateMsrl(member.getMsrl(), qpost.getQpost_id());
@@ -94,7 +86,7 @@ public class QnaService {
         if (files != null) {
             fileService.uploadFiles(files);
         }
-        qpost.setUpdate(paramQpost.getSubject(), paramQpost.getContent(), paramQpost.getTag());
+        qpost.setUpdate(paramQpost.getSubject(), paramQpost.getContent());
         return qpost;
     }
 
@@ -130,7 +122,6 @@ public class QnaService {
                     .qpost(qpost)
                     .writer(member.getNickname())
                     .answer(paramApost.getAnswer())
-                    .tag(paramApost.getTag())
                     .build();
             qpostRepository.updateAnswerCnt(qpost.getQpost_id());
             return apostRepository.save(apost);
@@ -146,7 +137,7 @@ public class QnaService {
         if (isSelected) {
             return null;
         }
-        apost.setUpdate(paramApost.getAnswer(), paramApost.getTag());
+        apost.setUpdate(paramApost.getAnswer());
         return apost;
     }
 

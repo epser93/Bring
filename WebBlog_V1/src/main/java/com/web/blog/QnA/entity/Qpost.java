@@ -9,6 +9,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Builder
 @Getter
@@ -32,9 +34,6 @@ public class Qpost extends CommonDateEntity implements Serializable {
     @Column(columnDefinition = "LONGTEXT")
     private String content;
 
-    @Column(length = 1000)
-    private String tag;
-
     private int views;
 
     private int answerCnt; //답변 수
@@ -46,10 +45,12 @@ public class Qpost extends CommonDateEntity implements Serializable {
     @JoinColumn(name = "msrl")
     private Member member;
 
-    public Qpost setUpdate(String subject, String content, String tag) {
+    @OneToMany(mappedBy = "tag", fetch = FetchType.EAGER)
+    private List<QpostTag> qpostTags = new ArrayList<>();
+
+    public Qpost setUpdate(String subject, String content) {
         this.subject = subject;
         this.content = content;
-        this.tag = tag;
         return this;
     }
 }

@@ -1,0 +1,25 @@
+package com.web.blog.Board.repository;
+
+import com.web.blog.Board.entity.Post;
+import com.web.blog.Board.entity.PostTag;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import javax.transaction.Transactional;
+import java.util.List;
+
+public interface PostTagRepository extends JpaRepository<PostTag, Long> {
+    List<PostTag> findByPost(Post post);
+
+    @Modifying
+    @Transactional
+    @Query(value = "insert into post_tag (post_id, tag_id) values (:post_id, :tag_id)", nativeQuery = true)
+    int insertTag(@Param("post_id") long post_id, @Param("tag_id") long tag_id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "delete from post_tag where post_id = :post_id and tag_id = :tag_id", nativeQuery = true)
+    int deleteTag(@Param("post_id") long post_id, @Param("tag_id") long tag_id);
+}
