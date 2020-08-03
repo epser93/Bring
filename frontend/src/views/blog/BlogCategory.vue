@@ -2,32 +2,78 @@
   <div id="blogCategory">
     <h2>카테고리</h2>
 
-    <h3 class="text-left">카테고리 수정</h3>
-    <!-- 기존 카테고리 -->
-    <div class="row form-group">
-      <div class="col-2 text-left"><label for="multiple-select" class=" form-control-label">카테고리 선택: </label></div>
-      <div class="col-10 text-left">
-        <select v-model="boardName">
-          <option v-for="category in categoryList" v-bind:key="category.name">
-            {{ category.name }}
-          </option>
-        </select>
+    <!-- 카테고리 수정 -->
+    <div class="row mt-5">
+      <div class="card offset-2 col-8">
+        <div class="card-header bg-white">
+          <strong>카테고리 수정</strong>
+        </div>
+        <div class="card-body card-block">
+          <form class="form-horizontal">
+            <div class="row form-group">
+              <div class="col col-md-12">
+                <div class="input-group">
+                  <div class="input-group-btn">
+                    <div class="btn-group">
+                      <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-success">{{ categorySelected }}</button>
+                      <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu">
+                        <button type="button" @click="dropdown(category.name)" tabindex="0" class="dropdown-item" v-for="category in categoryList" v-bind:key="category.name">
+                          {{ category.name }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <input type="text" id="input1-group3" v-model="editCategoryName" placeholder="새 카테고리 이름" class="form-control">
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="card-footer bg-white">
+          <button type="submit" class="btn btn-success btn-sm" @click="putCategory">
+            <i class="fa fa-dot-circle"></i> 수정
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- 카테고리 수정 -->
-    <form class="form-inline mb-5">
-        <label>카테고리 수정:</label>
-        <input class="form-control mr-sm-2 ml-5" v-model="editCategoryName" placeholder="새 카테고리 이름" aria-label="editCategory">
-        <button class="btn btn-outline-secondary my-2 my-sm-0" @click="putCategory" type="submit">수정</button>
-    </form>
-
     <!-- 카테고리 생성 -->
-    <form class="form-inline mb-5">
-        <label>카테고리 생성:</label>
-        <input class="form-control mr-sm-2 ml-5" v-model="newCategoryName" placeholder="새 카테고리 이름" aria-label="newCategory">
-        <button class="btn btn-outline-secondary my-2 my-sm-0" @click="postCategory" type="submit">생성</button>
-    </form>
+    <div class="row mt-5">
+      <div class="card offset-2 col-8">
+        <div class="card-header bg-white">
+          <strong>카테고리 생성</strong>
+        </div>
+        <div class="card-body card-block">
+          <form class="form-horizontal">
+            <div class="row form-group">
+              <div class="col col-md-12">
+                <div class="input-group">
+                  <div class="input-group-btn">
+                    <div class="btn-group">
+                      <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu">
+                        <button type="button" @click="dropdown(category.name)" tabindex="0" class="dropdown-item" v-for="category in categoryList" v-bind:key="category.name">
+                          {{ category.name }}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <input type="text" id="input1-group3" v-model="newCategoryName" placeholder="새 카테고리 이름" class="form-control">
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="card-footer bg-white">
+          <button type="submit" class="btn btn-success btn-sm" @click="postCategory">
+            <i class="fa fa-dot-circle"></i> 생성
+          </button>
+        </div>
+      </div>
+    </div>    
+
+
+
+    
   </div>
 </template>
 
@@ -46,12 +92,15 @@ export default {
       newCategoryName: '',
       nickname: this.$route.params.nickname,
       categoryList: [],
-      boardName:'',
       editCategoryName: '',
+      categorySelected: '카테고리 선택',
     }
   },  
 
   methods: {
+    dropdown(newBoardName) {
+      this.categorySelected = newBoardName
+    },
     postCategory() {
       const config = {
           headers: {
@@ -60,8 +109,10 @@ export default {
         }
         axios.post(
           `${BACK_URL}/blog/${this.nickname}/create`, this.newCategoryName, config)
-
           .then(() =>{
+            alert('성공')
+            // 카테고리 생성하면 바로 수정에서 반영 되게
+            this.getCategory()
           })
           .catch((err) => {
             alert('실패')
@@ -69,21 +120,21 @@ export default {
           })
     },
     putCategory() {
+      console.log(this.categorySelected)
+      console.log(this.editCategoryName)
       const config = {
           headers: {
             'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
           }
         }
         axios.put(
-          `${BACK_URL}/blog/${this.nickname}/${this.boardName}`, {
-            params: {
-              name: this.editCategoryName,
-            }}, config)
-
+          `${BACK_URL}/blog/${this.nickname}/${this.categorySelected}`, this.editCategoryName, config)
           .then(() =>{
+            alert('성공')
+            this.getCategory()
           })
           .catch((err) => {
-            alert('실패')
+            alert('카테고리를 선택해주세요')
             console.error(err)
           })
     },
@@ -100,7 +151,7 @@ export default {
   },
   created() {
     this.getCategory()
-  }
+  },
 }
 </script>
 
