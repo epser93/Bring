@@ -101,7 +101,7 @@ const routes = [{
 
     // 지식인
     {
-        path: '/qna',
+        path: '/qna/question/qlist',
         name: 'Question',
         component: Question
     },

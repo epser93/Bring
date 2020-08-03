@@ -23,7 +23,7 @@
   </div>
 
   <div>
-    <b-button @click="qnaWrite" variant="outline-primary"> <router-link to="/qna">작성</router-link></b-button>
+    <b-button @click="qnaWrite" variant="outline-primary">작성</b-button>
   </div>
   </b-container>
 </div>
@@ -46,6 +46,7 @@ export default {
     },
     methods: {
       qnaWrite(){
+        console.log(this.questionData)
         const config = {
               headers: {
                 'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
@@ -54,6 +55,7 @@ export default {
         axios.post(`${BACK_URL}/qna/question`,this.questionData,config)
         .then(res=>{
           console.log(res)
+          this.$router.push({name : 'Question'})
         })
         .catch(err=>{
           console.log(err)
