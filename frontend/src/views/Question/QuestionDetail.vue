@@ -82,7 +82,7 @@ export default {
         },
         getQna() {
             console.log(this.qPost)
-            axios.get(`${BACK_URL}/qna/question/${this.qpostId}`)
+            axios.get(`${BACK_URL}/qna/question/${this.qpost_id}`)
             .then(res => {
                 this.qPost = res.data.data
             })
