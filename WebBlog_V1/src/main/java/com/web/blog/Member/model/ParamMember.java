@@ -19,12 +19,12 @@ public class ParamMember {
     private String password1;
 
     @NotBlank
-    @Size(min = 1, max = 100)
+    @Size(min = 7, max = 21)
     @ApiModelProperty(value = "비밀번호 확인")
     private String password2;
 
     @NotBlank
-    @Size(min = 3, max = 16)
+    @Size(min = 2, max = 16)
     @ApiModelProperty(value = "닉네임")
     private String nickname;
 

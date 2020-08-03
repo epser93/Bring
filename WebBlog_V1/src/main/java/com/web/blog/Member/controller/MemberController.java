@@ -1,27 +1,24 @@
 package com.web.blog.Member.controller;
 
 import com.web.blog.Board.entity.Post;
-import com.web.blog.Board.entity.PostMember;
 import com.web.blog.Board.repository.PostMemberRepository;
-import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Board.service.BoardService;
-import com.web.blog.Common.advice.exception.CResourceNotExistException;
+import com.web.blog.Board.service.PostService;
+import com.web.blog.Common.advice.exception.CUserNotFoundException;
 import com.web.blog.Common.entity.UploadFile;
+import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.FileUploadResponse;
+import com.web.blog.Common.response.ListResult;
+import com.web.blog.Common.response.SingleResult;
 import com.web.blog.Common.service.FileService;
 import com.web.blog.Common.service.ResponseService;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.model.ParamMember;
 import com.web.blog.Member.repository.MemberRepository;
-import com.web.blog.Common.advice.exception.CUserNotFoundException;
-import com.web.blog.Common.response.CommonResult;
-import com.web.blog.Common.response.ListResult;
-import com.web.blog.Common.response.SingleResult;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,7 +28,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 
 @Api(tags = {"2. Member"})
@@ -45,7 +41,7 @@ public class MemberController {
     private final ResponseService responseService;
     private final PasswordEncoder passwordEncoder;
     private final FileService fileService;
-    private final PostRepository postRepository;
+    private final PostService postService;
     private static final Logger logger = LoggerFactory.getLogger(MemberController.class);
 
     @ApiImplicitParams({
@@ -86,7 +82,7 @@ public class MemberController {
     @GetMapping(value = "/{nickname}/likedposts")
     public List<Post> listLiked(@PathVariable String nickname) {
         Member member = repository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
-        List<Post> list = boardService.likedPostList(member);
+        List<Post> list = postService.likedPostList(member);
         return list;
     }
 

@@ -33,9 +33,6 @@ public class Post extends CommonDateEntity implements Serializable {
     @Column(columnDefinition = "LONGTEXT")
     private String content;
 
-    @Column(length = 1000)
-    private String tag;
-
     @Column(columnDefinition = "integer default 0")
     private int views;
 
@@ -52,6 +49,9 @@ public class Post extends CommonDateEntity implements Serializable {
     @OneToMany(mappedBy = "post", fetch = FetchType.EAGER)
     private List<PostMember> postMembers = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post")
+    private List<PostTag> postTags = new ArrayList<>();
+
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     public Board getBoard() {
         return board;
@@ -65,10 +65,9 @@ public class Post extends CommonDateEntity implements Serializable {
 //        this.tag = tag;
 //    }
 
-    public Post setUpdate(String subject, String content, String tag) {
+    public Post setUpdate(String subject, String content) {
         this.subject = subject;
         this.content = content;
-        this.tag = tag;
         return this;
     }
 }

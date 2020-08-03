@@ -8,7 +8,7 @@ import com.web.blog.Board.model.ParamPost;
 import com.web.blog.Board.repository.BoardRepository;
 import com.web.blog.Board.repository.PostMemberRepository;
 import com.web.blog.Board.repository.PostRepository;
-import com.web.blog.Board.service.BoardService;
+import com.web.blog.Board.service.*;
 import com.web.blog.Common.advice.exception.*;
 import com.web.blog.Common.service.FileService;
 import com.web.blog.Common.service.ResponseService;
@@ -22,17 +22,17 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
-import java.awt.print.Pageable;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Api(tags = {"5. Board"})
 @RequiredArgsConstructor
@@ -42,9 +42,12 @@ public class BoardController {
     private final PostRepository postRepository;
     private final BoardRepository boardRepository;
     private final BoardService boardService;
+    private final PostService postService;
+    private final TagService tagService;
+    private final SearchService searchService;
+    private final ReplyService replyService;
     private final ResponseService responseService;
     private final MemberRepository memberRepository;
-    private final FileService fileService;
     private final PostMemberRepository postMemberRepository;
 
     @ApiImplicitParams({
@@ -126,7 +129,7 @@ public class BoardController {
         Board board = boardService.getBoard(board_id);
         Member member = board.getMember();
         if (nickname.equals(member.getNickname())) {
-            return responseService.getListResult(boardService.CategoryPostSearch(type, board_id, keyword));
+            return responseService.getListResult(searchService.CategoryPostSearch(type, board_id, keyword));
         } else return null;
     }
 
@@ -141,7 +144,7 @@ public class BoardController {
     @ApiOperation(value = "블로그 내 검색", notes = "type 1: 통합검색, type 2: 제목 검색, type 3: 내용 검색, type 4: 태그 검색")
     @GetMapping(value = "/blog/{nickname}/search/blogPosts/{keyword}/{type}")
     public ListResult<Post> searchAlgorithm(@PathVariable int type, @PathVariable String nickname, @PathVariable(required = false) String keyword) {
-        return responseService.getListResult(boardService.BlogPostSearch(type, nickname, keyword));
+        return responseService.getListResult(searchService.BlogPostSearch(type, nickname, keyword));
     }
 
     //사이트의 모든 블로그의 포스트 리스트
@@ -155,31 +158,45 @@ public class BoardController {
     @ApiOperation(value = "모든 블로그의 포스트 검색 ", notes = "type 1: 통합검색, type 2: 제목 검색, type 3: 내용 검색, type 4: 태그 검색, type 5: 작성자 검색")
     @GetMapping(value = "/search/all_blog_posts/{keyword}/{type}")
     public ListResult<Post> searchAlgorithm(@PathVariable int type, @PathVariable(required = false) String keyword) {
-        return responseService.getListResult(boardService.SitePostSearch(type, keyword));
+        return responseService.getListResult(searchService.SitePostSearch(type, keyword));
     }
 
     @ApiImplicitParams({
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
     })
     @ApiOperation(value = "게시글 작성", notes = "게시글 작성")
-    @PostMapping(value = "/blog/{nickname}/{boardName}")
-    public SingleResult<Post> post(@PathVariable String boardName, @Valid @RequestBody ParamPost post, @PathVariable String nickname, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException { //, @RequestParam("files") MultipartFile[] files
+    @PostMapping(value = "/blog/{nickname}/{boardName}") //ParamPost 프론트에서 태그 중복작성 불가하게 처리 필요
+    public ListResult<SingleResult> post(@PathVariable String boardName, @Valid @RequestBody ParamPost paramPost, @PathVariable String nickname, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException { //, @RequestParam("files") MultipartFile[] files
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
         Member member2 = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
+        Set<String> tags = paramPost.getTags();
+        List<SingleResult> result = new ArrayList<>();
+        Post post = null;
         if (member.equals(member2)) { //블로그 주인과 로그인 한 사용자가 같으면~
-            return responseService.getSingleResult(boardService.writePost(member.getNickname(), boardName, post, files, member2));
+            post = postService.writePost(member.getNickname(), boardName, paramPost, files, member2);
         }
-        return null;
+        if (!tags.isEmpty()) {
+            for (String tag : tags) {
+                tagService.insertTags(post, tag);
+            }
+        }
+        result.add(responseService.getSingleResult(post));
+        result.add(responseService.getSingleResult(tags));
+        return responseService.getListResult(result);
     }
 
     @ApiOperation(value = "게시글 상세정보 조회", notes = "게시글 상세정보 비회원 조회")
     @GetMapping(value = "/blog/{nickname}/{boardName}/{postId}")
-    public SingleResult<Post> post(@PathVariable String boardName, @PathVariable long postId, @PathVariable String nickname) {
+    public ListResult<SingleResult> post(@PathVariable String boardName, @PathVariable long postId, @PathVariable String nickname) {
         Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
         Board board = boardRepository.findByNameAndMember(boardName, member);
-        return responseService.getSingleResult(boardService.getPost(postId, board));
+        List<SingleResult> results = new ArrayList<>();
+        results.add(responseService.getSingleResult(postService.getPost(postId)));
+        results.add(responseService.getSingleResult(tagService.getTags(postId)));
+        results.add(responseService.getSingleResult(replyService.getRepliesofOnePost(postId)));
+        return responseService.getListResult(results);
     }
 
     @ApiImplicitParams({
@@ -196,10 +213,10 @@ public class BoardController {
         if (postMember.isPresent() && likeit) {
             throw new CAlreadyLikedException();
         } else if (postMember.isPresent() && !likeit) { //좋아요를 이미 누른 사용자이면서 좋아요를 취소하면
-            boardService.likePost(member, post, likeit);
+            postService.likePost(member, post, likeit);
         } else {
             if (!member.getNickname().equals(nickname) && likeit) { //로그인 한 사용자가 게시글 작성자가 아니고~
-                boardService.likePost(member, post, likeit);
+                postService.likePost(member, post, likeit);
             } else if (member.getNickname().equals(nickname)) throw new COwnerCannotLike();
         }
     }
@@ -210,7 +227,7 @@ public class BoardController {
         Post post = postRepository.findById(postId).orElseThrow(CResourceNotExistException::new);
         Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
         Board board = boardRepository.findByNameAndMember(boardName, member);
-        if (post.getBoard().equals(board)) return responseService.getListResult(boardService.likedMemberList(post));
+        if (post.getBoard().equals(board)) return responseService.getListResult(postService.likedMemberList(post));
         return null;
     }
 
@@ -219,15 +236,25 @@ public class BoardController {
     })
     @ApiOperation(value = "게시글 수정", notes = "게시글 수정")
     @PutMapping(value = "/blog/{nickname}/{boardName}/{postId}")
-    public SingleResult<Post> post(@PathVariable String boardName, @PathVariable long postId, @Valid @RequestBody ParamPost post, @PathVariable String nickname, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
+    public ListResult<SingleResult> post(@PathVariable String boardName, @PathVariable long postId, @Valid @RequestBody ParamPost paramPost, @PathVariable String nickname, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
         Member member2 = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
-        if (member.equals(member2)) {
-            return responseService.getSingleResult(boardService.updatePost(boardName, postId, member.getMsrl(), post, files));
+        Set<String> tags = paramPost.getTags();
+        List<SingleResult> result = new ArrayList<>();
+        Post post = null;
+        if (member.equals(member2)) { //블로그 주인과 로그인 한 사용자가 같으면~~
+            post = postService.updatePost(boardName, postId, member.getMsrl(), paramPost, files);
         }
-        return null;
+        if (!tags.isEmpty()) {
+            for (String tag : tags) {
+                tagService.updateTag(post, tag);
+            }
+        }
+        result.add(responseService.getSingleResult(post));
+        result.add(responseService.getSingleResult(tags));
+        return responseService.getListResult(result);
     }
 
     @ApiImplicitParams({
@@ -238,8 +265,7 @@ public class BoardController {
     public CommonResult deletePost(@PathVariable long postId, @PathVariable String nickname, @PathVariable String boardName) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
-        boardService.deletePost(postId, uid);
+        postService.deletePost(postId, uid);
         return responseService.getSuccessResult();
     }
-
 }

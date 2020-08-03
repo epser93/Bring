@@ -1,6 +1,5 @@
 package com.web.blog.QnA.repository;
 
-import com.web.blog.Board.entity.Post;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.QnA.entity.Qpost;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,7 +37,7 @@ public interface QpostRepository extends JpaRepository<Qpost, Long> {
     int updateViewCnt(@Param("qpost_id") long qpost_id);
 
     //모든 질문글 통합 검색
-    @Query(value = "select distinct * from qpost where (subject like concat('%',:keyword,'%') or content like concat('%',:keyword,'%') or tag like concat('%',:keyword,'%') or writer like concat('%',:keyword,'%'))", nativeQuery = true)
+    @Query(value = "select distinct * from qpost where (subject like concat('%',:keyword,'%') or content like concat('%',:keyword,'%') or writer like concat('%',:keyword,'%'))", nativeQuery = true)
     List<Qpost> searchQuestions(@Param("keyword") String keyword);
 
     //모든 질문글 제목 검색
@@ -46,9 +45,6 @@ public interface QpostRepository extends JpaRepository<Qpost, Long> {
 
     //모든 질문글 내용 검색
     List<Qpost> findByContentContaining(String keyword);
-
-    //모든 질문글 태그 검색
-    List<Qpost> findByTagContaining(String keyword);
 
     //모든 질문글 작성자 검색
     List<Qpost> findByWriterContaining(String keyword);

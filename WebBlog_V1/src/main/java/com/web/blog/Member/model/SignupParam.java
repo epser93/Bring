@@ -32,7 +32,7 @@ public class SignupParam {
     private String name;
 
     @NotBlank
-    @Size(min = 3, max = 16, message = "닉네임은 3자 이상 15자 이하여야 합니다.")
+    @Size(min = 2, max = 16, message = "닉네임은 3자 이상 15자 이하여야 합니다.")
     @ApiModelProperty(value = "닉네임")
     private String nickname;
 }

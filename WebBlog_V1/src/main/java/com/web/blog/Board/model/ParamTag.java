@@ -1,4 +1,4 @@
-package com.web.blog.QnA.model;
+package com.web.blog.Board.model;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ParamApost {
-    @ApiModelProperty(value = "내용")
-    private String answer;
+public class ParamTag {
+    @ApiModelProperty(value = "태그")
+    private String tag;
 }

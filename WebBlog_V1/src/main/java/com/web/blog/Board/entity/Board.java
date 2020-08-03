@@ -15,7 +15,7 @@ import javax.persistence.*;
 public class Board extends CommonDateEntity { //implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long boardId;
+    private Long boardId;
 
     @Column(nullable = false, length = 100)
     private String name;

@@ -2,7 +2,6 @@ package com.web.blog.Board.repository;
 
 import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.entity.PostMember;
-import com.web.blog.Member.entity.Member;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

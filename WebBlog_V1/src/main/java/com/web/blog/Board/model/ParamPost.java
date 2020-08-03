@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -20,7 +21,6 @@ public class ParamPost {
     @ApiModelProperty(value = "내용")
     private String content;
 
-    @Size(max = 1000)
     @ApiModelProperty(value = "태그")
-    private String tag;
+    private Set<String> tags;
 }
