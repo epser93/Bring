@@ -9,7 +9,7 @@
           <div class="contents">
             <h4>{{ post.subject }}</h4>
             <p>{{ post.content }}</p>
-            <p class="comment-date">{{ post.cratedAt}} · {{ post.replyCnt }}개의 댓글</p>
+            <p class="comment-date">{{ post.createdAt}} · {{ post.replyCnt }}개의 댓글</p>
           </div>
           <div class="writer-info">
             <p>{{ post.writer }}</p>
@@ -21,118 +21,22 @@
 
     <section v-if="mode==='QnA'" class="cards row">
       <div class="col-lg-10 row">
-      <div class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-        <div class="img-section">
-          <a href=""></a>
+        <div v-for="question in orderedHotQuestions" :key="question.qpost_id" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
+          <div class="cardwrap">
+            <div class="img-section">
+              <a href=""></a>
+            </div>
+            <div class="contents">
+              <h4>{{ question.subject }}</h4>
+              <p>{{ question.content }}</p>
+              <p class="comment-date">{{ question.createdAt }} · {{ question.answerCnt }}개의 댓글</p>
+            </div>
+            <div class="writer-info">
+              <p>{{ question.writer }}</p>
+              <p>♥ {{ question.views }}</p>
+            </div>
+          </div>
         </div>
-        <div class="contents">
-          <h4>제목</h4>
-          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quos molestiae eligendi a expedita distinctio nostrum illo vero quod illum sunt molestias, omnis similique veritatis nisi, esse nulla consequatur impedit voluptates.</p>
-          <p class="comment-date">2020년 7월 28일 · 20개의 댓글</p>
-        </div>
-        <div class="writer-info">
-          <p>user1</p>
-          <p>♥ 2</p>
-        </div>
-      </div>
-      <div class="card1 col-lg-3 col-md-4 col-sm-6 col-12" >
-        <div class="img-section">
-          <a href=""></a>
-        </div>
-        <div class="contents">
-          <h4>제목</h4>
-          <p>LoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLoremLorem ipsum dolor sit amet consectetur, adipisicing elit. Quos molestiae eligendi a expedita distinctio nostrum illo vero quod illum sunt molestias, omnis similique veritatis nisi, esse nulla consequatur impedit voluptates. Lorem ipsum dolor sit amet consectetur adipisicing elit. Quos ex atque in obcaecati illum voluptatibus maxime, ipsa fuga debitis mollitia delectus possimus sequi, at omnis, distinctio eum quibusdam asperiores dolor.</p>
-          <p class="comment-date">2020년 7월 28일 · 20개의 댓글</p>
-        </div>
-        <div class="writer-info">
-          <p>user1</p>
-          <p>♥ 2</p>
-        </div>
-      </div>
-      <div class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-        <div class="img-section">
-          <a href=""></a>
-        </div>
-        <div class="contents">
-          <h4>제목</h4>
-          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quos molestiae eligendi a expedita distinctio nostrum illo vero quod illum sunt molestias, omnis similique veritatis nisi, esse nulla consequatur impedit voluptates.</p>
-          <p class="comment-date">2020년 7월 28일 · 20개의 댓글</p>
-        </div>
-        <div class="writer-info">
-          <p>user1</p>
-          <p>♥ 2</p>
-        </div>
-      </div>
-      <div class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-        <div class="img-section">
-          <a href=""></a>
-        </div>
-        <div class="contents">
-          <h4>제목</h4>
-          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quos molestiae eligendi a expedita distinctio nostrum illo vero quod illum sunt molestias, omnis similique veritatis nisi, esse nulla consequatur impedit voluptates.</p>
-          <p class="comment-date">2020년 7월 28일 · 20개의 댓글</p>
-        </div>
-        <div class="writer-info">
-          <p>user1</p>
-          <p>♥ 2</p>
-        </div>
-      </div>
-      <div class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-        <div class="img-section">
-          <a href=""></a>
-        </div>
-        <div class="contents">
-          <h4>제목</h4>
-          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quos molestiae eligendi a expedita distinctio nostrum illo vero quod illum sunt molestias, omnis similique veritatis nisi, esse nulla consequatur impedit voluptates.</p>
-          <p class="comment-date">2020년 7월 28일 · 20개의 댓글</p>
-        </div>
-        <div class="writer-info">
-          <p>user1</p>
-          <p>♥ 2</p>
-        </div>
-      </div>
-      <div class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-        <div class="img-section">
-          <a href=""></a>
-        </div>
-        <div class="contents">
-          <h4>제목</h4>
-          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quos molestiae eligendi a expedita distinctio nostrum illo vero quod illum sunt molestias, omnis similique veritatis nisi, esse nulla consequatur impedit voluptates.</p>
-          <p class="comment-date">2020년 7월 28일 · 20개의 댓글</p>
-        </div>
-        <div class="writer-info">
-          <p>user1</p>
-          <p>♥ 2</p>
-        </div>
-      </div>
-      <div class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-        <div class="img-section">
-          <a href=""></a>
-        </div>
-        <div class="contents">
-          <h4>제목</h4>
-          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quos molestiae eligendi a expedita distinctio nostrum illo vero quod illum sunt molestias, omnis similique veritatis nisi, esse nulla consequatur impedit voluptates.</p>
-          <p class="comment-date">2020년 7월 28일 · 20개의 댓글</p>
-        </div>
-        <div class="writer-info">
-          <p>user1</p>
-          <p>♥ 2</p>
-        </div>
-      </div>
-      <div class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-        <div class="img-section">
-          <a href=""></a>
-        </div>
-        <div class="contents">
-          <h4>제목</h4>
-          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quos molestiae eligendi a expedita distinctio nostrum illo vero quod illum sunt molestias, omnis similique veritatis nisi, esse nulla consequatur impedit voluptates.</p>
-          <p class="comment-date">2020년 7월 28일 · 20개의 댓글</p>
-        </div>
-        <div class="writer-info">
-          <p>user1</p>
-          <p>♥ 2</p>
-        </div>
-      </div>
       </div>
 
       <div v-if="mode==='QnA'" class="tag-list-wrap col-lg-2">
@@ -165,6 +69,9 @@ export default {
   computed: {
     orderedHotPosts () {
       return _.orderBy(this.posts, 'likes', 'desc')
+    },
+    orderedHotQuestions () {
+      return _.orderBy(this.posts, 'views', 'desc')
     }
   }
 }

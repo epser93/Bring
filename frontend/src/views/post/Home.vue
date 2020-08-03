@@ -3,8 +3,8 @@
     <div id="nav" class="mt-4">
       <router-link v-if="mode==='blog'" :to="{ name : 'Home' }"><h4 class="d-inline ml-5">최신글</h4></router-link> 
       <router-link v-if="mode==='blog'" :to="{ name: 'HotPost'}"><h4 class="d-inline ml-5"><b-icon class="mr-2" icon="graph-up" aria-hidden="true"></b-icon>트렌딩</h4></router-link> 
-      <router-link v-if="mode==='QnA'" to=""><h4 class="d-inline ml-5">최신질문</h4></router-link> 
-      <router-link v-if="mode==='QnA'" to=""><h4 class="d-inline ml-5">인기질문</h4></router-link>
+      <router-link v-if="mode==='QnA'" :to="{ name : 'Home' }"><h4 class="d-inline ml-5">최신질문</h4></router-link> 
+      <router-link v-if="mode==='QnA'" :to="{ name: 'HotPost'}"><h4 class="d-inline ml-5">인기질문</h4></router-link>
     </div>
     <hr>
     <router-view :mode="mode" :posts="posts"></router-view>
@@ -30,18 +30,28 @@ export default {
       if (this.mode == "blog") {
         this.mode = "QnA"
         this.modeText = 'blog'
+        this.getAllPost()
       } else {
         this.mode = "blog"
         this.modeText = 'QnA'
+        this.getAllPost()
       }
     },
     getAllPost () {
-      axios.get(`${BACK_URL}/search/all_blog_posts`)
-        .then (res => {
-          this.posts = res.data.list
-        })
-        .catch (err => console.log(err))
-    }
+      if (this.mode == "blog"){
+        axios.get(`${BACK_URL}/search/all_blog_posts`)
+          .then (res => {
+            this.posts = res.data.list
+          })
+          .catch (err => console.log(err))
+      } else {
+        axios.get(`${BACK_URL}/qna/question/qlist`)
+          .then (res => {
+            this.posts = res.data.list
+            console.log(this.posts)
+          })
+      }
+    },
   },
   data: () => {
     return {
