@@ -47,7 +47,7 @@ export default {
     return {
       mode: "blog",
       modeText : 'QnA',
-      posts: []
+      posts: [],
     }
   }
 }

@@ -1,7 +1,7 @@
 !<template>
   <div class="wrapB container-fluid">
     <section v-if="mode==='blog'" class="cards row">
-      <div v-for="(post,index) in posts" :key="index" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
+      <div v-for="post in orderedPosts" :key="post.post_id" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
         <div class="img-section">
           <a href=""></a>
         </div>
@@ -153,11 +153,17 @@
 </template>
 
 <script>
+import _ from 'lodash'
 export default {
   name: 'PostList',
   props: {
     mode: String,
     posts: Array,
+  },
+  computed: {
+    orderedPosts () {
+      return _.orderBy(this.posts, 'cratedAt', 'desc')
+    }
   }
 }
 </script>
