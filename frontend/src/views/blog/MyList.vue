@@ -15,6 +15,7 @@
             </form>
             <br>
             <button type="button" @click="newArticle" class="btn btn-outline-dark" style="width:100px;">새 글 작성</button>
+            <button type="button" @click="newCategory" class="btn btn-outline-dark mt-3" style="width:100px;">카테고리 관리</button>
             
         </div>
 
@@ -76,7 +77,9 @@ export default {
         newArticle() {
             this.$router.push(`/blog-editor/${this.nickname}`)
         },
-
+        newCategory() {
+            this.$router.push(`/blog-category/${this.nickname}`)
+        },
 
         getAllPosts() {
             axios.get(`${BACK_URL}/blog/${this.nickname}/post_list`)
