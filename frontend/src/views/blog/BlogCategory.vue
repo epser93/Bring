@@ -114,12 +114,13 @@ export default {
         axios.post(
           `${BACK_URL}/blog/${this.nickname}/create`, this.newCategoryName, config)
           .then(() =>{
-            alert('성공')
+            alert('카테고리를 생성하였습니다.')
             // 카테고리 생성하면 바로 수정에서 반영 되게
             this.getCategory()
+            this.newCategoryName.name = ""
           })
           .catch((err) => {
-            alert('실패')
+            alert('오류 발생.')
             console.error(err)
           })
     },
@@ -136,6 +137,7 @@ export default {
           .then(() =>{
             alert('성공')
             this.getCategory()
+            this.editCategoryName.name = ""
           })
           .catch((err) => {
             alert('중복된 카테고리 이름이거나, 없는 카테고리를 변경 요청 하셨습니다.')

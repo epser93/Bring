@@ -10,13 +10,19 @@
                 
             <!-- 검색창 -->
             <form class="form-inline mt-5">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-success">{{ keywordType.name }}</button>
+                <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu">
+                    <button type="button" tabindex="0" @click="dropdown(typeid, value)" class="dropdown-item" v-for="(value, typeid) in dropdownList" v-bind:key="typeid">
+                        {{ value }}
+                    </button>
+                </div>
+                <input class="form-control mr-sm-2" type="search" v-model="keyword" placeholder="키워드 입력" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" @click="searchFor" type="submit">검색</button>
             </form>
-            <br>
-            <button type="button" @click="newArticle" class="btn btn-outline-dark" style="width:100px;">새 글 작성</button>
-            <button type="button" @click="newCategory" class="btn btn-outline-dark mt-3" style="width:100px;">카테고리 관리</button>
-            
+
+            <!-- 이동버튼(나중에 합치거나 프로필에서 관리?) -->
+            <button type="button" @click="newArticle" class="btn btn-outline-dark mt-5" style="width:100px;">새 글 작성</button>
+            <button type="button" @click="newCategory" class="btn btn-outline-dark mt-3" style="width:100px;">카테고리 관리</button>   
         </div>
 
         <!-- 글 리스트 -->
@@ -106,13 +112,29 @@ export default {
         getSomePosts(categoryName) {
             this.categoryOn = true
             axios.get(`${BACK_URL}/blog/${this.nickname}/${categoryName}/post_list`)
-                    .then(res => {
-                        this.postListCategory = res.data.list
-                    })
-    
-                    .catch(err => {
-                        console.log(err)
-                    })
+                .then(res => {
+                    this.postListCategory = res.data.list
+                })
+
+                .catch(err => {
+                    console.log(err)
+                })
+        },
+        dropdown(typeid, value) {
+            this.keywordType.keyid = typeid
+            this.keywordType.name = value
+        },
+        searchFor() {
+            this.categoryOn = true
+            axios.get(`${BACK_URL}/blog/${this.nickname}/search/blogPosts/${this.keyword}/${this.keywordType.keyid}`)
+                .then(res => {
+                    alert(res)
+                    this.keywordList = res.list
+                })
+
+                .catch(err => {
+                    console.log(err)
+                })
         }    
     },
     
@@ -124,10 +146,24 @@ export default {
     data() {
         return{
             nickname: this.$route.params.nickname,
+            // 글 관련
             postList: [],
             postListCategory: [],
             categoryList: [],
             categoryOn: false,
+            // 검색 관련
+            keywordType: {
+                name: '통합검색',
+                keyid: 1,
+            },
+            keyword: '',
+            dropdownList: {
+                1: '통합검색',
+                2: '제목검색',
+                3: '내용검색',
+                4: '태그검색'
+            },
+            keywordList: [],
         }
     }
 }
