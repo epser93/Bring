@@ -1,0 +1,32 @@
+package com.web.blog.Board.repository;
+
+import com.web.blog.Board.entity.Post;
+import com.web.blog.Board.entity.Reply;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import javax.transaction.Transactional;
+import java.util.List;
+
+public interface ReplyRepository extends JpaRepository<Reply, Long> {
+    List<Reply> findByWriter(String writer);
+
+    List<Reply> findByPost(Post post);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update reply set selected = true where reply_id = :reply_id", nativeQuery = true)
+    int select(@Param("reply_id") long reply_id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE reply SET likes = likes + 1 where reply_id = :reply_id", nativeQuery = true)
+    int updateLikeCntPlus(@Param("reply_id") long reply_id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "UPDATE reply SET likes = likes - 1 where reply_id = :reply_id", nativeQuery = true)
+    int updateLikeCntMinus(@Param("reply_id") long reply_id);
+}

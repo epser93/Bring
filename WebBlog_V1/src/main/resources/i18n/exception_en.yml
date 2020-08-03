@@ -1,0 +1,48 @@
+unKnown:
+  code: "-9999"
+  msg: "An unknown error has occurred."
+userNotFound:
+  code: "-1000"
+  msg: "The member you have inputted does not exist."
+emailSigninFailed:
+  code: "-1001"
+  msg: "Your email or password is wrong. Maybe, email doesn't exist."
+entryPointException:
+  code: "-2000"
+  msg: "You don't have permission to access."
+accessDenied:
+  code: "-2001"
+  msg: "You don't have permission to access"
+communicationError:
+  code: "-3000"
+  msg: "An Error occured during communication"
+existingUser:
+  code: "-1002"
+  msg: "The email you have given is already exist."
+notOwner:
+  code: "-4000"
+  msg: "You are not the owner of this resource."
+resourceNotExist:
+  code: "-4001"
+  msg: "The post you requested does not exist."
+existingNickname:
+  code: "-1003"
+  msg: "The nickname you have given is already exist."
+boardNameExist:
+  code: "-4002"
+  msg: "The board name you have given is already exist."
+alreadyLikedExeption:
+  code: "-4003"
+  msg: "You already liked this post."
+ownerCannotLike:
+  code: "-4004"
+  msg: "You are the owner of this post. The owner cannot like her/his own post."
+answeredQuestion:
+  code: "-5000"
+  msg: "The question that has solution cannot be deleted."
+selectedAnswer:
+  code: "-5001"
+  msg: "Selected Answer cannot be deleted."
+youAskedQuestion:
+  code: "-5002"
+  msg: "You asked this question. You cannot answer on your question."

@@ -1,0 +1,48 @@
+unKnown:
+  code: "-9999"
+  msg: "알 수 없는 에러가 발생하였습니다."
+userNotFound:
+  code: "-1000"
+  msg: "입력하신 회원 정보가 존재하지 않습니다."
+emailSigninFailed:
+  code: "-1001"
+  msg: "이메일 또는 비밀번호가 맞지 않습니다. 존재하지 않는 이메일일 수도 있습니다."
+entryPointException:
+  code: "-2000"
+  msg: "접근 권한이 없습니다."
+accessDenied:
+  code: "-2001"
+  msg: "접근 권한이 없습니다."
+communicationError:
+  code: "-3000"
+  msg: "통신 오류가 발생하였습니다."
+existingUser:
+  code: "-1002"
+  msg: "이미 가입한 이메일입니다."
+notOwner:
+  code: "-4000"
+  msg: "해당 자료의 작성자가  아닙니다."
+resourceNotExist:
+  code: "-4001"
+  msg: "요청한 자료가 존재 하지 않습니다."
+existingNickname:
+  code: "-1003"
+  msg: "중복된 닉네임입니다."
+boardNameExist:
+  code: "-4002"
+  msg: "중복된 카테고리 입니다."
+alreadyLikedExeption:
+  code: "-4003"
+  msg: "이미 좋아요(추천)를 누르셨습니다."
+ownerCannotLike:
+  code: "-4004"
+  msg: "포스트 작성자는 자신의 글에 좋아요를 누를 수 없습니다."
+answeredQuestion:
+  code: "-5000"
+  msg: "답변이 달린 질문은 삭제할 수 없습니다."
+selectedAnswer:
+  code: "-5001"
+  msg: "채택된 답변은 삭제하실 수 없습니다."
+youAskedQuestion:
+  code: "-5002"
+  msg: "질문 작성자는 답변할 수 없습니다."

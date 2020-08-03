@@ -1,0 +1,18 @@
+unKnown:
+  code: "-9999"
+  msg: "An unknown error has occurred."
+userNotFound:
+  code: "-1000"
+  msg: "The member you have inputted does not exist."
+emailSigninFailed:
+  code: "-2000"
+  msg: "Your email or password is wrong. Maybe, email doesn't exist."
+entryPointException:
+  code: "-3000"
+  msg: "You don't have permission to access."
+accessDenied:
+  code: "-4000"
+  msg: "You don't have permission to access"
+communicationError:
+  code: "-5000"
+  msg: "An Error occured during communication"

@@ -1,0 +1,157 @@
+package com.web.blog.Member.controller;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.web.blog.Common.entity.UploadFile;
+import com.web.blog.Common.response.*;
+import com.web.blog.Common.service.FileService;
+import com.web.blog.Common.service.ResponseService;
+import com.web.blog.Member.entity.Member;
+import com.web.blog.Member.model.Email;
+import com.web.blog.Member.model.KakaoProfile;
+import com.web.blog.Member.model.LoginParam;
+import com.web.blog.Member.model.SignupParam;
+import com.web.blog.Member.repository.MemberRepository;
+import com.web.blog.Member.service.EmailService;
+import com.web.blog.Member.service.KakaoService;
+import com.web.blog.Common.advice.exception.CEmailSigninFailedException;
+import com.web.blog.Common.advice.exception.CUserExistException;
+import com.web.blog.Common.advice.exception.CUserNotFoundException;
+import com.web.blog.Common.config.security.JwtTokenProvider;
+import io.swagger.annotations.*;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import javax.mail.MessagingException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+@Api(tags = {"1. Sign"})
+@RequiredArgsConstructor
+@RestController
+@RequestMapping("/sign")
+public class SignController {
+    private final MemberRepository repository;
+    private final ResponseService responseService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
+    private final KakaoService kakaoService;
+    private final FileService fileService;
+
+    private static final Logger logger = LoggerFactory.getLogger(SignController.class);
+    @Autowired
+    private final EmailService emailService;
+
+    @ApiOperation(value = "로그인", notes = "이메일을 이용한 로그인")
+    @PostMapping("/in")
+    public String login(@Valid @RequestBody LoginParam user) throws JsonProcessingException {
+        String id = user.getId();
+        String password = user.getPassword();
+        Member member = repository.findByUid(id).orElseThrow(CEmailSigninFailedException::new);
+        if (!passwordEncoder.matches(password, member.getPassword())) {
+            throw new CEmailSigninFailedException();
+        }
+        ObjectMapper mapper = new ObjectMapper();
+        String Json = "";
+        Json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getMapResult(jwtTokenProvider.createToken(String.valueOf(member.getMsrl()), member.getRoles()), member));
+        return Json;
+    }
+
+    @ApiOperation(value = "회원가입", notes = "회원가입")
+    @PostMapping("/up")
+    public CommonResult register(@Valid @RequestBody SignupParam signupParam) {
+        String id = signupParam.getUid();
+        String password = signupParam.getPassword1();
+        String passwordChk = signupParam.getPassword2();
+        String name = signupParam.getName();
+        String nickname = signupParam.getNickname();
+
+        //패스워드 체크
+        if (!password.equals(passwordChk)) {
+            return responseService.getFailResult(-1001, "비밀번호가 다릅니다.");
+        }
+
+        //ID중복 확인
+        Optional<Member> member = repository.findByUid(String.valueOf(id));
+        if (member.isPresent()) throw new CUserExistException();
+
+        //닉네임 중복 확인
+        Optional<Member> member2 = repository.findByNickname(String.valueOf(nickname));
+        if (member2.isPresent()) throw new CUserExistException();
+
+//        UploadFile fileName = fileService.uploadFile(file);
+        repository.save(Member.builder()
+                .uid(id)
+                .password(passwordEncoder.encode(password))
+                .name(name)
+                .nickname(nickname)
+                .roles(Collections.singletonList("ROLE_USER"))
+                .build());
+        return responseService.getSuccessResult();
+    }
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
+    })
+    @ApiOperation(value = "logout")
+    @PostMapping("/out")
+    public void logout(HttpServletRequest req) {
+        HttpSession session = req.getSession();
+        session.invalidate();
+    }
+
+
+//    @ApiOperation(value = "소셜 로그인", notes = "소셜 회원 로그인을 한다.")
+//    @PostMapping(value = "/in/{provider}")
+//    public SingleResult<String> signinByProvider(@ApiParam(value = "서비스 제공자 provider", required = true, defaultValue = "kakao") @PathVariable String provider, @ApiParam(value = "소셜 access_token", required = true) @RequestParam String accessToken) {
+//        KakaoProfile profile = kakaoService.getKakaoProfile(accessToken);
+//        Member member = repository.findByUidAndProvider(String.valueOf(profile.getId()), provider).orElseThrow(CUserNotFoundException::new);
+//        return responseService.getSingleResult(jwtTokenProvider.createToken(String.valueOf(member.getMsrl()), member.getRoles()));
+//    }
+//
+//    @ApiOperation(value = "소셜 계정 가입", notes = "소셜 계정 회원가입을 한다.")
+//    @PostMapping(value = "/up/{provider}")
+//    public CommonResult signupProvider(@ApiParam(value = "서비스 제공자 provider", required = true, defaultValue = "kakao") @PathVariable String provider,
+//                                       @ApiParam(value = "소셜 access_token", required = true) @RequestParam String accessToken,
+//                                       @ApiParam(value = "이름", required = true) @RequestParam String name) {
+//
+//        KakaoProfile profile = kakaoService.getKakaoProfile(accessToken);
+//        Optional<Member> member = repository.findByUidAndProvider(String.valueOf(profile.getId()), provider);
+//        if(member.isPresent())
+//            throw new CUserExistException();
+//
+//        repository.save(Member.builder()
+//                .uid(String.valueOf(profile.getId()))
+//                .provider(provider)
+//                .name(name)
+//                .roles(Collections.singletonList("ROLE_USER"))
+//                .build());
+//        return responseService.getSuccessResult();
+//    }
+//
+//    @PostMapping("/up/email")
+//    public String emailSender(@RequestParam("title") String title, @RequestParam("content") String content, @RequestParam("sender")String sender, @RequestParam("receiver")String receiver) throws UnsupportedEncodingException, MessagingException {
+//        Email email = new Email(title, content, sender, receiver);
+//        try {
+//            emailService.send(email);
+//        } catch (Exception e) {
+//            System.out.println(e);
+//        }
+//
+//        return "Email has sent. Please check your Email.";
+//    }
+
+
+}
