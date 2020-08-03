@@ -65,9 +65,7 @@ export default {
             currentPage: 1,
             articles:10,
             count:5,
-            qpostId: this.$route.params.qpostId,
-
-            qPost:[],
+            qPost: null,
       
       }
     },
