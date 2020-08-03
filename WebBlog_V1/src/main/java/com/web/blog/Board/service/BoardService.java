@@ -11,6 +11,9 @@ import com.web.blog.Common.service.FileService;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -75,12 +78,15 @@ public class BoardService {
         return true;
     }
 
-    //게시판 내 포스트 검색 및 list 조회
-    public List<Post> CategoryPostList(long board_id) {
-        return postRepository.findByBoard_BoardId(board_id);
+    //게시판 내 포스트  list 조회
+    @Transactional
+    public Page<Post> CategoryPostList(long board_id, int page, int size) {
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("board_id").descending());
+        Board board = boardRepository.findById(board_id).orElseThrow(CResourceNotExistException::new);
+        return postRepository.findByBoard(board, pageRequest);
     }
 
-    //게시판 내 포스트 검색 및 list 조회
+    //게시판 내 포스트 검색
     public List<Post> CategoryPostSearch(int which, long board_id, String keyword) { //검색: which = 1~4
         if (which == 1) { //통합 검색
             return postRepository.searchCategoryPosts(board_id, keyword);
@@ -93,12 +99,12 @@ public class BoardService {
         }
     }
 
-    //블로그 내 포스트 검색 및 list 조회
+    //블로그 내 포스트 list 조회
     public List<Post> BlogPostList(String writer) {
         return postRepository.findByWriter(writer);
     }
 
-    //블로그 내 포스트 검색 및 list 조회
+    //블로그 내 포스트 검색
     public List<Post> BlogPostSearch(int which, String writer, String keyword) { //검색: which = 1~4
         if (which == 1) { //통합 검색
             return postRepository.searchBlogPosts(writer, keyword);
@@ -111,12 +117,12 @@ public class BoardService {
         }
     }
 
-    //사이트 내 포스트 검색 및 list 조회
+    //사이트 내 포스트 list 조회
     public List<Post> SitePostList() {
         return postRepository.findAll();
     }
 
-    //사이트 내 포스트 검색 및 list 조회
+    //사이트 내 포스트 검색
     public List<Post> SitePostSearch(int which, String keyword) { //검색: which = 1~5
         if (which == 1) { //통합 검색
             return postRepository.searchEveryBlogPosts(keyword);
