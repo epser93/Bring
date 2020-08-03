@@ -1,5 +1,14 @@
 <template>
   <div id="blogCategory">
+    <h2>카테고리</h2>
+    <!-- 기존 카테고리 -->
+    <div class="row col-6">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item" v-for="category in categoryList" v-bind:key="category.name">{{ category.name }}</li>
+      </ul>
+    </div>
+
+    <!-- 카테고리 생성 -->
     <form class="form-inline mb-5">
         <label>카테고리 생성:</label>
         <input class="form-control mr-sm-2 ml-5" v-model="newCategoryName" placeholder="새 카테고리 이름" aria-label="newCategory">
@@ -21,11 +30,11 @@ export default {
   data() {
     return {
       newCategoryName: '',
+      nickname: this.$route.params.nickname,
+      categoryList: [],
     }
   },  
-  props: {
-    nickname: String,
-  },
+
   methods: {
     postCategory() {
       const config = {
@@ -36,15 +45,26 @@ export default {
         axios.post(
           `${BACK_URL}/blog/${this.nickname}/create`, this.newCategoryName, config)
 
-          .then((res) =>{
-            console.log(res)
-            alert('카테고리 생성 성공')
+          .then(() =>{
           })
           .catch((err) => {
             alert('실패')
             console.error(err)
           })
     },
+    getCategory() {
+          axios.get(`${BACK_URL}/blog/${this.nickname}/categories`)
+              .then(res => {
+                  this.categoryList = res.data.list
+              })
+
+              .catch(err => {
+                  console.log(err)
+              })
+    },
+  },
+  created() {
+    this.getCategory()
   }
 }
 </script>
