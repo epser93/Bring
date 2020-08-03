@@ -80,10 +80,9 @@ public class BoardService {
 
     //게시판 내 포스트  list 조회
     @Transactional
-    public Page<Post> CategoryPostList(long board_id, int page, int size) {
-        PageRequest pageRequest = PageRequest.of(page, size, Sort.by("board_id").descending());
+    public List<Post> CategoryPostList(long board_id) {
         Board board = boardRepository.findById(board_id).orElseThrow(CResourceNotExistException::new);
-        return postRepository.findByBoard(board, pageRequest);
+        return postRepository.findByBoard(board);
     }
 
     //게시판 내 포스트 검색

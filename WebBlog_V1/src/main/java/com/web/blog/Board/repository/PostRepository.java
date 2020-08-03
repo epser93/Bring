@@ -15,7 +15,7 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByBoard(Board board);
-    Page<Post> findByBoard(Board board, Pageable pageable);
+    Page<Post> findByBoard(long board_id, Pageable pageable);
     Page<Post> findByBoard_BoardId(long board_id, Pageable pageable);
 
     @Modifying
