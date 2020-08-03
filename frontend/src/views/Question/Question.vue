@@ -28,7 +28,7 @@
                     
                     <!--heart icon-->
                 <b-icon icon="heart" scale="1"></b-icon>
-                <p><button class="btn btn-primary"><router-link :to="{ name: 'QuestionDetail' }">글 자세히</router-link></button></p>
+                <p><button class="btn btn-primary"><router-link :to="{ name: 'QuestionDetail' , params: { qpostId: 1 }}">글 자세히</router-link></button></p>
                 </li>
                 
             </ul>
@@ -65,7 +65,7 @@ export default {
             currentPage: 1,
             articles:10,
             count:5,
-            nickname: this.$route.params.nickname,
+            qpostId: this.$route.params.qpostId,
 
             qPost:[],
       

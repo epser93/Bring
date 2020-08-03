@@ -71,7 +71,7 @@ export default {
      data(){
         return {
             writeComment: false,
-            qpost_id: this.$route.params.qpost_id,
+            qpostId: this.$route.params.qpostId,
             qPost:[],
         }
      },
@@ -84,7 +84,7 @@ export default {
         },
         getQna() {
             console.log(this.qPost)
-            axios.get(`${BACK_URL}/qna/question/${this.qpost_id}`)
+            axios.get(`${BACK_URL}/qna/question/${this.qpostId}`)
             .then(res => {
                 this.qPost = res.data
                 
@@ -95,7 +95,7 @@ export default {
         },
     },
      created(){
-        this.getQna()
+        this.getQna(this.qpostId)
         }
 }
 </script>
