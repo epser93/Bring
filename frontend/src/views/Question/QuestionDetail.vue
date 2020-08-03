@@ -7,23 +7,21 @@
          </div>
          <b-container>
             <b-row>
-                <b-col></b-col>
+                <b-col>{{qPost.subject}}</b-col>
                 <b-col></b-col>
             <b-col>
                 <p>
-                작성자: |
-                <span class="text-muted ">작성시간: 2020-07-26</span>
+                작성자: {{qPost.writer}}
+                <span class="text-muted ">{{qPost.createdAt}}</span>
                 </p>
             </b-col>
             </b-row>
             </b-container>
         </div>
         <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded">
-             <p><b-badge pill variant="success" class="mr-3">#태그를 이런식으로 나열?</b-badge>
-             <b-badge pill variant="success" class="mr-3">#태그</b-badge>
-             <b-badge pill variant="success" class="mr-3">#태그</b-badge>
+             <p><b-badge pill variant="success" class="mr-3">#{{qPost.tag}}</b-badge>
              </p>
-              <h5 class="card-text">여기에 내용쓰기
+              <h5 class="card-text">{{qPost.content}}
                   <br><br><br><br><br><br><br><br><br><br><br><br>
                   <hr>
                   <div class="row">
@@ -71,8 +69,8 @@ export default {
      data(){
         return {
             writeComment: false,
-            qpostId: this.$route.params.qpostId,
-            qPost:[],
+            qpost_id: this.$route.params.qpostId,
+            qPost: null,
         }
      },
     methods: {
@@ -86,8 +84,7 @@ export default {
             console.log(this.qPost)
             axios.get(`${BACK_URL}/qna/question/${this.qpostId}`)
             .then(res => {
-                this.qPost = res.data
-                
+                this.qPost = res.data.data
             })
             .catch(err => {
                 console.log(err)
