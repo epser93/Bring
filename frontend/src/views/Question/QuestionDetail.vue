@@ -29,6 +29,7 @@
                       <div class="col"></div>
                       <div class="col">
                           <button class="btn btn-secondary"><b-icon icon="trash"></b-icon> 삭제</button>
+                          <button class="btn btn-warning">수정</button>
                       </div>
                   </div>
               </h5>
@@ -93,7 +94,7 @@ export default {
         },
     },
      created(){
-        this.getQna(this.qpostId)
+        this.getQna(this.qpost_id)
         }
 }
 </script>
