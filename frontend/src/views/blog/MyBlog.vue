@@ -1,10 +1,10 @@
 <template>
     <div id="blog">
       <!-- 프로필 -->
-      <div class="row">
-        <div class="col-2 ml-5 mt-3">
+      <div id="upsideTerritory" class="row">
+        <div class="ml-5 mt-3">
           <a class="d-inline" href=''>
-            <img class="rounded-circle mx-auto img-thumbnail mb-3" :src='cardUserImage' alt="Card image cap" style="width: 150px;">
+            <img class="rounded-circle mx-auto img-thumbnail mb-3" :src='cardUserImage' alt="Card image cap" style="width: 120px;">
           </a>
             <h5 class="d-inline ml-3">{{ this.nickname }}</h5>
             <br>
@@ -63,7 +63,6 @@ export default {
       axios.get(`${BACK_URL}/member/${this.nickname}/profile`)
         .then(res => {
           this.userInfo = res.data.data
-          console.log(res.data.data)
         })
         .catch(err => {
           alert('ID와 비밀번호를 다시 확인해주세요.')
@@ -99,6 +98,10 @@ export default {
 
 #nav a.router-link-exact-active {
   color: #42b983;
+}
+
+#upsideTerritory{
+  background-color: rgb(231, 231, 231);
 }
 
 </style>
