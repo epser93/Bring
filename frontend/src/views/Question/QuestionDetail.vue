@@ -3,17 +3,17 @@
      <b-container>
          <div class="card rounded-lg shadow p-3 mb-5 bg-white rounded">
          <div>
-             <h1></h1>
+             <h1>{{qPost.subject}}</h1>
          </div>
          <b-container>
             <b-row>
-                <!-- <b-col>{{qPost.subject}}</b-col> -->
+                <b-col></b-col>
                 <b-col></b-col>
             <b-col>
-                <p>
+                
                 작성자: {{qPost.writer}}
-                <span class="text-muted ">{{qPost.createdAt}}</span>
-                </p>
+                <span class="text-muted ">작성시간: {{qPost.createdAt}}</span>
+
             </b-col>
             </b-row>
             </b-container>
@@ -29,8 +29,8 @@
                       <div class="col"></div>
                       <div class="col"></div>
                       <div class="col">
-                          <button class="btn btn-secondary"><b-icon icon="trash"></b-icon> 삭제</button>
-                          <button class="btn btn-warning">수정</button>
+                          <b-button class="mr-1"><b-icon icon="trash"></b-icon> 삭제</b-button>
+                          <b-button variant="warning" class="ml-2">수정</b-button>
                       </div>
                   </div>
               </h5>
@@ -86,7 +86,7 @@ export default {
             axios.get(`${BACK_URL}/questions/${this.qpost_id}`)
             .then(res => {
                 console.log(res.data.list)
-                this.qPost = res.data.list
+                this.qPost = res.data.list[0].list[0]
             })
             .catch(err => {
                 console.log(err)
