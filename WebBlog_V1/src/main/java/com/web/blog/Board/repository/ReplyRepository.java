@@ -14,6 +14,7 @@ import java.util.Optional;
 
 public interface ReplyRepository extends JpaRepository<Reply, Long> {
     List<Reply> findByWriter(String writer);
+    List<Reply> findByPostOrderByReplyId(Post post);
 
     List<OnlyReplyMapping> findByPost(Post post);
     Optional<Reply> findById(long reply_id);

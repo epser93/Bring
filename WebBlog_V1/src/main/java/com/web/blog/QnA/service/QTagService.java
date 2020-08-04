@@ -54,17 +54,21 @@ public class QTagService {
 
     //포스트 태그 수정
     public Tag updateTag(Qpost qpost, String paramTag) {
-        List<QpostTag> originalPostTags = qpostTagRepository.findByQpost(qpost);
-        for (QpostTag pt : originalPostTags) {
-            Optional<Tag> tag = tagRepository.findByTag(pt.getTag().getTag()); //tag명으로 각 태그들을 찾고
-            Tag t = tag.get(); //t에 대입
-            if (t.getTagUsageCnt() > 1)
+        deleteQtags(qpost);
+        return insertTags(qpost, paramTag); //다시 입력된 값으로 insert
+    }
+
+    public void deleteQtags(Qpost qpost) {
+        List<QpostTag> originalQpostTags = qpostTagRepository.findByQpost(qpost);
+        for(QpostTag qt : originalQpostTags) {
+            Optional<Tag> tag = tagRepository.findByTag(qt.getTag().getTag());
+            Tag t = tag.get();
+            if(t.getTagUsageCnt() > 1)
                 tagRepository.updateTagUsageCntMinus(t.getTagId()); //해당 태그가 1번 초과 쓰였으면 사용한 내용만 -1
             else if (t.getTagUsageCnt() == 1) { //해당 태그가 한 번밖에 쓰지 않았으면 그냥 태그 통째로 삭제
                 tagRepository.delete(t);
             }
-            qpostTagRepository.deleteById(pt.getId()); //post_tag 에서 연결 해제
+            qpostTagRepository.deleteById(qt.getId()); //post_tag 에서 연결 해제
         }
-        return insertTags(qpost, paramTag); //다시 입력된 값으로 insert
     }
 }

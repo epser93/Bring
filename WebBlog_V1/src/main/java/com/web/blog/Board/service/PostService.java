@@ -1,7 +1,6 @@
 package com.web.blog.Board.service;
 
-import com.web.blog.Board.entity.Board;
-import com.web.blog.Board.entity.Post;
+import com.web.blog.Board.entity.*;
 import com.web.blog.Board.model.OnlyPostMapping;
 import com.web.blog.Board.model.ParamPost;
 import com.web.blog.Board.repository.*;
@@ -32,6 +31,8 @@ public class PostService {
     private final MemberRepository memberRepository;
     private final BoardService boardService;
     private final FileService fileService;
+    private final TagService tagService;
+    private final ReplyService replyService;
 
     //게시글 단건 조회
     public List<OnlyPostMapping> getPost(long postId) {
@@ -114,14 +115,24 @@ public class PostService {
         return post;
     }
 
+    //모든 좋아요 삭제
+    public void deleteLikes(Post post) {
+        List<PostMember> likers = postMemberRepository.findPostMemberByPost(post);
+        for(PostMember pm : likers) {
+            postMemberRepository.delete(pm);
+        }
+    }
+
     //게시글 삭제
-    public boolean deletePost(long postId, String uid) {
-        Optional<Post> post = postRepository.findById(postId);
-        Board board = post.get().getBoard();
-        Member member = board.getMember();
-        if (!uid.equals(member.getUid()))
-            throw new CNotOwnerException();
-        postRepository.delete(post.get());
+    public boolean deletePost(long postId, Member member) {
+        Post post = postRepository.findById(postId).orElseThrow(CResourceNotExistException::new);
+        String writer = post.getWriter();
+        Optional<Member> member2 = memberRepository.findByNickname(writer);
+        if (!member2.get().getNickname().equals(member.getNickname())) throw new CNotOwnerException();
+        tagService.deleteTags(post);
+        replyService.deleteReplies(post);
+        deleteLikes(post);
+        postRepository.delete(post);
         return true;
     }
 }

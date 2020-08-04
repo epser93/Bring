@@ -2,6 +2,7 @@ package com.web.blog.Board.service;
 
 import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.entity.Reply;
+import com.web.blog.Board.entity.ReplyMember;
 import com.web.blog.Board.model.OnlyReplyMapping;
 import com.web.blog.Board.model.ParamReply;
 import com.web.blog.Board.repository.*;
@@ -19,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -93,4 +95,17 @@ public class ReplyService {
             replyMemberRepository.deleteLike(msrl, reply_id);
         }
     }
+
+    public void deleteReplies(Post post){
+        List<Reply> list = replyRepository.findByPostOrderByReplyId(post);
+        for(Reply r : list) {
+            List<ReplyMember> originalReplyMember = replyMemberRepository.findByReply(r);
+            for (ReplyMember rm : originalReplyMember) {
+                replyMemberRepository.delete(rm);
+            }
+            replyRepository.delete(r);
+        }
+    }
+
+
 }

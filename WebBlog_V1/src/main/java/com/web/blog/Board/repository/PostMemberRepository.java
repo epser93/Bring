@@ -44,5 +44,5 @@ public interface PostMemberRepository extends CrudRepository<PostMember, Long> {
     @Query(value = "select msrl from post_member where post_id = :post_id", nativeQuery = true)
     List<Long> likedMember(@Param("post_id") long post_id);
 
-    List<PostMember> findPostMemberByPost(long post_id);
+    List<PostMember> findPostMemberByPost(Post post);
 }
