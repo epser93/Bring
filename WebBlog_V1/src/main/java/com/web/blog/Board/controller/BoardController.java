@@ -171,7 +171,8 @@ public class BoardController {
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
         Member member2 = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
-        Set<String> tags = paramPost.getTags();
+        Set<String> tag1 = paramPost.getTags();
+        List<String> tags = new ArrayList<>(tag1);
         List<SingleResult> result = new ArrayList<>();
         Post post = null;
         if (member.equals(member2)) { //블로그 주인과 로그인 한 사용자가 같으면~
@@ -241,7 +242,8 @@ public class BoardController {
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
         Member member2 = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
-        Set<String> tags = paramPost.getTags();
+        Set<String> tag1 = paramPost.getTags();
+        List<String> tags = new ArrayList<>(tag1);
         List<SingleResult> result = new ArrayList<>();
         Post post = null;
         if (member.equals(member2)) { //블로그 주인과 로그인 한 사용자가 같으면~~

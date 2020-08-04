@@ -108,17 +108,17 @@ const routes = [{
 
     // 지식인
     {
-        path: '/qna/question/qlist',
+        path: '/questions/qlist',
         name: 'Question',
         component: Question
     },
     {
-        path: '/qna/question',
+        path: '/questions/ask',
         name: 'QuestionWrite',
         component: QuestionWrite
     },
     {
-        path: '/qna/question/:qpostId',
+        path: '/questions/:qpostId',
         name: 'QuestionDetail',
         component: QuestionDetail
     },
