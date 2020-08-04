@@ -2,6 +2,7 @@ package com.web.blog.Board.repository;
 
 import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.entity.Reply;
+import com.web.blog.Board.model.OnlyReplyMapping;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -9,11 +10,14 @@ import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 public interface ReplyRepository extends JpaRepository<Reply, Long> {
     List<Reply> findByWriter(String writer);
 
-    List<Reply> findByPost(Post post);
+    List<OnlyReplyMapping> findByPost(Post post);
+    Optional<Reply> findById(long reply_id);
+    List<OnlyReplyMapping> findByReplyId(long reply_id);
 
     @Modifying
     @Transactional

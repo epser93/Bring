@@ -24,7 +24,7 @@ import java.util.List;
 public class Reply extends CommonDateEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long reply_id;
+    private Long replyId;
 
     @Column(nullable = false, length = 50)
     private String writer;

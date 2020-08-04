@@ -2,6 +2,7 @@ package com.web.blog.Board.service;
 
 import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.entity.Reply;
+import com.web.blog.Board.model.OnlyReplyMapping;
 import com.web.blog.Board.model.ParamReply;
 import com.web.blog.Board.repository.*;
 import com.web.blog.Common.advice.exception.CAskedQuestionException;
@@ -30,12 +31,12 @@ public class ReplyService {
     private final FileService fileService;
 
     //댓글 상세조회
-    public Reply getOneReply(long reply_id) {
-        return replyRepository.findById(reply_id).orElseThrow(CResourceNotExistException::new);
+    public List<OnlyReplyMapping> getOneReply(long reply_id) {
+        return replyRepository.findByReplyId(reply_id);
     }
 
     //한 포스트의 댓글 리스트 조회
-    public List<Reply> getRepliesofOnePost(long post_id) {
+    public List<OnlyReplyMapping> getRepliesofOnePost(long post_id) {
         Post post = postRepository.findById(post_id).orElseThrow(CResourceNotExistException::new);
         return replyRepository.findByPost(post);
     }
@@ -47,7 +48,7 @@ public class ReplyService {
             fileService.uploadFiles(files);
         }
 
-        postRepository.updateReplyCnt(post.getPost_id());
+        postRepository.updateReplyCnt(post.getPostId());
         return replyRepository.save(Reply.builder()
                 .post(post)
                 .writer(member.getNickname())
@@ -79,7 +80,7 @@ public class ReplyService {
     //댓글 추천
     public void likeThisReply(Member member, Reply reply, Boolean like) { //member는 로그인 한 사용자
         long msrl = member.getMsrl();
-        long reply_id = reply.getReply_id();
+        long reply_id = reply.getReplyId();
         String writer = reply.getWriter();
         Member answerer = memberRepository.findByNickname(writer).orElseThrow(CUserNotFoundException::new); //answerer은 답변자
         if (like) {

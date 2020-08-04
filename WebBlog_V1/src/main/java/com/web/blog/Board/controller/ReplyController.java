@@ -3,8 +3,11 @@ package com.web.blog.Board.controller;
 import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.entity.Reply;
 import com.web.blog.Board.entity.ReplyMember;
+import com.web.blog.Board.model.OnlyReplyMapping;
 import com.web.blog.Board.model.ParamReply;
+import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Board.repository.ReplyMemberRepository;
+import com.web.blog.Board.repository.ReplyRepository;
 import com.web.blog.Board.service.PostService;
 import com.web.blog.Board.service.ReplyService;
 import com.web.blog.Common.advice.exception.CAlreadyLikedException;
@@ -38,19 +41,20 @@ public class ReplyController {
     private final MemberRepository memberRepository;
     private final ReplyMemberRepository replyMemberRepository;
     private final ReplyService replyService;
-    private final PostService postService;
+    private final ReplyRepository replyRepository;
+    private final PostRepository postRepository;
 
     //댓글 상세조회
     @ApiOperation(value = "댓글 상세조회", notes = "댓글 상세조회")
     @GetMapping(value = "/reply/{replyId}")
-    public SingleResult<Reply> answerDetail(@PathVariable long replyId) {
-        return responseService.getSingleResult(replyService.getOneReply(replyId));
+    public ListResult<OnlyReplyMapping> answerDetail(@PathVariable long replyId) {
+        return responseService.getListResult(replyService.getOneReply(replyId));
     }
 
     //한 포스트의 댓글 리스트 조회
     @ApiOperation(value = "댓글 목록", notes = "댓글 목록")
     @GetMapping(value = "/reply/{postId}/replies")
-    public ListResult<Reply> getAllAnswersinOnePost(@PathVariable long postId) {
+    public ListResult<OnlyReplyMapping> getAllAnswersinOnePost(@PathVariable long postId) {
         return responseService.getListResult(replyService.getRepliesofOnePost(postId));
     }
 
@@ -61,10 +65,10 @@ public class ReplyController {
     @ApiOperation(value = "댓글 작성", notes = "댓글 작성")
     @PostMapping(value = "/reply/{postId}")
     public SingleResult<Reply> answerTheQuestion(@PathVariable long postId, @Valid @RequestBody ParamReply paramReply, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
-        Post post = postService.getPost(postId);
+        Optional<Post> post = postRepository.findById(postId);
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Member member = (Member) principal;
-        return responseService.getSingleResult(replyService.writeReply(post, member, paramReply, files));
+        return responseService.getSingleResult(replyService.writeReply(post.get(), member, paramReply, files));
     }
 
     //댓글 수정
@@ -74,8 +78,8 @@ public class ReplyController {
     @ApiOperation(value = "댓글 수정", notes = "댓글 수정")
     @PutMapping(value = "/reply/{replyId}")
     public SingleResult<Reply> updateAnswer(@Valid @RequestBody ParamReply paramReply, @PathVariable long replyId, @RequestParam(value = "files", required = false) MultipartFile[] files, @RequestParam Boolean isSelected) throws IOException {
-        Reply reply = replyService.getOneReply(replyId);
-        Post post = reply.getPost();
+        Optional<Reply> reply = replyRepository.findById(replyId);
+        Post post = reply.get().getPost();
         return responseService.getSingleResult(replyService.updateReply(replyId, paramReply, files));
     }
 
@@ -88,8 +92,8 @@ public class ReplyController {
     public CommonResult deleteAnswer(@PathVariable long replyId) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Member member = (Member) principal;
-        Reply reply = replyService.getOneReply(replyId);
-        Post post = reply.getPost();
+        Optional<Reply> reply = replyRepository.findById(replyId);
+        Post post = reply.get().getPost();
         Boolean isOk = replyService.deleteReply(replyId, member);
         if (isOk) {
             return responseService.getSuccessResult();
@@ -107,15 +111,15 @@ public class ReplyController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new); //로그인한 사용자
-        Reply reply = replyService.getOneReply(replyId);
-        Optional<ReplyMember> replyMember = replyMemberRepository.findByMemberAndReply(member, reply);
+        Optional<Reply> reply = replyRepository.findById(replyId);
+        Optional<ReplyMember> replyMember = replyMemberRepository.findByMemberAndReply(member, reply.get());
         if (replyMember.isPresent() && likeit) {
             throw new CAlreadyLikedException();
         } else if (replyMember.isPresent() && !likeit) { //추천을 이미 한 사용자면서 추천을 취소하면
-            replyService.likeThisReply(member, reply, likeit);
+            replyService.likeThisReply(member, reply.get(), likeit);
         } else {
             if (!member.getNickname().equals(replyer) && likeit) { //로그인 한 사용자가 댓글 작성자가 아니고~
-                replyService.likeThisReply(member, reply, likeit);
+                replyService.likeThisReply(member, reply.get(), likeit);
             } else if (member.getNickname().equals(replyer)) throw new COwnerCannotLike();
         }
     }

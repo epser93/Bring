@@ -8,6 +8,7 @@ import com.web.blog.Common.service.ResponseService;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.repository.MemberRepository;
 import com.web.blog.QnA.entity.Qpost;
+import com.web.blog.QnA.model.OnlyQpostMapping;
 import com.web.blog.QnA.model.ParamQpost;
 import com.web.blog.QnA.repository.ApostMemberRepository;
 import com.web.blog.QnA.repository.ApostRepository;
@@ -44,25 +45,25 @@ public class QuestionController {
 
     @ApiOperation(value = "QnA 전체 질문 리스트", notes = "QnA의 모든 질문글 리스트")
     @GetMapping("/qlist")
-    public ListResult<Qpost> listAllQposts() {
-        return responseService.getListResult(qnaService.getAllQuestions());
+    public ListResult<OnlyQpostMapping> listAllQposts() {
+        Long num = (long) 0;
+        return responseService.getListResult(qpostRepository.findAllByQpostIdGreaterThan(num));
     }
 
     @ApiOperation(value = "QnA 특정 유저 질문 리스트", notes = "한 유저의 모든 질문글 리스트")
     @GetMapping("/{nickname}/qlist")
-    public ListResult<Qpost> listUserQposts(@PathVariable String nickname) {
-        Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
-        return responseService.getListResult(qnaService.getOnesAllQuestion(member));
+    public ListResult<OnlyQpostMapping> listUserQposts(@PathVariable String nickname) {
+        return responseService.getListResult(qpostRepository.findByWriter(nickname));
     }
 
     //질문 조회
     @ApiOperation(value = "질문 조회", notes = "질문 조회")
     @GetMapping(value = "/{qpostId}")
-    public ListResult<SingleResult> questionDetail(@PathVariable long qpostId) {
-        List<SingleResult> results = new ArrayList<>();
-        results.add(responseService.getSingleResult(qnaService.getOneQpost(qpostId)));
-        results.add(responseService.getSingleResult(qTagService.getTags(qpostId)));
-        results.add(responseService.getSingleResult(qnaService.getApostsofOneQpost(qpostId)));
+    public ListResult<ListResult> questionDetail(@PathVariable long qpostId) {
+        List<ListResult> results = new ArrayList<>();
+        results.add(responseService.getListResult(qnaService.getOneQpost(qpostId)));
+        results.add(responseService.getListResult(qTagService.getTags(qpostId)));
+        results.add(responseService.getListResult(qnaService.getApostsofOneQpost(qpostId)));
         return responseService.getListResult(results);
     }
 

@@ -2,6 +2,7 @@ package com.web.blog.QnA.repository;
 
 import com.web.blog.Member.entity.Member;
 import com.web.blog.QnA.entity.Qpost;
+import com.web.blog.QnA.model.OnlyQpostMapping;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -9,9 +10,13 @@ import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 public interface QpostRepository extends JpaRepository<Qpost, Long> {
-    List<Qpost> findByMember(Member member);
+    List<OnlyQpostMapping> findByWriter(String writer);
+    Optional<Qpost> findById(long qpost_id);
+    List<OnlyQpostMapping> findByQpostId(long qpost_id);
+    List<OnlyQpostMapping> findAllByQpostIdGreaterThan(long num);
 
     @Modifying
     @Transactional
@@ -37,8 +42,8 @@ public interface QpostRepository extends JpaRepository<Qpost, Long> {
     int updateViewCnt(@Param("qpost_id") long qpost_id);
 
     //모든 질문글 통합 검색
-    @Query(value = "select distinct * from qpost where (subject like concat('%',:keyword,'%') or content like concat('%',:keyword,'%') or writer like concat('%',:keyword,'%'))", nativeQuery = true)
-    List<Qpost> searchQuestions(@Param("keyword") String keyword);
+//    @Query(value = "select distinct * from qpost where (subject like concat('%',:keyword,'%') or content like concat('%',:keyword,'%') or writer like concat('%',:keyword,'%'))", nativeQuery = true)
+    List<Qpost> findDistinctBySubjectContainingOrContentContainingOrWriterContaining(String keyword1, String keyword2, String keyword3);
 
     //모든 질문글 제목 검색
     List<Qpost> findBySubjectContaining(String keyword);
