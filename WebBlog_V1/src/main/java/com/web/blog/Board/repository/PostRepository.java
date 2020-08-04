@@ -15,10 +15,6 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByBoard(Board board);
 
-    Page<Post> findByBoard(long board_id, Pageable pageable);
-
-    Page<Post> findByBoard_BoardId(long board_id, Pageable pageable);
-
     @Modifying
     @Transactional
     @Query(value = "update post set select_over = true where post_id = :post_id", nativeQuery = true)
