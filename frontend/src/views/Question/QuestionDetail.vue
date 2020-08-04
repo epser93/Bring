@@ -7,7 +7,7 @@
          </div>
          <b-container>
             <b-row>
-                <b-col>{{qPost.subject}}</b-col>
+                <!-- <b-col>{{qPost.subject}}</b-col> -->
                 <b-col></b-col>
             <b-col>
                 <p>
@@ -22,6 +22,7 @@
              <!-- <p><b-badge pill variant="success" class="mr-3">#{{qPost.tag}}</b-badge>
              </p> -->
               <h5 class="card-text">{{qPost.content}}
+                  
                   <br><br><br><br><br><br><br><br><br><br><br><br>
                   <hr>
                   <div class="row">
@@ -71,7 +72,7 @@ export default {
         return {
             writeComment: false,
             qpost_id: this.$route.params.qpostId,
-            qPost: [],
+            qPost : [],
         }
      },
     methods: {
@@ -82,11 +83,10 @@ export default {
             this.writeComment = false
         },
         getQna() {
-            console.log(this.qPost)
             axios.get(`${BACK_URL}/questions/${this.qpost_id}`)
             .then(res => {
-                console.log(111111111) 
-                this.qPost = res.data.list.data
+                console.log(res.data.list)
+                this.qPost = res.data.list
             })
             .catch(err => {
                 console.log(err)
