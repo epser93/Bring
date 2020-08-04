@@ -40,7 +40,7 @@ export default {
         questionData:{
           content:"",
           subject:"",       
-          tag:"",
+          tags:[""],
         },
       }
     },
@@ -52,7 +52,7 @@ export default {
                 'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
               }
             }
-        axios.post(`${BACK_URL}/qna/question`,this.questionData,config)
+        axios.post(`${BACK_URL}/questions/ask`,this.questionData,config)
         .then(res=>{
           console.log(res)
           this.$router.push({name : 'Question'})

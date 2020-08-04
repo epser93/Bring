@@ -19,8 +19,8 @@
             </b-container>
         </div>
         <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded">
-             <p><b-badge pill variant="success" class="mr-3">#{{qPost.tag}}</b-badge>
-             </p>
+             <!-- <p><b-badge pill variant="success" class="mr-3">#{{qPost.tag}}</b-badge>
+             </p> -->
               <h5 class="card-text">{{qPost.content}}
                   <br><br><br><br><br><br><br><br><br><br><br><br>
                   <hr>
@@ -82,7 +82,7 @@ export default {
         },
         getQna() {
             console.log(this.qPost)
-            axios.get(`${BACK_URL}/qna/question/${this.qpost_id}`)
+            axios.get(`${BACK_URL}/questions/${this.qpost_id}`)
             .then(res => {
                 this.qPost = res.data.data
             })

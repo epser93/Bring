@@ -22,7 +22,7 @@
                     번호: {{qArticle.qpost_id}}
                     제목: {{qArticle.subject}}
                     <h5>내용: {{qArticle.content}}</h5>
-                    태그: {{qArticle.tag}}
+                    <!-- 태그: {{qArticle.tags}} -->
                     글쓴이: {{qArticle.writer}}
                     조회수: {{qArticle.views}}
                     
@@ -72,7 +72,7 @@ export default {
     methods:{
         getAllQna() {
             console.log(this.qPost)
-            axios.get(`${BACK_URL}/qna/question/qlist`)
+            axios.get(`${BACK_URL}/questions/qlist`)
             .then(res => {
                 this.qPost = res.data.list
                 
