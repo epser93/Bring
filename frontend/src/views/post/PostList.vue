@@ -22,7 +22,7 @@
     <section v-if="mode==='QnA'" class="cards row">
       <div class="col-lg-10 row">
         <div v-for="post in orderedPosts" :key="post.qpost_id" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-          <div class=cardwrap @click="gotoDetail(post)">
+          <div class=cardwrap @click="gotoQuestionDetail(post)">
             <div class="img-section">
               <a href=""></a>
             </div>
@@ -69,6 +69,9 @@ export default {
   methods : {
     gotoDetail(post) {
       this.$router.push({ name : "DetailPost" , params: { post: post, nickname : post.writer, post_id : post.post_id }})
+    },
+    gotoQuestionDetail(post) {
+      this.$router.push({ name : "DetailPost" , params: { post: post, nickname : post.writer, post_id : post.qpost_id }})
     }
   },
   computed: {

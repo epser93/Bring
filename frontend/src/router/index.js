@@ -47,10 +47,10 @@ const routes = [{
         ]
     },
     {
-        path: '/:nickname/:post_id',
+        path: '/:nickname/postqna/:post_id/',
         name: 'DetailPost',
         component: DetailPost,
-        // props: true
+        props: true
     },
     // 유저 관련
     {
