@@ -125,8 +125,6 @@ export default {
           })
     },
     putCategory() {
-      console.log(this.categorySelected)
-      console.log(this.editCategoryName.name)
       const config = {
           headers: {
             'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
@@ -137,6 +135,7 @@ export default {
           .then(() =>{
             alert('성공')
             this.getCategory()
+            this.categorySelected = this.editCategoryName.name
             this.editCategoryName.name = ""
           })
           .catch((err) => {
