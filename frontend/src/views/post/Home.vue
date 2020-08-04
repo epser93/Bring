@@ -42,13 +42,13 @@ export default {
         axios.get(`${BACK_URL}/search/all_blog_posts`)
           .then (res => {
             this.posts = res.data.list
+            console.log('포스팅', this.posts)
           })
           .catch (err => console.log(err))
       } else {
-        axios.get(`${BACK_URL}/qna/question/qlist`)
+        axios.get(`${BACK_URL}/questions/qlist`)
           .then (res => {
             this.posts = res.data.list
-            console.log(this.posts)
           })
       }
     },

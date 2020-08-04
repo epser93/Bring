@@ -5,6 +5,7 @@ import VueRouter from 'vue-router'
 import Home from '../views/post/Home.vue'
 import PostList from '../views/post/PostList.vue'
 import HotPost from '../views/post/HotPost.vue'
+import DetailPost from '../views/post/DetailPost.vue'
 
 // 유저
 import Login from '../views/user/Login.vue' // 곧 사라질 예정 모달로 처리함
@@ -44,6 +45,12 @@ const routes = [{
                 component: HotPost
             }
         ]
+    },
+    {
+        path: '/:nickname/:post_id',
+        name: 'DetailPost',
+        component: DetailPost,
+        // props: true
     },
     // 유저 관련
     {
