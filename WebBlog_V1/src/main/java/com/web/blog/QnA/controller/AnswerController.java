@@ -11,6 +11,7 @@ import com.web.blog.Member.repository.MemberRepository;
 import com.web.blog.QnA.entity.Apost;
 import com.web.blog.QnA.entity.ApostMember;
 import com.web.blog.QnA.entity.Qpost;
+import com.web.blog.QnA.model.OnlyApostMapping;
 import com.web.blog.QnA.model.ParamApost;
 import com.web.blog.QnA.repository.ApostMemberRepository;
 import com.web.blog.QnA.repository.ApostRepository;
@@ -54,14 +55,14 @@ public class AnswerController {
     //답변 상세조회
     @ApiOperation(value = "답변 상세조회", notes = "답변 상세조회")
     @GetMapping(value = "/{apostId}")
-    public SingleResult<Apost> answerDetail(@PathVariable long apostId) {
-        return responseService.getSingleResult(qnaService.getOneApost(apostId));
+    public ListResult<OnlyApostMapping> answerDetail(@PathVariable long apostId) {
+        return responseService.getListResult(qnaService.getOneApost(apostId));
     }
 
     //한 포스트의 답변 리스트 조회
     @ApiOperation(value = "답변 목록", notes = "답변 목록")
     @GetMapping(value = "/{qpostId}/answers")
-    public ListResult<Apost> getAllAnswersinOneQpost(@PathVariable long qpostId) {
+    public ListResult<OnlyApostMapping> getAllAnswersinOneQpost(@PathVariable long qpostId) {
         return responseService.getListResult(qnaService.getApostsofOneQpost(qpostId));
     }
 
@@ -72,11 +73,11 @@ public class AnswerController {
     @ApiOperation(value = "답변 작성", notes = "답변 작성")
     @PostMapping(value = "/{qpostId}")
     public SingleResult<Apost> answerTheQuestion(@PathVariable long qpostId, @Valid @RequestBody ParamApost paramApost, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
-        Qpost qpost = qnaService.getOneQpost(qpostId);
+        Optional<Qpost> qpost = qpostRepository.findById(qpostId);
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Member member = (Member) principal;
         if (qpostRepository.isSelectedAnswerExist(qpostId)) return null;
-        return responseService.getSingleResult(qnaService.writeAnswer(qpost, member, paramApost, files));
+        return responseService.getSingleResult(qnaService.writeAnswer(qpost.get(), member, paramApost, files));
     }
 
     //답변 수정
@@ -86,9 +87,9 @@ public class AnswerController {
     @ApiOperation(value = "답변 수정", notes = "답변 수정")
     @PutMapping(value = "/{apostId}")
     public SingleResult<Apost> updateAnswer(@Valid @RequestBody ParamApost paramApost, @PathVariable long apostId, @RequestParam(value = "files", required = false) MultipartFile[] files, @RequestParam Boolean isSelected) throws IOException {
-        Apost apost = qnaService.getOneApost(apostId);
-        Qpost qpost = apost.getQpost();
-        return responseService.getSingleResult(qnaService.updateAnswer(apostId, paramApost, files, qpostRepository.isSelectedAnswerExist(qpost.getQpost_id())));
+        Optional<Apost> apost = apostRepository.findById(apostId);
+        Qpost qpost = apost.get().getQpost();
+        return responseService.getSingleResult(qnaService.updateAnswer(apostId, paramApost, files, qpostRepository.isSelectedAnswerExist(qpost.getQpostId())));
     }
 
     //답변 삭제
@@ -100,9 +101,9 @@ public class AnswerController {
     public CommonResult deleteAnswer(@PathVariable long apostId) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Member member = (Member) principal;
-        Apost apost = qnaService.getOneApost(apostId);
-        Qpost qpost = apost.getQpost();
-        Boolean isOk = qnaService.deleteAnswer(apostId, member, qpostRepository.isSelectedAnswerExist(qpost.getQpost_id()));
+        Optional<Apost> apost = apostRepository.findById(apostId);
+        Qpost qpost = apost.get().getQpost();
+        Boolean isOk = qnaService.deleteAnswer(apostId, member, qpostRepository.isSelectedAnswerExist(qpost.getQpostId()));
         if (isOk) {
             return responseService.getSuccessResult();
         }
@@ -119,11 +120,11 @@ public class AnswerController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new); //로그인한 사용자
-        Apost apost = qnaService.getOneApost(apostId);
-        Qpost qpost = apost.getQpost();
+        Optional<Apost> apost = apostRepository.findById(apostId);
+        Qpost qpost = apost.get().getQpost();
         long msrl = qpost.getMember().getMsrl();
-        if (msrl == member.getMsrl() && !qpostRepository.isSelectedAnswerExist(qpost.getQpost_id())) { //로그인 한 사용자가 질문자면~
-            qnaService.selectThisAnswer(apostId, qpost.getQpost_id());
+        if (msrl == member.getMsrl() && !qpostRepository.isSelectedAnswerExist(qpost.getQpostId())) { //로그인 한 사용자가 질문자면~
+            qnaService.selectThisAnswer(apostId, qpost.getQpostId());
         } else throw new CNotOwnerException();
     }
 
@@ -137,15 +138,15 @@ public class AnswerController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new); //로그인한 사용자
-        Apost apost = qnaService.getOneApost(apostId);
-        Optional<ApostMember> apostMember = apostMemberRepository.findByMemberAndApost(member, apost);
+        Optional<Apost> apost = apostRepository.findById(apostId);
+        Optional<ApostMember> apostMember = apostMemberRepository.findByMemberAndApost(member, apost.get());
         if (apostMember.isPresent() && likeit) {
             throw new CAlreadyLikedException();
         } else if (apostMember.isPresent() && !likeit) { //추천을 이미 한 사용자면서 추천을 취소하면
-            qnaService.likeThisAnswer(member, apost, likeit);
+            qnaService.likeThisAnswer(member, apost.get(), likeit);
         } else {
             if (!member.getNickname().equals(answerer) && likeit) { //로그인 한 사용자가 답변 작성자가 아니고~
-                qnaService.likeThisAnswer(member, apost, likeit);
+                qnaService.likeThisAnswer(member, apost.get(), likeit);
             } else if (member.getNickname().equals(answerer)) throw new COwnerCannotLike();
         }
     }

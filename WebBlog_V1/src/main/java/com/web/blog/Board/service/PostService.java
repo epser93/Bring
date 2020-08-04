@@ -2,6 +2,7 @@ package com.web.blog.Board.service;
 
 import com.web.blog.Board.entity.Board;
 import com.web.blog.Board.entity.Post;
+import com.web.blog.Board.model.OnlyPostMapping;
 import com.web.blog.Board.model.ParamPost;
 import com.web.blog.Board.repository.*;
 import com.web.blog.Common.advice.exception.CNotOwnerException;
@@ -14,10 +15,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -31,16 +34,9 @@ public class PostService {
     private final FileService fileService;
 
     //게시글 단건 조회
-    public Post getPost(long postId) {
+    public List<OnlyPostMapping> getPost(long postId) {
         postRepository.updateViewCnt(postId);
-        return postRepository.findById(postId).orElseThrow(CResourceNotExistException::new);
-    }
-
-    public Post getPost(long postId, Board board) {
-        postRepository.updateViewCnt(postId);
-        Post post = postRepository.findById(postId).orElseThrow(CResourceNotExistException::new);
-        if (post.getBoard().equals(board)) return post;
-        else return null;
+        return postRepository.findByPostId(postId);
     }
 
     //게시글 작성
@@ -60,7 +56,7 @@ public class PostService {
     //게시글 좋아요
     public void likePost(Member member, Post post, Boolean like) {
         long msrl = member.getMsrl();
-        long postId = post.getPost_id();
+        long postId = post.getPostId();
         String nickname = post.getWriter();
         Member writer = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
         if (like) {
@@ -88,7 +84,7 @@ public class PostService {
 
     //게시글에 좋아요를 누른 유저 목록
     public List<String> likedMemberList(Post post) {
-        long post_id = post.getPost_id();
+        long post_id = post.getPostId();
         List<Long> list = postMemberRepository.likedMember(post_id);
         List<String> members = new ArrayList<>();
         for (Long id : list) {
@@ -120,12 +116,12 @@ public class PostService {
 
     //게시글 삭제
     public boolean deletePost(long postId, String uid) {
-        Post post = getPost(postId);
-        Board board = post.getBoard();
+        Optional<Post> post = postRepository.findById(postId);
+        Board board = post.get().getBoard();
         Member member = board.getMember();
         if (!uid.equals(member.getUid()))
             throw new CNotOwnerException();
-        postRepository.delete(post);
+        postRepository.delete(post.get());
         return true;
     }
 }

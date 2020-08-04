@@ -85,7 +85,8 @@ export default {
             console.log(this.qPost)
             axios.get(`${BACK_URL}/questions/${this.qpost_id}`)
             .then(res => {
-                this.qPost = res.data.data
+                console.log(111111111) 
+                this.qPost = res.data.list.data
             })
             .catch(err => {
                 console.log(err)

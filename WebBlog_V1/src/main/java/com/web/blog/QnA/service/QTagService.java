@@ -43,11 +43,11 @@ public class QTagService {
                     .tag(paramTag)
                     .build();
             tagRepository.save(tag);
-            tagRepository.updateTagUsageCntPlus(tag.getTag_id());
-            qpostTagRepository.insertTag(qpost.getQpost_id(), tag.getTag_id());
+            tagRepository.updateTagUsageCntPlus(tag.getTagId());
+            qpostTagRepository.insertTag(qpost.getQpostId(), tag.getTagId());
         } else {
-            tagRepository.updateTagUsageCntPlus(check.get().getTag_id());
-            qpostTagRepository.insertTag(qpost.getQpost_id(), check.get().getTag_id());
+            tagRepository.updateTagUsageCntPlus(check.get().getTagId());
+            qpostTagRepository.insertTag(qpost.getQpostId(), check.get().getTagId());
         }
         return tag;
     }
@@ -59,7 +59,7 @@ public class QTagService {
             Optional<Tag> tag = tagRepository.findByTag(pt.getTag().getTag()); //tag명으로 각 태그들을 찾고
             Tag t = tag.get(); //t에 대입
             if (t.getTagUsageCnt() > 1)
-                tagRepository.updateTagUsageCntMinus(t.getTag_id()); //해당 태그가 1번 초과 쓰였으면 사용한 내용만 -1
+                tagRepository.updateTagUsageCntMinus(t.getTagId()); //해당 태그가 1번 초과 쓰였으면 사용한 내용만 -1
             else if (t.getTagUsageCnt() == 1) { //해당 태그가 한 번밖에 쓰지 않았으면 그냥 태그 통째로 삭제
                 tagRepository.delete(t);
             }

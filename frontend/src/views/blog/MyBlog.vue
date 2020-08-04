@@ -1,13 +1,15 @@
 <template>
     <div id="blog">
       <!-- 프로필 -->
-      <div class="row">
-        <div class="offset-3 col-6">
+      <div id="upsideTerritory" class="row">
+        <div class="ml-5 mt-3">
           <a class="d-inline" href=''>
-            <img class="rounded-circle mx-auto img-thumbnail mb-3" :src='cardUserImage' alt="Card image cap" style="width: 150px;">
+            <img class="rounded-circle mx-auto img-thumbnail mb-3" :src='cardUserImage' alt="Card image cap" style="width: 120px;">
           </a>
             <h5 class="d-inline ml-3">{{ this.nickname }}</h5>
-            <h6>follower 수:  </h6>
+            <br>
+            <small class="mr-5">follower 수: {{ this.userInfo.followersCnt }} </small>
+            <small>following 수: {{ this.userInfo.followingCnt }} </small>
             <hr>
         </div>
       </div>
@@ -15,7 +17,7 @@
       <div class="row mt-3">
         <!-- 네비게이션 -->
         <div id="nav" class="col-12 ml-5">
-            <router-link :to="{ name: 'MyBlog' , params: { nickname: this.nickname }}"><h3 class="d-inline mr-5">글</h3></router-link> 
+            <router-link :to="{ name: 'MyBlog' , params: { nickname: this.nickname }}"><h3 class="d-inline ml-5 mr-5">글</h3></router-link> 
             <router-link :to="{ name: 'MyQuestions' , params: { nickname: this.nickname }}"><h3 class="d-inline mr-5">질문</h3></router-link> 
             <router-link :to="{ name: 'MyAnswers' , params: { nickname: this.nickname }}"><h3 class="d-inline mr-5">답변</h3></router-link>
             
@@ -52,14 +54,15 @@ export default {
     return {
       // 닉네임 라우터 매개변수로 받아오기
       nickname: this.$route.params.nickname,
+      userInfo: '',
     }
   },
   methods: {
     // 닉네임으로 유저 정보 get
     getUserInfo() {
-      axios.get(`${BACK_URL}/member/user/${this.nickname}`)
+      axios.get(`${BACK_URL}/member/${this.nickname}/profile`)
         .then(res => {
-          this.userInfo = res.data
+          this.userInfo = res.data.data
         })
         .catch(err => {
           alert('ID와 비밀번호를 다시 확인해주세요.')
@@ -68,6 +71,9 @@ export default {
     }
     
   },
+  created() {
+    this.getUserInfo()
+  }
 }
 </script>
 
@@ -92,6 +98,10 @@ export default {
 
 #nav a.router-link-exact-active {
   color: #42b983;
+}
+
+#upsideTerritory{
+  background-color: rgb(231, 231, 231);
 }
 
 </style>

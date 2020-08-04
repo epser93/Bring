@@ -21,7 +21,7 @@ import java.util.List;
 public class Tag extends CommonDateEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long tag_id;
+    private Long tagId;
 
     private String tag;
 

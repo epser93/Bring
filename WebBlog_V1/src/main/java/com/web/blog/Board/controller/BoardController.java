@@ -3,6 +3,7 @@ package com.web.blog.Board.controller;
 import com.web.blog.Board.entity.Board;
 import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.entity.PostMember;
+import com.web.blog.Board.model.OnlyPostMapping;
 import com.web.blog.Board.model.ParamBoard;
 import com.web.blog.Board.model.ParamPost;
 import com.web.blog.Board.repository.BoardRepository;
@@ -113,19 +114,19 @@ public class BoardController {
     //게시판 포스트 리스트
     @ApiOperation(value = "게시판 포스트 리스트", notes = "한 카테고리 내 모든 포스트 리스트")
     @GetMapping(value = "/blog/{nickname}/{boardName}/post_list")
-    public ListResult<Post> listPosts(@PathVariable String boardName, @PathVariable String nickname) {
+    public ListResult<OnlyPostMapping> listPosts(@PathVariable String boardName, @PathVariable String nickname) {
         Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
         Board board = boardService.findBoard(boardName, member);
-        List<Post> list = boardService.CategoryPostList(board.getBoardId());
+        List<OnlyPostMapping> list = boardService.CategoryPostList(board.getBoardId());
         if (member.getNickname().equals(nickname)) {
             return responseService.getListResult(list);
         } else return null;
     }
 
     //게시판 내 포스트 검색
-    @ApiOperation(value = "게시판 내 검색", notes = "type 1: 통합검색, type 2: 제목 검색, type 3: 내용 검색, type 4: 태그 검색")
+    @ApiOperation(value = "게시판 내 검색", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 통합검색")
     @GetMapping(value = "/blog/{nickname}/search/category/{board_id}/{keyword}/{type}")
-    public ListResult<Post> searchAlgorithm(@PathVariable int type, @PathVariable long board_id, @PathVariable(required = false) String keyword, @PathVariable String nickname) {
+    public ListResult<OnlyPostMapping> searchAlgorithm(@PathVariable int type, @PathVariable long board_id, @PathVariable(required = false) String keyword, @PathVariable String nickname) {
         Board board = boardService.getBoard(board_id);
         Member member = board.getMember();
         if (nickname.equals(member.getNickname())) {
@@ -136,28 +137,29 @@ public class BoardController {
     //블로그 포스트 리스트
     @ApiOperation(value = "블로그 포스트 리스트", notes = "한 블로그 내 모든 포스트 리스트")
     @GetMapping(value = "/blog/{nickname}/post_list")
-    public ListResult<Post> listPosts(@PathVariable String nickname) {
-        return responseService.getListResult(boardService.BlogPostList(nickname));
+    public ListResult<OnlyPostMapping> listPosts(@PathVariable String nickname) {
+        return responseService.getListResult(postRepository.findAllByWriter(nickname));
     }
 
     //블로그 내 포스트 검색
-    @ApiOperation(value = "블로그 내 검색", notes = "type 1: 통합검색, type 2: 제목 검색, type 3: 내용 검색, type 4: 태그 검색")
+    @ApiOperation(value = "블로그 내 검색", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 통합검색")
     @GetMapping(value = "/blog/{nickname}/search/blogPosts/{keyword}/{type}")
-    public ListResult<Post> searchAlgorithm(@PathVariable int type, @PathVariable String nickname, @PathVariable(required = false) String keyword) {
+    public ListResult<OnlyPostMapping> searchAlgorithm(@PathVariable int type, @PathVariable String nickname, @PathVariable(required = false) String keyword) {
         return responseService.getListResult(searchService.BlogPostSearch(type, nickname, keyword));
     }
 
     //사이트의 모든 블로그의 포스트 리스트
     @ApiOperation(value = "모든 블로그의 포스트 리스트", notes = "사이트의 모든 블로그의 포스트 리스트")
     @GetMapping(value = "/search/all_blog_posts")
-    public ListResult<Post> listPosts() {
-        return responseService.getListResult(boardService.SitePostList());
+    public ListResult<OnlyPostMapping> listPosts() {
+        Long num = (long) 0;
+        return responseService.getListResult(postRepository.findAllByPostIdGreaterThan(num));
     }
 
     //사이트의 모든 블로그의 포스트 검색
-    @ApiOperation(value = "모든 블로그의 포스트 검색 ", notes = "type 1: 통합검색, type 2: 제목 검색, type 3: 내용 검색, type 4: 태그 검색, type 5: 작성자 검색")
+    @ApiOperation(value = "모든 블로그의 포스트 검색 ", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 작성자 검색, type 4: 통합검색, ")
     @GetMapping(value = "/search/all_blog_posts/{keyword}/{type}")
-    public ListResult<Post> searchAlgorithm(@PathVariable int type, @PathVariable(required = false) String keyword) {
+    public ListResult<OnlyPostMapping> searchAlgorithm(@PathVariable int type, @PathVariable(required = false) String keyword) {
         return responseService.getListResult(searchService.SitePostSearch(type, keyword));
     }
 
@@ -188,15 +190,35 @@ public class BoardController {
         return responseService.getListResult(result);
     }
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "게시글 상세정보 조회", notes = "게시글 상세정보 비회원 조회")
     @GetMapping(value = "/blog/{nickname}/{boardName}/{postId}")
-    public ListResult<SingleResult> post(@PathVariable String boardName, @PathVariable long postId, @PathVariable String nickname) {
+    public ListResult<ListResult> post(@PathVariable String boardName, @PathVariable long postId, @PathVariable String nickname) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = memberRepository.findByUid(uid);
         Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
         Board board = boardRepository.findByNameAndMember(boardName, member);
-        List<SingleResult> results = new ArrayList<>();
-        results.add(responseService.getSingleResult(postService.getPost(postId)));
-        results.add(responseService.getSingleResult(tagService.getTags(postId)));
-        results.add(responseService.getSingleResult(replyService.getRepliesofOnePost(postId)));
+        Post post = postRepository.findById(postId).orElseThrow(CResourceNotExistException::new);
+        List<ListResult> results = new ArrayList<>();
+        List<String> likes;
+        likes = postService.likedMemberList(post);
+        boolean isLiked = false;
+        if(logined.isPresent()){
+            for(String nick : likes) {
+                if(nick.equals(logined.get().getNickname())) isLiked = true;
+                else isLiked = false;
+            }
+        }
+        List<Boolean> like = new ArrayList<>();
+        like.add(isLiked);
+        results.add(responseService.getListResult(postService.getPost(postId)));
+        results.add(responseService.getListResult(tagService.getTags(postId)));
+        results.add(responseService.getListResult(replyService.getRepliesofOnePost(postId)));
+        results.add(responseService.getListResult(likes));
+        results.add(responseService.getListResult(like));
         return responseService.getListResult(results);
     }
 
@@ -204,8 +226,8 @@ public class BoardController {
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
     })
     @ApiOperation(value = "게시글 좋아요", notes = "게시글 좋아요")
-    @PostMapping(value = "/blog/{nickname}/{boardName}/{postId}")
-    public void like(@RequestBody Boolean likeit, @PathVariable long postId, @PathVariable String nickname, @PathVariable String boardName) throws Exception {
+    @PostMapping(value = "/blog/{nickname}/like/{postId}")
+    public void like(@RequestBody Boolean likeit, @PathVariable long postId, @PathVariable String nickname) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new); //로그인한 사용자
