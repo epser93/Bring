@@ -18,8 +18,8 @@
 
         <div class="container">
             <ul >
-                <li v-for="qArticle in qPost" :key="qArticle.qpost_id">
-                    번호: {{qArticle.qpost_id}}
+                <li v-for="qArticle in qPost" :key="qArticle.qpostId">
+                    번호: {{qArticle.qpostId}}
                     제목: {{qArticle.subject}}
                     <h5>내용: {{qArticle.content}}</h5>
                     <!-- 태그: {{qArticle.tags}} -->
@@ -28,7 +28,7 @@
                     
                     <!--heart icon-->
                 <b-icon icon="heart" scale="1"></b-icon>
-                <p><button class="btn btn-primary"><router-link :to="{ name: 'QuestionDetail', params: {qpostId: qArticle.qpost_id} }">글 자세히</router-link></button></p>
+                <p><button class="btn btn-primary" @click="getQnaDetail(qArticle)">글 자세히</button></p>
                 </li>
                 
             </ul>
@@ -81,6 +81,9 @@ export default {
                 console.log(err)
             })
         },
+        getQnaDetail(qArticle){
+            this.$router.push({ name: 'QuestionDetail', params: {qpostId: qArticle.qpostId}})
+        }
     },
     created(){
         this.getAllQna()
