@@ -2,17 +2,19 @@
   <div class="wrapB container-fluid">
     <section v-if="mode==='blog'" class="cards row">
       <div v-for="post in orderedPosts" :key="post.post_id" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-        <div class="cardwrap" @click="gotoDetail(post)">
-          <div class="img-section">
-            <a href=""></a>
-          </div>
-          <div class="contents">
-            <h4>{{ post.subject }}</h4>
-            <p>{{ post.content }}</p>
-            <p class="comment-date">{{ post.createdAt}} · {{ post.replyCnt }}개의 댓글</p>
+        <div class="cardwrap">
+          <div class="card-body p-0" @click="gotoDetail(post)">
+            <div class="img-section">
+              <a href=""></a>
+            </div>
+            <div class="contents">
+              <h4>{{ post.subject }}</h4>
+              <p>{{ post.content }}</p>
+              <p class="comment-date">{{ post.createdAt}} · {{ post.replyCnt }}개의 댓글</p>
+            </div>
           </div>
           <div class="writer-info">
-            <p>{{ post.writer }}</p>
+            <button class="btn btn-sm" @click="gotoUserInfo(post.writer)">{{ post.writer }}</button>
             <p>♥ {{ post.likes}}</p>
           </div>
         </div>
@@ -72,6 +74,9 @@ export default {
     },
     gotoQuestionDetail(post) {
       this.$router.push({ name : "DetailPost" , params: { post: post, nickname : post.writer, post_id : post.qpost_id }})
+    },
+    gotoUserInfo(userNickname) {
+      this.$router.push({ name : "MyBlog" , params: { nickname : userNickname }})
     }
   },
   computed: {

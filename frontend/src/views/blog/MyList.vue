@@ -38,8 +38,8 @@
                             <h5 class="card-title">{{ item.subject }}</h5>
                             <p class="card-text mb-3">{{ item.content }}</p>
                             <!-- (수정중) 좋아요 부분 -->
-                            <small v-if="nickname in item.postMembers" class="d-inline mr-1" style="cursor:pointer" @click="postLike(item.post_id, $event)"><i class="fas fa-heart" style="color:crimson"></i></small>
-                            <small v-else class="d-inline mr-1" style="cursor:pointer" @click="postLike(item.post_id, $event)"><i class="fas fa-heart" style="color:black"></i></small>
+                            <small class="d-inline mr-1" style="cursor:pointer" @click="postLike(item.post_id, $event)"><i class="fas fa-heart" style="color:crimson"></i></small>
+                            <small class="d-inline mr-1" style="cursor:pointer" @click="postLike(item.post_id, $event)"><i class="fas fa-heart" style="color:black"></i></small>
                             <small ref="like-count-{{ post_id }}">{{ item.likes }} 개의 좋아요</small>
                         </div>
                         <div class="card-footer bg-transparent">
