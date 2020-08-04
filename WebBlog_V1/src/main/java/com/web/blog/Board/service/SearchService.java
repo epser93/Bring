@@ -1,6 +1,7 @@
 package com.web.blog.Board.service;
 
 import com.web.blog.Board.entity.Post;
+import com.web.blog.Board.model.OnlyPostMapping;
 import com.web.blog.Board.repository.*;
 import com.web.blog.Common.service.FileService;
 import com.web.blog.Member.repository.MemberRepository;
@@ -17,29 +18,29 @@ public class SearchService {
     private final PostRepository postRepository;
 
     //게시판 내 포스트 검색
-    public List<Post> CategoryPostSearch(int which, long board_id, String keyword) { //검색: which = 1~3
+    public List<OnlyPostMapping> CategoryPostSearch(int which, long board_id, String keyword) { //검색: which = 1~3
         if (which == 1) { //제목 검색
             return postRepository.findByBoard_BoardIdAndSubjectContaining(board_id, keyword);
         } else if (which == 2) { //내용 검색
             return postRepository.findByBoard_BoardIdAndContentContaining(board_id, keyword);
         } else { //통합검색
-            return postRepository.searchCategoryPosts(board_id, keyword);
+            return postRepository.findDistinctByBoard_BoardIdAndSubjectContainingOrBoard_BoardIdAndContentContaining(board_id, keyword, board_id, keyword);
         }
     }
 
     //블로그 내 포스트 검색
-    public List<Post> BlogPostSearch(int which, String writer, String keyword) { //검색: which = 1~3
+    public List<OnlyPostMapping> BlogPostSearch(int which, String writer, String keyword) { //검색: which = 1~3
         if (which == 1) { //제목 검색
             return postRepository.findByWriterAndSubjectContaining(writer, keyword);
         } else if (which == 2) { //내용 검색
             return postRepository.findByWriterAndContentContaining(writer, keyword);
         } else { //통합검색
-            return postRepository.searchBlogPosts(writer, keyword);
+            return postRepository.findDistinctByWriterAndSubjectContainingOrWriterAndContentContaining(writer, keyword, writer, keyword);
         }
     }
 
     //사이트 내 포스트 검색
-    public List<Post> SitePostSearch(int which, String keyword) { //검색: which = 1~4
+    public List<OnlyPostMapping> SitePostSearch(int which, String keyword) { //검색: which = 1~4
         if (which == 1) { //제목 검색
             return postRepository.findBySubjectContaining(keyword);
         } else if (which == 2) { //내용 검색
@@ -47,7 +48,7 @@ public class SearchService {
         } else if (which == 3) { //작성자 검색
             return postRepository.findByWriterContaining(keyword);
         } else { //통합검색
-            return postRepository.searchEveryBlogPosts(keyword);
+            return postRepository.findDistinctBySubjectContainingOrContentContainingOrWriterContaining(keyword, keyword, keyword);
         }
     }
 }

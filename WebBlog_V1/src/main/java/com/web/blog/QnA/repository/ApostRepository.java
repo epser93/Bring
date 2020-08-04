@@ -2,6 +2,7 @@ package com.web.blog.QnA.repository;
 
 import com.web.blog.QnA.entity.Apost;
 import com.web.blog.QnA.entity.Qpost;
+import com.web.blog.QnA.model.OnlyApostMapping;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,7 +14,9 @@ import java.util.List;
 public interface ApostRepository extends JpaRepository<Apost, Long> {
     List<Apost> findByWriter(String writer);
 
-    List<Apost> findByQpost(Qpost qpost);
+    List<OnlyApostMapping> findByQpost(Qpost qpost);
+
+    List<OnlyApostMapping> findByApostId(long apost_id);
 
     @Modifying
     @Transactional

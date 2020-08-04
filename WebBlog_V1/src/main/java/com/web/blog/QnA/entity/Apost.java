@@ -22,7 +22,7 @@ import java.util.List;
 public class Apost extends CommonDateEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long apost_id;
+    private Long apostId;
 
     @Column(nullable = false, length = 50)
     private String writer;

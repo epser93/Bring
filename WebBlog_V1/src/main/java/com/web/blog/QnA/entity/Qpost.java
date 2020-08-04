@@ -23,7 +23,7 @@ import java.util.List;
 public class Qpost extends CommonDateEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long qpost_id;
+    private Long qpostId;
 
     @Column(nullable = false, length = 50)
     private String writer;
@@ -38,6 +38,7 @@ public class Qpost extends CommonDateEntity implements Serializable {
 
     private int answerCnt; //답변 수
 
+    @Column(columnDefinition = "boolean default false")
     private boolean selectOver;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
