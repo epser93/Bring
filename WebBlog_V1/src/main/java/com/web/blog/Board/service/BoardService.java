@@ -115,6 +115,17 @@ public class BoardService {
         for (Board b : boards) {
             List<Post> posts = postRepository.findByBoard(b);
             for (Post p : posts) {
+                List<PostTag> originalPostTags = postTagRepository.findByPost(p);
+                for (PostTag pt : originalPostTags) {
+                    Optional<Tag> tag = tagRepository.findByTag(pt.getTag().getTag()); //tag명으로 각 태그들을 찾고
+                    Tag t = tag.get(); //t에 대입
+                    if (t.getTagUsageCnt() > 1)
+                        tagRepository.updateTagUsageCntMinus(t.getTag_id()); //해당 태그가 1번 초과 쓰였으면 사용한 내용만 -1
+                    else if (t.getTagUsageCnt() == 1) { //해당 태그가 한 번밖에 쓰지 않았으면 그냥 태그 통째로 삭제
+                        tagRepository.delete(t);
+                    }
+                    postTagRepository.deleteById(pt.getId()); //post_tag 에서 연결 해제
+                }
                 postRepository.delete(p);
             }
         }
