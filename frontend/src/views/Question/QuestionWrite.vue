@@ -40,7 +40,7 @@ export default {
         questionData:{
           content:"",
           subject:"",       
-          tags:[""],
+          tags:[],
         },
       }
     },

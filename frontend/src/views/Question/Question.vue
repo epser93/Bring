@@ -18,7 +18,7 @@
 
         <div class="container">
             <ul >
-                <li v-for="qArticle in qPost" :key="qArticle.qPost_id">
+                <li v-for="qArticle in qPost" :key="qArticle.qpost_id">
                     번호: {{qArticle.qpost_id}}
                     제목: {{qArticle.subject}}
                     <h5>내용: {{qArticle.content}}</h5>
