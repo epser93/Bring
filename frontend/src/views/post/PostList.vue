@@ -24,17 +24,19 @@
     <section v-if="mode==='QnA'" class="cards row">
       <div class="col-lg-10 row">
         <div v-for="post in orderedPosts" :key="post.qpost_id" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-          <div class=cardwrap @click="gotoQuestionDetail(post)">
-            <div class="img-section">
-              <a href=""></a>
-            </div>
-            <div class="contents">
-              <h4>{{ post.subject }}</h4>
-              <p>{{ post.content }}</p>
-              <p class="comment-date">{{ post.createdAt}} · {{ post.answerCnt }}개의 댓글</p>
+          <div class=cardwrap>
+            <div class="card-body p-0" @click="gotoQuestionDetail(post)">
+              <div class="img-section">
+                <a href=""></a>
+              </div>
+              <div class="contents">
+                <h4>{{ post.subject }}</h4>
+                <p>{{ post.content }}</p>
+                <p class="comment-date">{{ post.createdAt}} · {{ post.answerCnt }}개의 댓글</p>
+              </div>
             </div>
             <div class="writer-info">
-              <p>{{ post.writer }}</p>
+              <button class="btn btn-sm" @click="gotoUserInfo(post.writer)">{{ post.writer }}</button>
               <p>♥ {{ post.views }}</p>
             </div>
           </div>

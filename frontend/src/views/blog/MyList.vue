@@ -4,7 +4,7 @@
         <div class="nav col-2 flex-column text-left">
             <h5>카테고리</h5>
             <hr class="ml-0" style="width:70%;">
-            <div id="category-menu" v-for="category in categoryList" :key="category.board_id">
+            <div id="category-menu" v-for="category in categoryList" :key="category.boardId">
                 <button @click="getSomePosts(category.name)" type="button" class="btn btn-link mb-3 p-0">{{ category.name }}</button>
             </div>
                 
@@ -17,7 +17,7 @@
                     </button>
                 </div>
                 <input class="form-control mr-sm-2 w-75" type="search" v-model="keyword" placeholder="키워드 입력" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" @click="searchFor" type="submit">검색</button>
+                <button class="btn btn-outline-success my-2 my-sm-0" @click="searchFor">검색</button>
             </form>
 
             <!-- 이동버튼(나중에 합치거나 프로필에서 관리?) -->
@@ -31,16 +31,16 @@
                 <h3>현재 등록된 글이 없습니다</h3>
             </div>
             <div class="row">
-                <div v-for="item in postList" :key="item.post_id" class="p-0 mb-5 col-12 col-lg-3">
+                <div v-for="item in postList" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
                     <div class="card" style="width: 75%;">
                         <img class="card-img-top" :src="cardImage" alt="Card image cap">
                         <div class="card-body pb-0">
                             <h5 class="card-title">{{ item.subject }}</h5>
                             <p class="card-text mb-3">{{ item.content }}</p>
                             <!-- (수정중) 좋아요 부분 -->
-                            <small class="d-inline mr-1" style="cursor:pointer" @click="postLike(item.post_id, $event)"><i class="fas fa-heart" style="color:crimson"></i></small>
-                            <small class="d-inline mr-1" style="cursor:pointer" @click="postLike(item.post_id, $event)"><i class="fas fa-heart" style="color:black"></i></small>
-                            <small ref="like-count-{{ post_id }}">{{ item.likes }} 개의 좋아요</small>
+                            <small class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="postLike(item.postId, $event)"><i class="fas fa-heart"></i></small>
+                            <small class="d-inline mr-1" style="cursor:pointer; color: black;" @click="postLike(item.postId, $event)"><i class="fas fa-heart"></i></small>
+                            <small :ref="'like-count-' + item.postId">{{ item.likes }}</small><small>개의 좋아요</small>
                         </div>
                         <div class="card-footer bg-transparent">
                             <button class="btn btn-sm" @click="gotoDetail(item)">글 보기</button>
@@ -107,6 +107,7 @@ export default {
                 .then(res => {
                     this.postList = res.data.list
                     console.log(this.postList)
+
                 })
  
                 .catch(err => {
@@ -130,6 +131,7 @@ export default {
             axios.get(`${BACK_URL}/blog/${this.nickname}/${categoryName}/post_list`)
                 .then(res => {
                     this.postListCategory = res.data.list
+                    
                 })
 
                 .catch(err => {
@@ -141,15 +143,14 @@ export default {
             this.keywordType.keyid = typeid
             this.keywordType.name = value
         },
-        // 검색
+        // 검색(res에 아무것도 안오는 느낌)
         searchFor() {
-            console.log(this.keyword)
             console.log(this.keywordType.keyid)
             this.categoryOn = true
             axios.get(`${BACK_URL}/blog/${this.nickname}/search/blogPosts/${this.keyword}/${this.keywordType.keyid}`)
                 .then(res => {
-                    console.log(res)
                     this.postListCategory = res.data.list
+                    console.log(this.postListCategory)
                 })
 
                 .catch(err => {
@@ -162,23 +163,24 @@ export default {
         },    
         // 좋아요(아직 동작x)
         postLike(post_id, event) {
-            axios.post(`${BACK_URL}/blog/${this.nickname}/like/${post_id}`)
+            const config = {
+                headers: {
+                    'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
+                }
+            }
+            // 여기 변수 수정해야(likeit부분, res.data)
+            axios.post(`${BACK_URL}/blog/${this.userNow}/like/${post_id}`, config)
                 .then(res => {
-                    console.log(res)
-                    console.log(this.$refs)
-                    
                     // 하트 색 바꾸기
-                    if (event.target.style.color === 'crimson') {
-                        event.target.style.color = 'black'
+                    if (event.currentTarget.style.color === 'crimson') {
+                        event.currentTarget.style.color = 'black'
                     } else {
-                        event.target.style.color = 'crimson'
+                        event.currentTarget.style.color = 'crimson'
                     } 
                     
                     // 수정필요
-                    // 좋아요 수 바꾸기
-                    // refs 지양하라고 함(다른 방법이 떠오르지 않았어요...)
-                    this.$refs['like-count-' + `${post_id}`].innerText = res.data;
-                    
+                    // 좋아요 수 바꾸기(화면에서)
+                    this.$refs[`like-count-${post_id}`][0].innerText = res.data;
                 })
 
                 .catch(err => {
@@ -194,6 +196,7 @@ export default {
     },
     data() {
         return{
+            userNow: this.$cookies.get('nickname'), 
             nickname: this.$route.params.nickname,
             // 글 관련
             postList: [],
@@ -202,15 +205,14 @@ export default {
             categoryOn: false,
             // 검색 관련
             keywordType: {
-                name: '통합검색',
+                name: '제목검색',
                 keyid: 1,
             },
             keyword: '',
             dropdownList: {
-                1: '통합검색',
-                2: '제목검색',
-                3: '내용검색',
-                4: '태그검색'
+                1: '제목검색',
+                2: '내용검색',
+                3: '통합검색',
             },
         }
     }

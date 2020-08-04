@@ -1,16 +1,12 @@
 <template>
     <div id="blog">
       <!-- 프로필 -->
-      <div id="upsideTerritory" class="row">
+      <div id="upsideTerritory" class="row ml-4 mr-4">
         <div class="ml-5 mt-3">
           <a class="d-inline" href=''>
             <img class="rounded-circle mx-auto img-thumbnail mb-3" :src='cardUserImage' alt="Card image cap" style="width: 120px;">
           </a>
-            <h5 class="d-inline ml-3">{{ this.nickname }}</h5>
-            <br>
-            <small class="mr-5">follower 수: {{ this.userInfo.followersCnt }} </small>
-            <small>following 수: {{ this.userInfo.followingCnt }} </small>
-            <hr>
+            <h5 class="d-inline ml-3">{{ this.userInfo.nickname }}</h5>
         </div>
       </div>
 
@@ -59,8 +55,8 @@ export default {
   },
   methods: {
     // 닉네임으로 유저 정보 get
-    getUserInfo() {
-      axios.get(`${BACK_URL}/member/${this.nickname}/profile`)
+    getUserInfo(nickname) {
+      axios.get(`${BACK_URL}/member/${nickname}/profile`)
         .then(res => {
           this.userInfo = res.data.data
         })
@@ -68,11 +64,18 @@ export default {
           alert('ID와 비밀번호를 다시 확인해주세요.')
           console.log(err)
         })
-    }
+    },
+
     
   },
   created() {
-    this.getUserInfo()
+    this.getUserInfo(this.nickname)
+  },
+  watch: {
+    '$route.params.nickname' () {
+      // 동일한 경로의 params 변경 사항에 반응하려면
+      location.reload()
+    }
   }
 }
 </script>
