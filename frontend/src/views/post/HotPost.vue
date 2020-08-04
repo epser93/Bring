@@ -2,7 +2,7 @@
   <div class="wrapB container-fluid">
     <section v-if="mode==='blog'" class="cards row">
       <div v-for="post in orderedHotPosts" :key="post.post_id" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-        <div class="cardwrap">
+        <div class="cardwrap" @click="gotoDetail(post)">
           <div class="img-section">
             <a href=""></a>
           </div>
@@ -22,7 +22,7 @@
     <section v-if="mode==='QnA'" class="cards row">
       <div class="col-lg-10 row">
         <div v-for="question in orderedHotQuestions" :key="question.qpost_id" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-          <div class="cardwrap">
+          <div class="cardwrap" @click="gotoDetail(question)">
             <div class="img-section">
               <a href=""></a>
             </div>
@@ -65,6 +65,11 @@ export default {
   props: {
     mode: String,
     posts: Array,
+  },
+  methods: {
+    gotoDetail(post) {
+      this.$router.push({ name : "DetailPost" , params: { post: post, nickname : post.writer, post_id : post.post_id }})
+    }
   },
   computed: {
     orderedHotPosts () {
