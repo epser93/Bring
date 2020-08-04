@@ -29,8 +29,8 @@
                       <div class="col"></div>
                       <div class="col"></div>
                       <div class="col">
-                          <b-button class="mr-1"><b-icon icon="trash"></b-icon> 삭제</b-button>
-                          <b-button variant="warning" class="ml-2">수정</b-button>
+                          <b-button @click="deleteQna" class="mr-1"><b-icon icon="trash"></b-icon> 삭제</b-button>
+                          <b-button @click="modifyQna" variant="warning" class="ml-2">수정</b-button>
                       </div>
                   </div>
               </h5>
@@ -44,6 +44,7 @@
                     id="textarea-rows"
                     placeholder="Tall textarea"
                     rows="8"
+                    v-model="answer"
                 ></b-form-textarea>
             </div>
             <button class="btn btn-success btn-sm mx-1" @click='commentOpen'>답변 달기</button>
@@ -73,6 +74,12 @@ export default {
             writeComment: false,
             qpost_id: this.$route.params.qpostId,
             qPost : [],
+
+            // 질문 수정
+            newqPost:[],
+
+            // 답변
+            answer:"",
         }
      },
     methods: {
@@ -82,6 +89,7 @@ export default {
         commentClose() {
             this.writeComment = false
         },
+        // 게시물 호출
         getQna() {
             axios.get(`${BACK_URL}/questions/${this.qpost_id}`)
             .then(res => {
@@ -92,9 +100,60 @@ export default {
                 console.log(err)
             })
         },
+        // 게시물 삭제
+        deleteQna(){
+            console.log(this.qpost_id)
+            const config = {
+              headers: {
+                'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
+              }
+            }
+            axios.delete(`${BACK_URL}/questions/${this.qpost_id}`,config)
+            .then(res=>{
+                console.log(res)
+                alert('삭제가 완료 되었습니다.')
+                this.$router.push({ name: 'Question' })
+            })
+            .catch(err=>{
+                alert('삭제 실패')
+                console.log(err)
+            })
+        },
+        // 게시물 수정
+        modifyQna(){
+            console.log(this.qpost_id)
+            const config = {
+              headers: {
+                'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
+              }
+            }
+            axios.put(`${BACK_URL}/questions/${this.qpost_id}`,config) // 이 부분 수정 해야함
+            .then(res=>{
+                console.log(res)
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+        },
+        // 답변 작성
+        writeAnswer(){
+            const config = {
+              headers: {
+                'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
+              }
+            }
+            axios.post(`${BACK_URL}/answers/${this.qpost_id}`,this.answer,config)
+            .then(res=>{
+                console.log(res)
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+        }
     },
      created(){
         this.getQna(this.qpost_id)
+
         }
 }
 </script>
