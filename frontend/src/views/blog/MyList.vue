@@ -1,7 +1,7 @@
 <template>
     <div id="mylist" class="row">
         <!-- 사이드 바 -->
-        <div class="nav col-2 flex-column text-left mt-5">
+        <div class="nav col-2 flex-column text-left">
             <h5>카테고리</h5>
             <hr class="ml-0" style="width:70%;">
             <div id="category-menu" v-for="category in categoryList" :key="category.board_id">
@@ -16,7 +16,7 @@
                         {{ value }}
                     </button>
                 </div>
-                <input class="form-control mr-sm-2" type="search" v-model="keyword" placeholder="키워드 입력" aria-label="Search">
+                <input class="form-control mr-sm-2 w-75" type="search" v-model="keyword" placeholder="키워드 입력" aria-label="Search">
                 <button class="btn btn-outline-success my-2 my-sm-0" @click="searchFor" type="submit">검색</button>
             </form>
 
@@ -26,31 +26,41 @@
         </div>
 
         <!-- 글 리스트 -->
-        <div v-if="!this.categoryOn" class="offset-1 col-8">
+        <div v-if="!this.categoryOn" class="col-10 container">
             <div class="text-left mt-5" v-if="postList.length == 0">
                 <h3>현재 등록된 글이 없습니다</h3>
             </div>
-            <div v-for="item in postList" :key="item.post_id" class="mb-5">
-                <div class="card" style="width: 75%;">
-                    <img class="card-img-top" :src="cardImage" alt="Card image cap">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ item.subject }}</h5>
-                        <p class="card-text">{{ item.content }}</p>
-                        <a href="#" class="btn btn-outline-success">글 보기</a>
+            <div class="row">
+                <div v-for="item in postList" :key="item.post_id" class="p-0 mb-5 col-3">
+                    <div class="card" style="width: 75%;">
+                        <img class="card-img-top" :src="cardImage" alt="Card image cap">
+                        <div class="card-body pb-0">
+                            <h5 class="card-title">{{ item.subject }}</h5>
+                            <p class="card-text mb-3">{{ item.content }}</p>
+                            <p class="text-right">♥ {{ item.likes}}</p>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <button class="btn btn-sm" @click="gotoDetail(item)">글 보기</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- 글 리스트 카테고리 있는 경우 -->
-        <div v-if="this.categoryOn" class="offset-1 col-8">
-            <div v-for="item in postListCategory" :key="item.post_id" class="mb-5">
-                <div class="card" style="width: 75%;">
-                    <img class="card-img-top" :src="cardImage" alt="Card image cap">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ item.subject }}</h5>
-                        <p class="card-text">{{ item.content }}</p>
-                        <a href="#" class="btn btn-outline-success">글 보기</a>
+        <div v-if="this.categoryOn" class="col-10 container">
+            <div class="row">
+                <div v-for="item in postListCategory" :key="item.post_id" class="p-0 mb-5 col-3">
+                    <div class="card" style="width: 75%;">
+                        <img class="card-img-top" :src="cardImage" alt="Card image cap">
+                        <div class="card-body pb-0">
+                            <h5 class="card-title">{{ item.subject }}</h5>
+                            <p class="card-text mb-3">{{ item.content }}</p>
+                            <p class="text-right">♥ {{ item.likes}}</p>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <button class="btn btn-sm" @click="gotoDetail(item)">글 보기</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -125,17 +135,22 @@ export default {
             this.keywordType.name = value
         },
         searchFor() {
+            console.log(this.keyword)
+            console.log(this.keywordType.keyid)
             this.categoryOn = true
             axios.get(`${BACK_URL}/blog/${this.nickname}/search/blogPosts/${this.keyword}/${this.keywordType.keyid}`)
                 .then(res => {
-                    alert(res)
-                    this.keywordList = res.list
+                    console.log(res)
+                    this.keywordList = res.data.list
                 })
 
                 .catch(err => {
                     console.log(err)
                 })
-        }    
+        },
+        gotoDetail(post) {
+            this.$router.push({ name : "DetailPost" , params: { post: post, nickname : post.writer, post_id : post.post_id }})
+        },    
     },
     
     created() {
@@ -178,6 +193,9 @@ export default {
 #category-menu button:focus{
     font-weight: bold;
     color: #42b983;
+}
+.card {
+    box-shadow: 10px 0px 60px -40px black;
 }
 
 </style>

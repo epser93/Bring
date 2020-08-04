@@ -53,7 +53,7 @@ export default {
         post: {
                 content: "",
                 subject: "",
-                tag: ""
+                tag: ['1111'],
               },
         nickname: this.$route.params.nickname,
       },
