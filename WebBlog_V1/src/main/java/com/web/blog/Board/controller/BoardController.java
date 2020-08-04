@@ -286,10 +286,11 @@ public class BoardController {
     })
     @ApiOperation(value = "게시글 삭제", notes = "게시글 삭제")
     @DeleteMapping(value = "/blog/{nickname}/{boardName}/{postId}")
-    public CommonResult deletePost(@PathVariable long postId, @PathVariable String nickname, @PathVariable String boardName) {
+    public CommonResult deletePost(@PathVariable Long postId, @PathVariable String nickname, @PathVariable String boardName) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
-        postService.deletePost(postId, uid);
+        Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
+        postService.deletePost(postId, member);
         return responseService.getSuccessResult();
     }
 }

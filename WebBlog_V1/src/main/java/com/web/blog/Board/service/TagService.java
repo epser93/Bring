@@ -60,6 +60,12 @@ public class TagService {
 
     //포스트 태그 수정
     public Tag updateTag(Post post, String paramTag) {
+        deleteTags(post);
+        return insertTags(post, paramTag); //다시 입력된 값으로 insert
+    }
+
+    //태그 전체 삭제
+    public void deleteTags(Post post) {
         List<PostTag> originalPostTags = postTagRepository.findByPost(post);
         for (PostTag pt : originalPostTags) {
             Optional<Tag> tag = tagRepository.findByTag(pt.getTag().getTag()); //tag명으로 각 태그들을 찾고
@@ -71,6 +77,5 @@ public class TagService {
             }
             postTagRepository.deleteById(pt.getId()); //post_tag 에서 연결 해제
         }
-        return insertTags(post, paramTag); //다시 입력된 값으로 insert
     }
 }

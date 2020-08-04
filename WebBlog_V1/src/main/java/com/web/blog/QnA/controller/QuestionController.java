@@ -20,6 +20,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +29,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Api(tags = {"7. Questions"})
@@ -117,10 +119,11 @@ public class QuestionController {
     })
     @ApiOperation(value = "질문 삭제", notes = "질문 삭제")
     @DeleteMapping(value = "/{qpostId}")
-    public CommonResult deleteQuestion(@PathVariable long qpostId, @RequestParam Boolean isAnswered) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Member member = (Member) principal;
-        Boolean isOk = qnaService.deleteQuestion(qpostId, member, isAnswered);
+    public CommonResult deleteQuestion(@PathVariable long qpostId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> member = memberRepository.findByUid(uid);
+        Boolean isOk = qnaService.deleteQuestion(qpostId, member.get());
         if (isOk) {
             return responseService.getSuccessResult();
         }

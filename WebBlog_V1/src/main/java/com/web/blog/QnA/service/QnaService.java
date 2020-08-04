@@ -33,6 +33,7 @@ public class QnaService {
     private final ApostMemberRepository apostMemberRepository;
     private final ApostRepository apostRepository;
     private final QpostRepository qpostRepository;
+    private final QTagService qTagService;
 
     //모든 질문글 리스트
     public List<Qpost> getAllQuestions() {
@@ -90,12 +91,13 @@ public class QnaService {
     }
 
     //질문 삭제
-    public boolean deleteQuestion(long qpost_id, Member member, boolean isAnswered) {
+    public boolean deleteQuestion(long qpost_id, Member member) {
         Qpost qpost = qpostRepository.findById(qpost_id).orElseThrow(CResourceNotExistException::new);
-        if (!isAnswered && member.getMsrl().equals(qpost.getMember().getMsrl())) {
+        if (qpost.getAnswerCnt() == 0 && member.getMsrl().equals(qpost.getMember().getMsrl())) {
+            qTagService.deleteQtags(qpost);
             qpostRepository.delete(qpost);
             return true;
-        } else if (isAnswered) throw new CAnsweredQuestionException();
+        } else if (qpost.getAnswerCnt() > 0) throw new CAnsweredQuestionException();
         else if (!member.getMsrl().equals(qpost.getMember().getMsrl())) throw new CNotOwnerException();
         return false;
     }

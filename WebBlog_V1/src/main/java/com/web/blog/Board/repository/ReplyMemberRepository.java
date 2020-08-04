@@ -9,11 +9,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
+import java.util.List;
 import java.util.Optional;
 
 public interface ReplyMemberRepository extends JpaRepository<ReplyMember, Long> {
     Optional<ReplyMember> findByMemberAndReply(Member member, Reply reply);
-
+    List<ReplyMember> findByReply(Reply reply);
     @Modifying
     @Transactional
     @Query(value = "insert into reply_member (msrl, reply_id) values (:msrl, :reply_id)", nativeQuery = true)
