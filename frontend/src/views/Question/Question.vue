@@ -65,7 +65,7 @@ export default {
             currentPage: 1,
             articles:10,
             count:5,
-            qPost: null,
+            qPost: [],
       
       }
     },

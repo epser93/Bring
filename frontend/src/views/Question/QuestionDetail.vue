@@ -70,7 +70,7 @@ export default {
         return {
             writeComment: false,
             qpost_id: this.$route.params.qpostId,
-            qPost: null,
+            qPost: [],
         }
      },
     methods: {
