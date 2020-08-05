@@ -271,7 +271,7 @@ export default {
           
       },
       gotoEdit() {
-          //this.$router.push({ name : "DetailPost" , params: { post: post, nickname : post.writer, post_id : post.post_id }})
+          this.$router.push({ name : "Edit" })
       }
   },
 

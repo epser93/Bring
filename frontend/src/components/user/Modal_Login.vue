@@ -20,11 +20,6 @@
 
 
             <button id="register-btn" @click="register">Register</button>
-            <!-- <router-link v-bind:to="{name:constants.URL_TYPE.USER.JOIN}" class="btn--text">
-                            회원가입
-            </router-link> -->
-
-
 
           </div>
 
@@ -81,7 +76,7 @@ export default {
     register() {
         // this.$router.push({name:constants.URL_TYPE.USER.JOIN})
         this.closeModal()
-        //  this.$emit('close')
+
          console.log('dfsdfsdfsdfsd')
 
     },
