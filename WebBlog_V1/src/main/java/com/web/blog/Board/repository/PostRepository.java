@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,9 +75,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<OnlyPostMapping> findByWriterAndContentContaining(String writer, String keyword);
 
 
-    //사이트의 모든 포스트 리스트
-    List<OnlyPostMapping> findAllByPostIdGreaterThan(long num);
-    List<OnlyPostMapping> findAllByOrderByCreatedAtDesc();
+    //사이트의 모든 포스트 리스트(최신글)
+    List<OnlyPostMapping> findByCreatedAtLessThanEqualOrderByCreatedAtDesc(LocalDateTime date);
+
+    //사이트의 모든 포스트 리스트(인기글)
+    List<OnlyPostMapping> findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualOrLikesGreaterThanEqualAndCreatedAtLessThanEqualOrderByCreatedAtDesc(int views, LocalDateTime dateV, int likes, LocalDateTime dateL);
+
 
     //사이트의 모든 포스트 통합 검색(or 사이트 내 모든 포스트 리스트)
 //    @Query(value = "select distinct * from post where (subject like concat('%',:keyword,'%') or content like concat('%',:keyword,'%') or writer like concat('%',:keyword,'%'))", nativeQuery = true)
