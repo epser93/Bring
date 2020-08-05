@@ -1,0 +1,114 @@
+<template>
+  <div id="editor">
+    <div class="d-flex justify-content-between ml-3 mb-5">
+      <h2 class="">글 수정</h2>
+      <button type="button" @click="updatePost" class="btn btn-outline-success" style="width:80px;">수정</button>
+    </div>
+    <!-- 카테고리 생성 부분 -->
+    
+    
+    <!-- 카테고리 부분 -->
+    <div class="row form-group">
+      <div class="col-2 text-left"><label for="multiple-select" class=" form-control-label">카테고리 선택: </label></div>
+      <div class="col-10 text-left">
+        <select v-model="boardName">
+          <option v-for="category in categoryList" v-bind:key="category.name">
+            {{ category.name }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 제목 부분 -->
+    <form class="row text-left">
+      <div class="col-12 form-group">
+        <label for="titleInput">제목 :</label>
+        <input type="text" class="form-control" v-model="postData.subject" id="titleInput" placeholder="제목을 입력하세요">
+      </div>
+    </form>
+
+    <!-- 글 에디터 부분 -->
+    <v-md-editor class="text-left" v-model="postData.content" height="600px"></v-md-editor>
+    <br>
+    
+  </div>
+</template>
+
+<script>
+import axios from 'axios'
+
+
+
+const BACK_URL = 'http://localhost:8080'
+
+export default {
+  name: 'UpdateForm',
+  components: {
+      
+  },
+  data() {
+    return {
+      // 받아오는 정보 param
+      nickname : this.$route.params.nickname,
+      boardName: this.$route.params.boardName,
+      post_id : this.$route.params.post_id,
+      
+      postData: {
+        subject: '',
+        content: '',
+        tags: [''],
+      },
+
+      writer: null,
+      createdAt: null,
+      categoryList: [],
+    }
+  },
+  methods: {
+    updatePost () {
+      const config = {
+        headers: {
+          'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
+        }
+      }
+      console.log(this.postData)
+      console.log(config)
+      axios.put(`${BACK_URL}/blog/${this.nickname}/${this.boardName}/${this.post_id}`, this.postData, config)
+        .then(res => {
+          console.log(res)
+          this.$router.go(-1)
+        })
+        .catch(err => console.log(err))
+    },
+    getCategory() {
+          axios.get(`${BACK_URL}/blog/${this.nickname}/categories`)
+              .then(res => {
+                  this.categoryList = res.data.list
+              })
+
+              .catch(err => {
+                  console.log(err)
+              })
+      },
+      getPostInfo() {
+        axios.get(`${BACK_URL}/blog/${this.nickname}/${this.boardName}/${this.post_id}`)
+          .then(res => {
+            console.log('getpost', res)
+            this.writer = res.data.list[0].list[0].writer
+            this.postData.subject = res.data.list[0].list[0].subject
+            this.postData.content = res.data.list[0].list[0].content
+            this.createdAt = res.data.list[0].list[0].createdAt
+          })
+          .catch(err => console.log(err))
+      }
+  },
+  created() {
+    this.getPostInfo()
+    this.getCategory()
+  }
+};
+</script>
+
+
+
+

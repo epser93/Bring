@@ -7,12 +7,12 @@
         </div>
         <b-container>
           <b-row>
-            <b-col>{{post.subject}}</b-col>
+            <b-col>{{subject}}</b-col>
             <b-col></b-col>
           <b-col>
             <p>
-              작성자: {{ post.writer }}
-              <span class="text-muted ">{{ post.createdAt }}</span>
+              작성자: {{ writer }}
+              <span class="text-muted ">{{ createdAt }}</span>
             </p>
           </b-col>
           </b-row>
@@ -21,14 +21,14 @@
       <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded">
             <p><b-badge pill variant="success" class="mr-3">태그</b-badge>
             </p>
-            <h5 class="card-text">{{ post.content }}
+            <h5 class="card-text">{{ content }}
                 <br><br><br><br><br><br><br><br><br><br><br><br>
                 <hr>
                 <div class="row">
                     <div class="col"></div>
                     <div class="col"></div>
                     <div class="col">
-                        <button class="btn btn-secondary"><b-icon icon="trash"></b-icon> 수정</button>
+                        <button class="btn btn-secondary" @click="updatePost"><b-icon icon="trash"></b-icon> 수정</button>
                         <button class="btn btn-secondary"><b-icon icon="trash"></b-icon> 삭제</button>
                     </div>
                 </div>
@@ -62,33 +62,62 @@
 </template>
 
 <script>
-// import axios from 'axios'
-// const BACK_URL = 'http://localhost:8080'
+import axios from 'axios'
+const BACK_URL = 'http://localhost:8080'
 
 export default {
     name:'DetailPost',
      data(){
         return {
             writeComment: false,
+            // 넘겨받는 param
             post_id: this.$route.params.post_id,
             nickname: this.$route.params.nickname,
-            post : this.$route.params.post
+            board_name : this.$route.params.boardName,
+
+            subject: null,
+            writer: null,
+            content: null,
+            createdAt: null,
+
             // qpost_id: this.$route.params.qpostId,
             // qPost: null,
         }
      },
     methods: {
         commentOpen() {
-            this.writeComment = true
+          this.writeComment = true
         },
         commentClose() {
-            this.writeComment = false
+          this.writeComment = false
         },
+        updatePost() {
+          this.$router.push({ name : 'UpdateForm' , params: { nickname : this.writer, boardName : this.board_name, post_id : this.post_id}})
+        },
+        fetchPost() {
+          const config = {
+            headers: {
+              'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
+            }
+          }
+          axios.get(`${BACK_URL}/blog/${this.nickname}/${this.board_name}/${this.post_id}`,config)
+            .then(res => {
+              console.log(res.data.list[0].list[0])
+              this.writer = res.data.list[0].list[0].writer
+              this.subject = res.data.list[0].list[0].subject
+              this.content = res.data.list[0].list[0].content
+              this.createdAt = res.data.list[0].list[0].createdAt
+              console.log(res.data.list[0].list[0].content)
+            })
+            .catch(err => console.log(err))
+        }
     },
      created(){
        console.log(this.post_id)
        console.log(this.nickname)
-       console.log(this.post)
+       console.log(this.board_name)
+       this.fetchPost()
+
       }
 }
 </script>

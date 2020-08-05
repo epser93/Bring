@@ -39,7 +39,7 @@ export default {
     },
     getAllPost () {
       if (this.mode == "blog"){
-        axios.get(`${BACK_URL}/search/all_blog_posts`)
+        axios.get(`${BACK_URL}/blog/recent`)
           .then (res => {
             this.posts = res.data.list
             console.log('포스팅', this.posts)
