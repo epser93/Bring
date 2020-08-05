@@ -1,5 +1,5 @@
 <template>
-    <div style="padding-top: 100px;">
+    <div style="padding-top: 80px;">
         <div class="profile container" style="width:650px">
             <UserCard class="mb-3"/>
             <span v-if="isUpdate">
