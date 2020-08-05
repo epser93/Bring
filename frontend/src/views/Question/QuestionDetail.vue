@@ -29,13 +29,42 @@
                       <div class="col"></div>
                       <div class="col"></div>
                       <div class="col">
-                          <b-button @click="deleteQna" class="mr-1"><b-icon icon="trash"></b-icon> 삭제</b-button>
+                          {{qPost.writer}}/{{this.userinfo.nickname}}
+                          
+                          <b-button @click="deleteQna" class="mr-1" v-if="this.nickname===qPost.writer"><b-icon icon="trash"></b-icon> 삭제</b-button>
                           <b-button @click="modifyQna" variant="warning" class="ml-2">수정</b-button>
                       </div>
                   </div>
               </h5>
 
         </div>
+
+        <!-- 답변 리스트-->
+        <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded">
+            <div class="row">
+                <div class="col"></div>
+                <div class="col">
+
+                <ul>
+                    <li v-for="aArticle in aPost" :key="aArticle.aPostId">
+                        <p>글쓴이: {{aArticle.writer}}
+                        답변: {{aArticle.answer}}
+                        좋아요: {{aArticle.likes}}
+                        채택여부: {{aArticle.selected}}
+                        <button class="btn btn-secondary">채택</button>
+                        <button class="btn btn-danger" @click="deleteAnswer">삭제</button>
+                        </p>
+                    </li>
+                </ul>
+                </div>
+                <div class="col">
+                    <button class="btn btn-primary">답변채택</button>
+                    <button class="btn btn-warning">답변추천</button>
+                </div>
+        </div>
+        </div>
+
+
 
         <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded">
              <span v-if="writeComment">
@@ -44,10 +73,11 @@
                     id="textarea-rows"
                     placeholder="Tall textarea"
                     rows="8"
-                    v-model="answer"
+                    v-model="answerData.answer"
                 ></b-form-textarea>
             </div>
-            <button class="btn btn-success btn-sm mx-1" @click='commentOpen'>답변 달기</button>
+            
+            <button class="btn btn-success btn-sm mx-1" @click='writeAnswer' >답변 달기</button>
             <button class="btn btn-success btn-sm mx-1" @click='commentClose'>답변창 닫기</button>
             <!-- 누르면 새로 렌더해주게끔 로직짜야함-->
             
@@ -72,6 +102,7 @@ export default {
      data(){
         return {
             writeComment: false,
+            nickname: this.$route.params.nickname,
             qpost_id: this.$route.params.qpostId,
             qPost : [],
 
@@ -79,7 +110,11 @@ export default {
             newqPost:[],
 
             // 답변
-            answer:"",
+            answerData:{
+                answer:"",
+            },
+            aPost:[],
+            apost_id: this.$route.params.apostId,
         }
      },
     methods: {
@@ -93,8 +128,9 @@ export default {
         getQna() {
             axios.get(`${BACK_URL}/questions/${this.qpost_id}`)
             .then(res => {
-                console.log(res.data.list)
+                // console.log(res.data.list)
                 this.qPost = res.data.list[0].list[0]
+                
             })
             .catch(err => {
                 console.log(err)
@@ -121,7 +157,7 @@ export default {
         },
         // 게시물 수정
         modifyQna(){
-            console.log(this.qpost_id)
+            // console.log(this.qpost_id)
             const config = {
               headers: {
                 'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
@@ -142,18 +178,55 @@ export default {
                 'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
               }
             }
-            axios.post(`${BACK_URL}/answers/${this.qpost_id}`,this.answer,config)
+            axios.post(`${BACK_URL}/answers/${this.qpost_id}`,this.answerData,config)
             .then(res=>{
+                // console.log(this.answer)
+                // this.$router.push({ name: 'Question' }) // 이부분 수정해줘야함 어느페이지로 갈지
+                // location.reload() 새로고침
+                this.getAnswer() // 페이지 리로딩
                 console.log(res)
             })
             .catch(err=>{
                 console.log(err)
             })
-        }
+        },
+        // 답변 목록
+        getAnswer(){
+            axios.get(`${BACK_URL}/answers/${this.qpost_id}/answers`)
+            .then(res=>{
+                this.aPost=res.data.list
+                console.log(res)
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+        },
+        // 답변 삭제
+        deleteAnswer(){
+            console.log(this.apost_id)
+            const config = {
+              headers: {
+                'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
+              }
+            }
+            axios.delete(`${BACK_URL}/answers/${this.apost_id}`,config)
+            .then(res=>{
+                alert('삭제가 완료 되었습니다.')
+                console.log(res)
+            })
+            .catch(err=>{
+                alert('권한이 없습니다.')
+                console.log(err)
+            })
+        },
+        
+        
     },
+    
      created(){
-        this.getQna(this.qpost_id)
-
+        this.getQna()
+        this.getAnswer()
+        
         }
 }
 </script>
