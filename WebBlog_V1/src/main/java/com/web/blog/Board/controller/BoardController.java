@@ -30,6 +30,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -147,12 +149,24 @@ public class BoardController {
         return responseService.getListResult(searchService.BlogPostSearch(type, nickname, keyword));
     }
 
-    //사이트의 모든 블로그의 포스트 리스트
-    @ApiOperation(value = "모든 블로그의 포스트 리스트", notes = "사이트의 모든 블로그의 포스트 리스트")
-    @GetMapping(value = "/search/all_blog_posts")
-    public ListResult<OnlyPostMapping> listPosts() {
-        return responseService.getListResult(postRepository.findAllByOrderByCreatedAtDesc());
+    //사이트의 모든 블로그의 포스트 리스트(최신글)
+    @ApiOperation(value = "모든 블로그의 포스트 리스트 최신글", notes = "사이트의 모든 블로그의 포스트 리스트 인기글")
+    @GetMapping(value = "/blog/recent")
+    public ListResult<OnlyPostMapping> listRecentPosts() {
+        LocalDateTime date = LocalDateTime.now();
+        date.minus(14, ChronoUnit.DAYS);
+        return responseService.getListResult(postRepository.findByCreatedAtLessThanEqualOrderByCreatedAtDesc(date));
     }
+
+    //사이트의 모든 블로그의 포스트 리스트(인기글)
+    @ApiOperation(value = "모든 블로그의 포스트 리스트 인기글", notes = "사이트의 모든 블로그의 포스트 리스트 인기글")
+    @GetMapping(value = "/blog/trend")
+    public ListResult<OnlyPostMapping> listTrendPosts() {
+        LocalDateTime date = LocalDateTime.now();
+        date.minus(14, ChronoUnit.DAYS);
+        return responseService.getListResult(postRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualOrLikesGreaterThanEqualAndCreatedAtLessThanEqualOrderByCreatedAtDesc(40, date, 20, date));
+    }
+
 
     //사이트의 모든 블로그의 포스트 검색
     @ApiOperation(value = "모든 블로그의 포스트 검색 ", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 작성자 검색, type 4: 통합검색, ")
