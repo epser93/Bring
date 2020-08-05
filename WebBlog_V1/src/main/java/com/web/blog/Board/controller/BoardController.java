@@ -104,7 +104,6 @@ public class BoardController {
             long msrl = member.getMsrl();
             Board board = boardService.findBoard(boardName, member);
             Long boardId = board.getBoardId();
-            boardService.deletePosts(msrl);
             boardService.deleteBoard(boardId, msrl);
             return responseService.getSuccessResult();
         }
@@ -152,8 +151,7 @@ public class BoardController {
     @ApiOperation(value = "모든 블로그의 포스트 리스트", notes = "사이트의 모든 블로그의 포스트 리스트")
     @GetMapping(value = "/search/all_blog_posts")
     public ListResult<OnlyPostMapping> listPosts() {
-        Long num = (long) 0;
-        return responseService.getListResult(postRepository.findAllByPostIdGreaterThan(num));
+        return responseService.getListResult(postRepository.findAllByOrderByCreatedAtDesc());
     }
 
     //사이트의 모든 블로그의 포스트 검색
@@ -230,7 +228,7 @@ public class BoardController {
     public void like(@RequestBody Boolean likeit, @PathVariable long postId, @PathVariable String nickname) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
-        Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new); //로그인한 사용자
+        Member member = memberRepository.findByUid(uid).orElseThrow(CUserNotFoundException::new); //로그인한 사용자
         Post post = postRepository.findById(postId).orElseThrow(CResourceNotExistException::new);
         Optional<PostMember> postMember = postMemberRepository.findPostMemberByMember_MsrlAndPost(member.getMsrl(), post);
         if (postMember.isPresent() && likeit) {

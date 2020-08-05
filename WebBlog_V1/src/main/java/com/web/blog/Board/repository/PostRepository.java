@@ -76,6 +76,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     //사이트의 모든 포스트 리스트
     List<OnlyPostMapping> findAllByPostIdGreaterThan(long num);
+    List<OnlyPostMapping> findAllByOrderByCreatedAtDesc();
 
     //사이트의 모든 포스트 통합 검색(or 사이트 내 모든 포스트 리스트)
 //    @Query(value = "select distinct * from post where (subject like concat('%',:keyword,'%') or content like concat('%',:keyword,'%') or writer like concat('%',:keyword,'%'))", nativeQuery = true)
