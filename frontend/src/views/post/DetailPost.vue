@@ -43,9 +43,10 @@
                   id="textarea-rows"
                   placeholder="Tall textarea"
                   rows="8"
+                  v-model = "comment_content"
               ></b-form-textarea>
           </div>
-          <button class="btn btn-success btn-sm mx-1" @click='commentOpen'>답변 달기</button>
+          <button class="btn btn-success btn-sm mx-1" @click='commentWrite'>답변 달기</button>
           <button class="btn btn-success btn-sm mx-1" @click='commentClose'>답변창 닫기</button>
           
       </span>
@@ -54,6 +55,16 @@
       </span>
 
       </div>
+
+      <div class="card rounded-lg mb-3 shadow p-3 bg-white rounded" v-for="comment in recentlyComments" :key="comment.replyId">
+        <p>{{ comment.writer }}</p>
+        <p>{{ comment.reply}}</p>
+        <p>이 댓글을{{ comment.likes}}명이 좋아합니다</p>
+        <p>{{ comment.createdAt }}</p>
+        <button v-if="$cookies.get('nickname') === comment.writer" @click="commentDelete(comment)">삭제</button>
+        <button v-if="$cookies.get('nickname') === comment.writer">수정</button>
+      </div>
+      
       
 
     </b-container>
@@ -62,6 +73,7 @@
 
 <script>
 import axios from 'axios'
+import _ from 'lodash'
 const BACK_URL = 'http://localhost:8080'
 
 export default {
@@ -78,6 +90,9 @@ export default {
             writer: null,
             content: null,
             createdAt: null,
+
+            comments: null,
+            comment_content: '',
         }
      },
     methods: {
@@ -86,6 +101,43 @@ export default {
         },
         commentClose() {
           this.writeComment = false
+        },
+        commentWrite() {
+          const config = {
+            headers: {
+              'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
+            }
+          }
+          axios.post(`${BACK_URL}/reply/${this.post_id}`,{ reply : this.comment_content },config)
+            .then(() => {
+              this.comment_content = ''
+              this.getComment()
+              this.writeComment = false
+            })
+            .catch(err => console.log(err))
+        },
+        commentDelete(comment) {
+          const config = {
+            headers: {
+              'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
+            }
+          }
+          if (comment.writer === this.$cookies.get('nickname')) {
+            axios.delete(`${BACK_URL}/reply/${comment.replyId}`, config)
+              .then(() => {
+                this.getComment()
+              })
+              .catch(err => console.log(err))
+          } else {
+            alert("작성자가 다릅니다.")
+          }
+        },
+        getComment() {
+          axios.get(`${BACK_URL}/reply/${this.post_id}/replies`)
+            .then(res => {
+              this.comments = res.data.list
+              })
+            .catch(err => console.log(err))
         },
         updatePost() {
           this.$router.push({ name : 'UpdateForm' , params: { nickname : this.writer, boardName : this.board_name, post_id : this.post_id}})
@@ -118,9 +170,15 @@ export default {
             })
         }
     },
-     created(){
-       this.fetchPost()
-      }
+    created(){
+       this.fetchPost(),
+       this.getComment()
+    },
+    computed: {
+      recentlyComments () {
+        return _.orderBy(this.comments, ['createdAt'], ['desc'])
+      },
+    }
 }
 </script>
 

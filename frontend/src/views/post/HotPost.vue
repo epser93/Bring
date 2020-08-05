@@ -1,7 +1,7 @@
 !<template>
   <div class="wrapB container-fluid">
     <section v-if="mode==='blog'" class="cards row">
-      <div v-for="post in orderedHotPosts" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
+      <div v-for="post in postings" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
         <div class="cardwrap" @click="gotoDetail(post)">
           <div class="img-section">
             <a href=""></a>
@@ -59,12 +59,22 @@
 </template>
 
 <script>
+import axios from 'axios'
 import _ from 'lodash'
+const BACK_URL = 'http://localhost:8080'
 export default {
   name: 'HotPost',
   props: {
     mode: String,
     posts: Array,
+  },
+  data() {
+    return {
+      postings: null
+    }
+  },
+  created() {
+    this.getHotPost()
   },
   methods: {
     gotoDetail(post) {
@@ -72,16 +82,21 @@ export default {
     },
     gotoQuestionDetail(question) {
       this.$router.push({ name : "DetailPost" , params: { post: question, nickname : question.writer, post_id : question.qpost_id }})
+    },
+    getHotPost() {
+      axios.get(`${BACK_URL}/blog/trend`)
+        .then(res => {
+          this.postings = res.data.list
+          console.log('핫핫', this.postings)
+        })
+        .catch(err => console.log(err))
     }
   },
   computed: {
-    orderedHotPosts () {
-      return _.orderBy(this.posts, 'likes', 'desc')
-    },
     orderedHotQuestions () {
-      return _.orderBy(this.posts, 'views', 'desc')
+      return _.orderBy(this.postings, 'views', 'desc')
     }
-  }
+  },
 }
 </script>
 

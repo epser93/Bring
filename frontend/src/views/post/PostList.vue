@@ -15,7 +15,7 @@
           </div>
           <div class="writer-info">
             <button class="btn btn-sm" @click="gotoUserInfo(post.writer)">{{ post.writer }}</button>
-            <p>♥ {{ post.likes}}</p>
+            <p>♥ {{ post.likes }}</p>
           </div>
         </div>
       </div>
@@ -82,6 +82,7 @@ export default {
     }
   },
   computed: {
+    // qna때문에 남겨짐 지워야함!
     orderedPosts () {
       return _.orderBy(this.posts, 'createdAt', 'desc')
     }
