@@ -55,7 +55,7 @@ const routes = [{
     },
     {
         path: '/:nickname/:boardName/:post_id/update',
-        name : 'UpdateForm',
+        name: 'UpdateForm',
         component: UpdateForm,
         props: true
     },
@@ -102,7 +102,7 @@ const routes = [{
 
     // 블로그 에디터
     {
-        path: '/blog-editor/:nickname',
+        path: '/blog-editor/:nickname/:category/write',
         name: 'BlogEditor',
         component: Editor,
     },

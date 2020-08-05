@@ -4,18 +4,17 @@
       <h2 class="">글 작성</h2>
       <button type="button" @click="postText" class="btn btn-outline-success" style="width:80px;">발행</button>
     </div>
-    <!-- 카테고리 생성 부분 -->
-    
-    
+
     <!-- 카테고리 부분 -->
     <div class="row form-group">
-      <div class="col-2 text-left"><label for="multiple-select" class=" form-control-label">카테고리 선택: </label></div>
+      <div class="col-2 text-left"><label for="multiple-select" class=" form-control-label">카테고리: </label></div>
       <div class="col-10 text-left">
         <select v-model="aboutText.boardName">
           <option v-for="category in categoryList" v-bind:key="category.name">
             {{ category.name }}
           </option>
         </select>
+
       </div>
     </div>
 
@@ -37,8 +36,6 @@
 <script>
 import axios from 'axios'
 
-
-
 const BACK_URL = 'http://localhost:8080'
 
 export default {
@@ -56,6 +53,7 @@ export default {
                 tags: ['']
               },
         nickname: this.$route.params.nickname,
+        
       },
       categoryList: [],
     }
@@ -91,7 +89,8 @@ export default {
       },
   },
   created() {
-    this.getCategory()
+    this.getCategory(),
+    this.aboutText.boardName = this.$route.params.category
   }
 };
 </script>
