@@ -29,10 +29,12 @@
                       <div class="col"></div>
                       <div class="col"></div>
                       <div class="col">
-                          {{qPost.writer}}/{{this.userinfo.nickname}}
                           
-                          <b-button @click="deleteQna" class="mr-1" v-if="this.nickname===qPost.writer"><b-icon icon="trash"></b-icon> 삭제</b-button>
+                          <!-- 분기처리/ 작성자와 현재 사용자의 이름이 같으면 삭제표시되게끔-->
+                          <div v-if="this.nickname===qPost.writer">
+                          <b-button @click="deleteQna" class="mr-1" ><b-icon icon="trash"></b-icon> 삭제</b-button>
                           <b-button @click="modifyQna" variant="warning" class="ml-2">수정</b-button>
+                          </div>
                       </div>
                   </div>
               </h5>
@@ -44,22 +46,25 @@
             <div class="row">
                 <div class="col"></div>
                 <div class="col">
-
                 <ul>
                     <li v-for="aArticle in aPost" :key="aArticle.aPostId">
-                        <p>글쓴이: {{aArticle.writer}}
+                        <p>
+                            {{aArticle.apostId}}
+                        글쓴이: {{aArticle.writer}}
                         답변: {{aArticle.answer}}
                         좋아요: {{aArticle.likes}}
                         채택여부: {{aArticle.selected}}
-                        <button class="btn btn-secondary">채택</button>
-                        <button class="btn btn-danger" @click="deleteAnswer">삭제</button>
+                        <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="nickname===aArticle.writer">삭제</b-button>
+                        <b-button variant="primary" v-if="nickname===qPost.writer">채택</b-button>    
                         </p>
-                    </li>
+                         
+                    </li>   
+                                
                 </ul>
                 </div>
                 <div class="col">
-                    <button class="btn btn-primary">답변채택</button>
-                    <button class="btn btn-warning">답변추천</button>
+                    <!-- 답변 채택은 작성자만 할 수 있게 끔-->
+                    
                 </div>
         </div>
         </div>
@@ -76,14 +81,13 @@
                     v-model="answerData.answer"
                 ></b-form-textarea>
             </div>
-            
             <button class="btn btn-success btn-sm mx-1" @click='writeAnswer' >답변 달기</button>
             <button class="btn btn-success btn-sm mx-1" @click='commentClose'>답변창 닫기</button>
             <!-- 누르면 새로 렌더해주게끔 로직짜야함-->
             
         </span>
-        <span v-else>
-            <button class="btn btn-success btn-sm mx-1" @click='commentOpen'>답변창 열기</button>
+        <span v-else-if="this.nickname!=qPost.writer">
+            <button class="btn btn-success btn-sm mx-1" @click='commentOpen' >답변창 열기</button>
         </span>
 
         </div>
@@ -102,7 +106,7 @@ export default {
      data(){
         return {
             writeComment: false,
-            nickname: this.$route.params.nickname,
+            nickname: this.$cookies.get('nickname'),
             qpost_id: this.$route.params.qpostId,
             qPost : [],
 
@@ -115,6 +119,8 @@ export default {
             },
             aPost:[],
             apost_id: this.$route.params.apostId,
+            // 답변 채택
+            likeit:false,
         }
      },
     methods: {
@@ -151,7 +157,7 @@ export default {
                 this.$router.push({ name: 'Question' })
             })
             .catch(err=>{
-                alert('삭제 실패')
+                alert('답변이 등록 된 질문이거나 권한이 없습니다.')
                 console.log(err)
             })
         },
@@ -180,9 +186,7 @@ export default {
             }
             axios.post(`${BACK_URL}/answers/${this.qpost_id}`,this.answerData,config)
             .then(res=>{
-                // console.log(this.answer)
-                // this.$router.push({ name: 'Question' }) // 이부분 수정해줘야함 어느페이지로 갈지
-                // location.reload() 새로고침
+
                 this.getAnswer() // 페이지 리로딩
                 console.log(res)
             })
@@ -202,23 +206,41 @@ export default {
             })
         },
         // 답변 삭제
-        deleteAnswer(){
-            console.log(this.apost_id)
+        deleteAnswer(aPostId){
+            console.log(aPostId)
             const config = {
               headers: {
                 'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
               }
             }
-            axios.delete(`${BACK_URL}/answers/${this.apost_id}`,config)
+            axios.delete(`${BACK_URL}/answers/${aPostId}`,config)
             .then(res=>{
                 alert('삭제가 완료 되었습니다.')
+                this.getAnswer()
                 console.log(res)
             })
             .catch(err=>{
-                alert('권한이 없습니다.')
+                alert('삭제가 실패하였습니다')
                 console.log(err)
             })
         },
+        // 답변 추천
+        recommendAnswer(aPostId){
+            const config={
+                headers:{
+                    'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN')
+                }
+            }
+            axios.post(`${BACK_URL}/answers/like/${aPostId}/likedusers`,config)
+            .then(res=>{
+                alert("추천 완료")
+                console.log(res)
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+            
+        }
         
         
     },
