@@ -42,31 +42,20 @@
         </div>
 
         <!-- 답변 리스트-->
-        <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded">
-            <div class="row">
-                <div class="col"></div>
-                <div class="col">
-                <ul>
-                    <li v-for="aArticle in aPost" :key="aArticle.aPostId">
-                        <p>
-                            {{aArticle.apostId}}
-                        글쓴이: {{aArticle.writer}}
-                        답변: {{aArticle.answer}}
-                        좋아요: {{aArticle.likes}}
-                        채택여부: {{aArticle.selected}}
-                        <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="nickname===aArticle.writer">삭제</b-button>
-                        <b-button variant="primary" v-if="nickname===qPost.writer">채택</b-button>    
-                        </p>
-                         
-                    </li>   
-                                
-                </ul>
-                </div>
-                <div class="col">
-                    <!-- 답변 채택은 작성자만 할 수 있게 끔-->
-                    
-                </div>
-        </div>
+        
+
+        <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded" v-for="aArticle in aPost" :key="aArticle.aPostId">
+            <p>글쓴이: {{aArticle.writer}}<span class="ml-5">{{aArticle.likes}}</span></p> 
+            <span>채택여부: {{aArticle.selected}}</span>
+            
+            <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="nickname===aArticle.writer">삭제</b-button>
+             
+            <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="nickname===qPost.writer">채택</b-button>
+            <b-button variant="primary" @click="likeAnswer(aArticle.apostId)">좋아요</b-button>
+            
+            <hr>
+            {{aArticle.answer}}
+            
         </div>
 
 
@@ -121,6 +110,7 @@ export default {
             apost_id: this.$route.params.apostId,
             // 답변 채택
             likeit:false,
+            answerer: this.$cookies.get('nickname'),
         }
      },
     methods: {
@@ -225,21 +215,40 @@ export default {
             })
         },
         // 답변 추천
-        recommendAnswer(aPostId){
+        likeAnswer(aPostId){
+            console.log(this.nickname)
+            console.log(this.likeit)
             const config={
                 headers:{
                     'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN')
                 }
             }
-            axios.post(`${BACK_URL}/answers/like/${aPostId}/likedusers`,config)
+            axios.post(`${BACK_URL}/answers/like/${aPostId}/${this.nickname}`,this.answerer,config)
             .then(res=>{
+                
                 alert("추천 완료")
                 console.log(res)
             })
             .catch(err=>{
                 console.log(err)
             })
-            
+        },
+        // 답변 채택
+        selectAnswer(aPostId){
+            console.log(aPostId)
+            const config={
+                headers:{
+                    'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN')
+                }
+            }
+            axios.post(`${BACK_URL}/answers/select/${aPostId}`,config)
+            .then(res=>{
+                alert("한 번 채택하면 다시는 못돌아 갑니다")
+                console.log(res)
+            })
+            .catch(err=>{
+                console.log(err)
+            })
         }
         
         
