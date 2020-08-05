@@ -61,14 +61,14 @@
 <script>
 import _ from 'lodash'
 export default {
-  name: 'PostList',
+  name: 'HotPost',
   props: {
     mode: String,
     posts: Array,
   },
   methods: {
     gotoDetail(post) {
-      this.$router.push({ name : "DetailPost" , params: { post: post, nickname : post.writer, post_id : post.postId }})
+      this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.writer, post_id : post.postId }})
     },
     gotoQuestionDetail(question) {
       this.$router.push({ name : "DetailPost" , params: { post: question, nickname : question.writer, post_id : question.qpost_id }})

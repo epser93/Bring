@@ -28,8 +28,8 @@
                     <div class="col"></div>
                     <div class="col"></div>
                     <div class="col">
-                        <button class="btn btn-secondary" @click="updatePost"><b-icon icon="trash"></b-icon> 수정</button>
-                        <button class="btn btn-secondary"><b-icon icon="trash"></b-icon> 삭제</button>
+                        <button class="btn btn-secondary" v-if="(writer === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="updatePost"><b-icon icon="trash"></b-icon> 수정</button>
+                        <button class="btn btn-secondary" v-if="(writer === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="deletePost"><b-icon icon="trash"></b-icon> 삭제</button>
                     </div>
                 </div>
             </h5>
@@ -47,7 +47,6 @@
           </div>
           <button class="btn btn-success btn-sm mx-1" @click='commentOpen'>답변 달기</button>
           <button class="btn btn-success btn-sm mx-1" @click='commentClose'>답변창 닫기</button>
-          <!-- 누르면 새로 렌더해주게끔 로직짜야함-->
           
       </span>
       <span v-else>
@@ -79,9 +78,6 @@ export default {
             writer: null,
             content: null,
             createdAt: null,
-
-            // qpost_id: this.$route.params.qpostId,
-            // qPost: null,
         }
      },
     methods: {
@@ -102,22 +98,28 @@ export default {
           }
           axios.get(`${BACK_URL}/blog/${this.nickname}/${this.board_name}/${this.post_id}`,config)
             .then(res => {
-              console.log(res.data.list[0].list[0])
               this.writer = res.data.list[0].list[0].writer
               this.subject = res.data.list[0].list[0].subject
               this.content = res.data.list[0].list[0].content
               this.createdAt = res.data.list[0].list[0].createdAt
-              console.log(res.data.list[0].list[0].content)
             })
             .catch(err => console.log(err))
+        },
+        deletePost() {
+          const config = {
+            headers: {
+              'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
+            }
+          }
+          axios.delete(`${BACK_URL}/blog/${this.nickname}/${this.board_name}/${this.post_id}`,config)
+            .then(() =>{
+              alert('삭제되었습니다!')
+              this.$router.push({ name : 'Home' })
+            })
         }
     },
      created(){
-       console.log(this.post_id)
-       console.log(this.nickname)
-       console.log(this.board_name)
        this.fetchPost()
-
       }
 }
 </script>

@@ -71,11 +71,8 @@ export default {
           'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
         }
       }
-      console.log(this.postData)
-      console.log(config)
       axios.put(`${BACK_URL}/blog/${this.nickname}/${this.boardName}/${this.post_id}`, this.postData, config)
-        .then(res => {
-          console.log(res)
+        .then(() => {
           this.$router.go(-1)
         })
         .catch(err => console.log(err))
@@ -85,7 +82,6 @@ export default {
               .then(res => {
                   this.categoryList = res.data.list
               })
-
               .catch(err => {
                   console.log(err)
               })
@@ -93,7 +89,6 @@ export default {
       getPostInfo() {
         axios.get(`${BACK_URL}/blog/${this.nickname}/${this.boardName}/${this.post_id}`)
           .then(res => {
-            console.log('getpost', res)
             this.writer = res.data.list[0].list[0].writer
             this.postData.subject = res.data.list[0].list[0].subject
             this.postData.content = res.data.list[0].list[0].content

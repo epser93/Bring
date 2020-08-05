@@ -42,7 +42,6 @@ export default {
         axios.get(`${BACK_URL}/blog/recent`)
           .then (res => {
             this.posts = res.data.list
-            console.log('포스팅', this.posts)
           })
           .catch (err => console.log(err))
       } else {

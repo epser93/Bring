@@ -1,7 +1,7 @@
 <template>
   <div class="wrapB container-fluid">
     <section v-if="mode==='blog'" class="cards row">
-      <div v-for="post in orderedPosts" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
+      <div v-for="post in posts" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
         <div class="cardwrap">
           <div class="card-body p-0" @click="gotoDetail(post)">
             <div class="img-section">
