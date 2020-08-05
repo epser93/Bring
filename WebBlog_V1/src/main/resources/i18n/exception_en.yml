@@ -45,7 +45,7 @@ selectedAnswer:
   msg: "Selected Answer cannot be deleted."
 youAskedQuestion:
   code: "-5002"
-  msg: "You asked this question. You cannot answer on your question."
+  msg: "You asked this question. You cannot select on this question's your reply."
 alreadyFollowed:
   code: "-1005"
   msg: "You already followed this bloger."

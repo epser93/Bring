@@ -74,10 +74,11 @@ public class AnswerController {
     @PostMapping(value = "/{qpostId}")
     public SingleResult<Apost> answerTheQuestion(@PathVariable long qpostId, @Valid @RequestBody ParamApost paramApost, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
         Optional<Qpost> qpost = qpostRepository.findById(qpostId);
+        Member asker = qpost.get().getMember();
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Member member = (Member) principal;
         if (qpostRepository.isSelectedAnswerExist(qpostId)) return null;
-        return responseService.getSingleResult(qnaService.writeAnswer(qpost.get(), member, paramApost, files));
+        return responseService.getSingleResult(qnaService.writeAnswer(qpost.get(), member, asker, paramApost, files));
     }
 
     //답변 수정
@@ -124,7 +125,7 @@ public class AnswerController {
         Qpost qpost = apost.get().getQpost();
         long msrl = qpost.getMember().getMsrl();
         if (msrl == member.getMsrl() && !qpostRepository.isSelectedAnswerExist(qpost.getQpostId())) { //로그인 한 사용자가 질문자면~
-            qnaService.selectThisAnswer(apostId, qpost.getQpostId());
+            qnaService.selectThisAnswer(apostId, qpost.getQpostId(), member);
         } else throw new CNotOwnerException();
     }
 

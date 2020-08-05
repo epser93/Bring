@@ -45,7 +45,7 @@ selectedAnswer:
   msg: "채택된 답변은 삭제하실 수 없습니다."
 youAskedQuestion:
   code: "-5002"
-  msg: "질문 작성자는 답변할 수 없습니다."
+  msg: "질문 작성자는 자신의 댓글을 채택할 수 없습니다."
 alreadyFollowed:
   code: "-1005"
   msg: "이미 팔로우 하셨습니다."

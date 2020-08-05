@@ -114,19 +114,21 @@ public class QnaService {
     }
 
     //답변 작성
-    public Apost writeAnswer(Qpost qpost, Member member, ParamApost paramApost, MultipartFile[] files) throws IOException {
+    public Apost writeAnswer(Qpost qpost, Member member, Member asker, ParamApost paramApost, MultipartFile[] files) throws IOException {
         if (files != null) {
             fileService.uploadFiles(files);
         }
-        if (!qpost.getWriter().equals(member.getNickname())) {
-            Apost apost = Apost.builder()
-                    .qpost(qpost)
-                    .writer(member.getNickname())
-                    .answer(paramApost.getAnswer())
-                    .build();
+        Apost apost = Apost.builder()
+                .qpost(qpost)
+                .writer(member.getNickname())
+                .answer(paramApost.getAnswer())
+                .build();
+        if(member.equals(asker)){ //답변 작성자가
+            return apostRepository.save(apost);
+        } else {
             qpostRepository.updateAnswerCnt(qpost.getQpostId());
             return apostRepository.save(apost);
-        } else throw new CAskedQuestionException();
+        }
     }
 
     //답변 수정
@@ -172,10 +174,13 @@ public class QnaService {
     }
 
     //답변 채택
-    public boolean selectThisAnswer(long apost_id, long qpost_id) {
+    public boolean selectThisAnswer(long apost_id, long qpost_id, Member member) {
         Apost apost = apostRepository.findById(apost_id).orElseThrow(CResourceNotExistException::new);
         String writer = apost.getWriter();
         Member answerer = memberRepository.findByNickname(writer).orElseThrow(CUserNotFoundException::new);
+        if(member.equals(answerer)){
+            throw new CAskedQuestionException();
+        }
         memberRepository.updateScoreIfSelected(answerer.getMsrl());
         qpostRepository.changeSelectedAnswerExist(qpost_id);
         apostRepository.select(apost_id);

@@ -1,6 +1,8 @@
 package com.web.blog.Board.model;
 
 
+import com.web.blog.Board.entity.Board;
+
 import java.time.LocalDateTime;
 
 public interface OnlyPostMapping {
@@ -12,4 +14,5 @@ public interface OnlyPostMapping {
     String getContent();
     int getViews();
     int getLikes();
+    String getBoard_name();
 }

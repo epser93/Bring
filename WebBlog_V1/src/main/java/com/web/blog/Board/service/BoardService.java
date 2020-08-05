@@ -28,15 +28,14 @@ import java.util.Optional;
 @Transactional
 @RequiredArgsConstructor
 public class BoardService {
-    private final PostMemberRepository postMemberRepository;
     private final BoardRepository boardRepository;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
-    private final ReplyMemberRepository replyMemberRepository;
-    private final ReplyRepository replyRepository;
-    private final FileService fileService;
     private final TagRepository tagRepository;
     private final PostTagRepository postTagRepository;
+    private final PostMemberRepository postMemberRepository;
+    private final TagService tagService;
+    private final ReplyService replyService;
 
     //게시판 단건 조회
     public Board getBoard(long boardId) {
@@ -75,10 +74,30 @@ public class BoardService {
     public boolean deleteBoard(long boardId, long msrl) {
         Board board = getBoard(boardId);
         Member member = board.getMember();
+        List<Post> list = postRepository.findByBoard(board);
+        for(Post p : list) {
+            deletePost(p.getPostId());
+        }
         if (msrl != member.getMsrl())
             throw new CNotOwnerException();
         boardRepository.delete(board);
         return true;
+    }
+
+    public boolean deletePost(long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(CResourceNotExistException::new);
+        tagService.deleteTags(post);
+        replyService.deleteReplies(post);
+        deleteLikes(post);
+        postRepository.delete(post);
+        return true;
+    }
+
+    public void deleteLikes(Post post) {
+        List<PostMember> likers = postMemberRepository.findPostMemberByPost(post);
+        for(PostMember pm : likers) {
+            postMemberRepository.delete(pm);
+        }
     }
 
     //게시판 내 포스트  list 조회
