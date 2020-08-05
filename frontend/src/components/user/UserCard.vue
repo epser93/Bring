@@ -17,8 +17,8 @@
                         <br>
 
                     </div>
-                       <!-- 에디터 라우터도 바꿔야함 내일 무조건바꾸기 -->
-        <!-- 육성게임 -->
+
+                    <!-- 육성게임 -->
                     <div class="mx-3 mt-3"> 
                         <h3 class="card-title"><b>My Level</b> </h3>
                         <div v-if="computedGrade === 'bronze'" class="mb-3">
@@ -271,7 +271,7 @@ export default {
           
       },
       gotoEdit() {
-          //this.$router.push({ name : "DetailPost" , params: { post: post, nickname : post.writer, post_id : post.post_id }})
+          this.$router.push({ name : "Edit" })
       }
   },
 

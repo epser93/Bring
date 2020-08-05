@@ -12,6 +12,7 @@ import UpdateForm from '../views/post/UpdateForm.vue'
 import Login from '../views/user/Login.vue' // 곧 사라질 예정 모달로 처리함
 import Signup from '../views/user/Signup.vue'
 import Profile from '../views/user/Profile.vue'
+import Edit from '../components/user/EditProfile.vue'
 
 // 블로그
 import MyBlog from '../views/blog/MyBlog.vue'
@@ -74,6 +75,11 @@ const routes = [{
         path: '/user/profile',
         name: 'Profile',
         component: Profile
+    },
+    {
+        path: '/user/profile/edit',
+        name: 'Edit',
+        component: Edit
     },
     // 블로그 관련
     {
