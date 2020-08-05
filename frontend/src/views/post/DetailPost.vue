@@ -36,17 +36,18 @@
 
       </div>
 
-      <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded">
+      <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded" id="commentTextArea">
             <span v-if="writeComment">
                 <div>
               <b-form-textarea
                   id="textarea-rows"
-                  placeholder="Tall textarea"
+                  placeholder="댓글을 작성해주세요!"
                   rows="8"
                   v-model = "comment_content"
               ></b-form-textarea>
           </div>
-          <button class="btn btn-success btn-sm mx-1" @click='commentWrite'>답변 달기</button>
+          <button class="btn btn-success btn-sm mx-1" v-if="!commentUpdateToggle" @click='commentWrite'>답변 달기</button>
+          <button class="btn btn-success btn-sm mx-1" v-if="commentUpdateToggle" @click='commentUpdate'>답변 수정</button>
           <button class="btn btn-success btn-sm mx-1" @click='commentClose'>답변창 닫기</button>
           
       </span>
@@ -62,7 +63,7 @@
         <p>이 댓글을{{ comment.likes}}명이 좋아합니다</p>
         <p>{{ comment.createdAt }}</p>
         <button v-if="$cookies.get('nickname') === comment.writer" @click="commentDelete(comment)">삭제</button>
-        <button v-if="$cookies.get('nickname') === comment.writer">수정</button>
+        <button v-if="$cookies.get('nickname') === comment.writer" @click="openCommentUpdate(comment), setXY($event)">수정</button>
       </div>
       
       
@@ -93,6 +94,9 @@ export default {
 
             comments: null,
             comment_content: '',
+            commentUpdateToggle : false,
+            Y : 0,
+            comment_id : 0
         }
      },
     methods: {
@@ -113,6 +117,36 @@ export default {
               this.comment_content = ''
               this.getComment()
               this.writeComment = false
+            })
+            .catch(err => console.log(err))
+        },
+        openCommentUpdate(comment) {
+          this.writeComment = true
+          let target = document.getElementById('commentTextArea')
+          let targetTop = target.getBoundingClientRect().top;
+          let abTop = window.pageYOffset + targetTop -100;
+          window.scrollTo(0, abTop)
+          this.commentUpdateToggle = true
+          this.comment_content = comment.reply
+          this.comment_id = comment.replyId
+        },
+        setXY(event) {
+          this.Y = event.pageY
+        },
+        // isSelected 부분 다시 binding 해야함
+        commentUpdate() {
+          const config = {
+            headers: {
+              'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
+            }
+          }
+          axios.put(`${BACK_URL}/reply/${this.comment_id}?isSelected=false`, { reply : this.comment_content },config)
+            .then(() => {
+              this.getComment()
+              this.commentUpdateToggle = false,
+              this.writeComment = false,
+              this.comment_content = "",
+              window.scrollTo(0, this.Y)
             })
             .catch(err => console.log(err))
         },
@@ -168,7 +202,7 @@ export default {
               alert('삭제되었습니다!')
               this.$router.push({ name : 'Home' })
             })
-        }
+        },
     },
     created(){
        this.fetchPost(),
