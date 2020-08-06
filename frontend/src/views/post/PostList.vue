@@ -127,6 +127,10 @@ h2 {
   cursor: pointer;
 }
 
+.cardwrap {
+  box-shadow: 10px 0px 60px -40px black
+}
+
 .img-section {
   width: 100%;
   height: 200px;
