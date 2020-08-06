@@ -24,7 +24,7 @@ public class JwtTokenProvider {
     @Value("spring.jwt.secret")
     private String secretKey;
 
-    private long tokenValidMilisecond = 1000L * 60 * 60; //1Hour
+    private long tokenValidMilisecond = 1000L * 60 * 60 * 24; //24Hour
     private final UserDetailsService userDetailsService;
 
     @PostConstruct

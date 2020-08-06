@@ -1,5 +1,6 @@
 package com.web.blog.QnA.repository;
 
+import com.web.blog.Board.model.OnlyPostMapping;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.QnA.entity.Qpost;
 import com.web.blog.QnA.model.OnlyQpostMapping;
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,4 +55,12 @@ public interface QpostRepository extends JpaRepository<Qpost, Long> {
 
     //모든 질문글 작성자 검색
     List<Qpost> findByWriterContaining(String keyword);
+
+    //사이트의 모든 포스트 리스트(최신글)
+    List<OnlyQpostMapping> findByCreatedAtLessThanEqualOrderByCreatedAtDesc(LocalDateTime date);
+
+    //사이트의 모든 포스트 리스트(인기글)
+    List<OnlyQpostMapping> findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualOrAnswerCntGreaterThanEqualAndCreatedAtLessThanEqualOrderByCreatedAtDesc(int views, LocalDateTime dateV, int answerCnt, LocalDateTime dateL);
+
+
 }

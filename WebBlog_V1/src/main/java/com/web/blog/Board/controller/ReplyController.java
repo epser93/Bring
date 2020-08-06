@@ -45,6 +45,9 @@ public class ReplyController {
     private final PostRepository postRepository;
 
     //댓글 상세조회
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "댓글 상세조회", notes = "댓글 상세조회")
     @GetMapping(value = "/reply/{replyId}")
     public ListResult<OnlyReplyMapping> answerDetail(@PathVariable long replyId) {
@@ -52,6 +55,9 @@ public class ReplyController {
     }
 
     //한 포스트의 댓글 리스트 조회
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "댓글 목록", notes = "댓글 목록")
     @GetMapping(value = "/reply/{postId}/replies")
     public ListResult<OnlyReplyMapping> getAllAnswersinOnePost(@PathVariable long postId) {
@@ -77,7 +83,7 @@ public class ReplyController {
     })
     @ApiOperation(value = "댓글 수정", notes = "댓글 수정")
     @PutMapping(value = "/reply/{replyId}")
-    public SingleResult<Reply> updateAnswer(@Valid @RequestBody ParamReply paramReply, @PathVariable long replyId, @RequestParam(value = "files", required = false) MultipartFile[] files, @RequestParam Boolean isSelected) throws IOException {
+    public SingleResult<Reply> updateAnswer(@Valid @RequestBody ParamReply paramReply, @PathVariable long replyId, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
         Optional<Reply> reply = replyRepository.findById(replyId);
         Post post = reply.get().getPost();
         return responseService.getSingleResult(replyService.updateReply(replyId, paramReply, files));

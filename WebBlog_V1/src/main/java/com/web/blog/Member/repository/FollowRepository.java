@@ -8,9 +8,10 @@ import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 public interface FollowRepository extends JpaRepository<Follow, Long> {
-    Follow findByFromAndTo(long from_member_fk, long to_member_fk);
+    Optional<Follow> findByFrom_MsrlAndTo_Msrl(long from_member_fk, long to_member_fk);
 
     @Modifying
     @Transactional
