@@ -45,14 +45,31 @@
         
 
         <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded" v-for="aArticle in aPost" :key="aArticle.aPostId">
-            <p>글쓴이: {{aArticle.writer}}<span class="ml-5">{{aArticle.likes}}</span></p> 
+            <p>글쓴이: {{aArticle.writer}}<span class="ml-5"> 좋아요 수: {{aArticle.likes}}</span></p> 
             <span>채택여부: {{aArticle.selected}}</span>
             
             <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="nickname===aArticle.writer">삭제</b-button>
              
-            <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="nickname===qPost.writer">채택</b-button>
+            <!-- <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="nickname===qPost.writer">채택</b-button> -->
             <b-button variant="primary" @click="likeAnswer(aArticle.apostId)">좋아요</b-button>
-            
+             
+             <!-- 채택할지 여부 묻는 Modal / 이 부분 안됨 더 고민해보기-->
+
+                <!-- <b-button id="show-btn" v-if="nickname===qPost.writer" @click="$bvModal.show('bv-modal')">채택</b-button>
+                
+                <b-modal id="bv-modal" hide-footer>
+                    <template v-slot:modal-title>
+                        답변 채택
+                    </template>
+                    <div class="d-block text-center">
+                        <h3>답변을 채택 하시겠습니까? 채택 하시면 다시 되돌릴 수 없습니다.</h3>
+                        {{aArticle.apostId}}
+                    
+                    </div>
+                    <b-button class="mt-3" variant="outline-danger" block @click="selectAnswer(aArticle.apostId)">채택</b-button>
+                    <b-button class="mt-3" variant="outline-warning" block @click="$bvModal.hide('bv-modal')">취소</b-button>
+                </b-modal> -->
+ 
             <hr>
             {{aArticle.answer}}
             
@@ -243,14 +260,14 @@ export default {
             }
             axios.post(`${BACK_URL}/answers/select/${aPostId}`,config)
             .then(res=>{
-                alert("한 번 채택하면 다시는 못돌아 갑니다")
+                alert("채택 되었습니다")
+                this.getAnswer()
                 console.log(res)
             })
             .catch(err=>{
                 console.log(err)
             })
-        }
-        
+        },
         
     },
     
