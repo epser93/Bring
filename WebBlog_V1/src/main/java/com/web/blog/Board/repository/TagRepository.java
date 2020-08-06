@@ -1,6 +1,7 @@
 package com.web.blog.Board.repository;
 
 import com.web.blog.Board.entity.Tag;
+import com.web.blog.Board.model.OnlyTagMapping;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,6 +14,7 @@ import java.util.Optional;
 
 public interface TagRepository extends JpaRepository<Tag, Long> {
     List<Tag> findAll(Sort sort);
+    List<OnlyTagMapping> findAllByOrderByTagUsageCntAsc();
 
     Optional<Tag> findByTag(String tag);
 

@@ -3,6 +3,7 @@ package com.web.blog.Board.service;
 import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.entity.PostTag;
 import com.web.blog.Board.entity.Tag;
+import com.web.blog.Board.model.OnlyTagMapping;
 import com.web.blog.Board.repository.*;
 import com.web.blog.Common.advice.exception.CResourceNotExistException;
 import com.web.blog.Common.service.FileService;
@@ -25,8 +26,8 @@ public class TagService {
     private final PostTagRepository postTagRepository;
 
     //전체 태그 리스트
-    public List<Tag> getAllTags() {
-        return tagRepository.findAll(Sort.by("tag_usage_cnt"));
+    public List<OnlyTagMapping> getAllTags() {
+        return tagRepository.findAllByOrderByTagUsageCntAsc();
     }
 
     //한 포스트의 태그 리스트 조회
