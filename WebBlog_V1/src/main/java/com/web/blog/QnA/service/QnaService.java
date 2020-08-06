@@ -114,7 +114,7 @@ public class QnaService {
     }
 
     //답변 작성
-    public Apost writeAnswer(Qpost qpost, Member member, Member asker, ParamApost paramApost, MultipartFile[] files) throws IOException {
+    public Apost writeAnswer(Qpost qpost, Member member, ParamApost paramApost, MultipartFile[] files, long postId) throws IOException {
         if (files != null) {
             fileService.uploadFiles(files);
         }
@@ -122,13 +122,11 @@ public class QnaService {
                 .qpost(qpost)
                 .writer(member.getNickname())
                 .answer(paramApost.getAnswer())
+                .postId(postId)
                 .build();
-        if(member.equals(asker)){ //답변 작성자가
-            return apostRepository.save(apost);
-        } else {
-            qpostRepository.updateAnswerCnt(qpost.getQpostId());
-            return apostRepository.save(apost);
-        }
+
+        qpostRepository.updateAnswerCnt(qpost.getQpostId());
+        return apostRepository.save(apost);
     }
 
     //답변 수정
@@ -178,7 +176,7 @@ public class QnaService {
         Apost apost = apostRepository.findById(apost_id).orElseThrow(CResourceNotExistException::new);
         String writer = apost.getWriter();
         Member answerer = memberRepository.findByNickname(writer).orElseThrow(CUserNotFoundException::new);
-        if(member.equals(answerer)){
+        if (member.equals(answerer)) {
             throw new CAskedQuestionException();
         }
         memberRepository.updateScoreIfSelected(answerer.getMsrl());

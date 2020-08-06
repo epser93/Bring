@@ -41,33 +41,96 @@ public class PostService {
         return postRepository.findByPostId(postId);
     }
 
+    public Post getPost2(long postId) {
+        postRepository.updateViewCnt(postId);
+        return postRepository.findById(postId).get();
+    }
+
     //게시글 작성
-    public Post writePost(String nickname, String boardName, ParamPost paramPost, MultipartFile[] files, Member member) throws IOException { //, MultipartFile[] files
+    public Post writePost(String nickname, String boardName, ParamPost paramPost, MultipartFile[] files, Member member, String originWriter) throws IOException { //, MultipartFile[] files
         Board board = boardService.findBoard(boardName, member);
+
+        Post result = null;
         if (files != null) {
             fileService.uploadFiles(files);
         }
-        return postRepository.save(Post.builder()
-                .board(board)
-                .writer(nickname)
-                .subject(paramPost.getSubject())
-                .content(paramPost.getContent())
-                .build());
+        if(paramPost.getOriginal() != -1) {
+            List<OnlyPostMapping> originalPost = postRepository.findByPostId(paramPost.getOriginal());
+            OnlyPostMapping opm = originalPost.get(0);
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("[출처]@" + originWriter);
+            sb.append(" ");
+            String subject = paramPost.getSubject();
+            sb.append(subject);
+            subject = sb.toString();
+
+            sb = new StringBuilder();
+            String content = paramPost.getContent();
+            sb.append(content);
+            sb.append(System.getProperty("line.separator"));
+            sb.append(System.getProperty("line.separator"));
+            sb.append(System.getProperty("line.separator"));
+            sb.append("[Copyright by @" + originWriter);
+            sb.append("  Category: " + opm.getBoard_name() + "  Post ID: " + paramPost.getOriginal() + "]");
+            content = sb.toString();
+
+            result = postRepository.save(Post.builder()
+                    .board(board)
+                    .writer(nickname)
+                    .subject(subject)
+                    .content(content)
+                    .original(paramPost.getOriginal())
+                    .build());
+
+        } else {
+            result = postRepository.save(Post.builder()
+                    .board(board)
+                    .writer(nickname)
+                    .subject(paramPost.getSubject())
+                    .content(paramPost.getContent())
+                    .original(paramPost.getOriginal())
+                    .build());
+        }
+        return result;
     }
 
     //게시글 좋아요
     public void likePost(Member member, Post post, Boolean like) {
-        long msrl = member.getMsrl();
+        long msrl = member.getMsrl(); //좋아요를 누른 사람
         long postId = post.getPostId();
+        long original = post.getOriginal();
         String nickname = post.getWriter();
-        Member writer = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
+        Member writer = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new); //post의 작성자
+        List<OnlyPostMapping> originalPost = null;
         if (like) {
-            memberRepository.updateScoreIfLiked(writer.getMsrl());
-            postRepository.updateLikeCntPlus(postId);
+            postRepository.updateLikeCntPlus(postId); //해당 포스트 글의 좋아요 업데이트
+            if(original != -1) { //포스트의 오리지널이 존재하면
+                originalPost = postRepository.findByPostId(original);
+                String originWriter = originalPost.get(0).getWriter();
+                Member originMember = memberRepository.findByNickname(originWriter).orElseThrow(CUserNotFoundException::new);
+                postRepository.updateLikeCntPlus(original); //공유된 포스트 좋아요 업데이트(원래 포스트)
+                Post originalPost1 = postRepository.findById(original).orElseThrow(CResourceNotExistException::new);
+                Optional<PostMember> postMember = postMemberRepository.findPostMemberByMember_MsrlAndPost(msrl, originalPost1);
+                if(!postMember.isPresent()){ //공유된 포스트를 좋아요 누른 적이 없으면~
+                    postMemberRepository.insertLike(msrl, original); //공유된 포스트 좋아요 연결 추가
+                }
+                memberRepository.updateScoreIfLiked(originMember.getMsrl());
+            } else { //존재하지 않으면
+                memberRepository.updateScoreIfLiked(writer.getMsrl());
+            }
             postMemberRepository.insertLike(msrl, postId);
         } else {
             memberRepository.updateScoreIfUnliked(writer.getMsrl());
             postRepository.updateLikeCntMinus(postId);
+            if(original != -1) {
+                originalPost = postRepository.findByPostId(original);
+                String originWriter = originalPost.get(0).getWriter();
+                Member originMember = memberRepository.findByNickname(originWriter).orElseThrow(CUserNotFoundException::new);
+                postRepository.updateLikeCntMinus(original); //공유된 포스트 좋아요 업데이트(원래 포스트)
+                postMemberRepository.deleteLike(msrl, original); //공유된 포스트 좋아요 연결 해제
+                memberRepository.updateScoreIfUnliked(originMember.getMsrl());
+            }
             postMemberRepository.deleteLike(msrl, postId);
         }
     }

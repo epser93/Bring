@@ -20,32 +20,32 @@ existingUser:
   code: "-1002"
   msg: "이미 가입한 이메일입니다."
 notOwner:
-  code: "-4000"
+  code: "-5000"
   msg: "해당 자료의 작성자가  아닙니다."
 resourceNotExist:
-  code: "-4001"
+  code: "-5001"
   msg: "요청한 자료가 존재 하지 않습니다."
 existingNickname:
   code: "-1003"
   msg: "중복된 닉네임입니다."
 boardNameExist:
-  code: "-4002"
+  code: "-5002"
   msg: "중복된 카테고리 입니다."
 alreadyLikedExeption:
-  code: "-4003"
+  code: "-5003"
   msg: "이미 좋아요(추천)를 누르셨습니다."
 ownerCannotLike:
-  code: "-4004"
+  code: "-5004"
   msg: "포스트 작성자는 자신의 글에 좋아요를 누를 수 없습니다."
 answeredQuestion:
-  code: "-5000"
+  code: "-7000"
   msg: "답변이 달린 질문은 삭제할 수 없습니다."
 selectedAnswer:
-  code: "-5001"
+  code: "-8001"
   msg: "채택된 답변은 삭제하실 수 없습니다."
 youAskedQuestion:
-  code: "-5002"
-  msg: "질문 작성자는 자신의 댓글을 채택할 수 없습니다."
+  code: "-7001"
+  msg: "질문 작성자는 요청하신 작업을 할 수 없습니다."
 alreadyFollowed:
   code: "-1005"
   msg: "이미 팔로우 하셨습니다."
@@ -58,3 +58,6 @@ passwordIncorrect:
 passwordLength:
   code: "-1008"
   msg: "비밀번호는 7자 이상 20자 미만이어야 합니다. 닉네임은 2자 이상 15자 미만이어야 합니다. 확인해 주세요."
+sharedPost:
+  code: "-5005"
+  msg: "공유된 포스트는 공유할 수 없습니다."

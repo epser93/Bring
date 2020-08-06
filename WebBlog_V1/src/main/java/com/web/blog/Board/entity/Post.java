@@ -42,6 +42,9 @@ public class Post extends CommonDateEntity implements Serializable {
     @Column(columnDefinition = "integer default 0")
     private int replyCnt;
 
+    @Column(nullable = true)
+    private Long original;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board;

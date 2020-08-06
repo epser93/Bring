@@ -14,37 +14,37 @@ accessDenied:
   code: "-2001"
   msg: "You don't have permission to access"
 communicationError:
-  code: "-3000"
+  code: "-0000"
   msg: "An Error occured during communication"
 existingUser:
   code: "-1002"
   msg: "The email you have given is already exist."
 notOwner:
-  code: "-4000"
+  code: "-5000"
   msg: "You are not the owner of this resource."
 resourceNotExist:
-  code: "-4001"
+  code: "-5001"
   msg: "The post you requested does not exist."
 existingNickname:
   code: "-1003"
   msg: "The nickname you have given is already exist."
 boardNameExist:
-  code: "-4002"
+  code: "-5002"
   msg: "The board name you have given is already exist."
 alreadyLikedExeption:
-  code: "-4003"
+  code: "-5003"
   msg: "You already liked this post."
 ownerCannotLike:
-  code: "-4004"
+  code: "-5004"
   msg: "You are the owner of this post. The owner cannot like her/his own post."
 answeredQuestion:
-  code: "-5000"
+  code: "-7000"
   msg: "The question that has solution cannot be deleted."
 selectedAnswer:
-  code: "-5001"
+  code: "-8001"
   msg: "Selected Answer cannot be deleted."
 youAskedQuestion:
-  code: "-5002"
+  code: "-7001"
   msg: "You asked this question. You cannot select on this question's your reply."
 alreadyFollowed:
   code: "-1005"
@@ -58,3 +58,6 @@ passwordIncorrect:
 passwordLength:
   code: "-1008"
   msg: "Password's length must be between 7 to 20."
+sharedPost:
+  code: "-5005"
+  msg: "You cannot share shared post."

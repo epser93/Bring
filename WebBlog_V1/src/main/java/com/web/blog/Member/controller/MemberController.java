@@ -49,7 +49,6 @@ public class MemberController {
     private final PasswordEncoder passwordEncoder;
     private final FileService fileService;
     private final PostService postService;
-    private final FollowRepository followRepository;
     private final FollowService followService;
     private static final Logger logger = LoggerFactory.getLogger(MemberController.class);
 

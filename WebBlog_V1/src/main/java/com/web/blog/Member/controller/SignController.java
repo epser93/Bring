@@ -2,6 +2,7 @@ package com.web.blog.Member.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.web.blog.Board.service.BoardService;
 import com.web.blog.Common.advice.exception.CEmailSigninFailedException;
 import com.web.blog.Common.advice.exception.CUserExistException;
 import com.web.blog.Common.config.security.JwtTokenProvider;
@@ -42,6 +43,7 @@ public class SignController {
     private final ResponseService responseService;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final BoardService boardService;
     private final KakaoService kakaoService;
     private final FileService fileService;
 
@@ -94,6 +96,7 @@ public class SignController {
                 .nickname(nickname)
                 .roles(Collections.singletonList("ROLE_USER"))
                 .build());
+        boardService.createBoard(id, "나의 Answers");
         return responseService.getSuccessResult();
     }
 

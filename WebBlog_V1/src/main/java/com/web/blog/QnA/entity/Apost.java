@@ -36,6 +36,9 @@ public class Apost extends CommonDateEntity implements Serializable {
     @Column(columnDefinition = "boolean default false")
     private boolean selected;
 
+    @Column
+    private Long postId;
+
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "qpost_id")
