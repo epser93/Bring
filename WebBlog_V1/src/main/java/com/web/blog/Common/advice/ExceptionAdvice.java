@@ -128,6 +128,18 @@ public class ExceptionAdvice {
         return responseService.getFailResult(Integer.valueOf(getMessage("youNeverFollowedThisBloger.code")), getMessage("youNeverFollowedThisBloger.msg"));
     }
 
+    @ExceptionHandler(CPasswordDoesntMatch.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public CommonResult ownerCannotLike(HttpServletRequest request, CPasswordDoesntMatch e) {
+        return responseService.getFailResult(Integer.valueOf(getMessage("passwordIncorrect.code")), getMessage("passwordIncorrect.msg"));
+    }
+
+    @ExceptionHandler(CPasswordLengthException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public CommonResult ownerCannotLike(HttpServletRequest request, CPasswordLengthException e) {
+        return responseService.getFailResult(Integer.valueOf(getMessage("passwordLength.code")), getMessage("passwordLength.msg"));
+    }
+
     private String getMessage(String code) {
         return getMessage(code, null);
     }

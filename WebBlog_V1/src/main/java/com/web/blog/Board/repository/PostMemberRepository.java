@@ -13,6 +13,7 @@ import java.util.Optional;
 
 public interface PostMemberRepository extends CrudRepository<PostMember, Long> {
     Optional<PostMember> findPostMemberByMember_MsrlAndPost(long msrl, Post post);
+    Optional<PostMember> findPostMemberByMember_MsrlAndPost_PostId(long msrl, long postId);
 
     @Modifying
     @Transactional

@@ -52,3 +52,9 @@ alreadyFollowed:
 youNeverFollowedThisBloger:
   code: "-1006"
   msg: "You have never been following this bloger."
+passwordIncorrect:
+  code: "-1007"
+  msg: "Password is incorrect. Please check your password."
+passwordLength:
+  code: "-1008"
+  msg: "Password's length must be between 7 to 20."

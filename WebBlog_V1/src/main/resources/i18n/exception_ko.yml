@@ -52,3 +52,9 @@ alreadyFollowed:
 youNeverFollowedThisBloger:
   code: "-1006"
   msg: "이 블로거를 팔로우한 적이 없습니다. 팔로우 해제가 불가능합니다."
+passwordIncorrect:
+  code: "-1007"
+  msg: "비밀번호가 다릅니다."
+passwordLength:
+  code: "-1008"
+  msg: "비밀번호는 7자 이상 20자 미만이어야 합니다. 닉네임은 2자 이상 15자 미만이어야 합니다. 확인해 주세요."

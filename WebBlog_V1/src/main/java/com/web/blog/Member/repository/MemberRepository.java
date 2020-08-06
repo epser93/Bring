@@ -1,6 +1,7 @@
 package com.web.blog.Member.repository;
 
 import com.web.blog.Member.entity.Member;
+import com.web.blog.Member.model.OnlyMemberMapping;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,7 +15,28 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByUid(String email);
 
+    Member findAllByUid(String email);
+
     Optional<Member> findByNickname(String nickname);
+
+    Optional<OnlyMemberMapping> findByMsrl(long msrl);
+
+    Optional<OnlyMemberMapping> findAllByNickname(String nickname);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update userinfo set ip_addr = :ip_addr where uid = :uid", nativeQuery = true)
+    void updateIpAddr(@Param("ip_addr") String ip_addr);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update userinfo set todayCnt = todayCnt + 1 where uid = :uid", nativeQuery = true)
+    void updateTodayCnt(@Param("uid") String uid);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update userinfo set totalCnt = totalCnt + todayCnt where uid = :uid", nativeQuery = true)
+    void updateTotalCnt(@Param("uid") String uid);
 
     @Query(value = "select nickname, score from userinfo order by score desc", nativeQuery = true)
     List<Map<String, Integer>> rank();

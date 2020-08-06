@@ -17,6 +17,7 @@ import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.response.SingleResult;
 import com.web.blog.Member.entity.Member;
+import com.web.blog.Member.model.OnlyMemberMapping;
 import com.web.blog.Member.repository.MemberRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -113,18 +114,46 @@ public class BoardController {
     }
 
     //게시판 포스트 리스트
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "게시판 포스트 리스트", notes = "한 카테고리 내 모든 포스트 리스트")
     @GetMapping(value = "/blog/{nickname}/{boardName}/post_list")
-    public ListResult<OnlyPostMapping> listPosts(@PathVariable String boardName, @PathVariable String nickname) {
+    public ListResult<ListResult> listPosts(@PathVariable String boardName, @PathVariable String nickname) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        List<ListResult> result = new ArrayList<>();
+        List<Boolean> amIInTheList = new ArrayList<>();
+
         Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
         Board board = boardService.findBoard(boardName, member);
-        List<OnlyPostMapping> list = boardService.CategoryPostList(board.getBoardId());
-        if (member.getNickname().equals(nickname)) {
-            return responseService.getListResult(list);
-        } else return null;
+        List<OnlyPostMapping> list = boardService.CategoryPostList(board.getBoardId()); //포스트 리스트
+        result.add(responseService.getListResult(list)); //포스트 리스트 데이터 넘기기
+
+        int cnt = 0;
+        if (logined.isPresent()) {
+            for (OnlyPostMapping pm : list) {
+                long postId = pm.getPostId();
+                amIInTheList.add(false);
+                if (postMemberRepository.findPostMemberByMember_MsrlAndPost_PostId(logined.get().getMsrl(), postId).isPresent()) {
+                    amIInTheList.remove(cnt);
+                    amIInTheList.add(true);
+                }
+                cnt++;
+            }
+        } else {
+            for (OnlyPostMapping pm : list) amIInTheList.add(false);
+        }
+
+        result.add(responseService.getListResult(amIInTheList));
+        return responseService.getListResult(result);
     }
 
     //게시판 내 포스트 검색
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "게시판 내 검색", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 통합검색")
     @GetMapping(value = "/blog/{nickname}/search/category/{board_id}/{keyword}/{type}")
     public ListResult<OnlyPostMapping> searchAlgorithm(@PathVariable int type, @PathVariable long board_id, @PathVariable(required = false) String keyword, @PathVariable String nickname) {
@@ -136,13 +165,43 @@ public class BoardController {
     }
 
     //블로그 포스트 리스트
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "블로그 포스트 리스트", notes = "한 블로그 내 모든 포스트 리스트")
     @GetMapping(value = "/blog/{nickname}/post_list")
-    public ListResult<OnlyPostMapping> listPosts(@PathVariable String nickname) {
-        return responseService.getListResult(postRepository.findAllByWriter(nickname));
+    public ListResult<ListResult> listPosts(@PathVariable String nickname) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        List<ListResult> result = new ArrayList<>();
+        List<Boolean> amIInTheList = new ArrayList<>();
+
+        List<OnlyPostMapping> list = postRepository.findAllByWriter(nickname);
+        result.add(responseService.getListResult(list));
+        int cnt = 0;
+        if (logined.isPresent()) {
+            for (OnlyPostMapping pm : list) {
+                long postId = pm.getPostId();
+                amIInTheList.add(false);
+                if (postMemberRepository.findPostMemberByMember_MsrlAndPost_PostId(logined.get().getMsrl(), postId).isPresent()) {
+                    amIInTheList.remove(cnt);
+                    amIInTheList.add(true);
+                }
+                cnt++;
+            }
+        } else {
+            for (OnlyPostMapping pm : list) amIInTheList.add(false);
+        }
+
+        result.add(responseService.getListResult(amIInTheList));
+        return responseService.getListResult(result);
     }
 
     //블로그 내 포스트 검색
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "블로그 내 검색", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 통합검색")
     @GetMapping(value = "/blog/{nickname}/search/blogPosts/{keyword}/{type}")
     public ListResult<OnlyPostMapping> searchAlgorithm(@PathVariable int type, @PathVariable String nickname, @PathVariable(required = false) String keyword) {
@@ -150,25 +209,80 @@ public class BoardController {
     }
 
     //사이트의 모든 블로그의 포스트 리스트(최신글)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "모든 블로그의 포스트 리스트 최신글", notes = "사이트의 모든 블로그의 포스트 리스트 인기글")
     @GetMapping(value = "/blog/recent")
-    public ListResult<OnlyPostMapping> listRecentPosts() {
+    public ListResult<ListResult> listRecentPosts() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        List<ListResult> result = new ArrayList<>();
+        List<Boolean> amIInTheList = new ArrayList<>();
+
         LocalDateTime date = LocalDateTime.now();
         date.minus(14, ChronoUnit.DAYS);
-        return responseService.getListResult(postRepository.findByCreatedAtLessThanEqualOrderByCreatedAtDesc(date));
+        List<OnlyPostMapping> list = postRepository.findByCreatedAtLessThanEqualOrderByCreatedAtDesc(date);
+        result.add(responseService.getListResult(list));
+        int cnt = 0;
+        if (logined.isPresent()) {
+            for (OnlyPostMapping pm : list) { //전체 포스트 리스트 for문
+                long postId = pm.getPostId();
+                amIInTheList.add(false);
+                if (postMemberRepository.findPostMemberByMember_MsrlAndPost_PostId(logined.get().getMsrl(), postId).isPresent()) {
+                    amIInTheList.remove(cnt);
+                    amIInTheList.add(true);
+                }
+                cnt++;
+            }
+        } else {
+            for (OnlyPostMapping pm : list) amIInTheList.add(false);
+        }
+        result.add(responseService.getListResult(amIInTheList));
+        return responseService.getListResult(result);
     }
 
     //사이트의 모든 블로그의 포스트 리스트(인기글)
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "모든 블로그의 포스트 리스트 인기글", notes = "사이트의 모든 블로그의 포스트 리스트 인기글")
     @GetMapping(value = "/blog/trend")
-    public ListResult<OnlyPostMapping> listTrendPosts() {
+    public ListResult<ListResult> listTrendPosts() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        List<ListResult> result = new ArrayList<>();
+        List<Boolean> amIInTheList = new ArrayList<>();
         LocalDateTime date = LocalDateTime.now();
         date.minus(14, ChronoUnit.DAYS);
-        return responseService.getListResult(postRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualOrLikesGreaterThanEqualAndCreatedAtLessThanEqualOrderByCreatedAtDesc(40, date, 20, date));
+        List<OnlyPostMapping> list = postRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualOrLikesGreaterThanEqualAndCreatedAtLessThanEqualOrderByCreatedAtDesc(40, date, 20, date);
+        result.add(responseService.getListResult(list));
+
+        int cnt = 0;
+        if (logined.isPresent()) {
+            for (OnlyPostMapping pm : list) { //전체 포스트 리스트 for문
+                long postId = pm.getPostId();
+                amIInTheList.add(false);
+                if (postMemberRepository.findPostMemberByMember_MsrlAndPost_PostId(logined.get().getMsrl(), postId).isPresent()) {
+                    amIInTheList.remove(cnt);
+                    amIInTheList.add(true);
+                }
+                cnt++;
+            }
+        } else {
+            for (OnlyPostMapping pm : list) amIInTheList.add(false);
+        }
+        result.add(responseService.getListResult(amIInTheList));
+        return responseService.getListResult(result);
     }
 
 
     //사이트의 모든 블로그의 포스트 검색
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "모든 블로그의 포스트 검색 ", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 작성자 검색, type 4: 통합검색, ")
     @GetMapping(value = "/search/all_blog_posts/{keyword}/{type}")
     public ListResult<OnlyPostMapping> searchAlgorithm(@PathVariable int type, @PathVariable(required = false) String keyword) {
@@ -211,19 +325,20 @@ public class BoardController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = memberRepository.findByUid(uid);
-        Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
-        Board board = boardRepository.findByNameAndMember(boardName, member);
-        Post post = postRepository.findById(postId).orElseThrow(CResourceNotExistException::new);
         List<ListResult> results = new ArrayList<>();
         List<String> likes;
-        likes = postService.likedMemberList(post);
+        likes = postService.likedMemberList(postId);
         boolean isLiked = false;
-        if(logined.isPresent()){
-            for(String nick : likes) {
-                if(nick.equals(logined.get().getNickname())) isLiked = true;
+        if (logined.isPresent()) {
+            for (String nick : likes) {
+                if (nick.equals(logined.get().getNickname())) isLiked = true;
                 else isLiked = false;
             }
         }
+
+        Member member = memberRepository.findByNickname(nickname).get();
+
+
         List<Boolean> like = new ArrayList<>();
         like.add(isLiked);
         results.add(responseService.getListResult(postService.getPost(postId)));
@@ -239,30 +354,41 @@ public class BoardController {
     })
     @ApiOperation(value = "게시글 좋아요", notes = "게시글 좋아요")
     @PostMapping(value = "/blog/{nickname}/like/{postId}")
-    public void like(@RequestBody Boolean likeit, @PathVariable long postId, @PathVariable String nickname) throws Exception {
+    public SingleResult<Integer> like(@RequestBody Boolean likeit, @PathVariable long postId, @PathVariable String nickname) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserNotFoundException::new); //로그인한 사용자
         Post post = postRepository.findById(postId).orElseThrow(CResourceNotExistException::new);
         Optional<PostMember> postMember = postMemberRepository.findPostMemberByMember_MsrlAndPost(member.getMsrl(), post);
+        int like = 0;
         if (postMember.isPresent() && likeit) {
             throw new CAlreadyLikedException();
         } else if (postMember.isPresent() && !likeit) { //좋아요를 이미 누른 사용자이면서 좋아요를 취소하면
             postService.likePost(member, post, likeit);
+            List<OnlyPostMapping> findpost = postService.getPost(postId);
+            OnlyPostMapping onlyPostMapping = findpost.get(0);
+            like = onlyPostMapping.getLikes();
         } else {
             if (!member.getNickname().equals(nickname) && likeit) { //로그인 한 사용자가 게시글 작성자가 아니고~
                 postService.likePost(member, post, likeit);
+                List<OnlyPostMapping> findpost = postService.getPost(postId);
+                OnlyPostMapping onlyPostMapping = findpost.get(0);
+                like = onlyPostMapping.getLikes();
             } else if (member.getNickname().equals(nickname)) throw new COwnerCannotLike();
         }
+        return responseService.getSingleResult(like);
     }
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "게시글 좋아요 유저 목록", notes = "해당 게시글의 좋아요를 누른 유저들의 목록을 보여준다.")
     @GetMapping(value = "/blog/{nickname}/{boardName}/{postId}/likedusers")
     public ListResult<String> listLiked(@PathVariable long postId, @PathVariable String boardName, @PathVariable String nickname) {
         Post post = postRepository.findById(postId).orElseThrow(CResourceNotExistException::new);
         Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
         Board board = boardRepository.findByNameAndMember(boardName, member);
-        if (post.getBoard().equals(board)) return responseService.getListResult(postService.likedMemberList(post));
+        if (post.getBoard().equals(board)) return responseService.getListResult(postService.likedMemberList(postId));
         return null;
     }
 

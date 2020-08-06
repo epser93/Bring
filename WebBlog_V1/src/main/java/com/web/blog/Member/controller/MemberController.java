@@ -1,9 +1,13 @@
 package com.web.blog.Member.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.repository.PostMemberRepository;
 import com.web.blog.Board.service.BoardService;
 import com.web.blog.Board.service.PostService;
+import com.web.blog.Common.advice.exception.CPasswordDoesntMatch;
+import com.web.blog.Common.advice.exception.CPasswordLengthException;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
 import com.web.blog.Common.entity.UploadFile;
 import com.web.blog.Common.response.CommonResult;
@@ -13,8 +17,11 @@ import com.web.blog.Common.response.SingleResult;
 import com.web.blog.Common.service.FileService;
 import com.web.blog.Common.service.ResponseService;
 import com.web.blog.Member.entity.Member;
-import com.web.blog.Member.model.ParamMember;
+import com.web.blog.Member.model.OnlyMemberMapping;
+import com.web.blog.Member.model.ParamPassword;
+import com.web.blog.Member.repository.FollowRepository;
 import com.web.blog.Member.repository.MemberRepository;
+import com.web.blog.Member.service.FollowService;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -28,8 +35,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Api(tags = {"2. Member"})
 @RequiredArgsConstructor
@@ -43,6 +49,8 @@ public class MemberController {
     private final PasswordEncoder passwordEncoder;
     private final FileService fileService;
     private final PostService postService;
+    private final FollowRepository followRepository;
+    private final FollowService followService;
     private static final Logger logger = LoggerFactory.getLogger(MemberController.class);
 
     @ApiImplicitParams({
@@ -61,13 +69,36 @@ public class MemberController {
     }
 
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "회원 프로필 조회", notes = "닉네임으로 회원을 조회한다")
     @GetMapping(value = "/{nickname}/profile")
-    public SingleResult<Member> findUserById(@PathVariable String nickname) {
-        Member member = repository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
+    public String findUserById(@PathVariable String nickname) throws JsonProcessingException {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Member logined = (Member) principal;  //로그인 사용자
+        Member member = repository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new); //조회하려는 멤버
+        StringBuilder sb = new StringBuilder();
+        Boolean amIInTheList = false;
+        Optional<OnlyMemberMapping> omm = repository.findAllByNickname(nickname); //조회하려는 멤버의 OnlyMemberMapping 값
+
+        amIInTheList = followService.isFollowed(logined, member); //로그인 사용자가 조회하려는 유저를 팔로우했으면 true, 아니면 false
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getMapResult(omm.get(), amIInTheList)); //조회하려는 멤버와 불린값 맵 설정
+        sb.append(json);
+        sb.append("\n");
+
+        json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getListResult(followService.followingList(member))); //팔로잉 리스트(조회하려는 멤버가 구독중인 멤버 리스트)
+        sb.append(json);
+        sb.append("\n");
+
+        json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getListResult(followService.followersList(member))); //팔로워 리스트(조회하려는 멤버를 구독중인 멤버 리스트)
+        sb.append(json);
+
         //유저가 좋아요 한 글 개수
         repository.updateLikeCnt(postMemberRepository.likedPostCnt(member.getMsrl()), member.getMsrl());
-        return responseService.getSingleResult(repository.findByUid(member.getUid()).orElseThrow(CUserNotFoundException::new));
+        return sb.toString(); //출력
     }
 
     @Transactional
@@ -97,32 +128,49 @@ public class MemberController {
     })
     @ApiOperation(value = "회원 수정", notes = "회원정보를 수정한다")
     @PutMapping(value = "/update")
-    public SingleResult<Member> modify(@Valid @RequestBody ParamMember paramMember) {
-        String password = paramMember.getPassword1();
-        String passwordChk = paramMember.getPassword2();
-        String nickname = paramMember.getNickname();
+    public SingleResult<Member> modify(@Valid @RequestBody ParamPassword paramMember) {
+        String oldPassword = paramMember.getPassword3();
+        Optional<String> newPassword = Optional.ofNullable(paramMember.getPassword1());
+        Optional<String> newPasswordChk = Optional.ofNullable(paramMember.getPassword2());
+        Optional<String> nickname = Optional.ofNullable(paramMember.getNickname());
         MultipartFile file = paramMember.getUploadFile();
-
-        //패스워드 체크
-        if (!password.equals(passwordChk)) {
-            return (SingleResult<Member>) responseService.getFailResult(-1001, "비밀번호가 다릅니다.");
-        }
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String id = authentication.getName();
         Member member = repository.findByUid(id).orElseThrow(CUserNotFoundException::new);
-        member.setPassword(passwordEncoder.encode(password));
-        member.setNickname(nickname);
 
-        if (file != null) {
-            UploadFile fileName = fileService.uploadFile(file);
-            member.setUploadfile(fileName);
-            String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/downloadFile/")
-                    .path(fileName.getFilename())
-                    .toUriString();
-            FileUploadResponse fileUploadResponse = new FileUploadResponse(fileName.getFilename(), fileDownloadUri, file.getContentType(), file.getSize());
+        if(!passwordEncoder.matches(oldPassword, member.getPassword())){ //기존 비밀번호 입력값이 DB의 값과 다르면~
+            throw new CPasswordDoesntMatch(); //에러메세지
+        } else { //기존 비밀번호 입력값이 DB의 값과 같으면~
+            //비밀번호 변경
+            if(newPassword.isPresent()) { //새 비밀번호 입력값이 비어있지 않으면~
+                if(!newPasswordChk.isPresent() || newPassword.get().length() < 7 || newPassword.get().length() > 20 || newPasswordChk.get().length() < 7 || newPasswordChk.get().length() > 20) { //길이가 맞지 않으면~
+                    throw new CPasswordLengthException();
+                }
+                if(!newPassword.get().equals(newPasswordChk.get())) { //비밀번호 확인 값과 다르면~
+                    throw new CPasswordDoesntMatch();
+                } else { //비밀번호 확인 값과 같으면~
+                    member.setPassword(passwordEncoder.encode(newPassword.get()));
+                }
+            }
+
+            //닉네임 변경(값 존재하면!)
+            if(nickname.isPresent()) {
+                member.setNickname(nickname.get());
+            }
+
+            //프로필 사진 변경(파일 존재하면!)
+            if (file != null) {
+                UploadFile fileName = fileService.uploadFile(file);
+                member.setUploadfile(fileName);
+                String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                        .path("/downloadFile/")
+                        .path(fileName.getFilename())
+                        .toUriString();
+                FileUploadResponse fileUploadResponse = new FileUploadResponse(fileName.getFilename(), fileDownloadUri, file.getContentType(), file.getSize());
+            }
         }
+
         return responseService.getSingleResult(repository.save(member));
     }
 
