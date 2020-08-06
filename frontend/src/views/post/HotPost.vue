@@ -21,7 +21,7 @@
 
     <section v-if="mode==='QnA'" class="cards row">
       <div class="col-lg-10 row">
-        <div v-for="question in orderedHotQuestions" :key="question.qpost_id" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
+        <div v-for="question in postings" :key="question.qpostId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
           <div class="cardwrap" @click="gotoQuestionDetail(question)">
             <div class="img-section">
               <a href=""></a>
@@ -84,13 +84,20 @@ export default {
       this.$router.push({ name : "DetailPost" , params: { post: question, nickname : question.writer, post_id : question.qpost_id }})
     },
     getHotPost() {
-      axios.get(`${BACK_URL}/blog/trend`)
-        .then(res => {
-          this.postings = res.data.list
-          console.log('핫핫', this.postings)
-          console.log(this.mode)
-        })
-        .catch(err => console.log(err))
+      if (this.mode === "blog") {
+        axios.get(`${BACK_URL}/blog/trend`)
+          .then(res => {
+            this.postings = res.data.list[0].list
+            console.log(this.postings)
+          })
+          .catch(err => console.log(err))
+      } else {
+        axios.get(`${BACK_URL}/questions/trend`)
+          .then (res=> {
+            this.postings = res.data.list
+          })
+          .catch (err => console.log(err))
+      }
     }
   },
   computed: {

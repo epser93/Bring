@@ -32,26 +32,48 @@ export default {
       if (this.mode == "blog") {
         this.mode = "QnA"
         this.modeText = 'blog'
+        // 에러 헨들링
+        this.$router.push({ name: 'Home' }).catch(()=>{})
         this.getAllPost()
       } else {
         this.mode = "blog"
         this.modeText = 'QnA'
+        this.$router.push({ name: 'Home' }).catch(()=>{})
         this.getAllPost()
       }
     },
     getAllPost () {
-      if (this.mode == "blog"){
-        axios.get(`${BACK_URL}/blog/recent`)
-          .then (res => {
-            this.posts = res.data.list
-            console.log(this.posts)
-          })
-          .catch (err => console.log(err))
+      if (this.$cookies.get('X-AUTH-TOKEN')) {
+        const config = {
+          headers: {
+            'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
+          }
+        }
+        if (this.mode == "blog"){
+          axios.get(`${BACK_URL}/blog/recent`, config)
+            .then (res => {
+              this.posts = res.data.list[0].list
+            })
+            .catch (err => console.log(err))
+        } else {
+          axios.get(`${BACK_URL}/questions/recent`, config)
+            .then (res => {
+              this.posts = res.data.list
+            })
+        }
       } else {
-        axios.get(`${BACK_URL}/questions/qlist`)
-          .then (res => {
-            this.posts = res.data.list
-          })
+        if (this.mode == "blog"){
+          axios.get(`${BACK_URL}/blog/recent`)
+            .then (res => {
+              this.posts = res.data.list[0].list
+            })
+            .catch (err => console.log(err))
+        } else {
+          axios.get(`${BACK_URL}/questions/recent`)
+            .then (res => {
+              this.posts = res.data.list
+            })
+        }
       }
     },
   },
