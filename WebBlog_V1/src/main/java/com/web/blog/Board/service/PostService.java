@@ -9,6 +9,7 @@ import com.web.blog.Common.advice.exception.CResourceNotExistException;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
 import com.web.blog.Common.service.FileService;
 import com.web.blog.Member.entity.Member;
+import com.web.blog.Member.model.OnlyMemberMapping;
 import com.web.blog.Member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -84,15 +85,30 @@ public class PostService {
     }
 
     //게시글에 좋아요를 누른 유저 목록
-    public List<String> likedMemberList(Post post) {
-        long post_id = post.getPostId();
+    public List<OnlyMemberMapping> likedMemberListMM(long post_id) {
+        List<Long> list = postMemberRepository.likedMember(post_id);
+        List<OnlyMemberMapping> members = new ArrayList<>();
+        for (Long id : list) {
+            Optional<OnlyMemberMapping> member = memberRepository.findByMsrl(id);
+            members.add(member.get());
+        }
+        return members;
+    }
+
+    //게시글에 좋아요를 누른 유저 목록
+    public List<String> likedMemberList(long post_id) {
         List<Long> list = postMemberRepository.likedMember(post_id);
         List<String> members = new ArrayList<>();
         for (Long id : list) {
-            Member member = memberRepository.findById(id).orElseThrow(CUserNotFoundException::new);
-            members.add(member.getNickname());
+            Optional<Member> member = memberRepository.findById(id);
+            members.add(member.get().getNickname());
         }
         return members;
+    }
+
+    public OnlyMemberMapping getOnlyMember(Member member) {
+        Optional<OnlyMemberMapping> mm = memberRepository.findByMsrl(member.getMsrl());
+        return mm.get();
     }
 
     //게시글 수정
@@ -118,7 +134,7 @@ public class PostService {
     //모든 좋아요 삭제
     public void deleteLikes(Post post) {
         List<PostMember> likers = postMemberRepository.findPostMemberByPost(post);
-        for(PostMember pm : likers) {
+        for (PostMember pm : likers) {
             postMemberRepository.delete(pm);
         }
     }

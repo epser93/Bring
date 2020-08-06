@@ -70,6 +70,10 @@ public class Member extends CommonDateEntity implements UserDetails, Serializabl
     @Column(columnDefinition = "integer default 0")
     private int followingCnt;
 
+    private int todayCnt;
+
+    private int totalCnt;
+
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> roles = new ArrayList<>();

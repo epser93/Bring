@@ -27,6 +27,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -45,11 +47,20 @@ public class QuestionController {
     private final QpostRepository qpostRepository;
     private final ApostRepository apostRepository;
 
-    @ApiOperation(value = "QnA 전체 질문 리스트", notes = "QnA의 모든 질문글 리스트")
-    @GetMapping("/qlist")
-    public ListResult<OnlyQpostMapping> listAllQposts() {
-        Long num = (long) 0;
-        return responseService.getListResult(qpostRepository.findAllByQpostIdGreaterThan(num));
+    @ApiOperation(value = "QnA 전체 질문 리스트(최신글)", notes = "QnA의 모든 질문글 리스트(최신글)")
+    @GetMapping("/recent")
+    public ListResult<OnlyQpostMapping> listAllQpostsRecent() {
+        LocalDateTime date = LocalDateTime.now();
+        date.minus(30, ChronoUnit.DAYS);
+        return responseService.getListResult(qpostRepository.findByCreatedAtLessThanEqualOrderByCreatedAtDesc(date));
+    }
+
+    @ApiOperation(value = "QnA 전체 질문 리스트(인기글)", notes = "QnA의 모든 질문글 리스트(인기글)")
+    @GetMapping("/trend")
+    public ListResult<OnlyQpostMapping> listAllQpostsTrend() {
+        LocalDateTime date = LocalDateTime.now();
+        date.minus(30, ChronoUnit.DAYS);
+        return responseService.getListResult(qpostRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualOrAnswerCntGreaterThanEqualAndCreatedAtLessThanEqualOrderByCreatedAtDesc(20, date, 1, date));
     }
 
     @ApiOperation(value = "QnA 특정 유저 질문 리스트", notes = "한 유저의 모든 질문글 리스트")
