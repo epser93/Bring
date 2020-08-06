@@ -1,79 +1,63 @@
 <template>
-  <div>
-    <b-container>
-      <div class="card rounded-lg shadow p-3 mb-5 bg-white rounded">
-        <div>
-          <h1></h1>
-        </div>
-        <b-container>
-          <b-row>
-            <b-col>{{subject}}</b-col>
-            <b-col></b-col>
-          <b-col>
-            <p>
-              작성자: {{ writer }}
-              <span class="text-muted ">{{ createdAt }}</span>
-            </p>
-          </b-col>
-          </b-row>
-          </b-container>
-      </div>
-      <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded">
-            <p><b-badge pill variant="success" class="mr-3">태그</b-badge>
-            </p>
-            <h5 class="card-text">{{ content }}
-                <br><br><br><br><br><br><br><br><br><br><br><br>
-                <hr>
-                <div class="row">
-                    <div class="col"></div>
-                    <div class="col"></div>
-                    <div class="col">
-                        <button class="btn btn-secondary" v-if="(writer === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="updatePost"><b-icon icon="trash"></b-icon> 수정</button>
-                        <button class="btn btn-secondary" v-if="(writer === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="deletePost"><b-icon icon="trash"></b-icon> 삭제</button>
-                    </div>
-                </div>
-            </h5>
+  <div id="detail" class="row">
 
-      </div>
-
-      <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded" id="commentTextArea">
-            <span v-if="writeComment">
-                <div>
-              <b-form-textarea
-                  id="textarea-rows"
-                  placeholder="댓글을 작성해주세요!"
-                  rows="8"
-                  v-model = "comment_content"
-              ></b-form-textarea>
+    <!-- 글 부분(나중에 양 옆 채울것 필요) -->
+    <div class="wrapper text-left col-12 col-lg-8">
+        <div class="info">
+            <h1 class="mb-3">{{subject}}</h1>
+            <p>{{ writer }}</p>
+            <p class="text-muted ">{{ createdAt }}</p>
+            <div class="text-right">
+              <button class="btn btn-outline-warning btn-sm mx-1" v-if="(writer === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="updatePost"><b-icon icon="trash"></b-icon> 수정</button>
+              <button class="btn btn-outline-danger btn-sm mx-1" v-if="(writer === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="deletePost"><b-icon icon="trash"></b-icon> 삭제</button>
           </div>
-          <button class="btn btn-success btn-sm mx-1" v-if="!commentUpdateToggle" @click='commentWrite'>답변 달기</button>
-          <button class="btn btn-success btn-sm mx-1" v-if="commentUpdateToggle" @click='commentUpdate'>답변 수정</button>
-          <button class="btn btn-success btn-sm mx-1" @click='commentClose'>답변창 닫기</button>
-          
-      </span>
-      <span v-else>
-          <button class="btn btn-success btn-sm mx-1" @click='commentOpen'>답변창 열기</button>
-      </span>
+        </div>
+        
+        <!-- 태그부분 -->
+        <div class="tag">
+            <span class="badge badge-pill badge-success">tag</span>
+        </div>
+        <hr>
 
-      </div>
+        <p v-html="compiledMarkdown"></p>
+        <hr>
 
-      <div class="card rounded-lg mb-3 shadow p-3 bg-white rounded" v-for="comment in recentlyComments" :key="comment.replyId">
-        <p>{{ comment.writer }}</p>
-        <p>{{ comment.reply}}</p>
-        <p>이 댓글을{{ comment.likes}}명이 좋아합니다</p>
-        <p>{{ comment.createdAt }}</p>
-        <button v-if="$cookies.get('nickname') === comment.writer" @click="commentDelete(comment)">삭제</button>
-        <button v-if="$cookies.get('nickname') === comment.writer" @click="openCommentUpdate(comment), setXY($event)">수정</button>
-      </div>
-      
-      
-
-    </b-container>
+        <!-- 댓글 입력 부분 -->
+        <div id="commentTextArea">
+            <span v-if="writeComment">
+              <div>
+                  <b-form-textarea
+                      id="textarea-rows"
+                      placeholder="댓글을 작성해주세요!"
+                      rows="8"
+                      v-model = "comment_content"
+                  ></b-form-textarea>
+              </div>
+              <button class="btn btn-success btn-sm mx-1" v-if="!commentUpdateToggle" @click='commentWrite'>답변 달기</button>
+              <button class="btn btn-success btn-sm mx-1" v-if="commentUpdateToggle" @click='commentUpdate'>답변 수정</button>
+              <button class="btn btn-success btn-sm mx-1" @click='commentClose'>답변창 닫기</button>
+          </span>
+          <span v-else>
+              <button class="btn btn-success btn-sm mx-1" @click='commentOpen'>답변창 열기</button>
+          </span>
+        </div>
+        <!-- 댓글 목록부분 -->
+        <div class="" v-for="comment in recentlyComments" :key="comment.replyId">
+          <p>{{ comment.writer }}</p>
+          <p>{{ comment.reply }}</p>
+          <p>이 댓글을{{ comment.likes}}명이 좋아합니다</p>
+          <p>{{ comment.createdAt }}</p>
+          <button class="btn btn-outline-success btn-sm mx-1" v-if="$cookies.get('nickname') === comment.writer" @click="commentDelete(comment)">삭제</button>
+          <button class="btn btn-outline-success btn-sm" v-if="$cookies.get('nickname') === comment.writer" @click="openCommentUpdate(comment), setXY($event)">수정</button>
+        </div>
+    </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+// 마크다운
+import marked from 'marked'
 import _ from 'lodash'
 const BACK_URL = 'http://localhost:8080'
 
@@ -218,6 +202,9 @@ export default {
     computed: {
       recentlyComments () {
         return _.orderBy(this.comments, ['createdAt'], ['desc'])
+      },
+      compiledMarkdown: function () {
+        return marked(this.content, { sanitize: true })
       },
     }
 }

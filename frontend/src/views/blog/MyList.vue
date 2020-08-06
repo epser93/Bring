@@ -33,15 +33,15 @@
                 <h3>현재 등록된 글이 없습니다</h3>
             </div>
             <div class="row">
-                <div v-for="item in postList" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
+                <div v-for="(item, index) in postList" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
                     <div class="card" style="width: 75%;">
                         <img class="card-img-top" :src="cardImage" alt="Card image cap">
                         <div class="card-body pb-0">
                             <h5 class="card-title">{{ item.subject }}</h5>
                             <p class="card-text mb-3">{{ item.content }}</p>
-                            <!-- (수정중) 좋아요 부분 -->
-                            <span class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="postLike(item, false, $event)"><i class="fas fa-heart"></i></span>
-                            <span class="d-inline mr-1" style="cursor:pointer; color: black;" @click="postLike(item, true, $event)"><i class="fas fa-heart"></i></span>
+                            <!-- 좋아요 부분 -->
+                            <span v-if="postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="postLike(item, false)"><i class="fas fa-heart"></i></span>
+                            <span v-if="!postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="postLike(item, true)"><i class="fas fa-heart"></i></span>
                             <small :ref="'like-count-' + item.postId">{{ item.likes }}</small><small>개의 좋아요</small>
                         </div>
                         <div class="card-footer bg-transparent">
@@ -92,10 +92,7 @@
                         <div class="card-body pb-0">
                             <h5 class="card-title">{{ item.subject }}</h5>
                             <p class="card-text mb-3">{{ item.content }}</p>
-                            <!-- (수정중) 좋아요 부분 -->
-                            <small class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="postLike(item.postId, $event)"><i class="fas fa-heart"></i></small>
-                            <small class="d-inline mr-1" style="cursor:pointer; color: black;" @click="postLike(item.postId, $event)"><i class="fas fa-heart"></i></small>
-                            <small :ref="'like-count-' + item.postId">{{ item.likes }}</small><small>개의 좋아요</small>
+                            
                         </div>
                         <div class="card-footer bg-transparent">
                             <button class="btn btn-sm" @click="gotoDetail(item)">글 보기</button>
@@ -139,11 +136,18 @@ export default {
         },
 
         getAllPosts() {
+            const config = {
+                headers: {
+                    'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
+                }
+            }
             this.categoryOn = 1
-            axios.get(`${BACK_URL}/blog/${this.nickname}/post_list`)
+            axios.get(`${BACK_URL}/blog/${this.nickname}/post_list`, config)
                 .then(res => {
-                    this.postList = res.data.list
-                    console.log(this.postList)
+                    // 포스트 정보
+                    this.postList = res.data.list[0].list
+                    // 포스트에 사용자가 좋아요를 눌렀는지에 대한 불린 값
+                    this.postLike1 = res.data.list[1].list
                 })
  
                 .catch(err => {
@@ -155,7 +159,7 @@ export default {
             axios.get(`${BACK_URL}/blog/${this.nickname}/categories`)
                 .then(res => {
                     this.categoryList = res.data.list
-                    console.log(this.categoryList)
+               
                 })
                 .catch(err => {
                     console.log(err)
@@ -166,7 +170,7 @@ export default {
             this.categoryOn = 2
             axios.get(`${BACK_URL}/blog/${this.nickname}/${categoryName}/post_list`)
                 .then(res => {
-                    this.postListCategory = res.data.list
+                    this.postListCategory = res.data.list[0].list
                 })
                 .catch(err => {
                     console.log(err)
@@ -183,7 +187,7 @@ export default {
             axios.get(`${BACK_URL}/blog/${this.nickname}/search/blogPosts/${this.keyword}/${this.keywordType.keyid}`)
                 .then(res => {
                     this.postListKeyword = res.data.list
-                    console.log(this.postListKeyword)
+                    
                 })
 
                 .catch(err => {
@@ -192,11 +196,11 @@ export default {
         },
         // 포스트 디테일
         gotoDetail(post) {
-            this.$router.push({ name : "DetailPost" , params: { post: post, nickname : post.writer, post_id : post.post_id }})
+            this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.writer, post_id : post.postId }})
         },    
 
         // 좋아요
-        postLike(post, likeit, event) {
+        postLike(post, likeit) {
             const config = {
                 headers: {
                     'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
@@ -205,23 +209,21 @@ export default {
             }
             // 좋아요 현 상태로 구분
             if (likeit === false) {
-                event.currentTarget.style = 'black'
                 axios.post(`${BACK_URL}/blog/${post.writer}/like/${post.postId}`, likeit, config)
                     .then(res => {
                         // 좋아요 수 바꾸기(화면에서)
-                        console.log(res)
-                        this.$refs[`like-count-${post.postId}`][0].innerText = post.likes - 1                        
+                        this.$refs[`like-count-${post.postId}`][0].innerText = res.data.data    
+                        this.getAllPosts()                 
                     })
                     .catch(err => {
                         console.log(err)
                     })   
             } else {
-                event.currentTarget.style = 'crimson'
                 axios.post(`${BACK_URL}/blog/${post.writer}/like/${post.postId}`, likeit, config)
                     .then(res => {
                         // 좋아요 수 바꾸기(화면에서)
-                        console.log(res)
-                        this.$refs[`like-count-${post.postId}`][0].innerText = post.likes + 1                       
+                        this.$refs[`like-count-${post.postId}`][0].innerText = res.data.data   
+                        this.getAllPosts()                      
                     })
                     .catch(err => {
                         console.log(err)
@@ -257,7 +259,8 @@ export default {
                 2: '내용검색',
                 3: '통합검색',
             },
-            
+            // 좋아요 관련
+            postLike1: [],
         }
     }
 }

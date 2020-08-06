@@ -6,7 +6,7 @@
           <a class="d-inline" href=''>
             <img class="rounded-circle mx-auto img-thumbnail mb-3" :src='cardUserImage' alt="Card image cap" style="width: 120px;">
           </a>
-            <h5 class="d-inline ml-3">{{ this.userInfo.nickname }}</h5>
+            <h5 class="d-inline ml-3">{{ this.nickname }}</h5>
         </div>
       </div>
 
@@ -56,9 +56,15 @@ export default {
   methods: {
     // 닉네임으로 유저 정보 get
     getUserInfo(nickname) {
-      axios.get(`${BACK_URL}/member/${nickname}/profile`)
+      const config = {
+        headers: {
+            'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
+
+        }
+      }
+      axios.get(`${BACK_URL}/member/${nickname}/profile`, config)
         .then(res => {
-          this.userInfo = res.data.data
+          this.userInfo = res.data
         })
         .catch(err => {
           alert('ID와 비밀번호를 다시 확인해주세요.')
@@ -69,7 +75,8 @@ export default {
     
   },
   created() {
-    this.getUserInfo(this.nickname)
+    this.getUserInfo(this.nickname),
+    console.log(this.userInfo)
   },
   watch: {
     '$route.params.nickname' () {

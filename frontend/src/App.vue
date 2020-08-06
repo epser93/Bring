@@ -2,7 +2,7 @@
   <div id="app">
     <Header :isLogin="isLogin" :nickname="userNickname" @logout-state="updateLogout"/>
     <demo-login-modal @submit-login-data="login"/>
-    <div class="container-fluid">
+    <div class="container-fluid mt-5">
       <router-view @submit-login-data="login" @submit-signup-data="signup" />
     </div>
   </div>
