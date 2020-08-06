@@ -17,13 +17,12 @@ import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByBoard(Board board);
+
     List<OnlyPostMapping> findAllByBoard_BoardId(long board_id);
 
-    @Query(value = "select * from post where post_id = :post_id", nativeQuery = true)
-    List<OnlyPostMapping> postById(@Param("post_id") long post_id);
-    Optional<Post> findById(long post_id);
     List<OnlyPostMapping> findByPostId(long post_id);
-//    OnlyPostMapping postById(long post_id);
+
+    Optional<OnlyPostMapping> findAllByPostId(long post_id);
 
     @Modifying
     @Transactional

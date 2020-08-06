@@ -1,6 +1,12 @@
 package com.web.blog.QnA.controller;
 
 
+import com.web.blog.Board.entity.Post;
+import com.web.blog.Board.model.OnlyPostMapping;
+import com.web.blog.Board.model.ParamPost;
+import com.web.blog.Board.repository.PostRepository;
+import com.web.blog.Board.service.PostService;
+import com.web.blog.Board.service.TagService;
 import com.web.blog.Common.advice.exception.*;
 import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
@@ -30,7 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Optional;
+import java.util.*;
 
 @Api(tags = {"8. Answers"})
 @RequiredArgsConstructor
@@ -39,11 +45,14 @@ import java.util.Optional;
 public class AnswerController {
     private final ResponseService responseService;
     private final MemberRepository memberRepository;
-    private final QTagService qTagService;
+    private final PostService postService;
     private final QnaService qnaService;
+    private final QTagService qTagService;
+    private final TagService tagService;
     private final ApostMemberRepository apostMemberRepository;
     private final QpostRepository qpostRepository;
     private final ApostRepository apostRepository;
+    private final PostRepository postRepository;
 
     @ApiOperation(value = "QnA 특정 유저 답변 리스트", notes = "한 유저의 모든 답변글 리스트")
     @GetMapping("/{nickname}/alist")
@@ -76,9 +85,37 @@ public class AnswerController {
         Optional<Qpost> qpost = qpostRepository.findById(qpostId);
         Member asker = qpost.get().getMember();
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Member member = (Member) principal;
+        Member logined = (Member) principal;
+        ParamPost paramPost = new ParamPost();
+
+        if(asker.getMsrl() == logined.getMsrl()){
+            throw new CAskedQuestionException();
+        }
+
+        //블로그 Q&A 게시판
+        StringBuilder sb = new StringBuilder();
+        sb.append("[Q&A]\"" + qpost.get().getSubject() + "\"에 대한 나의 답변(질문번호: " + qpostId + ", 질문자: " + qpost.get().getWriter() + ")");
+        paramPost.setSubject(sb.toString());
+        sb = new StringBuilder();
+        sb.append("Q." + qpost.get().getSubject() + System.getProperty("line.separator"));
+        sb.append(qpost.get().getContent() + System.getProperty("line.separator") + System.getProperty("line.separator"));
+        sb.append("A." + System.getProperty("line.separator"));
+        sb.append(paramApost.getAnswer() + System.getProperty("line.separator"));
+        paramPost.setContent(sb.toString());
+        paramPost.setOriginal((long) -1);
+        Post answer = new Post();
+        answer = postService.writePost(logined.getNickname(), "나의 Answers", paramPost, null, logined, "");
+
+        Set<String> tagSet = new HashSet<>(qTagService.getTags(qpostId));
+        List<String> tags = new ArrayList<>(tagSet);
+        if (!tags.isEmpty()) {
+            for(String tag : tags) {
+                tagService.insertTags(answer, tag);
+            }
+        }
+        Apost apost = qnaService.writeAnswer(qpost.get(), logined, paramApost, files, answer.getPostId());
         if (qpostRepository.isSelectedAnswerExist(qpostId)) return null;
-        return responseService.getSingleResult(qnaService.writeAnswer(qpost.get(), member, asker, paramApost, files));
+        return responseService.getSingleResult(apost);
     }
 
     //답변 수정
@@ -117,15 +154,25 @@ public class AnswerController {
     })
     @ApiOperation(value = "답변 채택", notes = "답변 채택")
     @PostMapping(value = "/select/{apostId}")
-    public void select(@PathVariable long apostId) {
+    public void select(@PathVariable long apostId) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new); //로그인한 사용자
         Optional<Apost> apost = apostRepository.findById(apostId);
         Qpost qpost = apost.get().getQpost();
+        Optional<OnlyPostMapping> post = postRepository.findAllByPostId(apost.get().getPostId());
         long msrl = qpost.getMember().getMsrl();
+        Member answerer = memberRepository.findByNickname(apost.get().getWriter()).orElseThrow(CUserNotFoundException::new);
         if (msrl == member.getMsrl() && !qpostRepository.isSelectedAnswerExist(qpost.getQpostId())) { //로그인 한 사용자가 질문자면~
             qnaService.selectThisAnswer(apostId, qpost.getQpostId(), member);
+            ParamPost paramPost = new ParamPost();
+            StringBuilder sb = new StringBuilder();
+            sb.append("[채택]" + post.get().getSubject());
+            paramPost.setSubject(sb.toString());
+            paramPost.setContent(post.get().getContent());
+            Post post1 = new Post();
+            post1 = postService.updatePost("나의 Answers", post.get().getPostId(), answerer.getMsrl(), paramPost, null);
+            System.out.println("성공");
         } else throw new CNotOwnerException();
     }
 

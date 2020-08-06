@@ -140,6 +140,12 @@ public class ExceptionAdvice {
         return responseService.getFailResult(Integer.valueOf(getMessage("passwordLength.code")), getMessage("passwordLength.msg"));
     }
 
+    @ExceptionHandler(CSharedPostException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public CommonResult ownerCannotLike(HttpServletRequest request, CSharedPostException e) {
+        return responseService.getFailResult(Integer.valueOf(getMessage("sharedPost.code")), getMessage("sharedPost.msg"));
+    }
+
     private String getMessage(String code) {
         return getMessage(code, null);
     }

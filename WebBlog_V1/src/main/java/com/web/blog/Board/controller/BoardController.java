@@ -21,6 +21,8 @@ import com.web.blog.Common.response.SingleResult;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.model.OnlyMemberMapping;
 import com.web.blog.Member.repository.MemberRepository;
+import com.web.blog.QnA.entity.Apost;
+import com.web.blog.QnA.model.OnlyQpostMapping;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -35,10 +37,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Api(tags = {"5. Board"})
 @RequiredArgsConstructor
@@ -295,12 +294,13 @@ public class BoardController {
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
         Member member2 = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
-        Set<String> tag1 = paramPost.getTags();
-        List<String> tags = new ArrayList<>(tag1);
+        Set<String> tagSet = paramPost.getTags();
+        List<String> tags = new ArrayList<>(tagSet);
         List<SingleResult> result = new ArrayList<>();
+        paramPost.setOriginal((long)-1); //공유출처 없이 내가 직접 작성한 것
         Post post = null;
         if (member.equals(member2)) { //블로그 주인과 로그인 한 사용자가 같으면~
-            post = postService.writePost(member.getNickname(), boardName, paramPost, files, member2);
+            post = postService.writePost(nickname, boardName, paramPost, files, member, "");
         }
         if (!tags.isEmpty()) {
             for (String tag : tags) {
@@ -337,6 +337,10 @@ public class BoardController {
 
         List<Boolean> like = new ArrayList<>();
         like.add(isLiked);
+        Post ifshared = postService.getPost2(postId);
+        if(ifshared.getOriginal() != -1) {
+
+        }
         results.add(responseService.getListResult(postService.getPost(postId)));
         results.add(responseService.getListResult(tagService.getTags(postId)));
         results.add(responseService.getListResult(replyService.getRepliesofOnePost(postId)));
@@ -349,13 +353,17 @@ public class BoardController {
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
     })
     @ApiOperation(value = "게시글 좋아요", notes = "게시글 좋아요")
-    @PostMapping(value = "/blog/{nickname}/like/{postId}")
+    @PostMapping(value = "/blog/{nickname}/like/{postId}") //닉네임은 포스트 작성자
     public SingleResult<Integer> like(@RequestBody Boolean likeit, @PathVariable long postId, @PathVariable String nickname) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserNotFoundException::new); //로그인한 사용자
         Post post = postRepository.findById(postId).orElseThrow(CResourceNotExistException::new);
         Optional<PostMember> postMember = postMemberRepository.findPostMemberByMember_MsrlAndPost(member.getMsrl(), post);
+        Optional<Post> originPost = postRepository.findById(post.getOriginal());
+        if(post.getOriginal() != -1) {
+
+        }
         int like = 0;
         if (postMember.isPresent() && likeit) {
             throw new CAlreadyLikedException();
@@ -398,7 +406,7 @@ public class BoardController {
         Set<String> tag1 = paramPost.getTags();
         List<String> tags = new ArrayList<>(tag1);
         List<SingleResult> result = new ArrayList<>();
-        Post post = null;
+        Post post = new Post();
         if (member.equals(member2)) { //블로그 주인과 로그인 한 사용자가 같으면~~
             post = postService.updatePost(boardName, postId, member.getMsrl(), paramPost, files);
         }
@@ -426,9 +434,46 @@ public class BoardController {
     }
 
     @ApiOperation(value = "전체 태그 리스트", notes = "전체 태그 리스트")
-    @GetMapping(value = "/tags/list}")
+    @GetMapping(value = "/tags/list")
     public ListResult<OnlyTagMapping> allTagList() {
         return responseService.getListResult(tagService.getAllTags());
     }
 
+    //Post 공유기능
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
+    })
+    @ApiOperation(value = "게시글 공유", notes = "게시글 공유")
+    @PostMapping(value = "/blog/{nickname}/{boardName}/share/{postId}")
+    public ListResult<SingleResult> sharePost(@PathVariable String nickname, @PathVariable String boardName, @PathVariable long postId, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
+        Member member2 = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
+        ParamPost paramPost = new ParamPost();
+
+        //postId 는 공유할 포스트의 아이디!
+        Optional<OnlyPostMapping> post = postRepository.findAllByPostId(postId); //공유할 포스트 정보 불러오기
+        if(post.get().getOriginal() != -1) throw new CSharedPostException();
+        paramPost.setContent(post.get().getContent()); //포스트 인자에 공유포스트의 컨텐츠 불러와서 저장
+        paramPost.setSubject(post.get().getSubject()); //포스트 인자에 공유포스트의 제목 불러와서 저장
+        Set<String> tagSet = new HashSet<>(tagService.getTags(postId)); //포스트 인자에 공유포스트의 태그 불러와서 저장
+        List<String> tags = new ArrayList<>(tagSet);
+        List<SingleResult> result = new ArrayList<>(); //결과값 리스트 생성
+        paramPost.setOriginal(postId); //공유한 원 포스트의 포스트아이디 저장
+        Post share = new Post();
+
+        if (member.equals(member2)) { //블로그 주인과 로그인 한 사용자가 같으면~
+            share = postService.writePost(nickname, boardName, paramPost, files, member, post.get().getWriter());
+        }
+        if (!tags.isEmpty()) {
+           for(String tag : tags) {
+               tagService.insertTags(share, tag);
+           }
+        }
+
+        result.add(responseService.getSingleResult(share));
+        result.add(responseService.getSingleResult(tags));
+        return responseService.getListResult(result);
+    }
 }

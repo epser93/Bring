@@ -23,4 +23,7 @@ public class ParamPost {
 
     @ApiModelProperty(value = "태그")
     private Set<String> tags;
+
+    @ApiModelProperty(value = "공유된 게시글 여부")
+    private Long original;
 }
