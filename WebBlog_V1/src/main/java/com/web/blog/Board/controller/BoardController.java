@@ -3,7 +3,9 @@ package com.web.blog.Board.controller;
 import com.web.blog.Board.entity.Board;
 import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.entity.PostMember;
+import com.web.blog.Board.entity.Tag;
 import com.web.blog.Board.model.OnlyPostMapping;
+import com.web.blog.Board.model.OnlyTagMapping;
 import com.web.blog.Board.model.ParamBoard;
 import com.web.blog.Board.model.ParamPost;
 import com.web.blog.Board.repository.BoardRepository;
@@ -151,9 +153,6 @@ public class BoardController {
     }
 
     //게시판 내 포스트 검색
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
-    })
     @ApiOperation(value = "게시판 내 검색", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 통합검색")
     @GetMapping(value = "/blog/{nickname}/search/category/{board_id}/{keyword}/{type}")
     public ListResult<OnlyPostMapping> searchAlgorithm(@PathVariable int type, @PathVariable long board_id, @PathVariable(required = false) String keyword, @PathVariable String nickname) {
@@ -280,9 +279,6 @@ public class BoardController {
 
 
     //사이트의 모든 블로그의 포스트 검색
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
-    })
     @ApiOperation(value = "모든 블로그의 포스트 검색 ", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 작성자 검색, type 4: 통합검색, ")
     @GetMapping(value = "/search/all_blog_posts/{keyword}/{type}")
     public ListResult<OnlyPostMapping> searchAlgorithm(@PathVariable int type, @PathVariable(required = false) String keyword) {
@@ -379,9 +375,6 @@ public class BoardController {
         return responseService.getSingleResult(like);
     }
 
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
-    })
     @ApiOperation(value = "게시글 좋아요 유저 목록", notes = "해당 게시글의 좋아요를 누른 유저들의 목록을 보여준다.")
     @GetMapping(value = "/blog/{nickname}/{boardName}/{postId}/likedusers")
     public ListResult<String> listLiked(@PathVariable long postId, @PathVariable String boardName, @PathVariable String nickname) {
@@ -431,4 +424,11 @@ public class BoardController {
         postService.deletePost(postId, member);
         return responseService.getSuccessResult();
     }
+
+    @ApiOperation(value = "전체 태그 리스트", notes = "전체 태그 리스트")
+    @GetMapping(value = "/tags/list}")
+    public ListResult<OnlyTagMapping> allTagList() {
+        return responseService.getListResult(tagService.getAllTags());
+    }
+
 }
