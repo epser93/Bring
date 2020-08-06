@@ -84,13 +84,19 @@ export default {
       this.$router.push({ name : "DetailPost" , params: { post: question, nickname : question.writer, post_id : question.qpost_id }})
     },
     getHotPost() {
-      axios.get(`${BACK_URL}/blog/trend`)
-        .then(res => {
-          this.postings = res.data.list
-          console.log('핫핫', this.postings)
-          console.log(this.mode)
-        })
-        .catch(err => console.log(err))
+      if (this.mode === "blog") {
+        axios.get(`${BACK_URL}/blog/trend`)
+          .then(res => {
+            this.postings = res.data.list
+          })
+          .catch(err => console.log(err))
+      } else {
+        axios.get(`${BACK_URL}/questions/qlist`)
+          .then (res=> {
+            this.postings = res.data.list
+          })
+          .catch (err => console.log(err))
+      }
     }
   },
   computed: {

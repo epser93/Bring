@@ -32,11 +32,14 @@ export default {
       if (this.mode == "blog") {
         this.mode = "QnA"
         this.modeText = 'blog'
+        this.$router.push({ name: 'Home' })
         this.getAllPost()
       } else {
         this.mode = "blog"
         this.modeText = 'QnA'
+        this.$router.push({ name: 'Home' })
         this.getAllPost()
+
       }
     },
     getAllPost () {
