@@ -62,7 +62,52 @@
         <div class="row form-group">
           <div class="col col-md-3"><label for="password-input" class=" form-control-label">Password</label></div>
           <div class="col-12 col-md-9">
-            <button type="button" class="btn btn-primary" @click="changePw">비밀번호 변경</button>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#changePwModal">비밀번호 변경</button>
+            <!-- 모달 -->
+            <div class="modal fade" id="changePwModal" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="changePwModalLabel" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="changePwModalLabel"><b>비밀번호 변경</b></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    
+                     <div class="row form-group">
+                        <div class="col col-md-4">
+                          <label class=" form-control-label"></label>새 비밀번호
+                        </div>
+                        <!-- 회원탈퇴 -->
+                        <div class="col-12 col-md-8">
+                          <input v-model="changeData.password1" id="pw1"
+                          :type="password1Type"
+                          placeholder="비밀번호를 입력해주세요"/>
+                        </div>
+                      </div>
+                      <div class="row form-group">
+                        <div class="col col-md-4">
+                          <label class=" form-control-label"></label>새 비밀번호 확인
+                        </div>
+                        <!-- 회원탈퇴 -->
+                        <div class="col-12 col-md-8">
+                           <input v-model="changeData.password2" id="pw2"
+                            :type="password2Type"
+                            placeholder="비밀번호를 한번 더 입력해주세요"/>
+                        </div>
+                      </div>             
+
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" @click="changePw">변경하기</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+                    
           </div>
         </div>
 
@@ -91,7 +136,7 @@
       <!-- 여기다가 기본적인 자기소개 써놓기 -->
       <form action="" method="post" enctype="multipart/form-data" class="form-horizontal">
         <div class="row form-group">
-          <div class="col col-md-3"><label for="email-input" class=" form-control-label">Email</label></div>
+          <div class="col col-md-3"><label for="email-input" class=" form-control-label">한마디</label></div>
           <div class="col-12 col-md-9">
 
               <textarea name="" id="" cols="30" rows="10" placeholder="dd"></textarea>
@@ -126,9 +171,15 @@ export default {
 
     data() {
     return {
-        myProfile: null,
+        myProfile: "",
         inputText:"",
-      };
+        changeData:{
+          password1:null,
+          password2:null,
+        },
+        password1Type:"password",
+        password2Type:"password",
+      }
     },
 
     created() {
@@ -179,7 +230,27 @@ export default {
         this.$router.push('/')
       },
       changePw(){
-        console.log("들어감")
+        const config = {
+          headers: {
+          'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
+          }
+        }
+        const paramMember = {
+              // nickname : this.myProfile.nickname,
+              password1 : this.changeData.password1,
+              password2 : this.changeData.password2
+            }
+        console.log(paramMember)
+        axios.put(`${BACK_URL}/member/update`,paramMember, config)
+          .then(() => {
+                console.log("수정완료")                
+          })
+          .catch((err) => {
+            console.log('에러보기')
+            console.error(err)
+            alert('비밀번호가 다릅니다.')
+          })
+
       },
     }
 
