@@ -5,6 +5,11 @@
       <button type="button" @click="postText" class="btn btn-outline-success" style="width:80px;">발행</button>
     </div>
 
+    <!-- 모달 -->
+    <div v-if="categoryList.length === 0">
+      <CreateCategoryWarning />
+    </div>
+
     <!-- 카테고리 부분 -->
     <div class="row form-group">
       <div class="col-2 text-left"><label for="multiple-select" class=" form-control-label">카테고리: </label></div>
@@ -34,6 +39,7 @@
 </template>
 
 <script>
+import CreateCategoryWarning from '@/components/blog/CreateCategoryWarning.vue'
 import axios from 'axios'
 
 const BACK_URL = 'http://localhost:8080'
@@ -41,7 +47,7 @@ const BACK_URL = 'http://localhost:8080'
 export default {
   name: 'Editor',
   components: {
-      
+     CreateCategoryWarning,
   },
   data() {
     return {
@@ -78,15 +84,15 @@ export default {
           })
     },
     getCategory() {
-          axios.get(`${BACK_URL}/blog/${this.aboutText.nickname}/categories`)
-              .then(res => {
-                  this.categoryList = res.data.list
-              })
+        axios.get(`${BACK_URL}/blog/${this.aboutText.nickname}/categories`)
+            .then(res => {
+                this.categoryList = res.data.list
+            })
 
-              .catch(err => {
-                  console.log(err)
-              })
-      },
+            .catch(err => {
+                console.log(err)
+            })
+    },
   },
   created() {
     this.getCategory(),
