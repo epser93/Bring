@@ -88,6 +88,7 @@ export default {
         .then(res => {
           this.postings = res.data.list
           console.log('핫핫', this.postings)
+          console.log(this.mode)
         })
         .catch(err => console.log(err))
     }

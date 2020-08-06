@@ -8,7 +8,9 @@
     </div>
     <hr>
     <router-view :mode="mode" :posts="posts"></router-view>
-    <button @click="changeMode">{{ modeText }}보러 가기</button>   
+    <div id="modeToggler">
+      <button @click="changeMode">{{ modeText }}보러 가기</button>   
+    </div>
   </div>
 </template>
  
@@ -76,6 +78,35 @@ export default {
 
 #nav a.router-link-exact-active {
   color: #42b983;
+}
+
+#modeToggler {
+  display: flex;
+  justify-content: flex-end;
+  margin-right : 60px;
+}
+
+#modeToggler button {
+  border: none;
+  background-color: #fff;
+  color: #000;
+  font-weight: 500;
+  border-radius: 45px;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  height: 45px;
+  width: 140px;
+  outline: none;
+  position: fixed;
+  bottom : 0;
+  margin-bottom: 30px;
+  transition: all 0.3s ease 0s;
+}
+
+#modeToggler button:hover {
+  background-color: #2EE59D;
+  box-shadow: 0px 15px 20px rgba(46, 229, 157, 0.4);
+  color: #fff;
+  transform: translateY(-7px);
 }
 
 .hidden {

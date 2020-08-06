@@ -156,14 +156,18 @@ export default {
               'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
             }
           }
-          if (comment.writer === this.$cookies.get('nickname')) {
-            axios.delete(`${BACK_URL}/reply/${comment.replyId}`, config)
-              .then(() => {
-                this.getComment()
-              })
-              .catch(err => console.log(err))
-          } else {
-            alert("작성자가 다릅니다.")
+          const askDelete = confirm("정말 삭제하시겠습니까?")
+          if (askDelete === true) {
+            if (comment.writer === this.$cookies.get('nickname')) {
+              axios.delete(`${BACK_URL}/reply/${comment.replyId}`, config)
+                .then(() => {
+                  this.getComment()
+                  alert("삭제가 완료되었습니다.")
+                })
+                .catch(err => console.log(err))
+            } else {
+              alert("작성자가 다릅니다.")
+            }
           }
         },
         getComment() {
@@ -197,12 +201,15 @@ export default {
               'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
             }
           }
-          axios.delete(`${BACK_URL}/blog/${this.nickname}/${this.board_name}/${this.post_id}`,config)
-            .then(() =>{
-              alert('삭제되었습니다!')
-              this.$router.push({ name : 'Home' })
-            })
-        },
+          const askConfirm = confirm("정말 삭제하시나요?")
+          if (askConfirm === true) {
+            axios.delete(`${BACK_URL}/blog/${this.nickname}/${this.board_name}/${this.post_id}`,config)
+              .then(() =>{
+                alert('삭제되었습니다!')
+                this.$router.push({ name : 'Home' })
+              })
+          }
+        }
     },
     created(){
        this.fetchPost(),
