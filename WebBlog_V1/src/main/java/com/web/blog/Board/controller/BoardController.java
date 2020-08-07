@@ -337,10 +337,7 @@ public class BoardController {
 
         List<Boolean> like = new ArrayList<>();
         like.add(isLiked);
-        Post ifshared = postService.getPost2(postId);
-        if(ifshared.getOriginal() != -1) {
 
-        }
         results.add(responseService.getListResult(postService.getPost(postId)));
         results.add(responseService.getListResult(tagService.getTags(postId)));
         results.add(responseService.getListResult(replyService.getRepliesofOnePost(postId)));

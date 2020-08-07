@@ -27,5 +27,5 @@ public interface OnlyPostMapping {
 
     Long getOriginal();
 
-    Set<String> getTags();
+//    Set<String> getTags();
 }
