@@ -54,10 +54,8 @@
             <b-button variant="primary" @click="likeAnswer(aArticle.apostId)">좋아요</b-button>
              
              <!-- 채택할지 여부 묻는 Modal / 이 부분 안됨 더 고민해보기-->
-
-                <!-- <b-button id="show-btn" v-if="nickname===qPost.writer" @click="$bvModal.show('bv-modal')">채택</b-button>
-                
-                <b-modal id="bv-modal" hide-footer>
+            <b-button id="show-btn" v-if="nickname===qPost.writer" @click="$bvModal.show('bv-modal')">채택</b-button>
+                <b-modal id="bv-modal" >
                     <template v-slot:modal-title>
                         답변 채택
                     </template>
@@ -68,10 +66,15 @@
                     </div>
                     <b-button class="mt-3" variant="outline-danger" block @click="selectAnswer(aArticle.apostId)">채택</b-button>
                     <b-button class="mt-3" variant="outline-warning" block @click="$bvModal.hide('bv-modal')">취소</b-button>
-                </b-modal> -->
+                </b-modal>
  
             <hr>
             {{aArticle.answer}}
+            {{aArticle}}
+            <!--좋아요-->
+            <span v-if="answerlike[aArticle.apostId]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="likeAnswer(aArticle, false)"><i class="fas fa-heart"></i></span>
+            <span v-if="!answerlike[aArticle.apostId]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="likeAnswer(aArticle, true)"><i class="fas fa-heart"></i></span>
+            <small :ref="'like-count-' + aArticle.apostId">{{ aArticle.likes }}</small><small>개의 좋아요</small>
             
         </div>
 
@@ -126,8 +129,10 @@ export default {
             aPost:[],
             apost_id: this.$route.params.apostId,
             // 답변 채택
-            likeit:false,
+           
             answerer: this.$cookies.get('nickname'),
+            // 답변 추천(좋아요)
+            answerlike:[],
         }
      },
     methods: {
@@ -168,7 +173,7 @@ export default {
                 console.log(err)
             })
         },
-        // 게시물 수정
+        // 게시물 수정 (아젝 완성 x, 수정 해야함)
         modifyQna(){
             // console.log(this.qpost_id)
             const config = {
@@ -176,7 +181,7 @@ export default {
                 'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
               }
             }
-            axios.put(`${BACK_URL}/questions/${this.qpost_id}`,config) // 이 부분 수정 해야함
+            axios.put(`${BACK_URL}/questions/${this.qpost_id}`,config) 
             .then(res=>{
                 console.log(res)
             })
@@ -231,24 +236,37 @@ export default {
                 console.log(err)
             })
         },
-        // 답변 추천
-        likeAnswer(aPostId){
-            console.log(this.nickname)
+        // 답변 추천(좋아요)
+        likeAnswer(aArticle,likeit){
             console.log(this.likeit)
             const config={
                 headers:{
-                    'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN')
+                    'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN'),
+                    'Content-Type': 'application/json'
                 }
             }
-            axios.post(`${BACK_URL}/answers/like/${aPostId}/${this.nickname}`,this.answerer,config)
-            .then(res=>{
-                
-                alert("추천 완료")
-                console.log(res)
-            })
-            .catch(err=>{
-                console.log(err)
-            })
+            if (likeit === false) {
+                axios.post(`${BACK_URL}/answers/like/${aArticle.aPostId}/${aArticle.writer}`,likeit,config)
+                    .then(res=>{
+                        this.$refs[`like-count-${aArticle.apostId}`][0].innerText = res.data.data 
+                        console.log(res.data)
+                        this.getAnswer()
+                        
+                    })
+                    .catch(err=>{
+                        console.log(err)
+                    })
+            }else{
+                axios.post(`${BACK_URL}/answers/like/${aArticle.aPostId}/${aArticle.writer}`,likeit,config)
+                    .then(res=>{
+                        this.$refs[`like-count-${aArticle.apostId}`][0].innerText = res.data.data 
+                        this.getAnswer()
+                        console.log(res)
+                    })
+                    .catch(err=>{
+                        console.log(err)
+                    })
+            }
         },
         // 답변 채택
         selectAnswer(aPostId){
