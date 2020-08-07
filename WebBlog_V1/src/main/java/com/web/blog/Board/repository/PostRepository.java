@@ -49,6 +49,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "update post set reply_cnt = reply_cnt + 1 where post_id = :post_id", nativeQuery = true)
     int updateReplyCnt(@Param("post_id") long post_id);
 
+    @Modifying
+    @Transactional
+    @Query(value = "update post set reply_cnt = reply_cnt - 1 where post_id = :post_id", nativeQuery = true)
+    int updateReplyCntMinus(@Param("post_id") long post_id);
+
     //한 카테고리 내 모든 포스트 통합 검색
 //    @Query(value = "select distinct * from post where board_id = :board_id and (subject like concat('%',:keyword,'%') or content like concat('%',:keyword,'%'))", nativeQuery = true)
     List<OnlyPostMapping> findDistinctByBoard_BoardIdAndSubjectContainingOrBoard_BoardIdAndContentContaining(long board_id1, String keyword1, long board_id2, String keyword2);

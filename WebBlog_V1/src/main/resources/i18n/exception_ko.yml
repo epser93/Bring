@@ -39,10 +39,10 @@ ownerCannotLike:
   msg: "포스트 작성자는 자신의 글에 좋아요를 누를 수 없습니다."
 answeredQuestion:
   code: "-7000"
-  msg: "답변이 달린 질문은 삭제할 수 없습니다."
+  msg: "답변이 달린 질문은 수정이나 삭제할 수 없습니다."
 selectedAnswer:
   code: "-8001"
-  msg: "채택된 답변은 삭제하실 수 없습니다."
+  msg: "채택된 답변은 수정이나 삭제를 하실 수 없습니다."
 youAskedQuestion:
   code: "-7001"
   msg: "질문 작성자는 요청하신 작업을 할 수 없습니다."

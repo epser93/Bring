@@ -41,6 +41,14 @@ public class Qpost extends CommonDateEntity implements Serializable {
     @Column(columnDefinition = "boolean default false")
     private boolean selectOver;
 
+    public void setSelectOver(boolean selectOver) {
+        this.selectOver = selectOver;
+    }
+
+    public boolean getSelectOver() {
+        return this.selectOver;
+    }
+
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "msrl")
