@@ -44,7 +44,14 @@ public class BoardService {
 
     //게시판 리스트 조회
     public List<Board> getBoards(Member member) {
-        return boardRepository.findByMember(member);
+        List<Board> boards = boardRepository.findByMember(member);
+        for(Board board : boards) {
+            if(board.getName().equals("나의 Answers")){
+                boards.remove(board);
+                break;
+            }
+        }
+        return boards;
     }
 
     //게시판 카테고리 정보 조회

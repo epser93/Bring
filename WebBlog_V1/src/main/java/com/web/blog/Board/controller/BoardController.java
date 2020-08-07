@@ -176,6 +176,7 @@ public class BoardController {
         List<Boolean> amIInTheList = new ArrayList<>();
 
         List<OnlyPostMapping> list = postRepository.findAllByWriter(nickname);
+        list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
         result.add(responseService.getListResult(list));
         int cnt = 0;
         if (logined.isPresent()) {
@@ -222,6 +223,7 @@ public class BoardController {
         LocalDateTime date = LocalDateTime.now();
         date.minus(14, ChronoUnit.DAYS);
         List<OnlyPostMapping> list = postRepository.findByCreatedAtLessThanEqualOrderByCreatedAtDesc(date);
+        list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
         result.add(responseService.getListResult(list));
         int cnt = 0;
         if (logined.isPresent()) {
@@ -256,6 +258,7 @@ public class BoardController {
         LocalDateTime date = LocalDateTime.now();
         date.minus(14, ChronoUnit.DAYS);
         List<OnlyPostMapping> list = postRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualOrLikesGreaterThanEqualAndCreatedAtLessThanEqualOrderByCreatedAtDesc(40, date, 20, date);
+        list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
         result.add(responseService.getListResult(list));
 
         int cnt = 0;
