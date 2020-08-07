@@ -139,14 +139,10 @@ public class QuestionController {
             //블로그 Q&A 게시판
             OnlyMemberMapping oamMem = memberRepository.findAllByNickname(oam.getWriter()).orElseThrow(CUserNotFoundException::new);
             StringBuilder sb = new StringBuilder();
-            sb.append("[Q&A]\"" + qpost.getSubject() + "\"에 대한 나의 답변(질문번호: " + qpost.getQpostId() + ", 질문자: " + qpost.getWriter() + ")");
+            sb.append("Q. " + qpost.getSubject() + "(Q writer: " + qpost.getWriter() + ", Q number: " + qpostId + ")" + System.getProperty("line.separator"));
+            sb.append("\t" + qpost.getContent() + System.getProperty("line.separator"));
             paramPost.setSubject(sb.toString());
-            sb = new StringBuilder();
-            sb.append("Q." + qpost.getSubject() + System.getProperty("line.separator"));
-            sb.append(qpost.getContent() + System.getProperty("line.separator") + System.getProperty("line.separator"));
-            sb.append("A." + System.getProperty("line.separator"));
-            sb.append(oam.getAnswer() + System.getProperty("line.separator"));
-            paramPost.setContent(sb.toString());
+            paramPost.setContent(oam.getAnswer());
             paramPost.setOriginal((long) -1);
             postService.updatePost("나의 Answers", oam.getPostId(), oamMem.getMsrl(), paramPost, null);
             Post answer = postRepository.findById(oam.getPostId()).orElseThrow(CResourceNotExistException::new);
@@ -155,7 +151,7 @@ public class QuestionController {
             List<String> tags2 = new ArrayList<>(tagSet);
             if (!tags.isEmpty()) {
                 for (String tag : tags2) {
-                    tagService.insertTags(answer, tag);
+                    tagService.updateTag(answer, tag);
                 }
             }
         }

@@ -14,7 +14,6 @@ import java.util.Set;
 @NoArgsConstructor
 public class ParamPost {
     @NotEmpty
-    @Size(min = 2, max = 100)
     @ApiModelProperty(value = "제목")
     private String subject;
 

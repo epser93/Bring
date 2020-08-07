@@ -148,7 +148,6 @@ public class QnaService {
         Qpost qpost = apost.getQpost();
         if (!isSelected && apost.getWriter().equals(member.getNickname())) {
             apostRepository.delete(apost);
-            qpostRepository.updateAnswerCntMinus(qpost.getQpostId());
             return true;
         } else if (isSelected) throw new CAnsweredQuestionException();
         else if (!apost.getWriter().equals(member.getNickname())) throw new CNotOwnerException();

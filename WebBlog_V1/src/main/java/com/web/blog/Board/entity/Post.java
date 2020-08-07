@@ -27,7 +27,7 @@ public class Post extends CommonDateEntity implements Serializable {
     @Column(nullable = false, length = 50)
     private String writer;
 
-    @Column(nullable = false, length = 300)
+    @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String subject;
 
     @Column(columnDefinition = "LONGTEXT")
