@@ -3,8 +3,12 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-5 quote">
-                        
-                        <img class="rounded-circle mx-auto d-block" :src=cardUserImage alt="Card image cap" style="width:200px;">
+                        <div v-if="myProfile.uploadfile == null">
+                            <img class="rounded-circle mx-auto d-block" :src=cardUserImage alt="Card image cap" style="width:200px;">
+                        </div>
+                        <div v-else>
+                            <img class="rounded-circle mx-auto d-block" :src=myProfile.uploadfile alt="Card image cap" style="width:200px;">
+                        </div>
                         <h5 class="text-sm-center mt-2 mb-1"><b class="mr-3">{{ myProfile.nickname }}</b></h5>
                         <div class="location text-sm-center"><i class="far fa-envelope"></i>  {{ myProfile.uid }}</div>
                         <span><a href="" style="color:gray"><i class="fas fa-user-friends"></i> {{myProfile.followers.length}} follower</a></span>
@@ -96,7 +100,7 @@ export default {
 
   data() {
     return {
-        uploadImageFile: '',
+        uploadImageFile: "간다",
         myProfile: null,
         myScore: '',
         myRank: [],
