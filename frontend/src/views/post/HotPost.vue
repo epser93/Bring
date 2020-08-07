@@ -42,14 +42,8 @@
       <div v-if="mode==='QnA'" class="tag-list-wrap col-lg-2">
         <h4>명예의전당</h4>
         <ul class="tag-list">
-          <li>
-              1등 : user1
-          </li> 
-          <li>
-              2등 : user2
-          </li> 
-          <li>
-              3등 : user3
+          <li v-for="(ranker, index) in sortRanking.slice(0,5)" :key="index">
+              {{ index + 1 }}등 : {{ranker.nickname}}({{ ranker.score}}점)
           </li> 
         </ul>
       </div>   
@@ -70,11 +64,13 @@ export default {
   },
   data() {
     return {
-      postings: null
+      postings: null,
+      unsortedRank: []
     }
   },
   created() {
     this.getHotPost()
+    this.getRanking()
   },
   methods: {
     gotoDetail(post) {
@@ -98,11 +94,19 @@ export default {
           })
           .catch (err => console.log(err))
       }
+    },
+    getRanking() {
+      axios.get(`${BACK_URL}/member/rank`)
+        .then(res => {
+          this.unsortedRank = res.data.list
+          console.log(this.unsortedRank)
+        })
+        .catch(err => console.log(err))
     }
   },
   computed: {
-    orderedHotQuestions () {
-      return _.orderBy(this.postings, 'views', 'desc')
+    sortRanking () {
+      return _.orderBy(this.unsortedRank, 'score', 'desc')
     }
   },
 }

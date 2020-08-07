@@ -69,7 +69,7 @@
                 this.$cookies.remove('nickname')
                 isLoggedIn = false
                 this.$emit("logout-state", isLoggedIn)
-                this.$router.push({name : 'Home'})
+                this.$router.push({name : 'Home'}).catch(() => {})
               })
               .catch((err) => {
                 console.error(err)
