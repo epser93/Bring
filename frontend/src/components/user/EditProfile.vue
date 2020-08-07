@@ -57,15 +57,15 @@
         <!-- 패스워드 -->
         <div class="section">
           <h5 class="title"><b>현재 비밀번호</b></h5>
-          <input v-model="changeData.password1" id="pw1" :type="password1Type" placeholder="현재 비밀번호를 입력해주세요" class="inputRange"/>
+          <input v-model="changeData.password3" id="pw1" :type="password3Type" placeholder="현재 비밀번호를 입력해주세요" class="inputRange"/>
         </div>
         <div class="section">
           <h5 class="title"><b>새 비밀번호</b></h5>
-          <input v-model="changeData.password2" id="pw2" :type="password2Type" placeholder="새 비밀번호를 입력해주세요" class="inputRange"/>
+          <input v-model="changeData.password1" id="pw2" :type="password1Type" placeholder="새 비밀번호를 입력해주세요" class="inputRange"/>
         </div>
         <div class="section">
           <h5 class="title"><b>새 비밀번호 확인</b></h5>
-           <input v-model="changeData.password3" id="pw3" :type="password3Type" placeholder="새 비밀번호를 한번 더 입력해주세요" class="inputRange"/>
+           <input v-model="changeData.password2" id="pw3" :type="password2Type" placeholder="새 비밀번호를 한번 더 입력해주세요" class="inputRange"/>
         </div>       
 
       <!-- 프로필 사진 변경 -->
@@ -85,7 +85,7 @@
     </div>
       <!-- 여기는 제출 -->
     <div class="card-footer">
-        <button type="submit" class="btn btn-success mx-2">
+        <button type="submit" class="btn btn-success mx-2" @click="changeInfo">
           <i class="fa fa-dot-circle-o"></i> 완료
         </button>
         <button type="reset" class="btn btn-danger mx-2" @click="backProfile">
@@ -170,23 +170,29 @@ export default {
 
       backProfile(){
         // this.$router.go(-1) // 뭘로할까?? 뒤로가기?? 아니면 메인화면으로 가기??
-        this.$router.push('/')
+        //this.$router.push('/')
+        this.$router.push({ name : "Profile" }) 
       },
-      changePw(){
+      changeInfo(){
         const config = {
           headers: {
           'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
           }
         }
         const paramMember = {
-              // nickname : this.myProfile.nickname,
+              nickname : this.changeData.nickname,
               password1 : this.changeData.password1,
-              password2 : this.changeData.password2
+              password2 : this.changeData.password2,
+              password3 : this.changeData.password3,
+              uploadFile : this.changeData.uploadFile
+
             }
         console.log(paramMember)
         axios.put(`${BACK_URL}/member/update`,paramMember, config)
           .then(() => {
-                console.log("수정완료")                
+                console.log("수정완료")
+                //this.$router.go(-1)
+                this.$router.push({ name : "Profile" })                
           })
           .catch((err) => {
             console.log('에러보기')
