@@ -1,5 +1,5 @@
 <template>
-<div class="container" style="padding-top: 80px; width:650px">
+<div class="container" style="width:650px">
   <div class="card">
     <div class="card-header">
       <strong>Edit Profile</strong>
@@ -69,14 +69,16 @@
         </div>       
 
       <!-- 프로필 사진 변경 -->
-        <div class="section">
+        <div class="section" style="margin-bottom:0">
           <h5 class="title"><b>프로필 사진 변경</b></h5>
           <!-- <img class="popupImageItem" :src="uploadImageFile"> -->
-          <div class="filebox">
+          <div class="filebox" style="margin-top:0">
             <label for="ex_file"><i class="far fa-images"></i> 사진 변경 </label>
-            <input type="file" id="ex_file">
+            <input type="file" id="ex_file" v-on:change="upload">
           </div>
-          <br>
+          <div class="previewBg">
+            <img class="previewImg" :src="changeData.uploadFile"> 
+          </div>
         </div>
 
 
@@ -110,6 +112,7 @@ export default {
     return {
         myProfile: "",
         inputText:"",
+        newImgSrc:"",
         changeData:{
           nickname:null,
           password1:null,
@@ -201,6 +204,17 @@ export default {
           })
 
       },
+      upload(e){
+        let file = e.target.files;
+        let reader = new FileReader();
+        
+        reader.readAsDataURL(file[0]);
+        reader.onload = e => {
+        // console.log(e.target.result);
+        this.changeData.uploadFile = e.target.result;
+        console.log(this.changeData)
+        }
+      }
     }
 
 }
@@ -258,9 +272,18 @@ export default {
   height: 1px;
   padding: 0;
   margin: -1px;
-  overflow: hidden;
+  /* overflow: hidden; */
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+.previewImg{
+  width:150px;
+  height:150px;
+  margin-top:15px;
+}
+.previewBg{
+  background-color: whitesmoke;
+  height: 180px;
 }
 
 </style>
