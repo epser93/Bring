@@ -37,8 +37,8 @@
                     <div class="card" style="width: 75%;">
                         <img class="card-img-top" :src="cardImage" alt="Card image cap">
                         <div class="card-body pb-0">
-                            <h5 class="card-title">{{ item.subject }}</h5>
-                            <p class="card-text mb-3">{{ item.content }}</p>
+                            <h5 class="card-title">{{ item.subject.slice(0, 10) + '...'  }}</h5>
+                            <p class="card-text mb-3">{{ item.content.slice(0, 20) + '...' }}</p>
                             <!-- 좋아요 부분 -->
                             <span v-if="postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="postLike(item, false)"><i class="fas fa-heart"></i></span>
                             <span v-if="!postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="postLike(item, true)"><i class="fas fa-heart"></i></span>
@@ -76,7 +76,7 @@
                 </div>
             </div>
             <div class="text-right" v-if="userNow === nickname">
-                <button type="button" @click="newArticle(postListCategory[0].board_name)" class="btn btn-outline-dark mb-5 mr-5" style="width:100px;">새 글 작성</button>
+                <button type="button" @click="newArticle(currentCategory)" class="btn btn-outline-dark mb-5 mr-5" style="width:100px;">새 글 작성</button>
             </div>
         </div>
 
@@ -145,6 +145,7 @@ export default {
             axios.get(`${BACK_URL}/blog/${this.nickname}/post_list`, config)
                 .then(res => {
                     // 포스트 정보
+                    console.log(res)
                     this.postList = res.data.list[0].list
                     // 포스트에 사용자가 좋아요를 눌렀는지에 대한 불린 값
                     this.postLike1 = res.data.list[1].list
@@ -170,6 +171,8 @@ export default {
             axios.get(`${BACK_URL}/blog/${this.nickname}/${categoryName}/post_list`)
                 .then(res => {
                     this.postListCategory = res.data.list[0].list
+                    // 카테고리 바로 에디터로 가져가기 위한 용도
+                    this.currentCategory = categoryName
                 })
                 .catch(err => {
                     console.log(err)
@@ -246,6 +249,7 @@ export default {
             postListCategory: [],
             postListKeyword: [],
             categoryList: [],
+            currentCategory: '',
             
             // 검색 관련
             keywordType: {
@@ -261,7 +265,7 @@ export default {
             // 좋아요 관련
             postLike1: [],
         }
-    }
+    },
 }
 </script>
 
