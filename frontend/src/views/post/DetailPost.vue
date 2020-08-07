@@ -5,8 +5,8 @@
     <div class="wrapper text-left col-12 col-lg-8">
         <div class="info">
             <h1 class="mb-3">{{subject}}</h1>
-            <p>{{ writer }}</p>
-            <p class="text-muted ">{{ createdAt }}</p>
+            <span class="mr-2"><strong>{{ writer }}</strong></span>
+            <span class="text-muted">{{ createdAt }}</span>
             <div class="text-right">
               <button class="btn btn-outline-warning btn-sm mx-1" v-if="(writer === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="updatePost"><b-icon icon="trash"></b-icon> 수정</button>
               <button class="btn btn-outline-danger btn-sm mx-1" v-if="(writer === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="deletePost"><b-icon icon="trash"></b-icon> 삭제</button>
@@ -15,15 +15,13 @@
         
         <!-- 태그부분 -->
         <div class="tag">
-            <span class="badge badge-pill badge-success">tag</span>
+            <span class="badge badge-pill badge-light">tag</span>
         </div>
         <hr>
-
         <p v-html="compiledMarkdown"></p>
-        <hr>
 
         <!-- 댓글 입력 부분 -->
-        <div id="commentTextArea">
+        <div id="commentTextArea" class="mt-5">
             <span v-if="writeComment">
               <div>
                   <b-form-textarea
@@ -41,11 +39,13 @@
               <button class="btn btn-success btn-sm mx-1" @click='commentOpen'>답변창 열기</button>
           </span>
         </div>
+
         <!-- 댓글 목록부분 -->
-        <div class="" v-for="comment in recentlyComments" :key="comment.replyId">
+        <h3 class="mt-5">{{ recentlyComments.length }} Comments</h3>
+        <div class="ml-3" v-for="comment in recentlyComments" :key="comment.replyId">
           <p>{{ comment.writer }}</p>
           <p>{{ comment.reply }}</p>
-          <p>이 댓글을{{ comment.likes}}명이 좋아합니다</p>
+          <small>이 댓글을{{ comment.likes}}명이 좋아합니다</small>
           <p>{{ comment.createdAt }}</p>
           <button class="btn btn-outline-success btn-sm mx-1" v-if="$cookies.get('nickname') === comment.writer" @click="commentDelete(comment)">삭제</button>
           <button class="btn btn-outline-success btn-sm" v-if="$cookies.get('nickname') === comment.writer" @click="openCommentUpdate(comment), setXY($event)">수정</button>
