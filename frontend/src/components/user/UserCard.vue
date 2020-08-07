@@ -19,7 +19,7 @@
                     </div>
 
                     <!-- 육성게임 -->
-                    <div class="mx-3 mt-3"> 
+                    <div class="col-6 mx-3 mt-3"> 
                         <h3 class="card-title"><b>My Level</b> </h3>
                         <div v-if="computedGrade === 'bronze'" class="mb-3">
                             <h3 class="r_bronze"><i class="fas fa-medal"></i></h3>
@@ -48,7 +48,7 @@
 
                         <h5>다음 등급까지: ({{myScore}}/{{computedNext}})</h5>
 
-                        <p>{{allUsers}}명중 {{computedRank}}위 ---> 이걸 어떻게 표현해야 좋을까?</p> 
+                        <p>{{allUsers}}명중 {{computedRank}}위 1</p> 
                         
                         <div class="progress m-t-20">
                             <div class="progress-bar bg-warning progress-bar-striped" aria-valuemin="0" aria-valuemax="100" :style="{ width: computedScore + '%' }" role="progressbar"> <span>{{computedScore}}%</span> </div>
@@ -57,20 +57,16 @@
                 </div>
                 <hr>
         <!--  TIL  이거 주소다 있음  -->
-               <span>ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ
-                   <br>
-                   ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ
-                   <br>
-                   ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ
-                   <br>
-                   ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ
-                   <br>
-                   ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ
-                   <br>
-                   ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ
-                   <br>
-                   ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ
-               </span>
+            ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>                                
+            <br>
+            <br>
+            <br>
+            ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
                <hr>
             
 
@@ -80,8 +76,7 @@
             <br>
             <br>
             <br>
-                                            차트
-            <br>
+            <br>                                
             <br>
             <br>
             <br>
