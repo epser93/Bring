@@ -5,8 +5,6 @@
     <div class="wrapper text-left col-12 col-lg-8">
         <div class="info">
             <h1 class="mb-3">{{subject}}</h1>
-            <span class="mr-2"><strong>{{ writer }}</strong></span>
-            <span class="text-muted">{{ createdAt }}</span>
             <div class="text-right">
               <button class="btn btn-outline-warning btn-sm mx-1" v-if="(writer === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="updatePost"><b-icon icon="trash"></b-icon> 수정</button>
               <button class="btn btn-outline-danger btn-sm mx-1" v-if="(writer === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="deletePost"><b-icon icon="trash"></b-icon> 삭제</button>
@@ -20,8 +18,16 @@
         <hr>
         <p v-html="compiledMarkdown"></p>
 
+        <!-- 포스트 정보 박스 -->
+        <div class="bg-light" style="margin: 100px 0 50px;">
+            <span class="mr-2"><strong>{{ writer }}</strong></span>
+            <span class="text-muted">{{ createdAt }}</span>
+            <p>{{ likes }} 명이 이 게시글을 좋아합니다</p>
+            <p>조회수: {{ views }}</p>
+        </div>
+
         <!-- 댓글 입력 부분 -->
-        <div id="commentTextArea" class="mt-5">
+        <div id="commentTextArea" class="">
             <span v-if="writeComment">
               <div>
                   <b-form-textarea
@@ -75,6 +81,8 @@ export default {
             writer: null,
             content: null,
             createdAt: null,
+            views: null,
+            likes: null,
 
             comments: null,
             comment_content: '',
@@ -176,6 +184,8 @@ export default {
               this.subject = res.data.list[0].list[0].subject
               this.content = res.data.list[0].list[0].content
               this.createdAt = res.data.list[0].list[0].createdAt
+              this.likes = res.data.list[0].list[0].likes
+              this.views = res.data.list[0].list[0].views
             })
             .catch(err => console.log(err))
         },
