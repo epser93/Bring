@@ -159,7 +159,6 @@ export default {
             axios.get(`${BACK_URL}/blog/${this.nickname}/categories`)
                 .then(res => {
                     this.categoryList = res.data.list
-               
                 })
                 .catch(err => {
                     console.log(err)

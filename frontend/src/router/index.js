@@ -49,7 +49,7 @@ const routes = [{
         ]
     },
     {
-        path: '/:nickname/:boardName/:post_id/',
+        path: '/:nickname/:boardName/:post_id/detail',
         name: 'DetailPost',
         component: DetailPost,
         props: true
