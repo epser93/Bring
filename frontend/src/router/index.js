@@ -131,7 +131,7 @@ const routes = [{
         component: QuestionWrite
     },
     {
-        path: '/questions/:qpostId',
+        path: '/questions/:nickname/:qpostId',
         name: 'QuestionDetail',
         component: QuestionDetail
     },

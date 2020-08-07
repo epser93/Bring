@@ -23,7 +23,7 @@
 
     <section v-if="mode==='QnA'" class="cards row">
       <div class="col-lg-10 row">
-        <div v-for="post in orderedPosts" :key="post.qpost_id" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
+        <div v-for="post in posts" :key="post.qpostId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
           <div class=cardwrap>
             <div class="card-body p-0" @click="gotoQuestionDetail(post)">
               <div class="img-section">
@@ -32,12 +32,12 @@
               <div class="contents">
                 <h4>{{ post.subject }}</h4>
                 <p>{{ post.content }}</p>
-                <p class="comment-date">{{ post.createdAt}} · {{ post.answerCnt }}개의 댓글</p>
+                <p class="comment-date">{{ post.createdAt}} · {{ post.answerCnt }}개의 답변</p>
               </div>
             </div>
             <div class="writer-info">
               <button class="btn btn-sm" @click="gotoUserInfo(post.writer)">{{ post.writer }}</button>
-              <p>♥ {{ post.views }}</p>
+              <p><i class="far fa-eye"></i> {{ post.views }}</p>
             </div>
           </div>
         </div>
@@ -46,14 +46,8 @@
       <div v-if="mode==='QnA'" class="tag-list-wrap col-lg-2">
         <h4>명예의전당</h4>
         <ul class="tag-list">
-          <li>
-              1등 : user1
-          </li> 
-          <li>
-              2등 : user2
-          </li> 
-          <li>
-              3등 : user3
+          <li v-for="(ranker, index) in sortRanking.slice(0,5)" :key="index">
+              {{ index + 1 }}등 : {{ranker.nickname}}({{ ranker.score}}점)
           </li> 
         </ul>
       </div>   
@@ -63,28 +57,46 @@
 </template>
 
 <script>
+import axios from 'axios'
 import _ from 'lodash'
+const BACK_URL = 'http://localhost:8080'
+
 export default {
   name: 'PostList',
   props: {
     mode: String,
     posts: Array,
   },
+  data() {
+    return {
+      unsortedRank : [],
+    }
+  },
   methods : {
     gotoDetail(post) {
       this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.writer, post_id : post.postId }})
     },
     gotoQuestionDetail(post) {
-      this.$router.push({ name : "DetailPost" , params: { post: post, nickname : post.writer, post_id : post.qpost_id }})
+      this.$router.push({ name : "QuestionDetail" , params: { nickname : post.writer, qpostId : post.qpostId }})
     },
     gotoUserInfo(userNickname) {
       this.$router.push({ name : "MyBlog" , params: { nickname : userNickname }})
+    },
+    getRanking() {
+      axios.get(`${BACK_URL}/member/rank`)
+        .then(res => {
+          this.unsortedRank = res.data.list
+          console.log(this.unsortedRank)
+        })
+        .catch(err => console.log(err))
     }
   },
+  created() {
+    this.getRanking()
+  },
   computed: {
-    // qna때문에 남겨짐 지워야함!
-    orderedPosts () {
-      return _.orderBy(this.posts, 'createdAt', 'desc')
+    sortRanking () {
+      return _.orderBy(this.unsortedRank, 'score', 'desc')
     }
   }
 }

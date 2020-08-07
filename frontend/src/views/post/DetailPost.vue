@@ -29,7 +29,7 @@
                   <b-form-textarea
                       id="textarea-rows"
                       placeholder="댓글을 작성해주세요!"
-                      rows="8"
+                      rows="4"
                       v-model = "comment_content"
                   ></b-form-textarea>
               </div>
@@ -210,6 +210,9 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+#detail {
+  display: flex;
+  justify-content: center;
+}
 </style>
