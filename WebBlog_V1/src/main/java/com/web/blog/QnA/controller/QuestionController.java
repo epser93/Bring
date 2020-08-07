@@ -1,13 +1,24 @@
 package com.web.blog.QnA.controller;
 
+import com.web.blog.Board.entity.Post;
+import com.web.blog.Board.model.ParamPost;
+import com.web.blog.Board.repository.PostRepository;
+import com.web.blog.Board.service.PostService;
+import com.web.blog.Board.service.TagService;
+import com.web.blog.Common.advice.exception.CAnsweredQuestionException;
+import com.web.blog.Common.advice.exception.CResourceNotExistException;
+import com.web.blog.Common.advice.exception.CSelectedAnswerException;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
 import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.response.SingleResult;
 import com.web.blog.Common.service.ResponseService;
 import com.web.blog.Member.entity.Member;
+import com.web.blog.Member.model.OnlyMemberMapping;
 import com.web.blog.Member.repository.MemberRepository;
+import com.web.blog.QnA.entity.Apost;
 import com.web.blog.QnA.entity.Qpost;
+import com.web.blog.QnA.model.OnlyApostMapping;
 import com.web.blog.QnA.model.OnlyQpostMapping;
 import com.web.blog.QnA.model.ParamQpost;
 import com.web.blog.QnA.repository.ApostMemberRepository;
@@ -29,10 +40,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Api(tags = {"7. Questions"})
 @RequiredArgsConstructor
@@ -43,9 +51,11 @@ public class QuestionController {
     private final MemberRepository memberRepository;
     private final QTagService qTagService;
     private final QnaService qnaService;
-    private final ApostMemberRepository apostMemberRepository;
-    private final QpostRepository qpostRepository;
     private final ApostRepository apostRepository;
+    private final QpostRepository qpostRepository;
+    private final PostRepository postRepository;
+    private final PostService postService;
+    private final TagService tagService;
 
     @ApiOperation(value = "QnA 전체 질문 리스트(최신글)", notes = "QnA의 모든 질문글 리스트(최신글)")
     @GetMapping("/recent")
@@ -111,14 +121,45 @@ public class QuestionController {
     public ListResult<SingleResult> updateQuestion(@Valid @RequestBody ParamQpost paramQpost, @PathVariable long qpostId, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Member member = (Member) principal;
+        ParamPost paramPost = new ParamPost();
+
         Set<String> tags = paramQpost.getTags();
         List<SingleResult> result = new ArrayList<>();
+        Qpost qpost1 = qpostRepository.findById(qpostId).get();
+        if(qpost1.getSelectOver()) throw new CSelectedAnswerException();
         Qpost qpost = qnaService.updateQuestion(member, qpostId, paramQpost, files);
         if (!tags.isEmpty()) {
             for (String tag : tags) {
                 qTagService.updateTag(qpost, tag);
             }
         }
+
+        List<OnlyApostMapping> apost = apostRepository.findByQpost(qpost);
+        for (OnlyApostMapping oam : apost) {
+            //블로그 Q&A 게시판
+            OnlyMemberMapping oamMem = memberRepository.findAllByNickname(oam.getWriter()).orElseThrow(CUserNotFoundException::new);
+            StringBuilder sb = new StringBuilder();
+            sb.append("[Q&A]\"" + qpost.getSubject() + "\"에 대한 나의 답변(질문번호: " + qpost.getQpostId() + ", 질문자: " + qpost.getWriter() + ")");
+            paramPost.setSubject(sb.toString());
+            sb = new StringBuilder();
+            sb.append("Q." + qpost.getSubject() + System.getProperty("line.separator"));
+            sb.append(qpost.getContent() + System.getProperty("line.separator") + System.getProperty("line.separator"));
+            sb.append("A." + System.getProperty("line.separator"));
+            sb.append(oam.getAnswer() + System.getProperty("line.separator"));
+            paramPost.setContent(sb.toString());
+            paramPost.setOriginal((long) -1);
+            postService.updatePost("나의 Answers", oam.getPostId(), oamMem.getMsrl(), paramPost, null);
+            Post answer = postRepository.findById(oam.getPostId()).orElseThrow(CResourceNotExistException::new);
+
+            Set<String> tagSet = new HashSet<>(qTagService.getTags(qpost.getQpostId()));
+            List<String> tags2 = new ArrayList<>(tagSet);
+            if (!tags.isEmpty()) {
+                for (String tag : tags2) {
+                    tagService.insertTags(answer, tag);
+                }
+            }
+        }
+
         result.add(responseService.getSingleResult(qpost));
         result.add(responseService.getSingleResult(tags));
         return responseService.getListResult(result);

@@ -88,7 +88,7 @@ public class AnswerController {
         Member logined = (Member) principal;
         ParamPost paramPost = new ParamPost();
 
-        if(asker.getMsrl() == logined.getMsrl()){
+        if (asker.getMsrl() == logined.getMsrl()) {
             throw new CAskedQuestionException();
         }
 
@@ -109,7 +109,7 @@ public class AnswerController {
         Set<String> tagSet = new HashSet<>(qTagService.getTags(qpostId));
         List<String> tags = new ArrayList<>(tagSet);
         if (!tags.isEmpty()) {
-            for(String tag : tags) {
+            for (String tag : tags) {
                 tagService.insertTags(answer, tag);
             }
         }
@@ -125,8 +125,34 @@ public class AnswerController {
     @ApiOperation(value = "답변 수정", notes = "답변 수정")
     @PutMapping(value = "/{apostId}")
     public SingleResult<Apost> updateAnswer(@Valid @RequestBody ParamApost paramApost, @PathVariable long apostId, @RequestParam(value = "files", required = false) MultipartFile[] files, @RequestParam Boolean isSelected) throws IOException {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Member logined = (Member) principal;
         Optional<Apost> apost = apostRepository.findById(apostId);
-        Qpost qpost = apost.get().getQpost();
+        long qpostId = apost.get().getQpost().getQpostId();
+        Qpost qpost = qpostRepository.findById(qpostId).orElseThrow(CResourceNotExistException::new);
+        ParamPost paramPost = new ParamPost();
+
+        //블로그 Q&A 게시판
+        StringBuilder sb = new StringBuilder();
+        sb.append("[Q&A]\"" + qpost.getSubject() + "\"에 대한 나의 답변(질문번호: " + qpost.getQpostId() + ", 질문자: " + qpost.getWriter() + ")");
+        paramPost.setSubject(sb.toString());
+        sb = new StringBuilder();
+        sb.append("Q." + qpost.getSubject() + System.getProperty("line.separator"));
+        sb.append(qpost.getContent() + System.getProperty("line.separator") + System.getProperty("line.separator"));
+        sb.append("A." + System.getProperty("line.separator"));
+        sb.append(paramApost.getAnswer() + System.getProperty("line.separator"));
+        paramPost.setContent(sb.toString());
+        paramPost.setOriginal((long) -1);
+        postService.updatePost("나의 Answers", apost.get().getPostId(), logined.getMsrl(), paramPost, null);
+        Post answer = postRepository.findById(apost.get().getPostId()).orElseThrow(CResourceNotExistException::new);
+
+        Set<String> tagSet = new HashSet<>(qTagService.getTags(qpost.getQpostId()));
+        List<String> tags = new ArrayList<>(tagSet);
+        if (!tags.isEmpty()) {
+            for (String tag : tags) {
+                tagService.insertTags(answer, tag);
+            }
+        }
         return responseService.getSingleResult(qnaService.updateAnswer(apostId, paramApost, files, qpostRepository.isSelectedAnswerExist(qpost.getQpostId())));
     }
 
@@ -142,6 +168,8 @@ public class AnswerController {
         Optional<Apost> apost = apostRepository.findById(apostId);
         Qpost qpost = apost.get().getQpost();
         Boolean isOk = qnaService.deleteAnswer(apostId, member, qpostRepository.isSelectedAnswerExist(qpost.getQpostId()));
+        qpostRepository.updateAnswerCntMinus(qpost.getQpostId());
+        postService.deletePost(apost.get().getPostId(), member);
         if (isOk) {
             return responseService.getSuccessResult();
         }
@@ -159,6 +187,7 @@ public class AnswerController {
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new); //로그인한 사용자
         Optional<Apost> apost = apostRepository.findById(apostId);
+
         Qpost qpost = apost.get().getQpost();
         Optional<OnlyPostMapping> post = postRepository.findAllByPostId(apost.get().getPostId());
         long msrl = qpost.getMember().getMsrl();
@@ -170,8 +199,7 @@ public class AnswerController {
             sb.append("[채택]" + post.get().getSubject());
             paramPost.setSubject(sb.toString());
             paramPost.setContent(post.get().getContent());
-            Post post1 = new Post();
-            post1 = postService.updatePost("나의 Answers", post.get().getPostId(), answerer.getMsrl(), paramPost, null);
+            postService.updatePost("나의 Answers", post.get().getPostId(), answerer.getMsrl(), paramPost, null);
             System.out.println("성공");
         } else throw new CNotOwnerException();
     }

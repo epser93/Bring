@@ -101,6 +101,7 @@ public class ReplyController {
         Optional<Reply> reply = replyRepository.findById(replyId);
         Post post = reply.get().getPost();
         Boolean isOk = replyService.deleteReply(replyId, member);
+        postRepository.updateLikeCntMinus(post.getPostId());
         if (isOk) {
             return responseService.getSuccessResult();
         }

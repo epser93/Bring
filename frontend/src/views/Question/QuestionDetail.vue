@@ -237,7 +237,8 @@ export default {
             console.log(this.likeit)
             const config={
                 headers:{
-                    'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN')
+                    'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN'),
+                    'Content-Type': 'application/json'
                 }
             }
             axios.post(`${BACK_URL}/answers/like/${aPostId}/${this.nickname}`,this.answerer,config)

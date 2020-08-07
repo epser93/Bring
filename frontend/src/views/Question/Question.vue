@@ -72,7 +72,7 @@ export default {
     methods:{
         getAllQna() {
             console.log(this.qPost)
-            axios.get(`${BACK_URL}/questions/qlist`)
+            axios.get(`${BACK_URL}/questions/recent`)
             .then(res => {
                 this.qPost = res.data.list
                 

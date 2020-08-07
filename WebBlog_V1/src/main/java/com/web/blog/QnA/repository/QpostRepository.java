@@ -16,8 +16,11 @@ import java.util.Optional;
 
 public interface QpostRepository extends JpaRepository<Qpost, Long> {
     List<OnlyQpostMapping> findByWriter(String writer);
+
     Optional<Qpost> findById(long qpost_id);
+
     List<OnlyQpostMapping> findByQpostId(long qpost_id);
+
     List<OnlyQpostMapping> findAllByQpostIdGreaterThan(long num);
 
     @Modifying
@@ -32,6 +35,11 @@ public interface QpostRepository extends JpaRepository<Qpost, Long> {
     @Transactional
     @Query(value = "update qpost set answer_cnt = answer_cnt + 1 where qpost_id = :qpost_id", nativeQuery = true)
     int updateAnswerCnt(@Param("qpost_id") long qpost_id);
+
+    @Modifying
+    @Transactional
+    @Query(value = "update qpost set answer_cnt = answer_cnt - 1 where qpost_id = :qpost_id", nativeQuery = true)
+    int updateAnswerCntMinus(@Param("qpost_id") long qpost_id);
 
     @Modifying
     @Transactional
