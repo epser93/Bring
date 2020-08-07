@@ -16,12 +16,15 @@ import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.response.SingleResult;
 import com.web.blog.Common.service.FileService;
 import com.web.blog.Common.service.ResponseService;
+import com.web.blog.Common.service.S3Service;
 import com.web.blog.Member.entity.Member;
+import com.web.blog.Member.entity.ProfileImg;
 import com.web.blog.Member.model.OnlyMemberMapping;
 import com.web.blog.Member.model.ParamPassword;
-import com.web.blog.Member.repository.FollowRepository;
+import com.web.blog.Member.model.ProfileImgDto;
 import com.web.blog.Member.repository.MemberRepository;
 import com.web.blog.Member.service.FollowService;
+import com.web.blog.Member.service.ProfileImgService;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -35,7 +38,10 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
-import java.util.*;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Api(tags = {"2. Member"})
 @RequiredArgsConstructor
@@ -50,6 +56,8 @@ public class MemberController {
     private final FileService fileService;
     private final PostService postService;
     private final FollowService followService;
+    private final S3Service s3Service;
+    private final ProfileImgService profileImgService;
     private static final Logger logger = LoggerFactory.getLogger(MemberController.class);
 
     @ApiImplicitParams({
@@ -121,18 +129,43 @@ public class MemberController {
         return list;
     }
 
+    @Transactional
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
+    })
+    @ApiOperation(value = "프로필 이미지 등록", notes = "프로필 이미지 등록")
+    @PostMapping("/profile/image/{msrl}")
+    public SingleResult<ProfileImg> upload(@PathVariable long msrl, @RequestPart MultipartFile file) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String id = authentication.getName();
+        Member logined = repository.findByUid(id).orElseThrow(CUserNotFoundException::new);
+        if(msrl != logined.getMsrl()) return null;
+        String filePath = Long.toString(msrl);
+        String imgPath = s3Service.upload(filePath, file, msrl);
+        ProfileImgDto profileImgDto = new ProfileImgDto();
+        profileImgDto.setFilePath(imgPath);
+        profileImgDto.setMsrl(msrl);
+        return responseService.getSingleResult(profileImgService.savePost(profileImgDto));
+    }
+
+    @ApiOperation(value = "프로필 이미지 조회", notes = "프로필 이미지 조회")
+    @GetMapping("/profile/image/{msrl}")
+    public SingleResult<ProfileImgDto> dispWrite(@PathVariable long msrl) {
+        ProfileImgDto profileImgDto = profileImgService.getOneImg(msrl);
+        return responseService.getSingleResult(profileImgDto);
+    }
+
 
     @ApiImplicitParams({
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
     })
     @ApiOperation(value = "회원 수정", notes = "회원정보를 수정한다")
     @PutMapping(value = "/update")
-    public SingleResult<Member> modify(@Valid @RequestBody ParamPassword paramMember) {
+    public SingleResult<Member> modify(@Valid @RequestBody ParamPassword paramMember, @RequestPart MultipartFile file) {
         String oldPassword = paramMember.getPassword3();
         Optional<String> newPassword = Optional.ofNullable(paramMember.getPassword1());
         Optional<String> newPasswordChk = Optional.ofNullable(paramMember.getPassword2());
         Optional<String> nickname = Optional.ofNullable(paramMember.getNickname());
-        MultipartFile file = paramMember.getUploadFile();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String id = authentication.getName();

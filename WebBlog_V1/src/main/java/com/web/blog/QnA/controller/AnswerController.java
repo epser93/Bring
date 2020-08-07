@@ -94,13 +94,12 @@ public class AnswerController {
 
         //블로그 Q&A 게시판
         StringBuilder sb = new StringBuilder();
-        sb.append("[Q&A]\"" + qpost.get().getSubject() + "\"에 대한 나의 답변(질문번호: " + qpostId + ", 질문자: " + qpost.get().getWriter() + ")");
+        sb.append("Q. " + qpost.get().getSubject() + "(Q writer: " + qpost.get().getWriter() + ", Q number: " + qpostId + ")" + System.getProperty("line.separator"));
+        sb.append("\t" + qpost.get().getContent() + System.getProperty("line.separator"));
         paramPost.setSubject(sb.toString());
         sb = new StringBuilder();
-        sb.append("Q." + qpost.get().getSubject() + System.getProperty("line.separator"));
-        sb.append(qpost.get().getContent() + System.getProperty("line.separator") + System.getProperty("line.separator"));
         sb.append("A." + System.getProperty("line.separator"));
-        sb.append(paramApost.getAnswer() + System.getProperty("line.separator"));
+        sb.append("\t" + paramApost.getAnswer() + System.getProperty("line.separator"));
         paramPost.setContent(sb.toString());
         paramPost.setOriginal((long) -1);
         Post answer = new Post();
@@ -124,7 +123,7 @@ public class AnswerController {
     })
     @ApiOperation(value = "답변 수정", notes = "답변 수정")
     @PutMapping(value = "/{apostId}")
-    public SingleResult<Apost> updateAnswer(@Valid @RequestBody ParamApost paramApost, @PathVariable long apostId, @RequestParam(value = "files", required = false) MultipartFile[] files, @RequestParam Boolean isSelected) throws IOException {
+    public SingleResult<Apost> updateAnswer(@Valid @RequestBody ParamApost paramApost, @PathVariable long apostId, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Member logined = (Member) principal;
         Optional<Apost> apost = apostRepository.findById(apostId);
@@ -132,15 +131,18 @@ public class AnswerController {
         Qpost qpost = qpostRepository.findById(qpostId).orElseThrow(CResourceNotExistException::new);
         ParamPost paramPost = new ParamPost();
 
+        if(!logined.getNickname().equals(apost.get().getWriter())) {
+            throw new CNotOwnerException();
+        }
+
         //블로그 Q&A 게시판
         StringBuilder sb = new StringBuilder();
-        sb.append("[Q&A]\"" + qpost.getSubject() + "\"에 대한 나의 답변(질문번호: " + qpost.getQpostId() + ", 질문자: " + qpost.getWriter() + ")");
+        sb.append("Q. " + qpost.getSubject() + "(Q writer: " + qpost.getWriter() + ", Q number: " + qpostId + ")" + System.getProperty("line.separator"));
+        sb.append("\t" + qpost.getContent() + System.getProperty("line.separator"));
         paramPost.setSubject(sb.toString());
         sb = new StringBuilder();
-        sb.append("Q." + qpost.getSubject() + System.getProperty("line.separator"));
-        sb.append(qpost.getContent() + System.getProperty("line.separator") + System.getProperty("line.separator"));
         sb.append("A." + System.getProperty("line.separator"));
-        sb.append(paramApost.getAnswer() + System.getProperty("line.separator"));
+        sb.append("\t" + paramApost.getAnswer() + System.getProperty("line.separator"));
         paramPost.setContent(sb.toString());
         paramPost.setOriginal((long) -1);
         postService.updatePost("나의 Answers", apost.get().getPostId(), logined.getMsrl(), paramPost, null);
@@ -150,7 +152,7 @@ public class AnswerController {
         List<String> tags = new ArrayList<>(tagSet);
         if (!tags.isEmpty()) {
             for (String tag : tags) {
-                tagService.insertTags(answer, tag);
+                tagService.updateTag(answer, tag);
             }
         }
         return responseService.getSingleResult(qnaService.updateAnswer(apostId, paramApost, files, qpostRepository.isSelectedAnswerExist(qpost.getQpostId())));
@@ -196,7 +198,7 @@ public class AnswerController {
             qnaService.selectThisAnswer(apostId, qpost.getQpostId(), member);
             ParamPost paramPost = new ParamPost();
             StringBuilder sb = new StringBuilder();
-            sb.append("[채택]" + post.get().getSubject());
+            sb.append("[채택]\n" + post.get().getContent());
             paramPost.setSubject(sb.toString());
             paramPost.setContent(post.get().getContent());
             postService.updatePost("나의 Answers", post.get().getPostId(), answerer.getMsrl(), paramPost, null);
