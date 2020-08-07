@@ -2088,6 +2088,11 @@ cache-loader@^4.1.0:
     neo-async "^2.6.1"
     schema-utils "^2.0.0"
 
+calendar-graph@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/calendar-graph/-/calendar-graph-1.0.0.tgz#6c113b36ca99a12569bc301da2d96e8de83bdd66"
+  integrity sha512-TUKBJ8uN6Q0ZV8piQFKYNeQlNbUpf4Lie4LhmExav4Jj20vma4NXOrb9QDE6tCOH1+ohyr7RQHDwHqsJmcPdwA==
+
 call-me-maybe@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/call-me-maybe/-/call-me-maybe-1.0.1.tgz#26d208ea89e37b5cbde60250a15f031c16a4d66b"
@@ -5417,6 +5422,11 @@ markdown-it@^8.4.1:
     linkify-it "^2.0.0"
     mdurl "^1.0.1"
     uc.micro "^1.0.5"
+
+marked@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-1.1.1.tgz#e5d61b69842210d5df57b05856e0c91572703e6a"
+  integrity sha512-mJzT8D2yPxoPh7h0UXkB+dBj4FykPJ2OIfxAWeIHrvoHDkFxukV/29QxoFQoPM6RLEwhIFdJpmKBlqVM3s2ZIw==
 
 md5.js@^1.3.4:
   version "1.3.5"
