@@ -1,5 +1,5 @@
 <template>
-    <div style="padding-top: 80px;">
+    <div style="padding-top: 10px;">
         <div class="profile container" style="width:650px">
             <UserCard class="mb-3"/>
         </div>    

@@ -50,32 +50,17 @@
             
             <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="nickname===aArticle.writer">삭제</b-button>
              
-            <!-- <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="nickname===qPost.writer">채택</b-button> -->
-            <b-button variant="primary" @click="likeAnswer(aArticle.apostId)">좋아요</b-button>
-             
-             <!-- 채택할지 여부 묻는 Modal / 이 부분 안됨 더 고민해보기-->
-
-                <!-- <b-button id="show-btn" v-if="nickname===qPost.writer" @click="$bvModal.show('bv-modal')">채택</b-button>
-                
-                <b-modal id="bv-modal" hide-footer>
-                    <template v-slot:modal-title>
-                        답변 채택
-                    </template>
-                    <div class="d-block text-center">
-                        <h3>답변을 채택 하시겠습니까? 채택 하시면 다시 되돌릴 수 없습니다.</h3>
-                        {{aArticle.apostId}}
-                    
-                    </div>
-                    <b-button class="mt-3" variant="outline-danger" block @click="selectAnswer(aArticle.apostId)">채택</b-button>
-                    <b-button class="mt-3" variant="outline-warning" block @click="$bvModal.hide('bv-modal')">취소</b-button>
-                </b-modal> -->
+            <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="nickname===qPost.writer">채택</b-button>
  
             <hr>
             {{aArticle.answer}}
-            
+            {{aArticle}}
+            <!--좋아요-->
+            <span v-if="answerLike[aArticle.apostId]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="likeAnswer(aArticle, true)"><i class="fas fa-heart"></i></span>
+            <span v-if="!answerLike[aArticle.apostId]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="likeAnswer(aArticle, false)"><i class="fas fa-heart"></i></span>
+            <small :ref="'like-count-' + aArticle.apostId">{{ aArticle.likes }}</small><small>개의 좋아요</small>
+            {{answerLike}}
         </div>
-
-
 
         <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded">
              <span v-if="writeComment">
@@ -97,8 +82,6 @@
         </span>
 
         </div>
-        
-
     </b-container>
   </div>
 </template>
@@ -125,9 +108,10 @@ export default {
             },
             aPost:[],
             apost_id: this.$route.params.apostId,
-            // 답변 채택
-            likeit:false,
+           
+            // 답변 추천(좋아요)
             answerer: this.$cookies.get('nickname'),
+            answerLike:[],      
         }
      },
     methods: {
@@ -141,7 +125,6 @@ export default {
         getQna() {
             axios.get(`${BACK_URL}/questions/${this.qpost_id}`)
             .then(res => {
-                // console.log(res.data.list)
                 this.qPost = res.data.list[0].list[0]
                 
             })
@@ -151,7 +134,7 @@ export default {
         },
         // 게시물 삭제
         deleteQna(){
-            console.log(this.qpost_id)
+            
             const config = {
               headers: {
                 'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
@@ -168,7 +151,7 @@ export default {
                 console.log(err)
             })
         },
-        // 게시물 수정
+        // 게시물 수정 (아직 완성 x, 수정 해야함)
         modifyQna(){
             // console.log(this.qpost_id)
             const config = {
@@ -176,7 +159,7 @@ export default {
                 'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
               }
             }
-            axios.put(`${BACK_URL}/questions/${this.qpost_id}`,config) // 이 부분 수정 해야함
+            axios.put(`${BACK_URL}/questions/${this.qpost_id}`,config) 
             .then(res=>{
                 console.log(res)
             })
@@ -184,7 +167,7 @@ export default {
                 console.log(err)
             })
         },
-        // 답변 작성
+        // 답변 작성 (페이지 리로딩 하는 방식 고민해볼것)
         writeAnswer(){
             const config = {
               headers: {
@@ -193,8 +176,11 @@ export default {
             }
             axios.post(`${BACK_URL}/answers/${this.qpost_id}`,this.answerData,config)
             .then(res=>{
-
                 this.getAnswer() // 페이지 리로딩
+                this.writeComment = false
+                this.answerData.answer=""
+                // 새로고침 하는 방법도 고민
+
                 console.log(res)
             })
             .catch(err=>{
@@ -206,7 +192,7 @@ export default {
             axios.get(`${BACK_URL}/answers/${this.qpost_id}/answers`)
             .then(res=>{
                 this.aPost=res.data.list
-                console.log(res)
+                
             })
             .catch(err=>{
                 console.log(err)
@@ -227,31 +213,47 @@ export default {
                 console.log(res)
             })
             .catch(err=>{
-                alert('삭제가 실패하였습니다')
+                alert('권한이 없습니다.')
                 console.log(err)
             })
         },
-        // 답변 추천
-        likeAnswer(aPostId){
-            console.log(this.nickname)
-            console.log(this.likeit)
+        // 답변 추천(좋아요) 아직 안됨
+        likeAnswer(aArticle,likeit){
+            
             const config={
                 headers:{
                     'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN'),
                     'Content-Type': 'application/json'
                 }
             }
-            axios.post(`${BACK_URL}/answers/like/${aPostId}/${this.nickname}`,this.answerer,config)
-            .then(res=>{
+            if (likeit === false) {
+                console.log(aArticle)
+                console.log(aArticle.apostId)
+                console.log(aArticle.writer)
+                axios.post(`${BACK_URL}/answers/like/${aArticle.apostId}/${aArticle.writer}`,likeit,config)
+                    .then(res=>{
+                        console.log(res)
+                        this.$refs[`like-count-${aArticle.apostId}`][0].innerText = res.data.data
+                        this.getAnswer()
+                    })
+                    .catch(err=>{
+                        console.log(err)
+                    })
+            }else{
+                console.log(aArticle)
                 
-                alert("추천 완료")
-                console.log(res)
-            })
-            .catch(err=>{
-                console.log(err)
-            })
+                axios.post(`${BACK_URL}/answers/like/${aArticle.apostId}/${aArticle.writer}`,likeit,config)
+                    .then(res=>{
+                        this.$refs[`like-count-${aArticle.apostId}`][0].innerText = res.data.data 
+                        this.getAnswer()
+                        console.log(res)
+                    })
+                    .catch(err=>{
+                        console.log(err)
+                    })
+            }
         },
-        // 답변 채택
+        // 답변 채택 (되는데 모달로 할 때는 에러남// 그냥 에러남;;)
         selectAnswer(aPostId){
             console.log(aPostId)
             const config={
@@ -267,12 +269,28 @@ export default {
             })
             .catch(err=>{
                 console.log(err)
+                alert("더 이상 답변을 채택할 수 없습니다")
             })
         },
+        // 답변 수정(아직 덜함)
+        modifyAnswer(){
+            const config={
+                headers:{
+                    'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN')
+                }
+            }
+            axios.put(`${BACK_URL}/answers/select/${this.aPostId}`,config)
+            .then(res=>{
+                console.log(res)
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+        }
         
     },
     
-     created(){
+    created(){
         this.getQna()
         this.getAnswer()
         

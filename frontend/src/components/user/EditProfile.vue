@@ -1,5 +1,5 @@
 <template>
-<div class="container" style="padding-top: 80px; width:650px">
+<div class="container" style="width:650px">
   <div class="card">
     <div class="card-header">
       <strong>Edit Profile</strong>
@@ -57,26 +57,28 @@
         <!-- 패스워드 -->
         <div class="section">
           <h5 class="title"><b>현재 비밀번호</b></h5>
-          <input v-model="changeData.password1" id="pw1" :type="password1Type" placeholder="현재 비밀번호를 입력해주세요" class="inputRange"/>
+          <input v-model="changeData.password3" id="pw1" :type="password3Type" placeholder="현재 비밀번호를 입력해주세요" class="inputRange"/>
         </div>
         <div class="section">
           <h5 class="title"><b>새 비밀번호</b></h5>
-          <input v-model="changeData.password2" id="pw2" :type="password2Type" placeholder="새 비밀번호를 입력해주세요" class="inputRange"/>
+          <input v-model="changeData.password1" id="pw2" :type="password1Type" placeholder="새 비밀번호를 입력해주세요" class="inputRange"/>
         </div>
         <div class="section">
           <h5 class="title"><b>새 비밀번호 확인</b></h5>
-           <input v-model="changeData.password3" id="pw3" :type="password3Type" placeholder="새 비밀번호를 한번 더 입력해주세요" class="inputRange"/>
+           <input v-model="changeData.password2" id="pw3" :type="password2Type" placeholder="새 비밀번호를 한번 더 입력해주세요" class="inputRange"/>
         </div>       
 
       <!-- 프로필 사진 변경 -->
-        <div class="section">
+        <div class="section" style="margin-bottom:0">
           <h5 class="title"><b>프로필 사진 변경</b></h5>
           <!-- <img class="popupImageItem" :src="uploadImageFile"> -->
-          <div class="filebox">
+          <div class="filebox" style="margin-top:0">
             <label for="ex_file"><i class="far fa-images"></i> 사진 변경 </label>
-            <input type="file" id="ex_file">
+            <input type="file" id="ex_file" v-on:change="upload">
           </div>
-          <br>
+          <div class="previewBg">
+            <img class="previewImg" :src="changeData.uploadFile"> 
+          </div>
         </div>
 
 
@@ -85,7 +87,7 @@
     </div>
       <!-- 여기는 제출 -->
     <div class="card-footer">
-        <button type="submit" class="btn btn-success mx-2">
+        <button type="submit" class="btn btn-success mx-2" @click="changeInfo">
           <i class="fa fa-dot-circle-o"></i> 완료
         </button>
         <button type="reset" class="btn btn-danger mx-2" @click="backProfile">
@@ -110,6 +112,7 @@ export default {
     return {
         myProfile: "",
         inputText:"",
+        newImgSrc:"",
         changeData:{
           nickname:null,
           password1:null,
@@ -170,23 +173,29 @@ export default {
 
       backProfile(){
         // this.$router.go(-1) // 뭘로할까?? 뒤로가기?? 아니면 메인화면으로 가기??
-        this.$router.push('/')
+        //this.$router.push('/')
+        this.$router.push({ name : "Profile" }) 
       },
-      changePw(){
+      changeInfo(){
         const config = {
           headers: {
           'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
           }
         }
         const paramMember = {
-              // nickname : this.myProfile.nickname,
+              nickname : this.changeData.nickname,
               password1 : this.changeData.password1,
-              password2 : this.changeData.password2
+              password2 : this.changeData.password2,
+              password3 : this.changeData.password3,
+              uploadFile : this.changeData.uploadFile
+
             }
         console.log(paramMember)
         axios.put(`${BACK_URL}/member/update`,paramMember, config)
           .then(() => {
-                console.log("수정완료")                
+                console.log("수정완료")
+                //this.$router.go(-1)
+                this.$router.push({ name : "Profile" })                
           })
           .catch((err) => {
             console.log('에러보기')
@@ -195,6 +204,17 @@ export default {
           })
 
       },
+      upload(e){
+        let file = e.target.files;
+        let reader = new FileReader();
+        
+        reader.readAsDataURL(file[0]);
+        reader.onload = e => {
+        // console.log(e.target.result);
+        this.changeData.uploadFile = e.target.result;
+        console.log(this.changeData)
+        }
+      }
     }
 
 }
@@ -252,9 +272,18 @@ export default {
   height: 1px;
   padding: 0;
   margin: -1px;
-  overflow: hidden;
+  /* overflow: hidden; */
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+.previewImg{
+  width:150px;
+  height:150px;
+  margin-top:15px;
+}
+.previewBg{
+  background-color: whitesmoke;
+  height: 180px;
 }
 
 </style>

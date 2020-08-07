@@ -70,6 +70,7 @@ export default {
       }
     },
     methods:{
+        // 전체 질문 리스트 최신글
         getAllQna() {
             console.log(this.qPost)
             axios.get(`${BACK_URL}/questions/recent`)
@@ -82,7 +83,7 @@ export default {
             })
         },
         getQnaDetail(qArticle){
-            this.$router.push({ name: 'QuestionDetail', params: {qpostId: qArticle.qpostId}})
+            this.$router.push({ name: 'QuestionDetail', params: {nickname: qArticle.writer, qpostId: qArticle.qpostId}})
         }
     },
     created(){
