@@ -3,26 +3,20 @@ package com.web.blog.Board.controller;
 import com.web.blog.Board.entity.Board;
 import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.entity.PostMember;
-import com.web.blog.Board.entity.Tag;
-import com.web.blog.Board.model.OnlyPostMapping;
-import com.web.blog.Board.model.OnlyTagMapping;
-import com.web.blog.Board.model.ParamBoard;
-import com.web.blog.Board.model.ParamPost;
+import com.web.blog.Board.model.*;
 import com.web.blog.Board.repository.BoardRepository;
 import com.web.blog.Board.repository.PostMemberRepository;
 import com.web.blog.Board.repository.PostRepository;
+import com.web.blog.Board.repository.PostUploadsRepository;
 import com.web.blog.Board.service.*;
 import com.web.blog.Common.advice.exception.*;
-import com.web.blog.Common.service.FileService;
-import com.web.blog.Common.service.ResponseService;
 import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.response.SingleResult;
+import com.web.blog.Common.service.ResponseService;
+import com.web.blog.Common.service.S3Service;
 import com.web.blog.Member.entity.Member;
-import com.web.blog.Member.model.OnlyMemberMapping;
 import com.web.blog.Member.repository.MemberRepository;
-import com.web.blog.QnA.entity.Apost;
-import com.web.blog.QnA.model.OnlyQpostMapping;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -54,6 +48,9 @@ public class BoardController {
     private final ResponseService responseService;
     private final MemberRepository memberRepository;
     private final PostMemberRepository postMemberRepository;
+    private final S3Service s3Service;
+    private final PostUploadsService postUploadsService;
+    private final PostUploadsRepository postUploadsRepository;
 
     @ApiImplicitParams({
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
@@ -292,7 +289,7 @@ public class BoardController {
     })
     @ApiOperation(value = "게시글 작성", notes = "게시글 작성")
     @PostMapping(value = "/blog/{nickname}/{boardName}") //ParamPost 프론트에서 태그 중복작성 불가하게 처리 필요
-    public ListResult<SingleResult> post(@PathVariable String boardName, @Valid @RequestBody ParamPost paramPost, @PathVariable String nickname, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException { //, @RequestParam("files") MultipartFile[] files
+    public ListResult<SingleResult> post(@PathVariable String boardName, @Valid @RequestBody ParamPost paramPost, @PathVariable String nickname) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
@@ -300,11 +297,13 @@ public class BoardController {
         Set<String> tagSet = paramPost.getTags();
         List<String> tags = new ArrayList<>(tagSet);
         List<SingleResult> result = new ArrayList<>();
-        paramPost.setOriginal((long)-1); //공유출처 없이 내가 직접 작성한 것
+
+        paramPost.setOriginal((long) -1); //공유출처 없이 내가 직접 작성한 것
         Post post = null;
         if (member.equals(member2)) { //블로그 주인과 로그인 한 사용자가 같으면~
-            post = postService.writePost(nickname, boardName, paramPost, files, member, "");
+            post = postService.writePost(nickname, boardName, paramPost, member, "");
         }
+
         if (!tags.isEmpty()) {
             for (String tag : tags) {
                 tagService.insertTags(post, tag);
@@ -334,18 +333,24 @@ public class BoardController {
                 else isLiked = false;
             }
         }
-
-        Member member = memberRepository.findByNickname(nickname).get();
-
-
         List<Boolean> like = new ArrayList<>();
         like.add(isLiked);
+
+        //파일 조회
+        List<String> filePaths = new ArrayList<>();
+        if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+            List<PostUploadsDto> files = postUploadsService.getList(postId);
+            for (PostUploadsDto ud : files) {
+                filePaths.add(ud.getImgFullPath());
+            }
+        }
 
         results.add(responseService.getListResult(postService.getPost(postId)));
         results.add(responseService.getListResult(tagService.getTags(postId)));
         results.add(responseService.getListResult(replyService.getRepliesofOnePost(postId)));
         results.add(responseService.getListResult(likes));
         results.add(responseService.getListResult(like));
+        results.add(responseService.getListResult(filePaths));
         return responseService.getListResult(results);
     }
 
@@ -360,10 +365,7 @@ public class BoardController {
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserNotFoundException::new); //로그인한 사용자
         Post post = postRepository.findById(postId).orElseThrow(CResourceNotExistException::new);
         Optional<PostMember> postMember = postMemberRepository.findPostMemberByMember_MsrlAndPost(member.getMsrl(), post);
-        Optional<Post> originPost = postRepository.findById(post.getOriginal());
-        if(post.getOriginal() != -1) {
 
-        }
         int like = 0;
         if (postMember.isPresent() && likeit) {
             throw new CAlreadyLikedException();
@@ -398,7 +400,7 @@ public class BoardController {
     })
     @ApiOperation(value = "게시글 수정", notes = "게시글 수정")
     @PutMapping(value = "/blog/{nickname}/{boardName}/{postId}")
-    public ListResult<SingleResult> post(@PathVariable String boardName, @PathVariable long postId, @Valid @RequestBody ParamPost paramPost, @PathVariable String nickname, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
+    public ListResult<SingleResult> post(@PathVariable String boardName, @PathVariable long postId, @Valid @RequestBody ParamPost paramPost, @PathVariable String nickname) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
@@ -406,9 +408,10 @@ public class BoardController {
         Set<String> tag1 = paramPost.getTags();
         List<String> tags = new ArrayList<>(tag1);
         List<SingleResult> result = new ArrayList<>();
+
         Post post = new Post();
         if (member.equals(member2)) { //블로그 주인과 로그인 한 사용자가 같으면~~
-            post = postService.updatePost(boardName, postId, member.getMsrl(), paramPost, files);
+            post = postService.updatePost(boardName, postId, member.getMsrl(), paramPost);
         }
         if (!tags.isEmpty()) {
             for (String tag : tags) {
@@ -430,6 +433,7 @@ public class BoardController {
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
         postService.deletePost(postId, member);
+
         return responseService.getSuccessResult();
     }
 
@@ -445,7 +449,7 @@ public class BoardController {
     })
     @ApiOperation(value = "게시글 공유", notes = "게시글 공유")
     @PostMapping(value = "/blog/{nickname}/{boardName}/share/{postId}")
-    public ListResult<SingleResult> sharePost(@PathVariable String nickname, @PathVariable String boardName, @PathVariable long postId, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
+    public ListResult<SingleResult> sharePost(@PathVariable String nickname, @PathVariable String boardName, @PathVariable long postId) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
@@ -454,7 +458,7 @@ public class BoardController {
 
         //postId 는 공유할 포스트의 아이디!
         Optional<OnlyPostMapping> post = postRepository.findAllByPostId(postId); //공유할 포스트 정보 불러오기
-        if(post.get().getOriginal() != -1) throw new CSharedPostException();
+        if (post.get().getOriginal() != -1) throw new CSharedPostException();
         paramPost.setContent(post.get().getContent()); //포스트 인자에 공유포스트의 컨텐츠 불러와서 저장
         paramPost.setSubject(post.get().getSubject()); //포스트 인자에 공유포스트의 제목 불러와서 저장
         Set<String> tagSet = new HashSet<>(tagService.getTags(postId)); //포스트 인자에 공유포스트의 태그 불러와서 저장
@@ -464,16 +468,62 @@ public class BoardController {
         Post share = new Post();
 
         if (member.equals(member2)) { //블로그 주인과 로그인 한 사용자가 같으면~
-            share = postService.writePost(nickname, boardName, paramPost, files, member, post.get().getWriter());
+            share = postService.writePost(nickname, boardName, paramPost, member, post.get().getWriter());
+            if (!tags.isEmpty()) {
+                for (String tag : tags) {
+                    tagService.insertTags(share, tag);
+                }
+            }
+            result.add(responseService.getSingleResult(share));
+            result.add(responseService.getSingleResult(tags));
+            if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드 된 파일이 존재하면~
+                int num = 0;
+                List<PostUploadsDto> files = postUploadsService.getList(postId); //해당 파일들 불러와서
+                for (PostUploadsDto postUploadsDto : files) { //각 파일들마다 DB에 저장!
+                    String imgPath = postUploadsDto.getFilePath();
+                    PostUploadsDto ud = new PostUploadsDto();
+                    ud.setFilePath(imgPath);
+                    ud.setPostId(share.getPostId());
+                    ud.setNum(num);
+                    postUploadsService.savePost(ud);
+                    num++;
+                }
+            }
         }
-        if (!tags.isEmpty()) {
-           for(String tag : tags) {
-               tagService.insertTags(share, tag);
-           }
-        }
-
-        result.add(responseService.getSingleResult(share));
-        result.add(responseService.getSingleResult(tags));
         return responseService.getListResult(result);
+    }
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
+    })
+    @ApiOperation(value = "파일 등록", notes = "새로운 포스트 작성 시, 또는 공유 할 시 파일 등록")
+    @PostMapping(value = "/blog/{nickname}/{boardName}/uploads")
+    public SingleResult<Boolean> upload(@PathVariable String nickname, @PathVariable String boardName, @RequestPart MultipartFile files) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
+        Board board = boardRepository.findByNameAndMember(boardName, logined);
+        Optional<List<Post>> list = postRepository.findByBoard_BoardIdAndWriter(board.getBoardId(), nickname);
+        MultipartFile[] files1 = new MultipartFile[1];
+        files1[0] = files;
+        if (list.isPresent()) {
+            Post post = list.get().get(list.get().size() - 1);
+            long postId = post.getPostId();
+            return responseService.getSingleResult(postService.saveFiles(postId, nickname, files1));
+        } else return null;
+    }
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
+    })
+    @ApiOperation(value = "파일 수정 등록", notes = "기존 포스트 수정 할 때, 필요시 파일 수정")
+    @PostMapping(value = "/blog/{nickname}/{boardName}/{postId}/uploads")
+    public SingleResult<Boolean> uploadUpdate(@PathVariable String nickname, @PathVariable String boardName, @PathVariable long postId, @RequestPart MultipartFile files) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
+        MultipartFile[] files1 = new MultipartFile[1];
+        files1[0] = files;
+        return responseService.getSingleResult(postService.saveFiles(postId, nickname, files1));
     }
 }

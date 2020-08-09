@@ -9,7 +9,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Builder
 @Getter
@@ -59,14 +58,6 @@ public class Post extends CommonDateEntity implements Serializable {
     public Board getBoard() {
         return board;
     }
-
-//    public Post(Board board, String writer, String subject, String content, String tag) {
-//        this.board = board;
-//        this.writer = writer;
-//        this.subject = subject;
-//        this.content = content;
-//        this.tag = tag;
-//    }
 
     public Post setUpdate(String subject, String content) {
         this.subject = subject;

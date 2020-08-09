@@ -13,11 +13,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ReplyRepository extends JpaRepository<Reply, Long> {
-    List<Reply> findByWriter(String writer);
     List<Reply> findByPostOrderByReplyId(Post post);
 
+    Optional<List<Reply>> findByWriterAndPost_PostId(String writer, long post_id);
+
     List<OnlyReplyMapping> findByPost(Post post);
+
     Optional<Reply> findById(long reply_id);
+
     List<OnlyReplyMapping> findByReplyId(long reply_id);
 
     @Modifying

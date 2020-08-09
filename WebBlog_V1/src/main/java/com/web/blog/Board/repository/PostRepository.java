@@ -3,8 +3,6 @@ package com.web.blog.Board.repository;
 import com.web.blog.Board.entity.Board;
 import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.model.OnlyPostMapping;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -23,6 +21,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<OnlyPostMapping> findByPostId(long post_id);
 
     Optional<OnlyPostMapping> findAllByPostId(long post_id);
+
+    Optional<List<Post>> findByBoard_BoardIdAndWriter(long boardId, String writer);
 
     @Modifying
     @Transactional

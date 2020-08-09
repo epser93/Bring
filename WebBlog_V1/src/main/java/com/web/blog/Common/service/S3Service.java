@@ -7,8 +7,6 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.web.blog.Common.advice.exception.CUserNotFoundException;
-import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +15,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -57,25 +57,21 @@ public class S3Service {
         return fileName;
     }
 
-    public String upload(String currentFilePath, MultipartFile file, long msrl) throws IOException {
+    public String upload(MultipartFile file, long id, int num, String nickname) throws IOException {
         // 고유한 key 값을 갖기위해 현재 시간을 postfix로 붙여줌
-        Member member = memberRepository.findById(msrl).orElseThrow(CUserNotFoundException::new);
-        String fileName = member.getNickname() + "-" + msrl + "-" + file.getOriginalFilename();
-
-        // key가 존재하면 기존 파일은 삭제
-        if ("".equals(currentFilePath) == false && currentFilePath != null) {
-            boolean isExistObject = s3Client.doesObjectExist(bucket, currentFilePath);
-
-            if (isExistObject == true) {
-                System.out.println("앙기모찌이");
-                s3Client.deleteObject(bucket, currentFilePath);
-            }
-        }
+        SimpleDateFormat format = new SimpleDateFormat ( "yyyy-MM-dd-HH-mm-ss");
+        Date date = new Date();
+        String time = format.format(date);
+        String fileName = nickname + "-" + time + "-" + id + "-" + num + "-" +file.getOriginalFilename();
 
         // 파일 업로드
         s3Client.putObject(new PutObjectRequest(bucket, fileName, file.getInputStream(), null)
                 .withCannedAcl(CannedAccessControlList.PublicRead));
 
         return fileName;
+    }
+
+    public void delete(String fileName) {
+        s3Client.deleteObject(bucket, fileName);
     }
 }

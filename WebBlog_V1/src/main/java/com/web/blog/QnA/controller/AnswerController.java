@@ -32,7 +32,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
@@ -81,7 +80,7 @@ public class AnswerController {
     })
     @ApiOperation(value = "답변 작성", notes = "답변 작성")
     @PostMapping(value = "/{qpostId}")
-    public SingleResult<Apost> answerTheQuestion(@PathVariable long qpostId, @Valid @RequestBody ParamApost paramApost, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
+    public SingleResult<Apost> answerTheQuestion(@PathVariable long qpostId, @Valid @RequestBody ParamApost paramApost) throws IOException {
         Optional<Qpost> qpost = qpostRepository.findById(qpostId);
         Member asker = qpost.get().getMember();
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -103,7 +102,7 @@ public class AnswerController {
         paramPost.setContent(sb.toString());
         paramPost.setOriginal((long) -1);
         Post answer = new Post();
-        answer = postService.writePost(logined.getNickname(), "나의 Answers", paramPost, null, logined, "");
+        answer = postService.writePost(logined.getNickname(), "나의 Answers", paramPost, logined, "");
 
         Set<String> tagSet = new HashSet<>(qTagService.getTags(qpostId));
         List<String> tags = new ArrayList<>(tagSet);
@@ -112,7 +111,7 @@ public class AnswerController {
                 tagService.insertTags(answer, tag);
             }
         }
-        Apost apost = qnaService.writeAnswer(qpost.get(), logined, paramApost, files, answer.getPostId());
+        Apost apost = qnaService.writeAnswer(qpost.get(), logined, paramApost, answer.getPostId());
         if (qpostRepository.isSelectedAnswerExist(qpostId)) return null;
         return responseService.getSingleResult(apost);
     }
@@ -123,7 +122,7 @@ public class AnswerController {
     })
     @ApiOperation(value = "답변 수정", notes = "답변 수정")
     @PutMapping(value = "/{apostId}")
-    public SingleResult<Apost> updateAnswer(@Valid @RequestBody ParamApost paramApost, @PathVariable long apostId, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
+    public SingleResult<Apost> updateAnswer(@Valid @RequestBody ParamApost paramApost, @PathVariable long apostId) throws IOException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Member logined = (Member) principal;
         Optional<Apost> apost = apostRepository.findById(apostId);
@@ -131,7 +130,7 @@ public class AnswerController {
         Qpost qpost = qpostRepository.findById(qpostId).orElseThrow(CResourceNotExistException::new);
         ParamPost paramPost = new ParamPost();
 
-        if(!logined.getNickname().equals(apost.get().getWriter())) {
+        if (!logined.getNickname().equals(apost.get().getWriter())) {
             throw new CNotOwnerException();
         }
 
@@ -145,7 +144,7 @@ public class AnswerController {
         sb.append("\t" + paramApost.getAnswer() + System.getProperty("line.separator"));
         paramPost.setContent(sb.toString());
         paramPost.setOriginal((long) -1);
-        postService.updatePost("나의 Answers", apost.get().getPostId(), logined.getMsrl(), paramPost, null);
+        postService.updatePost("나의 Answers", apost.get().getPostId(), logined.getMsrl(), paramPost);
         Post answer = postRepository.findById(apost.get().getPostId()).orElseThrow(CResourceNotExistException::new);
 
         Set<String> tagSet = new HashSet<>(qTagService.getTags(qpost.getQpostId()));
@@ -155,7 +154,7 @@ public class AnswerController {
                 tagService.updateTag(answer, tag);
             }
         }
-        return responseService.getSingleResult(qnaService.updateAnswer(apostId, paramApost, files, qpostRepository.isSelectedAnswerExist(qpost.getQpostId())));
+        return responseService.getSingleResult(qnaService.updateAnswer(apostId, paramApost, qpostRepository.isSelectedAnswerExist(qpost.getQpostId())));
     }
 
     //답변 삭제
@@ -201,7 +200,7 @@ public class AnswerController {
             sb.append("[채택]\n" + post.get().getContent());
             paramPost.setSubject(sb.toString());
             paramPost.setContent(post.get().getContent());
-            postService.updatePost("나의 Answers", post.get().getPostId(), answerer.getMsrl(), paramPost, null);
+            postService.updatePost("나의 Answers", post.get().getPostId(), answerer.getMsrl(), paramPost);
             System.out.println("성공");
         } else throw new CNotOwnerException();
     }
