@@ -8,9 +8,6 @@ import com.web.blog.Member.repository.ProfileImgRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
 @AllArgsConstructor
 public class ProfileImgService {
@@ -24,17 +21,6 @@ public class ProfileImgService {
         return profileImgRepository.save(profileImgDto.toEntity());
     }
 
-    public List<ProfileImgDto> getList() {
-        List<ProfileImg> profileImgList = profileImgRepository.findAll();
-        List<ProfileImgDto> profileImgDtoList = new ArrayList<>();
-
-        for (ProfileImg profileImg : profileImgList) {
-            profileImgDtoList.add(convertEntityToDto(profileImg));
-        }
-
-        return profileImgDtoList;
-    }
-
     public ProfileImgDto getOneImg(long msrl) {
         ProfileImg profileImg = profileImgRepository.findByMsrl(msrl).orElseThrow(CResourceNotExistException::new);
         ProfileImgDto profileImgDto = convertEntityToDto(profileImg);
@@ -46,7 +32,7 @@ public class ProfileImgService {
                 .id(profileImg.getId())
                 .filePath(profileImg.getFilePath())
                 .msrl(profileImg.getMsrl())
-                .imgFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + profileImg.getMsrl() + "/" + profileImg.getFilePath())
+                .imgFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/profile/" + profileImg.getFilePath())
                 .build();
     }
 }

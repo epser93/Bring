@@ -2,25 +2,16 @@ package com.web.blog.Board.service;
 
 import com.web.blog.Board.entity.*;
 import com.web.blog.Board.model.OnlyPostMapping;
-import com.web.blog.Board.model.ParamPost;
-import com.web.blog.Board.model.ParamReply;
-import com.web.blog.Board.model.ParamTag;
 import com.web.blog.Board.repository.*;
-import com.web.blog.Common.advice.exception.*;
-import com.web.blog.Common.service.FileService;
+import com.web.blog.Common.advice.exception.CNotOwnerException;
+import com.web.blog.Common.advice.exception.CResourceNotExistException;
+import com.web.blog.Common.advice.exception.CUserNotFoundException;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,8 +36,8 @@ public class BoardService {
     //게시판 리스트 조회
     public List<Board> getBoards(Member member) {
         List<Board> boards = boardRepository.findByMember(member);
-        for(Board board : boards) {
-            if(board.getName().equals("나의 Answers")){
+        for (Board board : boards) {
+            if (board.getName().equals("나의 Answers")) {
                 boards.remove(board);
                 break;
             }
@@ -82,7 +73,7 @@ public class BoardService {
         Board board = getBoard(boardId);
         Member member = board.getMember();
         List<Post> list = postRepository.findByBoard(board);
-        for(Post p : list) {
+        for (Post p : list) {
             deletePost(p.getPostId());
         }
         if (msrl != member.getMsrl())
@@ -102,7 +93,7 @@ public class BoardService {
 
     public void deleteLikes(Post post) {
         List<PostMember> likers = postMemberRepository.findPostMemberByPost(post);
-        for(PostMember pm : likers) {
+        for (PostMember pm : likers) {
             postMemberRepository.delete(pm);
         }
     }

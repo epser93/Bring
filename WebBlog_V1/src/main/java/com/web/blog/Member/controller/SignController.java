@@ -7,7 +7,6 @@ import com.web.blog.Common.advice.exception.CEmailSigninFailedException;
 import com.web.blog.Common.advice.exception.CUserExistException;
 import com.web.blog.Common.config.security.JwtTokenProvider;
 import com.web.blog.Common.response.CommonResult;
-import com.web.blog.Common.service.FileService;
 import com.web.blog.Common.service.ResponseService;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.model.LoginParam;
@@ -28,6 +27,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -45,7 +45,6 @@ public class SignController {
     private final PasswordEncoder passwordEncoder;
     private final BoardService boardService;
     private final KakaoService kakaoService;
-    private final FileService fileService;
 
     private static final Logger logger = LoggerFactory.getLogger(SignController.class);
     @Autowired

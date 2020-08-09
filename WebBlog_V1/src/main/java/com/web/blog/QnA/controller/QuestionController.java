@@ -5,9 +5,9 @@ import com.web.blog.Board.model.ParamPost;
 import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Board.service.PostService;
 import com.web.blog.Board.service.TagService;
-import com.web.blog.Common.advice.exception.CAnsweredQuestionException;
 import com.web.blog.Common.advice.exception.CResourceNotExistException;
 import com.web.blog.Common.advice.exception.CSelectedAnswerException;
+import com.web.blog.Common.advice.exception.CUserExistException;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
 import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
@@ -16,12 +16,10 @@ import com.web.blog.Common.service.ResponseService;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.model.OnlyMemberMapping;
 import com.web.blog.Member.repository.MemberRepository;
-import com.web.blog.QnA.entity.Apost;
 import com.web.blog.QnA.entity.Qpost;
 import com.web.blog.QnA.model.OnlyApostMapping;
 import com.web.blog.QnA.model.OnlyQpostMapping;
 import com.web.blog.QnA.model.ParamQpost;
-import com.web.blog.QnA.repository.ApostMemberRepository;
 import com.web.blog.QnA.repository.ApostRepository;
 import com.web.blog.QnA.repository.QpostRepository;
 import com.web.blog.QnA.service.QTagService;
@@ -96,12 +94,12 @@ public class QuestionController {
     })
     @ApiOperation(value = "질문 작성", notes = "질문 작성")
     @PostMapping(value = "/ask")
-    public ListResult<SingleResult> writeQuestion(@Valid @RequestBody ParamQpost paramQpost, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
+    public ListResult<SingleResult> writeQuestion(@Valid @RequestBody ParamQpost paramQpost) throws IOException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Member member = (Member) principal;
         Set<String> tags = paramQpost.getTags();
         List<SingleResult> result = new ArrayList<>();
-        Qpost qpost = qnaService.writeQuestion(member, paramQpost, files);
+        Qpost qpost = qnaService.writeQuestion(member, paramQpost);
         if (!tags.isEmpty()) {
             for (String tag : tags) {
                 qTagService.insertTags(qpost, tag);
@@ -118,7 +116,7 @@ public class QuestionController {
     })
     @ApiOperation(value = "질문 수정", notes = "질문 수정")
     @PutMapping(value = "/{qpostId}")
-    public ListResult<SingleResult> updateQuestion(@Valid @RequestBody ParamQpost paramQpost, @PathVariable long qpostId, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
+    public ListResult<SingleResult> updateQuestion(@Valid @RequestBody ParamQpost paramQpost, @PathVariable long qpostId) throws IOException {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Member member = (Member) principal;
         ParamPost paramPost = new ParamPost();
@@ -126,8 +124,8 @@ public class QuestionController {
         Set<String> tags = paramQpost.getTags();
         List<SingleResult> result = new ArrayList<>();
         Qpost qpost1 = qpostRepository.findById(qpostId).get();
-        if(qpost1.getSelectOver()) throw new CSelectedAnswerException();
-        Qpost qpost = qnaService.updateQuestion(member, qpostId, paramQpost, files);
+        if (qpost1.getSelectOver()) throw new CSelectedAnswerException();
+        Qpost qpost = qnaService.updateQuestion(member, qpostId, paramQpost);
         if (!tags.isEmpty()) {
             for (String tag : tags) {
                 qTagService.updateTag(qpost, tag);
@@ -144,7 +142,7 @@ public class QuestionController {
             paramPost.setSubject(sb.toString());
             paramPost.setContent(oam.getAnswer());
             paramPost.setOriginal((long) -1);
-            postService.updatePost("나의 Answers", oam.getPostId(), oamMem.getMsrl(), paramPost, null);
+            postService.updatePost("나의 Answers", oam.getPostId(), oamMem.getMsrl(), paramPost);
             Post answer = postRepository.findById(oam.getPostId()).orElseThrow(CResourceNotExistException::new);
 
             Set<String> tagSet = new HashSet<>(qTagService.getTags(qpost.getQpostId()));
@@ -176,5 +174,38 @@ public class QuestionController {
             return responseService.getSuccessResult();
         }
         return null;
+    }
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
+    })
+    @ApiOperation(value = "파일 등록", notes = "새로운 질문 작성 시 파일 등록")
+    @PostMapping(value = "/ask/uploads")
+    public SingleResult<Boolean> upload(@RequestPart MultipartFile files) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
+        Optional<List<Qpost>> list = qpostRepository.findAllByWriter(logined.getNickname());
+        MultipartFile[] files1 = new MultipartFile[1];
+        files1[0] = files;
+        if (list.isPresent()) {
+            Qpost qpost = list.get().get(list.get().size() - 1); //찾은 리스트 중 마지막 댓글 가져오기
+            long qpostId = qpost.getQpostId();
+            return responseService.getSingleResult(qnaService.saveFiles(qpostId, logined.getNickname(), files1));
+        } else return null;
+    }
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
+    })
+    @ApiOperation(value = "파일 수정 등록", notes = "기존 질문 수정 할 때, 필요시 파일 수정")
+    @PostMapping(value = "/ask/{qpostId}/uploads")
+    public SingleResult<Boolean> uploadUpdate(@PathVariable long qpostId, @RequestPart MultipartFile files) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
+        MultipartFile[] files1 = new MultipartFile[1];
+        files1[0] = files;
+        return responseService.getSingleResult(qnaService.saveFiles(qpostId, logined.getNickname(), files1));
     }
 }

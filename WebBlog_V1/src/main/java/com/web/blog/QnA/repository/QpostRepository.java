@@ -1,7 +1,5 @@
 package com.web.blog.QnA.repository;
 
-import com.web.blog.Board.model.OnlyPostMapping;
-import com.web.blog.Member.entity.Member;
 import com.web.blog.QnA.entity.Qpost;
 import com.web.blog.QnA.model.OnlyQpostMapping;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,7 +19,7 @@ public interface QpostRepository extends JpaRepository<Qpost, Long> {
 
     List<OnlyQpostMapping> findByQpostId(long qpost_id);
 
-    List<OnlyQpostMapping> findAllByQpostIdGreaterThan(long num);
+    Optional<List<Qpost>> findAllByWriter(String writer);
 
     @Modifying
     @Transactional

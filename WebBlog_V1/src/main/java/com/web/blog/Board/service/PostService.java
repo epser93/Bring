@@ -1,13 +1,20 @@
 package com.web.blog.Board.service;
 
-import com.web.blog.Board.entity.*;
+import com.web.blog.Board.entity.Board;
+import com.web.blog.Board.entity.Post;
+import com.web.blog.Board.entity.PostMember;
+import com.web.blog.Board.entity.PostUploads;
 import com.web.blog.Board.model.OnlyPostMapping;
 import com.web.blog.Board.model.ParamPost;
-import com.web.blog.Board.repository.*;
+import com.web.blog.Board.model.PostUploadsDto;
+import com.web.blog.Board.repository.BoardRepository;
+import com.web.blog.Board.repository.PostMemberRepository;
+import com.web.blog.Board.repository.PostRepository;
+import com.web.blog.Board.repository.PostUploadsRepository;
 import com.web.blog.Common.advice.exception.CNotOwnerException;
 import com.web.blog.Common.advice.exception.CResourceNotExistException;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
-import com.web.blog.Common.service.FileService;
+import com.web.blog.Common.service.S3Service;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.model.OnlyMemberMapping;
 import com.web.blog.Member.repository.MemberRepository;
@@ -15,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.swing.text.html.Option;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,9 +37,11 @@ public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final BoardService boardService;
-    private final FileService fileService;
     private final TagService tagService;
     private final ReplyService replyService;
+    private final PostUploadsRepository postUploadsRepository;
+    private final PostUploadsService postUploadsService;
+    private final S3Service s3Service;
 
     //게시글 단건 조회
     public List<OnlyPostMapping> getPost(long postId) {
@@ -46,15 +54,36 @@ public class PostService {
         return postRepository.findById(postId).get();
     }
 
+    public boolean saveFiles(long postId, String nickname, MultipartFile[] files) throws IOException {
+        if (files != null) {
+            if (postUploadsRepository.findByPostId(postId).isPresent()) { //포스트에 사진이 한장이라도 존재하면~
+                List<PostUploads> beforeUpdate = postUploadsRepository.findAllByPostId(postId);
+                postUploadsService.deleteImgs(postId); //해당하는 포스트의 모든 사진 정보 db에서 삭제
+                for (PostUploads upload : beforeUpdate) { //해당하는 포스트의 모든 사진 s3에서 삭제
+                    s3Service.delete(upload.getFilePath());
+                }
+            }
+
+            int num = 0;
+            for (MultipartFile file : files) { //s3에 업로드하고 db에 파일 정보 저장
+                String imgPath = s3Service.upload(file, postId, num, nickname); //s3에 저장
+                PostUploadsDto postUploadsDto = new PostUploadsDto();
+                postUploadsDto.setFilePath(imgPath);
+                postUploadsDto.setPostId(postId);
+                postUploadsDto.setNum(num);
+                postUploadsService.savePost(postUploadsDto);
+                num++;
+            }
+        }
+        return true;
+    }
+
     //게시글 작성
-    public Post writePost(String nickname, String boardName, ParamPost paramPost, MultipartFile[] files, Member member, String originWriter) throws IOException { //, MultipartFile[] files
+    public Post writePost(String nickname, String boardName, ParamPost paramPost, Member member, String originWriter) { //, MultipartFile[] files
         Board board = boardService.findBoard(boardName, member);
 
         Post result = null;
-        if (files != null) {
-            fileService.uploadFiles(files);
-        }
-        if(paramPost.getOriginal() != -1) {
+        if (paramPost.getOriginal() != -1) {
             List<OnlyPostMapping> originalPost = postRepository.findByPostId(paramPost.getOriginal());
             OnlyPostMapping opm = originalPost.get(0);
 
@@ -82,7 +111,6 @@ public class PostService {
                     .content(content)
                     .original(paramPost.getOriginal())
                     .build());
-
         } else {
             result = postRepository.save(Post.builder()
                     .board(board)
@@ -105,14 +133,14 @@ public class PostService {
         List<OnlyPostMapping> originalPost = null;
         if (like) {
             postRepository.updateLikeCntPlus(postId); //해당 포스트 글의 좋아요 업데이트
-            if(original != -1) { //포스트의 오리지널이 존재하면
+            if (original != -1) { //포스트의 오리지널이 존재하면
                 originalPost = postRepository.findByPostId(original);
                 String originWriter = originalPost.get(0).getWriter();
                 Member originMember = memberRepository.findByNickname(originWriter).orElseThrow(CUserNotFoundException::new);
                 postRepository.updateLikeCntPlus(original); //공유된 포스트 좋아요 업데이트(원래 포스트)
                 Post originalPost1 = postRepository.findById(original).orElseThrow(CResourceNotExistException::new);
                 Optional<PostMember> postMember = postMemberRepository.findPostMemberByMember_MsrlAndPost(msrl, originalPost1);
-                if(!postMember.isPresent()){ //공유된 포스트를 좋아요 누른 적이 없으면~
+                if (!postMember.isPresent()) { //공유된 포스트를 좋아요 누른 적이 없으면~
                     postMemberRepository.insertLike(msrl, original); //공유된 포스트 좋아요 연결 추가
                 }
                 memberRepository.updateScoreIfLiked(originMember.getMsrl());
@@ -123,7 +151,7 @@ public class PostService {
         } else {
             memberRepository.updateScoreIfUnliked(writer.getMsrl());
             postRepository.updateLikeCntMinus(postId);
-            if(original != -1) {
+            if (original != -1) {
                 originalPost = postRepository.findByPostId(original);
                 String originWriter = originalPost.get(0).getWriter();
                 Member originMember = memberRepository.findByNickname(originWriter).orElseThrow(CUserNotFoundException::new);
@@ -175,15 +203,12 @@ public class PostService {
     }
 
     //게시글 수정
-    public Post updatePost(String boardname, long postId, long msrl, ParamPost paramPost, MultipartFile[] files) throws IOException {
+    public Post updatePost(String boardname, long postId, long msrl, ParamPost paramPost) throws IOException {
         Member member = memberRepository.findById(msrl).orElseThrow(CUserNotFoundException::new);
         Board board = boardRepository.findByNameAndMember(boardname, member);
         Post post = postRepository.findById(postId).orElseThrow(CResourceNotExistException::new);
         Board board1 = post.getBoard();
         if (board.equals(board1)) {
-            if (files != null) {
-                fileService.uploadFiles(files);
-            }
             try {
                 post.setUpdate(paramPost.getSubject(), paramPost.getContent());
             } catch (Exception e) {
@@ -212,6 +237,14 @@ public class PostService {
         replyService.deleteReplies(post);
         deleteLikes(post);
         postRepository.delete(post);
+
+        if (postUploadsRepository.findByPostId(postId).isPresent()) { //포스트에 사진이 한장이라도 존재하면~
+            List<PostUploads> beforeDelete = postUploadsRepository.findAllByPostId(postId);
+            postUploadsService.deleteImgs(postId); //해당하는 포스트의 모든 사진 정보 db에서 삭제
+            for (PostUploads upload : beforeDelete) { //해당하는 포스트의 모든 사진 s3에서 삭제
+                s3Service.delete(upload.getFilePath());
+            }
+        }
         return true;
     }
 }

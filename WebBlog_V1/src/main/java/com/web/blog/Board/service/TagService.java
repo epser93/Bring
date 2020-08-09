@@ -6,10 +6,7 @@ import com.web.blog.Board.entity.Tag;
 import com.web.blog.Board.model.OnlyTagMapping;
 import com.web.blog.Board.repository.*;
 import com.web.blog.Common.advice.exception.CResourceNotExistException;
-import com.web.blog.Common.service.FileService;
-import com.web.blog.Member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;

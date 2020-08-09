@@ -5,11 +5,12 @@ import com.web.blog.Board.entity.Reply;
 import com.web.blog.Board.entity.ReplyMember;
 import com.web.blog.Board.model.OnlyReplyMapping;
 import com.web.blog.Board.model.ParamReply;
+import com.web.blog.Board.repository.BoardRepository;
 import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Board.repository.ReplyMemberRepository;
 import com.web.blog.Board.repository.ReplyRepository;
-import com.web.blog.Board.service.PostService;
 import com.web.blog.Board.service.ReplyService;
+import com.web.blog.Board.service.ReplyUploadsService;
 import com.web.blog.Common.advice.exception.CAlreadyLikedException;
 import com.web.blog.Common.advice.exception.COwnerCannotLike;
 import com.web.blog.Common.advice.exception.CUserExistException;
@@ -31,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Api(tags = {"6. Blog - Post Reply"})
@@ -43,6 +45,8 @@ public class ReplyController {
     private final ReplyService replyService;
     private final ReplyRepository replyRepository;
     private final PostRepository postRepository;
+    private final BoardRepository boardRepository;
+    private final ReplyUploadsService replyUploadsService;
 
     //댓글 상세조회
     @ApiImplicitParams({
@@ -70,11 +74,11 @@ public class ReplyController {
     })
     @ApiOperation(value = "댓글 작성", notes = "댓글 작성")
     @PostMapping(value = "/reply/{postId}")
-    public SingleResult<Reply> answerTheQuestion(@PathVariable long postId, @Valid @RequestBody ParamReply paramReply, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
+    public SingleResult<Reply> answerTheQuestion(@PathVariable long postId, @Valid @RequestBody ParamReply paramReply) throws IOException {
         Optional<Post> post = postRepository.findById(postId);
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Member member = (Member) principal;
-        return responseService.getSingleResult(replyService.writeReply(post.get(), member, paramReply, files));
+        return responseService.getSingleResult(replyService.writeReply(post.get(), member, paramReply));
     }
 
     //댓글 수정
@@ -83,10 +87,10 @@ public class ReplyController {
     })
     @ApiOperation(value = "댓글 수정", notes = "댓글 수정")
     @PutMapping(value = "/reply/{replyId}")
-    public SingleResult<Reply> updateAnswer(@Valid @RequestBody ParamReply paramReply, @PathVariable long replyId, @RequestParam(value = "files", required = false) MultipartFile[] files) throws IOException {
+    public SingleResult<Reply> updateAnswer(@Valid @RequestBody ParamReply paramReply, @PathVariable long replyId) throws IOException {
         Optional<Reply> reply = replyRepository.findById(replyId);
         Post post = reply.get().getPost();
-        return responseService.getSingleResult(replyService.updateReply(replyId, paramReply, files));
+        return responseService.getSingleResult(replyService.updateReply(replyId, paramReply));
     }
 
     //댓글 삭제
@@ -129,5 +133,38 @@ public class ReplyController {
                 replyService.likeThisReply(member, reply.get(), likeit);
             } else if (member.getNickname().equals(replyer)) throw new COwnerCannotLike();
         }
+    }
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
+    })
+    @ApiOperation(value = "파일 등록", notes = "새로운 댓글 작성 시 파일 등록")
+    @PostMapping(value = "/reply/{postId}/newuploads")
+    public SingleResult<Boolean> upload(@PathVariable long postId, @RequestPart MultipartFile files) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
+        Optional<List<Reply>> list = replyRepository.findByWriterAndPost_PostId(logined.getNickname(), postId); //해당 포스트의 댓글 작성자가 쓴 모든 댓글 리스트를 불러옴
+        MultipartFile[] files1 = new MultipartFile[1];
+        files1[0] = files;
+        if (list.isPresent()) {
+            Reply reply = list.get().get(list.get().size() - 1); //찾은 리스트 중 마지막 댓글 가져오기
+            long replyId = reply.getReplyId();
+            return responseService.getSingleResult(replyService.saveFiles(replyId, logined.getNickname(), files1));
+        } else return null;
+    }
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
+    })
+    @ApiOperation(value = "파일 수정 등록", notes = "기존 댓글 수정 할 때, 필요시 파일 수정")
+    @PostMapping(value = "/reply/{replyId}/uploads")
+    public SingleResult<Boolean> uploadUpdate(@PathVariable long replyId, @RequestPart MultipartFile files) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
+        MultipartFile[] files1 = new MultipartFile[1];
+        files1[0] = files;
+        return responseService.getSingleResult(replyService.saveFiles(replyId, logined.getNickname(), files1));
     }
 }

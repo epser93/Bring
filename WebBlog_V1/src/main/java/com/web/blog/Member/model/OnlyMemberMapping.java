@@ -1,7 +1,5 @@
 package com.web.blog.Member.model;
 
-import com.web.blog.Common.entity.UploadFile;
-
 import java.time.LocalDateTime;
 
 public interface OnlyMemberMapping {
@@ -15,5 +13,4 @@ public interface OnlyMemberMapping {
     int getScore();
     int getFollowersCnt();
     int getFollowingCnt();
-    UploadFile getUploadfile();
 }

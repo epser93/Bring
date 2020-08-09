@@ -9,12 +9,9 @@ import com.web.blog.Board.service.PostService;
 import com.web.blog.Common.advice.exception.CPasswordDoesntMatch;
 import com.web.blog.Common.advice.exception.CPasswordLengthException;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
-import com.web.blog.Common.entity.UploadFile;
 import com.web.blog.Common.response.CommonResult;
-import com.web.blog.Common.response.FileUploadResponse;
 import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.response.SingleResult;
-import com.web.blog.Common.service.FileService;
 import com.web.blog.Common.service.ResponseService;
 import com.web.blog.Common.service.S3Service;
 import com.web.blog.Member.entity.Member;
@@ -23,6 +20,7 @@ import com.web.blog.Member.model.OnlyMemberMapping;
 import com.web.blog.Member.model.ParamPassword;
 import com.web.blog.Member.model.ProfileImgDto;
 import com.web.blog.Member.repository.MemberRepository;
+import com.web.blog.Member.repository.ProfileImgRepository;
 import com.web.blog.Member.service.FollowService;
 import com.web.blog.Member.service.ProfileImgService;
 import io.swagger.annotations.*;
@@ -34,7 +32,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -53,11 +50,11 @@ public class MemberController {
     private final BoardService boardService;
     private final ResponseService responseService;
     private final PasswordEncoder passwordEncoder;
-    private final FileService fileService;
     private final PostService postService;
     private final FollowService followService;
     private final S3Service s3Service;
     private final ProfileImgService profileImgService;
+    private final ProfileImgRepository profileImgRepository;
     private static final Logger logger = LoggerFactory.getLogger(MemberController.class);
 
     @ApiImplicitParams({
@@ -82,14 +79,17 @@ public class MemberController {
     @ApiOperation(value = "회원 프로필 조회", notes = "닉네임으로 회원을 조회한다")
     @GetMapping(value = "/{nickname}/profile")
     public String findUserById(@PathVariable String nickname) throws JsonProcessingException {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Member logined = (Member) principal;  //로그인 사용자
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = repository.findByUid(uid); //로그인 한 사용자
         Member member = repository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new); //조회하려는 멤버
         StringBuilder sb = new StringBuilder();
         Boolean amIInTheList = false;
         Optional<OnlyMemberMapping> omm = repository.findAllByNickname(nickname); //조회하려는 멤버의 OnlyMemberMapping 값
 
-        amIInTheList = followService.isFollowed(logined, member); //로그인 사용자가 조회하려는 유저를 팔로우했으면 true, 아니면 false
+        if(logined.isPresent()) {
+            amIInTheList = followService.isFollowed(logined.get(), member); //로그인 사용자가 조회하려는 유저를 팔로우했으면 true, 아니면 false
+        }
 
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getMapResult(omm.get(), amIInTheList)); //조회하려는 멤버와 불린값 맵 설정
@@ -102,6 +102,17 @@ public class MemberController {
 
         json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getListResult(followService.followersList(member))); //팔로워 리스트(조회하려는 멤버를 구독중인 멤버 리스트)
         sb.append(json);
+        sb.append("\n");
+
+        if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
+            ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+            String filePath = "";
+            if(profileImgDto != null) {
+                filePath = profileImgDto.getImgFullPath();
+            }
+            json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getSingleResult(filePath)); //프로필 사진
+            sb.append(json);
+        }
 
         //유저가 좋아요 한 글 개수
         repository.updateLikeCnt(postMemberRepository.likedPostCnt(member.getMsrl()), member.getMsrl());
@@ -129,39 +140,12 @@ public class MemberController {
         return list;
     }
 
-    @Transactional
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
-    })
-    @ApiOperation(value = "프로필 이미지 등록", notes = "프로필 이미지 등록")
-    @PostMapping("/profile/image/{msrl}")
-    public SingleResult<ProfileImg> upload(@PathVariable long msrl, @RequestPart MultipartFile file) throws IOException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String id = authentication.getName();
-        Member logined = repository.findByUid(id).orElseThrow(CUserNotFoundException::new);
-        if(msrl != logined.getMsrl()) return null;
-        String filePath = Long.toString(msrl);
-        String imgPath = s3Service.upload(filePath, file, msrl);
-        ProfileImgDto profileImgDto = new ProfileImgDto();
-        profileImgDto.setFilePath(imgPath);
-        profileImgDto.setMsrl(msrl);
-        return responseService.getSingleResult(profileImgService.savePost(profileImgDto));
-    }
-
-    @ApiOperation(value = "프로필 이미지 조회", notes = "프로필 이미지 조회")
-    @GetMapping("/profile/image/{msrl}")
-    public SingleResult<ProfileImgDto> dispWrite(@PathVariable long msrl) {
-        ProfileImgDto profileImgDto = profileImgService.getOneImg(msrl);
-        return responseService.getSingleResult(profileImgDto);
-    }
-
-
     @ApiImplicitParams({
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
     })
     @ApiOperation(value = "회원 수정", notes = "회원정보를 수정한다")
     @PutMapping(value = "/update")
-    public SingleResult<Member> modify(@Valid @RequestBody ParamPassword paramMember, @RequestPart MultipartFile file) {
+    public SingleResult<Member> modify(@Valid @RequestBody ParamPassword paramMember) {
         String oldPassword = paramMember.getPassword3();
         Optional<String> newPassword = Optional.ofNullable(paramMember.getPassword1());
         Optional<String> newPasswordChk = Optional.ofNullable(paramMember.getPassword2());
@@ -190,28 +174,44 @@ public class MemberController {
             if(nickname.isPresent()) {
                 member.setNickname(nickname.get());
             }
-
-            //프로필 사진 변경(파일 존재하면!)
-            if (file != null) {
-                UploadFile fileName = fileService.uploadFile(file);
-                member.setUploadfile(fileName);
-                String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                        .path("/downloadFile/")
-                        .path(fileName.getFilename())
-                        .toUriString();
-                FileUploadResponse fileUploadResponse = new FileUploadResponse(fileName.getFilename(), fileDownloadUri, file.getContentType(), file.getSize());
-            }
         }
 
         return responseService.getSingleResult(repository.save(member));
     }
 
+    @Transactional
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
+    })
+    @ApiOperation(value = "프로필 이미지 등록", notes = "프로필 이미지 등록")
+    @PostMapping("/profile/image/{msrl}")
+    public SingleResult<ProfileImg> upload(@PathVariable long msrl, @RequestPart MultipartFile file) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String id = authentication.getName();
+        Member logined = repository.findByUid(id).orElseThrow(CUserNotFoundException::new);
+        if(msrl != logined.getMsrl()) return null;
+        if(profileImgRepository.findByMsrl(msrl).isPresent()) { // 기존 프로필 이미지 존재시 삭제 먼저하기
+            s3Service.delete(profileImgRepository.findByMsrl(msrl).get().getFilePath());
+            profileImgRepository.deleteByMsrl(logined.getMsrl());
+        }
+        String imgPath = s3Service.upload(file, logined.getMsrl(), 999, logined.getNickname());
+        ProfileImgDto profileImgDto = new ProfileImgDto();
+        profileImgDto.setFilePath(imgPath);
+        profileImgDto.setMsrl(logined.getMsrl());
+        return responseService.getSingleResult(profileImgService.savePost(profileImgDto));
+    }
+
+    @Transactional
     @ApiImplicitParams({
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
     })
     @ApiOperation(value = "회원 삭제", notes = "회원번호로 회원정보를 삭제한다")
     @DeleteMapping(value = "/delete/{msrl}")
     public CommonResult delete(@ApiParam(value = "회원번호", required = true) @PathVariable long msrl) {
+        if(profileImgRepository.findByMsrl(msrl).isPresent()) { // 기존 프로필 이미지 존재시 삭제 먼저하기
+            s3Service.delete(profileImgRepository.findByMsrl(msrl).get().getFilePath());
+            profileImgRepository.deleteByMsrl(msrl);
+        }
         boardService.deletePosts(msrl);
         boardService.deleteBoards(msrl);
         repository.deleteById(msrl);

@@ -1,10 +1,7 @@
 package com.web.blog.Board.service;
 
-import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.model.OnlyPostMapping;
 import com.web.blog.Board.repository.*;
-import com.web.blog.Common.service.FileService;
-import com.web.blog.Member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -17,9 +17,4 @@ public interface PostTagRepository extends JpaRepository<PostTag, Long> {
     @Transactional
     @Query(value = "insert into post_tag (post_id, tag_id) values (:post_id, :tag_id)", nativeQuery = true)
     int insertTag(@Param("post_id") long post_id, @Param("tag_id") long tag_id);
-
-    @Modifying
-    @Transactional
-    @Query(value = "delete from post_tag where post_id = :post_id and tag_id = :tag_id", nativeQuery = true)
-    int deleteTag(@Param("post_id") long post_id, @Param("tag_id") long tag_id);
 }

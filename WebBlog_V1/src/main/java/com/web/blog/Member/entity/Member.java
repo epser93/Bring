@@ -7,7 +7,6 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.web.blog.Board.entity.CommonDateEntity;
 import com.web.blog.Board.entity.PostMember;
 import com.web.blog.Board.entity.ReplyMember;
-import com.web.blog.Common.entity.UploadFile;
 import com.web.blog.QnA.entity.ApostMember;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -78,23 +77,19 @@ public class Member extends CommonDateEntity implements UserDetails, Serializabl
     @Builder.Default
     private List<String> roles = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "filename")
-    private UploadFile uploadfile;
-
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<PostMember> postMembers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<ApostMember> apostMembers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member")
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<ReplyMember> replyMembers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "from")
+    @OneToMany(mappedBy = "from", cascade = CascadeType.REMOVE)
     private List<Follow> following;
 
-    @OneToMany(mappedBy = "to")
+    @OneToMany(mappedBy = "to", cascade = CascadeType.REMOVE)
     private List<Follow> followers;
 
     @Override

@@ -4,11 +4,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Null;
 import javax.validation.constraints.Size;
 
 @Getter
@@ -28,8 +25,5 @@ public class ParamPassword {
 
     @ApiModelProperty(value = "닉네임")
     private String nickname;
-
-    @ApiModelProperty(value = "프로필 이미지")
-    private MultipartFile uploadFile;
 }
 
