@@ -15,7 +15,6 @@
     </b-row>
   <v-md-editor class="text-left" v-model="questionData.content" height="600px"></v-md-editor>
 
-
 <!--태그 추가-->
   <div>
     <!-- <b-form-input v-model="questionData.tags" placeholder="Enter your name" label="파일 첨부 "></b-form-input> -->
@@ -49,27 +48,29 @@ export default {
         }
     },
     methods:{
+        // 질문 수정
         modifyQuestion(){
             const config = {
               headers: {
                 'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
               }
             }
-            axios.put(`${BACK_URL}/question/${this.qpost_id}`,this.questionData,config)
+            axios.put(`${BACK_URL}/questions/${this.qpost_id}`,this.questionData,config)
             .then(res=>{
                 console.log(res)
-                this.getQna()
+               
                 this.$router.push({name:'QuestionDetail'})
             })
             .catch(err=>{
                 console.log(err)
             })
         },
+        // 기존 질문 내용 호출
         getQna() {
             axios.get(`${BACK_URL}/questions/${this.qpost_id}`)
             .then(res => {
-                this.qPost = res.data.list[0].list[0]
-                console.log(res)
+                this.questionData.subject=res.data.list[0].list[0].subject
+                this.questionData.content=res.data.list[0].list[0].content                
             })
             .catch(err => {
                 console.log(err)
