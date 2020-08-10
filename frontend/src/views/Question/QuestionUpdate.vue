@@ -9,10 +9,12 @@
         <label>제목</label>
       </b-col>
       <b-col sm="9">
+
         <b-form-input v-model="questionData.subject"></b-form-input>
       </b-col>
     </b-row>
   <v-md-editor class="text-left" v-model="questionData.content" height="600px"></v-md-editor>
+
 
 <!--태그 추가-->
   <div>
@@ -38,6 +40,7 @@ export default {
     data(){
         return{
             qpost_id: this.$route.params.qpostId,
+            qPost : [],
             questionData:{
                 content:"",
                 subject:"",       
@@ -55,13 +58,28 @@ export default {
             axios.put(`${BACK_URL}/question/${this.qpost_id}`,this.questionData,config)
             .then(res=>{
                 console.log(res)
+                this.getQna()
                 this.$router.push({name:'QuestionDetail'})
             })
             .catch(err=>{
                 console.log(err)
             })
+        },
+        getQna() {
+            axios.get(`${BACK_URL}/questions/${this.qpost_id}`)
+            .then(res => {
+                this.qPost = res.data.list[0].list[0]
+                console.log(res)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        },
+    },
+     created(){
+        this.getQna()
+        
         }
-    }
     }
 
     
