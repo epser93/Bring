@@ -94,16 +94,13 @@ public class MemberController {
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getMapResult(omm.get(), amIInTheList)); //조회하려는 멤버와 불린값 맵 설정
         sb.append(json);
-        sb.append("\n");
+        sb.append(",\n");
 
         json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getListResult(followService.followingList(member))); //팔로잉 리스트(조회하려는 멤버가 구독중인 멤버 리스트)
         sb.append(json);
-        sb.append("\n");
-
+        sb.append(",\n");
         json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getListResult(followService.followersList(member))); //팔로워 리스트(조회하려는 멤버를 구독중인 멤버 리스트)
         sb.append(json);
-        sb.append("\n");
-
         if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
             ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
             String filePath = "";
@@ -111,6 +108,7 @@ public class MemberController {
                 filePath = profileImgDto.getImgFullPath();
             }
             json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getSingleResult(filePath)); //프로필 사진
+            sb.append(",\n");
             sb.append(json);
         }
 
@@ -135,8 +133,6 @@ public class MemberController {
 
         String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getSingleResult(omm.get())); //조회하려는 멤버와 불린값 맵 설정
         sb.append(json);
-        sb.append("\n");
-
         if(profileImgRepository.findByMsrl(logined.get().getMsrl()).isPresent()) {
             ProfileImgDto profileImgDto = profileImgService.getOneImg(logined.get().getMsrl());
             String filePath = "";
@@ -144,6 +140,7 @@ public class MemberController {
                 filePath = profileImgDto.getImgFullPath();
             }
             json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getSingleResult(filePath)); //프로필 사진
+            sb.append(",\n");
             sb.append(json);
         }
         return sb.toString();
