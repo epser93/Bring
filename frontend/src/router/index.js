@@ -26,6 +26,7 @@ import BlogCategory from '../views/blog/BlogCategory.vue'
 import Question from '../views/Question/Question.vue'
 import QuestionWrite from '../views/Question/QuestionWrite.vue'
 import QuestionDetail from '../views/Question/QuestionDetail.vue'
+import QuestionUpdate from '../views/Question/QuestionUpdate.vue'
 
 // 에디터(임시)
 import Editor from '../views/blog/Editor.vue'
@@ -134,6 +135,11 @@ const routes = [{
         path: '/questions/:nickname/:qpostId',
         name: 'QuestionDetail',
         component: QuestionDetail
+    },
+    {
+        path: '/questions/:qpostId',
+        name: 'QuestionDetail',
+        component: QuestionUpdate
     },
 
 ]

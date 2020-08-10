@@ -33,7 +33,7 @@
                           <!-- 분기처리/ 작성자와 현재 사용자의 이름이 같으면 삭제표시되게끔-->
                           <div v-if="this.nickname===qPost.writer">
                           <b-button @click="deleteQna" class="mr-1" ><b-icon icon="trash"></b-icon> 삭제</b-button>
-                          <b-button @click="modifyQna" variant="warning" class="ml-2">수정</b-button>
+                          <b-button @click="modifyQna(qArticle)" variant="warning" class="ml-2">수정</b-button>
                           </div>
                       </div>
                   </div>
@@ -152,20 +152,8 @@ export default {
             })
         },
         // 게시물 수정 (아직 완성 x, 수정 해야함)
-        modifyQna(){
-            // console.log(this.qpost_id)
-            const config = {
-              headers: {
-                'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
-              }
-            }
-            axios.put(`${BACK_URL}/questions/${this.qpost_id}`,config) 
-            .then(res=>{
-                console.log(res)
-            })
-            .catch(err=>{
-                console.log(err)
-            })
+        modifyQna(qArticle){
+            this.$router.push({name:'QuestionUpdate', params:{qpostId: qArticle.qpostId}})
         },
         // 답변 작성 (페이지 리로딩 하는 방식 고민해볼것)
         writeAnswer(){
