@@ -63,7 +63,7 @@
             <div class="row">
                 <div v-for="(item, index) in postListCategory" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
                     <div class="card" style="width: 75%;">
-                        <img class="card-img-top" :src="cardImage" alt="Card image cap">
+                        <img class="card-img-top" :src="thumbnail2[index]" alt="Card image cap">
                         <div class="card-body pb-0">
                             <h5 class="card-title">{{ item.subject.slice(0, 10) + '...'  }}</h5>
                             <p class="card-text mb-3">{{ item.content.slice(0, 20) + '...' }}</p>
@@ -89,13 +89,16 @@
                 <h3>현재 등록된 글이 없습니다</h3>
             </div>
             <div class="row">
-                <div v-for="item in postListKeyword" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
+                <div v-for="(item, index) in postListKeyword" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
                     <div class="card" style="width: 75%;">
-                        <img class="card-img-top" :src="cardImage" alt="Card image cap">
+                        <img class="card-img-top" :src="thumbnail3[index]" alt="Card image cap">
                         <div class="card-body pb-0">
-                            <h5 class="card-title">{{ item.subject }}</h5>
-                            <p class="card-text mb-3">{{ item.content }}</p>
-                            
+                            <h5 class="card-title">{{ item.subject.slice(0, 10) + '...'  }}</h5>
+                            <p class="card-text mb-3">{{ item.content.slice(0, 20) + '...' }}</p>
+                            <!-- 좋아요 부분 -->
+                            <b-icon icon="heart-fill" v-if="postLike3[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="postLike(item, false, 3)"></b-icon>
+                            <b-icon icon="heart" v-if="!postLike3[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="postLike(item, true, 3)"></b-icon>
+                            <small :ref="'like-count-' + item.postId">{{ item.likes }}</small><small>개의 좋아요</small>
                         </div>
                         <div class="card-footer bg-transparent">
                             <button class="btn btn-sm" @click="gotoDetail(item)">글 보기</button>
@@ -163,7 +166,6 @@ export default {
         getCategory() {
             axios.get(`${BACK_URL}/blog/${this.nickname}/categories`)
                 .then(res => {
-                    console.log(res)
                     this.categoryList = res.data.list
                 })
                 .catch(err => {
@@ -182,6 +184,7 @@ export default {
                 .then(res => {
                     this.postListCategory = res.data.list[0].list
                     this.postLike2 = res.data.list[1].list
+                    this.thumbnail2 = res.data.list[2].list
                     // 카테고리 바로 에디터로 가져가기 위한 용도
                     this.currentCategory = categoryName
                 })
@@ -196,11 +199,17 @@ export default {
         },
         // 검색
         searchFor() {
+            const config = {
+                headers: {
+                    'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
+                }
+            }
             this.categoryOn = 3
-            axios.get(`${BACK_URL}/blog/${this.nickname}/search/blogPosts/${this.keyword}/${this.keywordType.keyid}`)
+            axios.get(`${BACK_URL}/blog/${this.nickname}/search/blogPosts/${this.keyword}/${this.keywordType.keyid}`, config)
                 .then(res => {
-                    this.postListKeyword = res.data.list
-                    
+                    this.postListKeyword = res.data.list[0].list 
+                    this.postLike3 = res.data.list[1].list
+                    this.thumbnail3 = res.data.list[2].list
                 })
 
                 .catch(err => {
@@ -231,6 +240,8 @@ export default {
                             this.getAllPosts()  
                         } else if (num === 2) {
                             this.getSomePosts(this.currentCategory) 
+                        } else if (num === 3) {
+                            this.searchFor()
                         }
                                     
                     })
@@ -246,7 +257,9 @@ export default {
                             this.getAllPosts()  
                         } else if (num === 2) {
                             this.getSomePosts(this.currentCategory) 
-                        }                    
+                        } else if (num === 3)  {
+                            this.searchFor()
+                        }                   
                     })
                     .catch(err => {
                         console.log(err)
@@ -272,6 +285,8 @@ export default {
             categoryList: [],
             currentCategory: '',
             thumbnail1: [],
+            thumbnail2: [],
+            thumbnail3: [],
             
             // 검색 관련
             keywordType: {
@@ -287,6 +302,7 @@ export default {
             // 좋아요 관련
             postLike1: [],
             postLike2: [],
+            postLike3: [],
         }
     },
 }

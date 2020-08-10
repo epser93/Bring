@@ -87,7 +87,7 @@ export default {
             this.thumbnailPost()
           })
           .catch((err) => {
-            alert('카테고리를 선택해 주세요')
+            alert('필수 항목을 모두 입력해 주세요')
             console.error(err)
           })
     },
