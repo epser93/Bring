@@ -123,12 +123,11 @@ public class BoardController {
         Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
         List<ListResult> result = new ArrayList<>();
         List<Boolean> amIInTheList = new ArrayList<>();
-
+        List<String> filePaths = new ArrayList<>();
         Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
         Board board = boardService.findBoard(boardName, member);
         List<OnlyPostMapping> list = boardService.CategoryPostList(board.getBoardId()); //포스트 리스트
         result.add(responseService.getListResult(list)); //포스트 리스트 데이터 넘기기
-        List<String> filePaths = new ArrayList<>();
         int cnt = 0;
         if (logined.isPresent()) {
             for (OnlyPostMapping pm : list) {

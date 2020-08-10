@@ -21,8 +21,9 @@ import java.util.Date;
 @Service
 @RequiredArgsConstructor
 public class S3Service {
-    private final MemberRepository memberRepository;
+    private final MemberRepository memberRepository; //lawliet0521.s3.amazonaws.com
     public static final String CLOUD_FRONT_DOMAIN_NAME = "dp02rmdt3p3bw.cloudfront.net";
+//    public static final String CLOUD_FRONT_DOMAIN_NAME = "lawliet0521.s3.amazonaws.com";
 
     private AmazonS3 s3Client;
 

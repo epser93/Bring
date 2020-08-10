@@ -40,7 +40,7 @@ public class PostUploadsService {
                 .id(uploads.getId())
                 .filePath(uploads.getFilePath())
                 .postId(uploads.getPostId())
-                .imgFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/posts/" + uploads.getFilePath())
+                .imgFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + uploads.getFilePath())
                 .build();
     }
 }
