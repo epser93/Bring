@@ -3,12 +3,8 @@ package com.web.blog.Board.controller;
 import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.entity.Reply;
 import com.web.blog.Board.entity.ReplyMember;
-import com.web.blog.Board.model.OnlyReplyMapping;
-import com.web.blog.Board.model.ParamReply;
-import com.web.blog.Board.repository.BoardRepository;
-import com.web.blog.Board.repository.PostRepository;
-import com.web.blog.Board.repository.ReplyMemberRepository;
-import com.web.blog.Board.repository.ReplyRepository;
+import com.web.blog.Board.model.*;
+import com.web.blog.Board.repository.*;
 import com.web.blog.Board.service.ReplyService;
 import com.web.blog.Board.service.ReplyUploadsService;
 import com.web.blog.Common.advice.exception.CAlreadyLikedException;
@@ -32,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +44,7 @@ public class ReplyController {
     private final PostRepository postRepository;
     private final BoardRepository boardRepository;
     private final ReplyUploadsService replyUploadsService;
+    private final ReplyUploadsRepository replyUploadsRepository;
 
     //댓글 상세조회
     @ApiImplicitParams({
@@ -65,6 +63,45 @@ public class ReplyController {
     @ApiOperation(value = "댓글 목록", notes = "댓글 목록")
     @GetMapping(value = "/reply/{postId}/replies")
     public ListResult<OnlyReplyMapping> getAllAnswersinOnePost(@PathVariable long postId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        List<ListResult> result = new ArrayList<>();
+        List<Boolean> amIInTheList = new ArrayList<>();
+        List<String> filePaths = new ArrayList<>();
+        List<OnlyReplyMapping> list = replyRepository.findByPost_PostId(postId);
+        result.add(responseService.getListResult(list));
+
+        int cnt = 0;
+        if (logined.isPresent()) {
+            for (OnlyReplyMapping rm : list) {
+                amIInTheList.add(false);
+                long replyId = rm.getReplyId();
+                if (replyMemberRepository.findByMember_MsrlAndReply_ReplyId(logined.get().getMsrl(), replyId).isPresent()) {
+                    amIInTheList.remove(cnt);
+                    amIInTheList.add(true);
+                }
+                //파일 조회
+                if (replyUploadsRepository.findByReplyId(replyId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<ReplyUploadsDto> files = replyUploadsService.getList(replyId);
+                    ReplyUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
+                cnt++;
+            }
+        } else {
+            for (OnlyReplyMapping rm : list) {
+                long replyId = rm.getReplyId();
+                amIInTheList.add(false);
+                //파일 조회
+                if (replyUploadsRepository.findByReplyId(replyId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<ReplyUploadsDto> files = replyUploadsService.getList(replyId);
+                    ReplyUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
+            }
+        }
+
         return responseService.getListResult(replyService.getRepliesofOnePost(postId));
     }
 

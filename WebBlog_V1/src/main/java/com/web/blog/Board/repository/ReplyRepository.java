@@ -19,6 +19,8 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
     List<OnlyReplyMapping> findByPost(Post post);
 
+    List<OnlyReplyMapping> findByPost_PostId(long postId);
+
     Optional<Reply> findById(long reply_id);
 
     List<OnlyReplyMapping> findByReplyId(long reply_id);

@@ -9,4 +9,5 @@ public interface OnlyReplyMapping {
     String getWriter();
     String getReply();
     int getLikes();
+    long getPost_postId();
 }

@@ -45,7 +45,6 @@ public class PostService {
 
     //게시글 단건 조회
     public List<OnlyPostMapping> getPost(long postId) {
-        postRepository.updateViewCnt(postId);
         return postRepository.findByPostId(postId);
     }
 
