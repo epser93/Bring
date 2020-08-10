@@ -18,6 +18,8 @@ public interface ApostRepository extends JpaRepository<Apost, Long> {
 
     List<OnlyApostMapping> findByApostId(long apost_id);
 
+    List<OnlyApostMapping> findAllByWriter(String writer);
+
     @Modifying
     @Transactional
     @Query(value = "update apost set selected = true where apost_id = :apost_id", nativeQuery = true)

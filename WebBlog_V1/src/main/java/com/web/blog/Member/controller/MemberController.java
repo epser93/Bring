@@ -1,9 +1,10 @@
 package com.web.blog.Member.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.web.blog.Board.entity.Post;
+import com.web.blog.Board.model.OnlyPostMapping;
 import com.web.blog.Board.repository.PostMemberRepository;
+import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Board.service.BoardService;
 import com.web.blog.Board.service.PostService;
 import com.web.blog.Common.advice.exception.CPasswordDoesntMatch;
@@ -23,6 +24,10 @@ import com.web.blog.Member.repository.MemberRepository;
 import com.web.blog.Member.repository.ProfileImgRepository;
 import com.web.blog.Member.service.FollowService;
 import com.web.blog.Member.service.ProfileImgService;
+import com.web.blog.QnA.model.OnlyApostMapping;
+import com.web.blog.QnA.model.OnlyQpostMapping;
+import com.web.blog.QnA.repository.ApostRepository;
+import com.web.blog.QnA.repository.QpostRepository;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
@@ -36,6 +41,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,6 +62,9 @@ public class MemberController {
     private final S3Service s3Service;
     private final ProfileImgService profileImgService;
     private final ProfileImgRepository profileImgRepository;
+    private final PostRepository postRepository;
+    private final QpostRepository qpostRepository;
+    private final ApostRepository apostRepository;
     private static final Logger logger = LoggerFactory.getLogger(MemberController.class);
 
     @ApiImplicitParams({
@@ -78,73 +88,100 @@ public class MemberController {
     })
     @ApiOperation(value = "회원 프로필 조회", notes = "닉네임으로 회원을 조회한다")
     @GetMapping(value = "/{nickname}/profile")
-    public String findUserById(@PathVariable String nickname) throws JsonProcessingException {
+    public ListResult<ListResult> findUserById(@PathVariable String nickname) throws JsonProcessingException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = repository.findByUid(uid); //로그인 한 사용자
         Member member = repository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new); //조회하려는 멤버
-        StringBuilder sb = new StringBuilder();
-        Boolean amIInTheList = false;
         Optional<OnlyMemberMapping> omm = repository.findAllByNickname(nickname); //조회하려는 멤버의 OnlyMemberMapping 값
-
-        if(logined.isPresent()) {
-            amIInTheList = followService.isFollowed(logined.get(), member); //로그인 사용자가 조회하려는 유저를 팔로우했으면 true, 아니면 false
+        List<ListResult> result = new ArrayList<>();
+        List<Boolean> amIInTheList = new ArrayList<>(); //불린 값
+        Boolean amIIn = false;
+        List<OnlyMemberMapping> profile = new ArrayList<>(); //조회하려는 회원 정보
+        profile.add(omm.get());
+        List<String> img = new ArrayList<>();
+        List<LocalDateTime> createdAt = new ArrayList<>();
+        List<OnlyPostMapping> posts = postRepository.findAllByWriter(member.getNickname());
+        List<OnlyQpostMapping> qposts = qpostRepository.findByWriter(member.getNickname());
+        List<OnlyApostMapping> aposts = apostRepository.findAllByWriter(member.getNickname());
+        for(OnlyPostMapping opm : posts) {
+            createdAt.add(opm.getCreatedAt());
+        }
+        for(OnlyQpostMapping oqm : qposts) {
+            createdAt.add(oqm.getCreatedAt());
+        }
+        for(OnlyApostMapping oam : aposts) {
+            createdAt.add(oam.getCreatedAt());
         }
 
-        ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getMapResult(omm.get(), amIInTheList)); //조회하려는 멤버와 불린값 맵 설정
-        sb.append(json);
-        sb.append(",\n");
-
-        json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getListResult(followService.followingList(member))); //팔로잉 리스트(조회하려는 멤버가 구독중인 멤버 리스트)
-        sb.append(json);
-        sb.append(",\n");
-        json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getListResult(followService.followersList(member))); //팔로워 리스트(조회하려는 멤버를 구독중인 멤버 리스트)
-        sb.append(json);
-        if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-            ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-            String filePath = "";
-            if(profileImgDto != null) {
-                filePath = profileImgDto.getImgFullPath();
+        if(logined.get().getMsrl() != member.getMsrl()) { //프로필 주인이 아니면~
+            if(logined.isPresent()) {
+                amIIn = followService.isFollowed(logined.get(), member); //로그인 사용자가 조회하려는 유저를 팔로우했으면 true, 아니면 false
+                amIInTheList.add(amIIn);
+                result.add(responseService.getListResult(profile)); //조회하려는 멤버와 불린값 맵 설정
+                result.add(responseService.getListResult(amIInTheList));
+                result.add(responseService.getListResult(followService.followingList(member))); //팔로잉 리스트(조회하려는 멤버가 구독중인 멤버 리스트)
+                result.add(responseService.getListResult(followService.followersList(member))); //팔로워 리스트(조회하려는 멤버를 구독중인 멤버 리스트)
+                result.add(responseService.getListResult(createdAt)); //모든 포스트의 각 게시 시간
+                if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = "";
+                    if(profileImgDto != null) {
+                        filePath = profileImgDto.getImgFullPath();
+                    }
+                    img.add(filePath);
+                    result.add(responseService.getListResult(img)); //프로필 사진
+                }
             }
-            json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getSingleResult(filePath)); //프로필 사진
-            sb.append(",\n");
-            sb.append(json);
+        } else { //프로필 본인이면~(마이페이지)
+            result.add(responseService.getListResult(profile)); //내 정보
+            result.add(responseService.getListResult(followService.followingList(member))); //팔로잉 리스트(조회하려는 멤버가 구독중인 멤버 리스트)
+            result.add(responseService.getListResult(followService.followersList(member))); //팔로워 리스트(조회하려는 멤버를 구독중인 멤버 리스트)
+            result.add(responseService.getListResult(createdAt)); //모든 포스트의 각 게시 시간
+            if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
+                ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                String filePath = "";
+                if(profileImgDto != null) {
+                    filePath = profileImgDto.getImgFullPath();
+                }
+                img.add(filePath);
+                result.add(responseService.getListResult(img)); //프로필 사진
+            }
         }
 
         //유저가 좋아요 한 글 개수
         repository.updateLikeCnt(postMemberRepository.likedPostCnt(member.getMsrl()), member.getMsrl());
-        return sb.toString(); //출력
+        return responseService.getListResult(result); //출력
     }
 
-    @Transactional
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
-    })
-    @ApiOperation(value = "마이페이지 조회", notes = "마이페이지 조회")
-    @GetMapping("/mypage")
-    public String mypage() throws JsonProcessingException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String id = authentication.getName();
-        Optional<Member> logined = repository.findByUid(id);
-        Optional<OnlyMemberMapping> omm = repository.findByMsrl(logined.get().getMsrl());
-        StringBuilder sb = new StringBuilder();
-        ObjectMapper mapper = new ObjectMapper();
-
-        String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getSingleResult(omm.get())); //조회하려는 멤버와 불린값 맵 설정
-        sb.append(json);
-        if(profileImgRepository.findByMsrl(logined.get().getMsrl()).isPresent()) {
-            ProfileImgDto profileImgDto = profileImgService.getOneImg(logined.get().getMsrl());
-            String filePath = "";
-            if(profileImgDto != null) {
-                filePath = profileImgDto.getImgFullPath();
-            }
-            json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getSingleResult(filePath)); //프로필 사진
-            sb.append(",\n");
-            sb.append(json);
-        }
-        return sb.toString();
-    }
+//    @Transactional
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
+//    })
+//    @ApiOperation(value = "마이페이지 조회", notes = "마이페이지 조회")
+//    @GetMapping("/mypage")
+//    public String mypage() throws JsonProcessingException {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String id = authentication.getName();
+//        Optional<Member> logined = repository.findByUid(id);
+//        Optional<OnlyMemberMapping> omm = repository.findByMsrl(logined.get().getMsrl());
+//        StringBuilder sb = new StringBuilder();
+//        ObjectMapper mapper = new ObjectMapper();
+//
+//        String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getSingleResult(omm.get())); //조회하려는 멤버와 불린값 맵 설정
+//        sb.append(json);
+//        if(profileImgRepository.findByMsrl(logined.get().getMsrl()).isPresent()) {
+//            ProfileImgDto profileImgDto = profileImgService.getOneImg(logined.get().getMsrl());
+//            String filePath = "";
+//            if(profileImgDto != null) {
+//                filePath = profileImgDto.getImgFullPath();
+//            }
+//            json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getSingleResult(filePath)); //프로필 사진
+//            sb.append(",\n");
+//            sb.append(json);
+//        }
+//        return sb.toString();
+//    }
 
     @ApiOperation(value = "좋아요 글 목록", notes = "좋아요한 글의 목록을 보여준다.")
     @GetMapping(value = "/{nickname}/likedposts")
