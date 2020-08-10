@@ -40,7 +40,7 @@ public class ReplyUploadsService {
                 .id(uploads.getId())
                 .filePath(uploads.getFilePath())
                 .replyId(uploads.getReplyId())
-                .imgFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/replies/" + uploads.getFilePath())
+                .imgFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + uploads.getFilePath())
                 .build();
     }
 }

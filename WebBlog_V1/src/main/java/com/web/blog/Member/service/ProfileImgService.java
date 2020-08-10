@@ -32,7 +32,7 @@ public class ProfileImgService {
                 .id(profileImg.getId())
                 .filePath(profileImg.getFilePath())
                 .msrl(profileImg.getMsrl())
-                .imgFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/profile/" + profileImg.getFilePath())
+                .imgFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + profileImg.getFilePath())
                 .build();
     }
 }
