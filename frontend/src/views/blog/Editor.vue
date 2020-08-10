@@ -23,6 +23,12 @@
       </div>
     </div>
 
+    <!-- 썸네일  -->
+    <div class="row ml-1 mt-5 mb-5">
+      <label for="thumbnailInput">썸네일 : </label>
+      <input @change="thumbnailSelect" type="file" ref="thumbnailImage" id="thumbnailInput">
+    </div>
+
     <!-- 제목 부분 -->
     <form class="row text-left">
       <div class="col-12 form-group">
@@ -62,6 +68,7 @@ export default {
         
       },
       categoryList: [],
+      thumbnail: '',
     }
   },
   methods: {
@@ -76,7 +83,8 @@ export default {
           `${BACK_URL}/blog/${this.aboutText.nickname}/${this.aboutText.boardName}`, this.aboutText.post, config)
 
           .then(() =>{
-            this.$router.push({name : 'MyBlog'})
+            // 글 작성 완료 후, 썸네일 포스트 요청 
+            this.thumbnailPost()
           })
           .catch((err) => {
             alert('카테고리를 선택해 주세요')
@@ -93,6 +101,33 @@ export default {
                 console.log(err)
             })
     },
+
+    // 썸네일 관련
+    thumbnailSelect() {
+      this.thumbnail = this.$refs.thumbnailImage.files[0]
+    },
+    
+    thumbnailPost() {
+      const formData = new FormData()
+      formData.append('files', this.thumbnail)
+
+      const config = {
+          headers: {
+            'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
+            'Content-Type' : 'multipart/form-data'
+          }
+        }
+        axios.post(
+          `${BACK_URL}/blog/${this.aboutText.nickname}/${this.aboutText.boardName}/uploads`, formData, config)
+
+          .then(() =>{
+            this.$router.push({name : 'MyBlog'})
+          })
+          .catch((err) => {
+            alert('카테고리를 선택해 주세요')
+            console.error(err)
+          })      
+    }
   },
   created() {
     this.getCategory(),

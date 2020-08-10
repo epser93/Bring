@@ -40,8 +40,8 @@
                             <h5 class="card-title">{{ item.subject.slice(0, 10) + '...'  }}</h5>
                             <p class="card-text mb-3">{{ item.content.slice(0, 20) + '...' }}</p>
                             <!-- 좋아요 부분 -->
-                            <span v-if="postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="postLike(item, false)"><i class="fas fa-heart"></i></span>
-                            <span v-if="!postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="postLike(item, true)"><i class="fas fa-heart"></i></span>
+                            <b-icon icon="heart-fill" v-if="postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="postLike(item, false)"></b-icon>
+                            <b-icon icon="heart" v-if="!postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="postLike(item, true)"></b-icon>
                             <small :ref="'like-count-' + item.postId">{{ item.likes }}</small><small>개의 좋아요</small>
                         </div>
                         <div class="card-footer bg-transparent">
@@ -145,7 +145,6 @@ export default {
             axios.get(`${BACK_URL}/blog/${this.nickname}/post_list`, config)
                 .then(res => {
                     // 포스트 정보
-                    console.log(res)
                     this.postList = res.data.list[0].list
                     // 포스트에 사용자가 좋아요를 눌렀는지에 대한 불린 값
                     this.postLike1 = res.data.list[1].list
@@ -210,12 +209,13 @@ export default {
                 }
             }
             // 좋아요 현 상태로 구분
+            
             if (likeit === false) {
                 axios.post(`${BACK_URL}/blog/${post.writer}/like/${post.postId}`, likeit, config)
                     .then(res => {
                         // 좋아요 수 바꾸기(화면에서)
                         this.$refs[`like-count-${post.postId}`][0].innerText = res.data.data    
-                        this.getAllPosts()                 
+                        this.getAllPosts()             
                     })
                     .catch(err => {
                         console.log(err)

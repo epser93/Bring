@@ -22,8 +22,15 @@
         <div class="bg-light" style="margin: 100px 0 50px;">
             <span class="mr-2"><strong>{{ writer }}</strong></span>
             <span class="text-muted">{{ createdAt }}</span>
-            <p>{{ likes }} 명이 이 게시글을 좋아합니다</p>
             <p>조회수: {{ views }}</p>
+            
+        </div>
+
+        <!-- 좋아요 -->
+        <div class="mb-5">
+          <b-icon icon="heart-fill" v-if="likeItOrNot" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="postLike(false)"></b-icon>
+          <b-icon icon="heart" v-if="!likeItOrNot" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="postLike(true)"></b-icon>          
+          <span :ref="'like-count-' + post_id">{{ likes }}</span>
         </div>
 
         <!-- 댓글 입력 부분 -->
@@ -83,6 +90,7 @@ export default {
             createdAt: null,
             views: null,
             likes: null,
+            likeItOrNot: null,
 
             comments: null,
             comment_content: '',
@@ -186,6 +194,8 @@ export default {
               this.createdAt = res.data.list[0].list[0].createdAt
               this.likes = res.data.list[0].list[0].likes
               this.views = res.data.list[0].list[0].views
+              // 좋아요 했는지
+              this.likeItOrNot = res.data.list[4].list[0]
             })
             .catch(err => console.log(err))
         },
@@ -203,6 +213,39 @@ export default {
                 this.$router.push({ name : 'Home' })
               })
           }
+        },
+
+        // 좋아요
+        postLike(likeit) {
+            const config = {
+                headers: {
+                    'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
+                    'Content-Type': 'application/json'
+                }
+            }
+            // 좋아요 현 상태로 구분
+            
+            if (likeit === false) {
+                axios.post(`${BACK_URL}/blog/${this.writer}/like/${this.post_id}`, likeit, config)
+                    .then(res => {
+                        // 좋아요 수 바꾸기(화면에서)
+                        this.$refs[`like-count-${this.post_id}`].innerText = res.data.data    
+                        this.likeItOrNot = false            
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })   
+            } else {
+                axios.post(`${BACK_URL}/blog/${this.writer}/like/${this.post_id}`, likeit, config)
+                    .then(res => {
+                        // 좋아요 수 바꾸기(화면에서)
+                        this.$refs[`like-count-${this.post_id}`].innerText = res.data.data   
+                        this.likeItOrNot = true                    
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })   
+            }        
         }
     },
     created(){
