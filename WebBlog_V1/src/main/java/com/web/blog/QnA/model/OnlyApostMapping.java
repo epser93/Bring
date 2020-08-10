@@ -1,6 +1,6 @@
 package com.web.blog.QnA.model;
 
-import com.web.blog.QnA.entity.Qpost;
+import java.time.LocalDateTime;
 
 public interface OnlyApostMapping {
     Long getApostId();
@@ -9,4 +9,5 @@ public interface OnlyApostMapping {
     int getLikes();
     boolean getSelected();
     Long getPostId();
+    LocalDateTime getCreatedAt();
 }

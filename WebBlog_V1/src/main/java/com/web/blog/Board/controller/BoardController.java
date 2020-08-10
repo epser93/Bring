@@ -645,12 +645,14 @@ public class BoardController {
     public ListResult<SingleResult> sharePost(@PathVariable String nickname, @PathVariable String boardName, @PathVariable long postId) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
-        Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
-        Member member2 = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
+        Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new); //로그인 한 사용자
+        Member member2 = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new); //공유할 블로그의 주인
         ParamPost paramPost = new ParamPost();
 
         //postId 는 공유할 포스트의 아이디!
         Optional<OnlyPostMapping> post = postRepository.findAllByPostId(postId); //공유할 포스트 정보 불러오기
+        long post_id = post.get().getPostId();
+        Optional<Member> writer = memberRepository.findByNickname(post.get().getWriter()); //공유된 포스트의 작성자
         if (post.get().getOriginal() != -1) throw new CSharedPostException();
         paramPost.setContent(post.get().getContent()); //포스트 인자에 공유포스트의 컨텐츠 불러와서 저장
         paramPost.setSubject(post.get().getSubject()); //포스트 인자에 공유포스트의 제목 불러와서 저장
@@ -660,7 +662,7 @@ public class BoardController {
         paramPost.setOriginal(postId); //공유한 원 포스트의 포스트아이디 저장
         Post share = new Post();
 
-        if (member.equals(member2)) { //블로그 주인과 로그인 한 사용자가 같으면~
+        if (member.equals(member2) && !member.equals(writer.get())) { //블로그 주인과 로그인 한 사용자가 같으면~ && 로그인 한 사용자와 공유할 포스트의 작성자가 다르면~
             share = postService.writePost(nickname, boardName, paramPost, member, post.get().getWriter());
             if (!tags.isEmpty()) {
                 for (String tag : tags) {
