@@ -318,7 +318,7 @@ public class BoardController {
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
     })
     @ApiOperation(value = "게시글 상세정보 조회", notes = "게시글 상세정보 비회원 조회")
-    @GetMapping(value = "/blog/{nickname}/{boardName}/{postId}")
+    @GetMapping(value = "/blog/{nickname}/{boardName}/{postId}") 
     public ListResult<ListResult> post(@PathVariable String boardName, @PathVariable long postId, @PathVariable String nickname) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
