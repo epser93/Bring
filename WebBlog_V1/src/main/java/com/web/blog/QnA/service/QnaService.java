@@ -83,7 +83,6 @@ public class QnaService {
 
     //질문 상세조회
     public List<OnlyQpostMapping> getOneQpost(long qpost_id) {
-        qpostRepository.updateViewCnt(qpost_id);
         return qpostRepository.findByQpostId(qpost_id);
     }
 

@@ -128,7 +128,7 @@ public class BoardController {
         Board board = boardService.findBoard(boardName, member);
         List<OnlyPostMapping> list = boardService.CategoryPostList(board.getBoardId()); //포스트 리스트
         result.add(responseService.getListResult(list)); //포스트 리스트 데이터 넘기기
-
+        List<String> filePaths = new ArrayList<>();
         int cnt = 0;
         if (logined.isPresent()) {
             for (OnlyPostMapping pm : list) {
@@ -138,24 +138,84 @@ public class BoardController {
                     amIInTheList.remove(cnt);
                     amIInTheList.add(true);
                 }
+                //파일 조회
+                if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<PostUploadsDto> files = postUploadsService.getList(postId);
+                    PostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
                 cnt++;
             }
         } else {
-            for (OnlyPostMapping pm : list) amIInTheList.add(false);
+            for (OnlyPostMapping pm : list) {
+                long postId = pm.getPostId();
+                amIInTheList.add(false);
+                //파일 조회
+                if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<PostUploadsDto> files = postUploadsService.getList(postId);
+                    PostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
+            }
         }
 
         result.add(responseService.getListResult(amIInTheList));
+        result.add(responseService.getListResult(filePaths));
         return responseService.getListResult(result);
     }
 
     //게시판 내 포스트 검색
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "게시판 내 검색", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 통합검색")
     @GetMapping(value = "/blog/{nickname}/search/category/{board_id}/{keyword}/{type}")
-    public ListResult<OnlyPostMapping> searchAlgorithm(@PathVariable int type, @PathVariable long board_id, @PathVariable(required = false) String keyword, @PathVariable String nickname) {
+    public ListResult<ListResult> searchAlgorithm(@PathVariable int type, @PathVariable long board_id, @PathVariable(required = false) String keyword, @PathVariable String nickname) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
         Board board = boardService.getBoard(board_id);
         Member member = board.getMember();
+        List<ListResult> result = new ArrayList<>();
+        List<Boolean> amIInTheList = new ArrayList<>();
+        List<String> filePaths = new ArrayList<>();
         if (nickname.equals(member.getNickname())) {
-            return responseService.getListResult(searchService.CategoryPostSearch(type, board_id, keyword));
+            List<OnlyPostMapping> list = searchService.CategoryPostSearch(type, board_id, keyword);
+            list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
+            result.add(responseService.getListResult(list));
+
+            int cnt = 0;
+            if (logined.isPresent()) {
+                for (OnlyPostMapping pm : list) {
+                    long postId = pm.getPostId();
+                    amIInTheList.add(false);
+                    if (postMemberRepository.findPostMemberByMember_MsrlAndPost_PostId(logined.get().getMsrl(), postId).isPresent()) {
+                        amIInTheList.remove(cnt);
+                        amIInTheList.add(true);
+                    }
+                    //파일 조회
+                    if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                        List<PostUploadsDto> files = postUploadsService.getList(postId);
+                        PostUploadsDto file = files.get(0);
+                        filePaths.add(file.getImgFullPath());
+                    }
+                    cnt++;
+                }
+            } else {
+                for (OnlyPostMapping pm : list) {
+                    long postId = pm.getPostId();
+                    amIInTheList.add(false);
+                    //파일 조회
+                    if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                        List<PostUploadsDto> files = postUploadsService.getList(postId);
+                        PostUploadsDto file = files.get(0);
+                        filePaths.add(file.getImgFullPath());
+                    }
+                }
+            }
+            result.add(responseService.getListResult(amIInTheList));
+            result.add(responseService.getListResult(filePaths));
+            return responseService.getListResult(result);
         } else return null;
     }
 
@@ -171,7 +231,7 @@ public class BoardController {
         Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
         List<ListResult> result = new ArrayList<>();
         List<Boolean> amIInTheList = new ArrayList<>();
-
+        List<String> filePaths = new ArrayList<>();
         List<OnlyPostMapping> list = postRepository.findAllByWriter(nickname);
         list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
         result.add(responseService.getListResult(list));
@@ -184,13 +244,29 @@ public class BoardController {
                     amIInTheList.remove(cnt);
                     amIInTheList.add(true);
                 }
+                //파일 조회
+                if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<PostUploadsDto> files = postUploadsService.getList(postId);
+                    PostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
                 cnt++;
             }
         } else {
-            for (OnlyPostMapping pm : list) amIInTheList.add(false);
+            for (OnlyPostMapping pm : list) {
+                long postId = pm.getPostId();
+                amIInTheList.add(false);
+                //파일 조회
+                if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<PostUploadsDto> files = postUploadsService.getList(postId);
+                    PostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
+            }
         }
 
         result.add(responseService.getListResult(amIInTheList));
+        result.add(responseService.getListResult(filePaths));
         return responseService.getListResult(result);
     }
 
@@ -200,8 +276,49 @@ public class BoardController {
     })
     @ApiOperation(value = "블로그 내 검색", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 통합검색")
     @GetMapping(value = "/blog/{nickname}/search/blogPosts/{keyword}/{type}")
-    public ListResult<OnlyPostMapping> searchAlgorithm(@PathVariable int type, @PathVariable String nickname, @PathVariable(required = false) String keyword) {
-        return responseService.getListResult(searchService.BlogPostSearch(type, nickname, keyword));
+    public ListResult<ListResult> searchAlgorithm(@PathVariable int type, @PathVariable String nickname, @PathVariable(required = false) String keyword) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        List<ListResult> result = new ArrayList<>();
+        List<Boolean> amIInTheList = new ArrayList<>();
+
+        List<OnlyPostMapping> list = searchService.BlogPostSearch(type, nickname, keyword);
+        list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
+        result.add(responseService.getListResult(list));
+        List<String> filePaths = new ArrayList<>();
+        int cnt = 0;
+        if (logined.isPresent()) {
+            for (OnlyPostMapping pm : list) {
+                long postId = pm.getPostId();
+                amIInTheList.add(false);
+                if (postMemberRepository.findPostMemberByMember_MsrlAndPost_PostId(logined.get().getMsrl(), postId).isPresent()) {
+                    amIInTheList.remove(cnt);
+                    amIInTheList.add(true);
+                }
+                //파일 조회
+                if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<PostUploadsDto> files = postUploadsService.getList(postId);
+                    PostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
+                cnt++;
+            }
+        } else {
+            for (OnlyPostMapping pm : list) {
+                long postId = pm.getPostId();
+                amIInTheList.add(false);
+                //파일 조회
+                if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<PostUploadsDto> files = postUploadsService.getList(postId);
+                    PostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
+            }
+        }
+        result.add(responseService.getListResult(amIInTheList));
+        result.add(responseService.getListResult(filePaths));
+        return responseService.getListResult(result);
     }
 
     //사이트의 모든 블로그의 포스트 리스트(최신글)
@@ -222,6 +339,7 @@ public class BoardController {
         List<OnlyPostMapping> list = postRepository.findByCreatedAtLessThanEqualOrderByCreatedAtDesc(date);
         list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
         result.add(responseService.getListResult(list));
+        List<String> filePaths = new ArrayList<>();
         int cnt = 0;
         if (logined.isPresent()) {
             for (OnlyPostMapping pm : list) { //전체 포스트 리스트 for문
@@ -231,12 +349,28 @@ public class BoardController {
                     amIInTheList.remove(cnt);
                     amIInTheList.add(true);
                 }
+                //파일 조회
+                if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<PostUploadsDto> files = postUploadsService.getList(postId);
+                    PostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
                 cnt++;
             }
         } else {
-            for (OnlyPostMapping pm : list) amIInTheList.add(false);
+            for (OnlyPostMapping pm : list) {
+                long postId = pm.getPostId();
+                amIInTheList.add(false);
+                //파일 조회
+                if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<PostUploadsDto> files = postUploadsService.getList(postId);
+                    PostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
+            }
         }
         result.add(responseService.getListResult(amIInTheList));
+        result.add(responseService.getListResult(filePaths));
         return responseService.getListResult(result);
     }
 
@@ -257,7 +391,7 @@ public class BoardController {
         List<OnlyPostMapping> list = postRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualOrLikesGreaterThanEqualAndCreatedAtLessThanEqualOrderByCreatedAtDesc(40, date, 20, date);
         list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
         result.add(responseService.getListResult(list));
-
+        List<String> filePaths = new ArrayList<>();
         int cnt = 0;
         if (logined.isPresent()) {
             for (OnlyPostMapping pm : list) { //전체 포스트 리스트 for문
@@ -267,21 +401,81 @@ public class BoardController {
                     amIInTheList.remove(cnt);
                     amIInTheList.add(true);
                 }
+                //파일 조회
+                if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<PostUploadsDto> files = postUploadsService.getList(postId);
+                    PostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
                 cnt++;
             }
         } else {
-            for (OnlyPostMapping pm : list) amIInTheList.add(false);
+            for (OnlyPostMapping pm : list) {
+                long postId = pm.getPostId();
+                amIInTheList.add(false);
+                //파일 조회
+                if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<PostUploadsDto> files = postUploadsService.getList(postId);
+                    PostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
+            }
         }
         result.add(responseService.getListResult(amIInTheList));
+        result.add(responseService.getListResult(filePaths));
         return responseService.getListResult(result);
     }
 
 
     //사이트의 모든 블로그의 포스트 검색
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "모든 블로그의 포스트 검색 ", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 작성자 검색, type 4: 통합검색, ")
     @GetMapping(value = "/search/all_blog_posts/{keyword}/{type}")
-    public ListResult<OnlyPostMapping> searchAlgorithm(@PathVariable int type, @PathVariable(required = false) String keyword) {
-        return responseService.getListResult(searchService.SitePostSearch(type, keyword));
+    public ListResult<ListResult> searchAlgorithm(@PathVariable int type, @PathVariable(required = false) String keyword) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        List<ListResult> result = new ArrayList<>();
+        List<Boolean> amIInTheList = new ArrayList<>();
+
+        List<OnlyPostMapping> list = searchService.SitePostSearch(type, keyword);
+        list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
+        result.add(responseService.getListResult(list));
+        List<String> filePaths = new ArrayList<>();
+        int cnt = 0;
+        if (logined.isPresent()) {
+            for (OnlyPostMapping pm : list) {
+                long postId = pm.getPostId();
+                amIInTheList.add(false);
+                if (postMemberRepository.findPostMemberByMember_MsrlAndPost_PostId(logined.get().getMsrl(), postId).isPresent()) {
+                    amIInTheList.remove(cnt);
+                    amIInTheList.add(true);
+                }
+                //파일 조회
+                if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<PostUploadsDto> files = postUploadsService.getList(postId);
+                    PostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
+                cnt++;
+            }
+        } else {
+            for (OnlyPostMapping pm : list) {
+                long postId = pm.getPostId();
+                amIInTheList.add(false);
+                //파일 조회
+                if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<PostUploadsDto> files = postUploadsService.getList(postId);
+                    PostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
+            }
+        }
+        result.add(responseService.getListResult(amIInTheList));
+        result.add(responseService.getListResult(filePaths));
+        return responseService.getListResult(result);
     }
 
     @ApiImplicitParams({
@@ -344,7 +538,7 @@ public class BoardController {
                 filePaths.add(ud.getImgFullPath());
             }
         }
-
+        postRepository.updateViewCnt(postId);
         results.add(responseService.getListResult(postService.getPost(postId)));
         results.add(responseService.getListResult(tagService.getTags(postId)));
         results.add(responseService.getListResult(replyService.getRepliesofOnePost(postId)));

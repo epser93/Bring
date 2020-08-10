@@ -20,10 +20,13 @@ import com.web.blog.QnA.entity.Qpost;
 import com.web.blog.QnA.model.OnlyApostMapping;
 import com.web.blog.QnA.model.OnlyQpostMapping;
 import com.web.blog.QnA.model.ParamQpost;
+import com.web.blog.QnA.model.QpostUploadsDto;
 import com.web.blog.QnA.repository.ApostRepository;
 import com.web.blog.QnA.repository.QpostRepository;
+import com.web.blog.QnA.repository.QpostUploadsRepository;
 import com.web.blog.QnA.service.QTagService;
 import com.web.blog.QnA.service.QnaService;
+import com.web.blog.QnA.service.QpostUploadsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -54,34 +57,135 @@ public class QuestionController {
     private final PostRepository postRepository;
     private final PostService postService;
     private final TagService tagService;
+    private final QpostUploadsRepository qpostUploadsRepository;
+    private final QpostUploadsService qpostUploadsService;
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "QnA 전체 질문 리스트(최신글)", notes = "QnA의 모든 질문글 리스트(최신글)")
     @GetMapping("/recent")
-    public ListResult<OnlyQpostMapping> listAllQpostsRecent() {
+    public ListResult<ListResult> listAllQpostsRecent() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        List<ListResult> result = new ArrayList<>();
+        List<String> filePaths = new ArrayList<>();
         LocalDateTime date = LocalDateTime.now();
         date.minus(30, ChronoUnit.DAYS);
-        return responseService.getListResult(qpostRepository.findByCreatedAtLessThanEqualOrderByCreatedAtDesc(date));
+        List<OnlyQpostMapping> list = qpostRepository.findByCreatedAtLessThanEqualOrderByCreatedAtDesc(date);
+        if (logined.isPresent()) {
+            for (OnlyQpostMapping qm : list) {
+                long qpostId = qm.getQpostId();
+                //파일 조회
+                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
+                    QpostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
+            }
+        } else {
+            for (OnlyQpostMapping qm : list) {
+                long qpostId = qm.getQpostId();
+                //파일 조회
+                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
+                    QpostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
+            }
+        }
+        result.add(responseService.getListResult(filePaths));
+        return responseService.getListResult(result);
     }
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "QnA 전체 질문 리스트(인기글)", notes = "QnA의 모든 질문글 리스트(인기글)")
     @GetMapping("/trend")
-    public ListResult<OnlyQpostMapping> listAllQpostsTrend() {
+    public ListResult<ListResult> listAllQpostsTrend() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        List<ListResult> result = new ArrayList<>();
+        List<String> filePaths = new ArrayList<>();
         LocalDateTime date = LocalDateTime.now();
         date.minus(30, ChronoUnit.DAYS);
-        return responseService.getListResult(qpostRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualOrAnswerCntGreaterThanEqualAndCreatedAtLessThanEqualOrderByCreatedAtDesc(20, date, 1, date));
+        List<OnlyQpostMapping> list = qpostRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualOrAnswerCntGreaterThanEqualAndCreatedAtLessThanEqualOrderByCreatedAtDesc(20, date, 1, date);
+        if (logined.isPresent()) {
+            for (OnlyQpostMapping qm : list) {
+                long qpostId = qm.getQpostId();
+                //파일 조회
+                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
+                    QpostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
+            }
+        } else {
+            for (OnlyQpostMapping qm : list) {
+                long qpostId = qm.getQpostId();
+                //파일 조회
+                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
+                    QpostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
+            }
+        }
+        result.add(responseService.getListResult(filePaths));
+        return responseService.getListResult(result);
     }
 
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "QnA 특정 유저 질문 리스트", notes = "한 유저의 모든 질문글 리스트")
     @GetMapping("/{nickname}/qlist")
-    public ListResult<OnlyQpostMapping> listUserQposts(@PathVariable String nickname) {
-        return responseService.getListResult(qpostRepository.findByWriter(nickname));
+    public ListResult<ListResult> listUserQposts(@PathVariable String nickname) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        List<ListResult> result = new ArrayList<>();
+        List<String> filePaths = new ArrayList<>();
+        LocalDateTime date = LocalDateTime.now();
+        date.minus(30, ChronoUnit.DAYS);
+        List<OnlyQpostMapping> list = qpostRepository.findByWriter(nickname);
+        if (logined.isPresent()) {
+            for (OnlyQpostMapping qm : list) {
+                long qpostId = qm.getQpostId();
+                //파일 조회
+                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
+                    QpostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
+            }
+        } else {
+            for (OnlyQpostMapping qm : list) {
+                long qpostId = qm.getQpostId();
+                //파일 조회
+                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
+                    QpostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                }
+            }
+        }
+        result.add(responseService.getListResult(filePaths));
+        return responseService.getListResult(result);
     }
 
     //질문 조회
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "질문 조회", notes = "질문 조회")
     @GetMapping(value = "/{qpostId}")
     public ListResult<ListResult> questionDetail(@PathVariable long qpostId) {
         List<ListResult> results = new ArrayList<>();
+        qpostRepository.updateViewCnt(qpostId);
         results.add(responseService.getListResult(qnaService.getOneQpost(qpostId)));
         results.add(responseService.getListResult(qTagService.getTags(qpostId)));
         results.add(responseService.getListResult(qnaService.getApostsofOneQpost(qpostId)));

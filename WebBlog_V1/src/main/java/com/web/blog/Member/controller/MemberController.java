@@ -125,11 +125,28 @@ public class MemberController {
     })
     @ApiOperation(value = "마이페이지 조회", notes = "마이페이지 조회")
     @GetMapping("/mypage")
-    public SingleResult<Member> mypage() {
+    public String mypage() throws JsonProcessingException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String id = authentication.getName();
-        Member logined = repository.findByUid(id).orElseThrow(CUserNotFoundException::new);
-        return responseService.getSingleResult(logined);
+        Optional<Member> logined = repository.findByUid(id);
+        Optional<OnlyMemberMapping> omm = repository.findByMsrl(logined.get().getMsrl());
+        StringBuilder sb = new StringBuilder();
+        ObjectMapper mapper = new ObjectMapper();
+
+        String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getSingleResult(omm.get())); //조회하려는 멤버와 불린값 맵 설정
+        sb.append(json);
+        sb.append("\n");
+
+        if(profileImgRepository.findByMsrl(logined.get().getMsrl()).isPresent()) {
+            ProfileImgDto profileImgDto = profileImgService.getOneImg(logined.get().getMsrl());
+            String filePath = "";
+            if(profileImgDto != null) {
+                filePath = profileImgDto.getImgFullPath();
+            }
+            json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getSingleResult(filePath)); //프로필 사진
+            sb.append(json);
+        }
+        return sb.toString();
     }
 
     @ApiOperation(value = "좋아요 글 목록", notes = "좋아요한 글의 목록을 보여준다.")
