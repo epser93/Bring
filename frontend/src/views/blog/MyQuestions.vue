@@ -1,41 +1,227 @@
 <template>
-    <div id="myquestion" class="row">
+    <div id="myquestions" class="row">
         <!-- 사이드 바 -->
         <div class="nav col-2 flex-column text-left">
-            <h5>카테고리</h5>
+            <h5>태그</h5>
             <hr class="ml-0" style="width:70%;">
-            <a class="nav-link" href="#">Link</a>
-            <a class="nav-link" href="#">Link</a>
-            <a class="nav-link" href="#">Link</a>
-            <a class="nav-link" href="#">Link</a>
-
-            <!-- 검색창 -->
-            <form class="form-inline mt-5">
-                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-            </form>
-            <br>
-            <button type="button" class="btn btn-outline-success" style="width:100px;">새 질문 작성</button>
+            <button id="category-all" @click="getAllPosts" type="button" class="btn mb-3 p-0 text-left">전체보기()</button>
+            <div id="category-menu" v-for="category in categoryList" :key="category.boardId">
+                <button type="button" class="btn mb-3 p-0">{{ category.name }}({{  }})</button>
+            </div>
         </div>
 
         <!-- 글 리스트 -->
-        <div class="list offset-1 col-8">
-            <div class="card border-light" style="width: 75%;">
-                <div class="card-header">Header</div>
-                <div class="card-body">
-                    <h5 class="card-title">Light card title</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+        <div v-if="this.categoryOn === 1" class="col-10 container">
+            <div class="text-left ml-5 mt-5" v-if="postList.length == 0">
+                <h3>현재 등록된 글이 없습니다</h3>
+            </div>
+            <div class="row">
+                <div v-for="(item, index) in postList" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
+                    <div class="card" style="width: 75%;">
+                        <img class="card-img-top" :src="cardImage" alt="Card image cap">
+                        <div class="card-body pb-0">
+                            <h5 class="card-title">{{ item.subject.slice(0, 10) + '...'  }}</h5>
+                            <p class="card-text mb-3">{{ item.content.slice(0, 20) + '...' }}</p>
+                            <!-- 좋아요 부분 -->
+                            <span v-if="postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="postLike(item, false)"><i class="fas fa-heart"></i></span>
+                            <span v-if="!postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="postLike(item, true)"><i class="fas fa-heart"></i></span>
+                            <small :ref="'like-count-' + item.postId">{{ item.likes }}</small><small>개의 좋아요</small>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <button class="btn btn-sm" @click="gotoDetail(item)">글 보기</button>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <div class="text-right" v-if="userNow === nickname">
+                <button type="button" @click="newArticle('default')" class="btn btn-outline-dark mb-5 mr-5" style="width:100px;">새 글 작성</button>
+            </div>
+        </div>
+
+        <!-- 글 리스트 카테고리 있는 경우 -->
+        <div v-if="this.categoryOn === 2" class="col-10 container">
+            <div class="row text-left ml-5 mt-5" v-if="postListCategory.length == 0">
+                <h3>현재 등록된 글이 없습니다</h3>
+            </div>
+            <div class="row">
+                <div v-for="item in postListCategory" :key="item.post_id" class="p-0 mb-5 col-12 col-lg-3">
+                    <div class="card" style="width: 75%;">
+                        <img class="card-img-top" :src="cardImage" alt="Card image cap">
+                        <div class="card-body pb-0">
+                            <h5 class="card-title">{{ item.subject }}</h5>
+                            <p class="card-text mb-3">{{ item.content }}</p>
+                            <p class="text-right">♥ {{ item.likes }}</p>
+                        </div>
+                        <div class="card-footer bg-transparent">
+                            <button class="btn btn-sm" @click="gotoDetail(item)">글 보기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-right" v-if="userNow === nickname">
+                <button type="button" @click="newArticle(currentCategory)" class="btn btn-outline-dark mb-5 mr-5" style="width:100px;">새 글 작성</button>
             </div>
         </div>
     </div>
 </template>
+
 <script>
+import axios from 'axios'
+
+const BACK_URL = 'http://localhost:8080'
+
 export default {
+    name: 'MyList',
+    components: {
+   
+    }, 
+    props: {
+        cardUserImage: {
+            type: String,
+            default: require("@/assets/img/faces/marc.jpg")
+        },
+        cardImage: {
+            type: String,
+            default: require("@/assets/img/card.jpg")
+        },
+    },
+
+    methods: {
+        getAllPosts() {
+            this.categoryOn = 1
+            axios.get(`${BACK_URL}/questions/${this.nickname}/qlist`)
+                .then(res => {
+                    // 포스트 정보
+                    console.log(res.data.list)
+                    this.postList = res.data.list
+                    // 포스트에 사용자가 좋아요를 눌렀는지에 대한 불린 값
+                    // this.postLike1 = res.data.list
+                })
+ 
+                .catch(err => {
+                    console.log(err)
+                })
+        },
+       
+        getCategory() {
+            axios.get(`${BACK_URL}/blog/${this.nickname}/categories`)
+                .then(res => {
+                    this.categoryList = res.data.list
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        },
+        // 카테고리에 맞는 포스트만 가져오기
+        getSomePosts(categoryName) {
+            this.categoryOn = 2
+            axios.get(`${BACK_URL}/blog/${this.nickname}/${categoryName}/post_list`)
+                .then(res => {
+                    this.postListCategory = res.data.list[0].list
+                    // 카테고리 바로 에디터로 가져가기 위한 용도
+                    this.currentCategory = categoryName
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        },
+
+        // 포스트 디테일
+        gotoDetail(post) {
+            this.$router.push({ name : "QuestionDetail" , params: { nickname : post.writer, qpostId : post.qpostId }})
+        },    
+
+        // 좋아요
+        postLike(post, likeit) {
+            const config = {
+                headers: {
+                    'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
+                    'Content-Type': 'application/json'
+                }
+            }
+            // 좋아요 현 상태로 구분
+            if (likeit === false) {
+                axios.post(`${BACK_URL}/blog/${post.writer}/like/${post.postId}`, likeit, config)
+                    .then(res => {
+                        // 좋아요 수 바꾸기(화면에서)
+                        this.$refs[`like-count-${post.postId}`][0].innerText = res.data.data    
+                        this.getAllPosts()                 
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })   
+            } else {
+                axios.post(`${BACK_URL}/blog/${post.writer}/like/${post.postId}`, likeit, config)
+                    .then(res => {
+                        // 좋아요 수 바꾸기(화면에서)
+                        this.$refs[`like-count-${post.postId}`][0].innerText = res.data.data   
+                        this.getAllPosts()                      
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })   
+            }        
+        }
+    },
     
+    created() {
+        this.getAllPosts(),
+        this.getCategory()
+        
+    },
+    data() {
+        return{
+            userNow: this.$cookies.get('nickname'), 
+            nickname: this.$route.params.nickname,
+            // 글 관련
+            categoryOn: 1,
+            postList: [],
+            postListCategory: [],
+            postListKeyword: [],
+            categoryList: [],
+            currentCategory: '',
+            
+            // 검색 관련
+            keywordType: {
+                name: '제목검색',
+                keyid: 1,
+            },
+            keyword: '',
+            dropdownList: {
+                1: '제목검색',
+                2: '내용검색',
+                3: '통합검색',
+            },
+            // 좋아요 관련
+            postLike1: [],
+        }
+    },
 }
 </script>
 
 <style>
+#category-menu button{
+    text-decoration: none;
+    color: black;
+}
+
+#category-menu button:focus{
+    font-weight: bold;
+    color: #42b983;
+}
+
+#category-all button{
+    text-decoration: none;
+    color: black;
+}
+
+#category-all button:focus{
+    font-weight: bold;
+    color: #42b983;
+}
+
+.card {
+    box-shadow: 10px 0px 60px -40px black;
+}
 
 </style>

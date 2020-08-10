@@ -2,7 +2,7 @@
     <div id="myanswers" class="row">
         <!-- 사이드 바 -->
         <div class="nav col-2 flex-column text-left">
-            <h5>카테고리</h5>
+            <h5>태그</h5>
             <hr class="ml-0" style="width:70%;">
             <a class="nav-link" href="#">Link</a>
             <a class="nav-link" href="#">Link</a>
