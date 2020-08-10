@@ -318,7 +318,7 @@ public class BoardController {
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
     })
     @ApiOperation(value = "게시글 상세정보 조회", notes = "게시글 상세정보 비회원 조회")
-    @GetMapping(value = "/blog/{nickname}/{boardName}/{postId}") 
+    @GetMapping(value = "/blog/{nickname}/{boardName}/{postId}")
     public ListResult<ListResult> post(@PathVariable String boardName, @PathVariable long postId, @PathVariable String nickname) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
@@ -498,18 +498,17 @@ public class BoardController {
     })
     @ApiOperation(value = "파일 등록", notes = "새로운 포스트 작성 시, 또는 공유 할 시 파일 등록")
     @PostMapping(value = "/blog/{nickname}/{boardName}/uploads")
-    public SingleResult<Boolean> upload(@PathVariable String nickname, @PathVariable String boardName, @RequestPart MultipartFile files) throws IOException {
+    public SingleResult<Boolean> upload(@PathVariable String nickname, @PathVariable String boardName, @RequestPart MultipartFile[] files) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
         Board board = boardRepository.findByNameAndMember(boardName, logined);
         Optional<List<Post>> list = postRepository.findByBoard_BoardIdAndWriter(board.getBoardId(), nickname);
-        MultipartFile[] files1 = new MultipartFile[1];
-        files1[0] = files;
+
         if (list.isPresent()) {
             Post post = list.get().get(list.get().size() - 1);
             long postId = post.getPostId();
-            return responseService.getSingleResult(postService.saveFiles(postId, nickname, files1));
+            return responseService.getSingleResult(postService.saveFiles(postId, nickname, files));
         } else return null;
     }
 
@@ -518,12 +517,10 @@ public class BoardController {
     })
     @ApiOperation(value = "파일 수정 등록", notes = "기존 포스트 수정 할 때, 필요시 파일 수정")
     @PostMapping(value = "/blog/{nickname}/{boardName}/{postId}/uploads")
-    public SingleResult<Boolean> uploadUpdate(@PathVariable String nickname, @PathVariable String boardName, @PathVariable long postId, @RequestPart MultipartFile files) throws IOException {
+    public SingleResult<Boolean> uploadUpdate(@PathVariable String nickname, @PathVariable String boardName, @PathVariable long postId, @RequestPart MultipartFile[] files) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
-        MultipartFile[] files1 = new MultipartFile[1];
-        files1[0] = files;
-        return responseService.getSingleResult(postService.saveFiles(postId, nickname, files1));
+        return responseService.getSingleResult(postService.saveFiles(postId, nickname, files));
     }
 }

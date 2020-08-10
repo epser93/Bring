@@ -140,17 +140,15 @@ public class ReplyController {
     })
     @ApiOperation(value = "파일 등록", notes = "새로운 댓글 작성 시 파일 등록")
     @PostMapping(value = "/reply/{postId}/newuploads")
-    public SingleResult<Boolean> upload(@PathVariable long postId, @RequestPart MultipartFile files) throws IOException {
+    public SingleResult<Boolean> upload(@PathVariable long postId, @RequestPart MultipartFile[] files) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
         Optional<List<Reply>> list = replyRepository.findByWriterAndPost_PostId(logined.getNickname(), postId); //해당 포스트의 댓글 작성자가 쓴 모든 댓글 리스트를 불러옴
-        MultipartFile[] files1 = new MultipartFile[1];
-        files1[0] = files;
         if (list.isPresent()) {
             Reply reply = list.get().get(list.get().size() - 1); //찾은 리스트 중 마지막 댓글 가져오기
             long replyId = reply.getReplyId();
-            return responseService.getSingleResult(replyService.saveFiles(replyId, logined.getNickname(), files1));
+            return responseService.getSingleResult(replyService.saveFiles(replyId, logined.getNickname(), files));
         } else return null;
     }
 
@@ -159,12 +157,10 @@ public class ReplyController {
     })
     @ApiOperation(value = "파일 수정 등록", notes = "기존 댓글 수정 할 때, 필요시 파일 수정")
     @PostMapping(value = "/reply/{replyId}/uploads")
-    public SingleResult<Boolean> uploadUpdate(@PathVariable long replyId, @RequestPart MultipartFile files) throws IOException {
+    public SingleResult<Boolean> uploadUpdate(@PathVariable long replyId, @RequestPart MultipartFile[] files) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
-        MultipartFile[] files1 = new MultipartFile[1];
-        files1[0] = files;
-        return responseService.getSingleResult(replyService.saveFiles(replyId, logined.getNickname(), files1));
+        return responseService.getSingleResult(replyService.saveFiles(replyId, logined.getNickname(), files));
     }
 }
