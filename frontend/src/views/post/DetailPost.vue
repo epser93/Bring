@@ -173,6 +173,7 @@ export default {
         getComment() {
           axios.get(`${BACK_URL}/reply/${this.post_id}/replies`)
             .then(res => {
+              console.log(res)
               this.comments = res.data.list
               })
             .catch(err => console.log(err))
@@ -241,6 +242,35 @@ export default {
                         // 좋아요 수 바꾸기(화면에서)
                         this.$refs[`like-count-${this.post_id}`].innerText = res.data.data   
                         this.likeItOrNot = true                    
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })   
+            }        
+        },
+        // 댓글 좋아요
+        commentLike(replyId, replyer, likeit) {
+            const config = {
+                headers: {
+                    'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
+                    'Content-Type': 'application/json'
+                }
+            }
+
+            if (likeit === false) {
+                axios.post(`${BACK_URL}/reply/like/${replyId}/${replyer}`, likeit, config)
+                    .then(res => {
+                        this.$refs[`like-count-${replyId}`].innerText = res.data.data   
+                        this.getComment()       
+                    })
+                    .catch(err => {
+                        console.log(err)
+                    })   
+            } else {
+                axios.post(`${BACK_URL}/reply/like/${replyId}/${replyer}`, likeit, config)
+                    .then(res => {
+                        this.$refs[`like-count-${replyId}`].innerText = res.data.data 
+                        this.getComment()   
                     })
                     .catch(err => {
                         console.log(err)
