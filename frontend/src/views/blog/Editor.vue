@@ -121,7 +121,7 @@ export default {
           `${BACK_URL}/blog/${this.aboutText.nickname}/${this.aboutText.boardName}/uploads`, formData, config)
 
           .then(() =>{
-            this.$router.push({name : 'MyBlog'})
+            this.$router.go(-1)
           })
           .catch((err) => {
             alert('카테고리를 선택해 주세요')
