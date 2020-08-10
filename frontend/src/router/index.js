@@ -138,7 +138,7 @@ const routes = [{
     },
     {
         path: '/questions/:qpostId',
-        name: 'QuestionDetail',
+        name: 'QuestionUpdate',
         component: QuestionUpdate
     },
 
