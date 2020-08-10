@@ -181,17 +181,15 @@ public class QuestionController {
     })
     @ApiOperation(value = "파일 등록", notes = "새로운 질문 작성 시 파일 등록")
     @PostMapping(value = "/ask/uploads")
-    public SingleResult<Boolean> upload(@RequestPart MultipartFile files) throws IOException {
+    public SingleResult<Boolean> upload(@RequestPart MultipartFile[] files) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
         Optional<List<Qpost>> list = qpostRepository.findAllByWriter(logined.getNickname());
-        MultipartFile[] files1 = new MultipartFile[1];
-        files1[0] = files;
         if (list.isPresent()) {
             Qpost qpost = list.get().get(list.get().size() - 1); //찾은 리스트 중 마지막 댓글 가져오기
             long qpostId = qpost.getQpostId();
-            return responseService.getSingleResult(qnaService.saveFiles(qpostId, logined.getNickname(), files1));
+            return responseService.getSingleResult(qnaService.saveFiles(qpostId, logined.getNickname(), files));
         } else return null;
     }
 
@@ -200,12 +198,10 @@ public class QuestionController {
     })
     @ApiOperation(value = "파일 수정 등록", notes = "기존 질문 수정 할 때, 필요시 파일 수정")
     @PostMapping(value = "/ask/{qpostId}/uploads")
-    public SingleResult<Boolean> uploadUpdate(@PathVariable long qpostId, @RequestPart MultipartFile files) throws IOException {
+    public SingleResult<Boolean> uploadUpdate(@PathVariable long qpostId, @RequestPart MultipartFile[] files) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
-        MultipartFile[] files1 = new MultipartFile[1];
-        files1[0] = files;
-        return responseService.getSingleResult(qnaService.saveFiles(qpostId, logined.getNickname(), files1));
+        return responseService.getSingleResult(qnaService.saveFiles(qpostId, logined.getNickname(), files));
     }
 }
