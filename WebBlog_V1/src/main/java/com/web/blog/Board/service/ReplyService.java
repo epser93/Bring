@@ -92,7 +92,6 @@ public class ReplyService {
         Post post = reply.getPost();
         if (reply.getWriter().equals(member.getNickname())) {
             replyRepository.delete(reply);
-            replyRepository.updateLikeCntMinus(reply_id);
             postRepository.updateReplyCntMinus(post.getPostId());
             return true;
         } else if (!reply.getWriter().equals(member.getNickname())) throw new CNotOwnerException();
