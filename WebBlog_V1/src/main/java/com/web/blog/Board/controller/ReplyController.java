@@ -62,7 +62,7 @@ public class ReplyController {
     })
     @ApiOperation(value = "댓글 목록", notes = "댓글 목록")
     @GetMapping(value = "/reply/{postId}/replies")
-    public ListResult<OnlyReplyMapping> getAllAnswersinOnePost(@PathVariable long postId) {
+    public ListResult<ListResult> getAllAnswersinOnePost(@PathVariable long postId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
@@ -101,8 +101,9 @@ public class ReplyController {
                 }
             }
         }
-
-        return responseService.getListResult(replyService.getRepliesofOnePost(postId));
+        result.add(responseService.getListResult(amIInTheList));
+        result.add(responseService.getListResult(filePaths));
+        return responseService.getListResult(result);
     }
 
     //댓글 작성
@@ -113,9 +114,10 @@ public class ReplyController {
     @PostMapping(value = "/reply/{postId}")
     public SingleResult<Reply> answerTheQuestion(@PathVariable long postId, @Valid @RequestBody ParamReply paramReply) throws IOException {
         Optional<Post> post = postRepository.findById(postId);
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Member member = (Member) principal;
-        return responseService.getSingleResult(replyService.writeReply(post.get(), member, paramReply));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> member = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        return responseService.getSingleResult(replyService.writeReply(post.get(), member.get(), paramReply));
     }
 
     //댓글 수정
@@ -180,7 +182,7 @@ public class ReplyController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
-        Optional<List<Reply>> list = replyRepository.findByWriterAndPost_PostId(logined.getNickname(), postId); //해당 포스트의 댓글 작성자가 쓴 모든 댓글 리스트를 불러옴
+        Optional<List<Reply>> list = replyRepository.findByMember_NicknameAndPost_PostId(logined.getNickname(), postId); //해당 포스트의 댓글 작성자가 쓴 모든 댓글 리스트를 불러옴
         if (list.isPresent()) {
             Reply reply = list.get().get(list.get().size() - 1); //찾은 리스트 중 마지막 댓글 가져오기
             long replyId = reply.getReplyId();

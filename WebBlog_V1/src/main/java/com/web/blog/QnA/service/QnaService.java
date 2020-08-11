@@ -65,7 +65,7 @@ public class QnaService {
 
     //한 유저의 모든 답변글 리스트
     public List<Apost> getOnesAllAnswer(Member member) {
-        return apostRepository.findByWriter(member.getNickname());
+        return apostRepository.findByMember_Nickname(member.getNickname());
     }
 
     //모든 질문글 검색
@@ -75,9 +75,9 @@ public class QnaService {
         } else if (which == 2) { //내용 검색
             return qpostRepository.findByContentContaining(keyword);
         } else if (which == 3) { //작성자 검색
-            return qpostRepository.findByWriterContaining(keyword);
+            return qpostRepository.findByMember_NicknameContaining(keyword);
         } else { //통합검색
-            return qpostRepository.findDistinctBySubjectContainingOrContentContainingOrWriterContaining(keyword, keyword, keyword);
+            return qpostRepository.findDistinctBySubjectContainingOrContentContainingOrMember_NicknameContaining(keyword, keyword, keyword);
         }
     }
 
@@ -87,13 +87,13 @@ public class QnaService {
     }
 
     //질문 작성
-    public Qpost writeQuestion(Member member, ParamQpost paramQpost) throws IOException {
-        Qpost qpost = Qpost.builder()
-                .writer(member.getNickname())
+    @Transactional
+    public Qpost writeQuestion(Member member, ParamQpost paramQpost) {
+        Qpost qpost = qpostRepository.save(Qpost.builder()
+                .member(member)
                 .subject(paramQpost.getSubject())
                 .content(paramQpost.getContent())
-                .build();
-        qpostRepository.save(qpost);
+                .build());
         qpostRepository.updateMsrl(member.getMsrl(), qpost.getQpostId());
         return qpost;
     }
@@ -143,7 +143,7 @@ public class QnaService {
     public Apost writeAnswer(Qpost qpost, Member member, ParamApost paramApost, long postId) throws IOException {
         Apost apost = Apost.builder()
                 .qpost(qpost)
-                .writer(member.getNickname())
+                .member(member)
                 .answer(paramApost.getAnswer())
                 .postId(postId)
                 .build();
@@ -166,11 +166,11 @@ public class QnaService {
     public boolean deleteAnswer(long apost_id, Member member, boolean isSelected) {
         Apost apost = apostRepository.findById(apost_id).orElseThrow(CResourceNotExistException::new);
         Qpost qpost = apost.getQpost();
-        if (!isSelected && apost.getWriter().equals(member.getNickname())) {
+        if (!isSelected && apost.getMember().getNickname().equals(member.getNickname())) {
             apostRepository.delete(apost);
             return true;
         } else if (isSelected) throw new CAnsweredQuestionException();
-        else if (!apost.getWriter().equals(member.getNickname())) throw new CNotOwnerException();
+        else if (!apost.getMember().getNickname().equals(member.getNickname())) throw new CNotOwnerException();
 
         return false;
     }
@@ -179,7 +179,7 @@ public class QnaService {
     public void likeThisAnswer(Member member, Apost apost, Boolean like) { //member는 로그인 한 사용자
         long msrl = member.getMsrl();
         long apost_id = apost.getApostId();
-        String writer = apost.getWriter();
+        String writer = apost.getMember().getNickname();
         Member answerer = memberRepository.findByNickname(writer).orElseThrow(CUserNotFoundException::new); //answerer은 답변자
         if (like) {
             memberRepository.updateScoreIfLiked(answerer.getMsrl());
@@ -195,7 +195,7 @@ public class QnaService {
     //답변 채택
     public boolean selectThisAnswer(long apost_id, long qpost_id, Member member) {
         Apost apost = apostRepository.findById(apost_id).orElseThrow(CResourceNotExistException::new);
-        String writer = apost.getWriter();
+        String writer = apost.getMember().getNickname();
         Member answerer = memberRepository.findByNickname(writer).orElseThrow(CUserNotFoundException::new);
         if (member.equals(answerer)) {
             throw new CAskedQuestionException();

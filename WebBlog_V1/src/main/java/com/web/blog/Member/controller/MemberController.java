@@ -1,6 +1,7 @@
 package com.web.blog.Member.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.model.OnlyPostMapping;
 import com.web.blog.Board.repository.PostMemberRepository;
@@ -10,6 +11,7 @@ import com.web.blog.Board.service.PostService;
 import com.web.blog.Common.advice.exception.CPasswordDoesntMatch;
 import com.web.blog.Common.advice.exception.CPasswordLengthException;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
+import com.web.blog.Common.config.security.JwtTokenProvider;
 import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.response.SingleResult;
@@ -65,6 +67,7 @@ public class MemberController {
     private final PostRepository postRepository;
     private final QpostRepository qpostRepository;
     private final ApostRepository apostRepository;
+    private final JwtTokenProvider jwtTokenProvider;
     private static final Logger logger = LoggerFactory.getLogger(MemberController.class);
 
     @ApiImplicitParams({
@@ -101,9 +104,9 @@ public class MemberController {
         profile.add(omm.get());
         List<String> img = new ArrayList<>();
         List<LocalDateTime> createdAt = new ArrayList<>();
-        List<OnlyPostMapping> posts = postRepository.findAllByWriter(member.getNickname());
-        List<OnlyQpostMapping> qposts = qpostRepository.findByWriter(member.getNickname());
-        List<OnlyApostMapping> aposts = apostRepository.findAllByWriter(member.getNickname());
+        List<OnlyPostMapping> posts = postRepository.findAllByMember_Nickname(member.getNickname());
+        List<OnlyQpostMapping> qposts = qpostRepository.findByMember_Nickname(member.getNickname());
+        List<OnlyApostMapping> aposts = apostRepository.findAllByMember_Nickname(member.getNickname());
         for(OnlyPostMapping opm : posts) {
             createdAt.add(opm.getCreatedAt());
         }
@@ -196,7 +199,7 @@ public class MemberController {
     })
     @ApiOperation(value = "회원 수정", notes = "회원정보를 수정한다")
     @PutMapping(value = "/update")
-    public SingleResult<Member> modify(@Valid @RequestBody ParamPassword paramMember) {
+    public SingleResult<Member> modify(@Valid @RequestBody ParamPassword paramMember) throws JsonProcessingException {
         String oldPassword = paramMember.getPassword3();
         Optional<String> newPassword = Optional.ofNullable(paramMember.getPassword1());
         Optional<String> newPasswordChk = Optional.ofNullable(paramMember.getPassword2());
@@ -226,7 +229,9 @@ public class MemberController {
                 member.setNickname(nickname.get());
             }
         }
-
+        ObjectMapper mapper = new ObjectMapper();
+        String Json;
+        Json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getMapResult(jwtTokenProvider.createToken(String.valueOf(member.getMsrl()), member.getRoles()), member));
         return responseService.getSingleResult(repository.save(member));
     }
 

@@ -6,7 +6,7 @@ public interface OnlyQpostMapping {
     Long getQpostId();
     LocalDateTime getCreatedAt();
     LocalDateTime getUpdatedAt();
-    String getWriter();
+    String getMember_nickname();
     String getSubject();
     String getContent();
     int getViews();

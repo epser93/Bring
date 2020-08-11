@@ -1,7 +1,5 @@
 package com.web.blog.QnA.repository;
 
-import com.web.blog.Board.entity.Post;
-import com.web.blog.Board.entity.PostTag;
 import com.web.blog.QnA.entity.Qpost;
 import com.web.blog.QnA.entity.QpostTag;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,6 +12,8 @@ import java.util.List;
 
 public interface QpostTagRepository extends JpaRepository<QpostTag, Long> {
     List<QpostTag> findByQpost(Qpost qpost);
+
+    List<QpostTag> findByQpost_QpostId(long qpost_id);
 
     @Modifying
     @Transactional

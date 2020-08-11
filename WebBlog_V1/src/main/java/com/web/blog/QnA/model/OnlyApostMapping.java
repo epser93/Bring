@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public interface OnlyApostMapping {
     Long getApostId();
-    String getWriter();
+    String getMember_nickname();
     String getAnswer();
     int getLikes();
     boolean getSelected();

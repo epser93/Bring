@@ -83,17 +83,18 @@ public class AnswerController {
     public SingleResult<Apost> answerTheQuestion(@PathVariable long qpostId, @Valid @RequestBody ParamApost paramApost) throws IOException {
         Optional<Qpost> qpost = qpostRepository.findById(qpostId);
         Member asker = qpost.get().getMember();
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Member logined = (Member) principal;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
         ParamPost paramPost = new ParamPost();
 
-        if (asker.getMsrl() == logined.getMsrl()) {
+        if (asker.getMsrl() == logined.get().getMsrl()) {
             throw new CAskedQuestionException();
         }
 
         //블로그 Q&A 게시판
         StringBuilder sb = new StringBuilder();
-        sb.append("Q. " + qpost.get().getSubject() + "(Q writer: " + qpost.get().getWriter() + ", Q number: " + qpostId + ")" + System.getProperty("line.separator"));
+        sb.append("Q. " + qpost.get().getSubject() + "(Q writer: " + qpost.get().getMember().getNickname() + ", Q number: " + qpostId + ")" + System.getProperty("line.separator"));
         sb.append("\t" + qpost.get().getContent() + System.getProperty("line.separator"));
         paramPost.setSubject(sb.toString());
         sb = new StringBuilder();
@@ -102,7 +103,7 @@ public class AnswerController {
         paramPost.setContent(sb.toString());
         paramPost.setOriginal((long) -1);
         Post answer = new Post();
-        answer = postService.writePost(logined.getNickname(), "나의 Answers", paramPost, logined, "");
+        answer = postService.writePost("나의 Answers", paramPost, logined.get(), "");
 
         Set<String> tagSet = new HashSet<>(qTagService.getTags(qpostId));
         List<String> tags = new ArrayList<>(tagSet);
@@ -111,7 +112,7 @@ public class AnswerController {
                 tagService.insertTags(answer, tag);
             }
         }
-        Apost apost = qnaService.writeAnswer(qpost.get(), logined, paramApost, answer.getPostId());
+        Apost apost = qnaService.writeAnswer(qpost.get(), logined.get(), paramApost, answer.getPostId());
         if (qpostRepository.isSelectedAnswerExist(qpostId)) return null;
         return responseService.getSingleResult(apost);
     }
@@ -130,13 +131,13 @@ public class AnswerController {
         Qpost qpost = qpostRepository.findById(qpostId).orElseThrow(CResourceNotExistException::new);
         ParamPost paramPost = new ParamPost();
 
-        if (!logined.getNickname().equals(apost.get().getWriter())) {
+        if (!logined.getNickname().equals(apost.get().getMember().getNickname())) {
             throw new CNotOwnerException();
         }
 
         //블로그 Q&A 게시판
         StringBuilder sb = new StringBuilder();
-        sb.append("Q. " + qpost.getSubject() + "(Q writer: " + qpost.getWriter() + ", Q number: " + qpostId + ")" + System.getProperty("line.separator"));
+        sb.append("Q. " + qpost.getSubject() + "(Q writer: " + qpost.getMember().getNickname() + ", Q number: " + qpostId + ")" + System.getProperty("line.separator"));
         sb.append("\t" + qpost.getContent() + System.getProperty("line.separator"));
         paramPost.setSubject(sb.toString());
         sb = new StringBuilder();
@@ -192,7 +193,7 @@ public class AnswerController {
         Qpost qpost = apost.get().getQpost();
         Optional<OnlyPostMapping> post = postRepository.findAllByPostId(apost.get().getPostId());
         long msrl = qpost.getMember().getMsrl();
-        Member answerer = memberRepository.findByNickname(apost.get().getWriter()).orElseThrow(CUserNotFoundException::new);
+        Member answerer = memberRepository.findByNickname(apost.get().getMember().getNickname()).orElseThrow(CUserNotFoundException::new);
         if (msrl == member.getMsrl() && !qpostRepository.isSelectedAnswerExist(qpost.getQpostId())) { //로그인 한 사용자가 질문자면~
             qnaService.selectThisAnswer(apostId, qpost.getQpostId(), member);
             ParamPost paramPost = new ParamPost();

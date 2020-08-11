@@ -12,13 +12,13 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 public interface ApostRepository extends JpaRepository<Apost, Long> {
-    List<Apost> findByWriter(String writer);
+    List<Apost> findByMember_Nickname(String writer);
 
     List<OnlyApostMapping> findByQpost(Qpost qpost);
 
     List<OnlyApostMapping> findByApostId(long apost_id);
 
-    List<OnlyApostMapping> findAllByWriter(String writer);
+    List<OnlyApostMapping> findAllByMember_Nickname(String writer);
 
     @Modifying
     @Transactional
