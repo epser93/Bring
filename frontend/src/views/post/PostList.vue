@@ -80,8 +80,12 @@ export default {
     gotoQuestionDetail(post) {
       this.$router.push({ name : "QuestionDetail" , params: { nickname : post.member_nickname, qpostId : post.qpostId }})
     },
+    // gotoUserInfo(userNickname) {
+    //   this.$router.push({ name : "MyBlog" , params: { nickname : userNickname }})
+    // },
     gotoUserInfo(userNickname) {
-      this.$router.push({ name : "MyBlog" , params: { nickname : userNickname }})
+      console.log(userNickname)
+      this.$router.push({ name : "Profile" , params: { userNickname : userNickname }})
     },
     getRanking() {
       axios.get(`${BACK_URL}/member/rank`)
