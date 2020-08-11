@@ -117,8 +117,8 @@ public class MemberController {
             createdAt.add(oam.getCreatedAt());
         }
 
-        if(logined.get().getMsrl() != member.getMsrl()) { //프로필 주인이 아니면~
-            if(logined.isPresent()) {
+        if(logined.isPresent()) {
+            if(logined.get().getMsrl() != member.getMsrl()) { //프로필 주인이 아니면~
                 amIIn = followService.isFollowed(logined.get(), member); //로그인 사용자가 조회하려는 유저를 팔로우했으면 true, 아니면 false
                 amIInTheList.add(amIIn);
                 result.add(responseService.getListResult(profile)); //조회하려는 멤버와 불린값 맵 설정
@@ -135,9 +135,23 @@ public class MemberController {
                     img.add(filePath);
                     result.add(responseService.getListResult(img)); //프로필 사진
                 }
+            } else { //프로필 본인이면~(마이페이지)
+                result.add(responseService.getListResult(profile)); //내 정보
+                result.add(responseService.getListResult(followService.followingList(member))); //팔로잉 리스트(조회하려는 멤버가 구독중인 멤버 리스트)
+                result.add(responseService.getListResult(followService.followersList(member))); //팔로워 리스트(조회하려는 멤버를 구독중인 멤버 리스트)
+                result.add(responseService.getListResult(createdAt)); //모든 포스트의 각 게시 시간
+                if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = "";
+                    if(profileImgDto != null) {
+                        filePath = profileImgDto.getImgFullPath();
+                    }
+                    img.add(filePath);
+                    result.add(responseService.getListResult(img)); //프로필 사진
+                }
             }
-        } else { //프로필 본인이면~(마이페이지)
-            result.add(responseService.getListResult(profile)); //내 정보
+        } else {
+            result.add(responseService.getListResult(profile)); //조회하려는 멤버 설정
             result.add(responseService.getListResult(followService.followingList(member))); //팔로잉 리스트(조회하려는 멤버가 구독중인 멤버 리스트)
             result.add(responseService.getListResult(followService.followersList(member))); //팔로워 리스트(조회하려는 멤버를 구독중인 멤버 리스트)
             result.add(responseService.getListResult(createdAt)); //모든 포스트의 각 게시 시간

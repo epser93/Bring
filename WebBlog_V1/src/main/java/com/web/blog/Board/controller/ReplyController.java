@@ -162,13 +162,20 @@ public class ReplyController {
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new); //로그인한 사용자
         Optional<Reply> reply = replyRepository.findById(replyId);
         Optional<ReplyMember> replyMember = replyMemberRepository.findByMemberAndReply(member, reply.get());
+        int like = 0;
         if (replyMember.isPresent() && likeit) {
             throw new CAlreadyLikedException();
         } else if (replyMember.isPresent() && !likeit) { //추천을 이미 한 사용자면서 추천을 취소하면
             replyService.likeThisReply(member, reply.get(), likeit);
+            List<OnlyReplyMapping> findReply = replyService.getOneReply(replyId);
+            OnlyReplyMapping onlyReplyMapping = findReply.get(0);
+            like = onlyReplyMapping.getLikes();
         } else {
             if (!member.getNickname().equals(replyer) && likeit) { //로그인 한 사용자가 댓글 작성자가 아니고~
                 replyService.likeThisReply(member, reply.get(), likeit);
+                List<OnlyReplyMapping> findReply = replyService.getOneReply(replyId);
+                OnlyReplyMapping onlyReplyMapping = findReply.get(0);
+                like = onlyReplyMapping.getLikes();
             } else if (member.getNickname().equals(replyer)) throw new COwnerCannotLike();
         }
     }

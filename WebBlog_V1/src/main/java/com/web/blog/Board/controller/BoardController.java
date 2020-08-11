@@ -156,7 +156,8 @@ public class BoardController {
                         }
                         filePaths.add(filePath);
                     } else {
-
+                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
+                        filePaths.add(filePath);
                     }
                 }
                 cnt++;
@@ -179,7 +180,8 @@ public class BoardController {
                         }
                         filePaths.add(filePath);
                     } else {
-
+                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
+                        filePaths.add(filePath);
                     }
                 }
 
@@ -234,7 +236,8 @@ public class BoardController {
                             }
                             filePaths.add(filePath);
                         } else {
-
+                            String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
+                            filePaths.add(filePath);
                         }
                     }
                     cnt++;
@@ -257,7 +260,8 @@ public class BoardController {
                             }
                             filePaths.add(filePath);
                         } else {
-
+                            String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
+                            filePaths.add(filePath);
                         }
                     }
                 }
@@ -308,7 +312,8 @@ public class BoardController {
                         }
                         filePaths.add(filePath);
                     } else {
-
+                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
+                        filePaths.add(filePath);
                     }
                 }
                 cnt++;
@@ -331,7 +336,8 @@ public class BoardController {
                         }
                         filePaths.add(filePath);
                     } else {
-
+                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
+                        filePaths.add(filePath);
                     }
                 }
             }
@@ -382,7 +388,8 @@ public class BoardController {
                         }
                         filePaths.add(filePath);
                     } else {
-
+                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
+                        filePaths.add(filePath);
                     }
                 }
                 cnt++;
@@ -405,7 +412,8 @@ public class BoardController {
                         }
                         filePaths.add(filePath);
                     } else { //없으면~
-
+                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
+                        filePaths.add(filePath);
                     }
                 }
             }
@@ -458,7 +466,8 @@ public class BoardController {
                         }
                         filePaths.add(filePath);
                     } else {
-
+                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
+                        filePaths.add(filePath);
                     }
                 }
                 cnt++;
@@ -482,7 +491,8 @@ public class BoardController {
                         }
                         filePaths.add(filePath);
                     } else {
-
+                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
+                        filePaths.add(filePath);
                     }
                 }
             }
@@ -534,7 +544,8 @@ public class BoardController {
                         }
                         filePaths.add(filePath);
                     } else {
-
+                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
+                        filePaths.add(filePath);
                     }
                 }
                 cnt++;
@@ -774,8 +785,9 @@ public class BoardController {
             post = postService.updatePost(boardName, postId, member.getMsrl(), paramPost);
         }
         if (!tags.isEmpty()) {
+            tagService.deleteTags(post);
             for (String tag : tags) {
-                tagService.updateTag(post, tag);
+                tagService.insertTags(post, tag);
             }
         }
         result.add(responseService.getSingleResult(post));

@@ -8,17 +8,23 @@ import com.web.blog.Common.advice.exception.CUserExistException;
 import com.web.blog.Common.config.security.JwtTokenProvider;
 import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.service.ResponseService;
+import com.web.blog.Common.service.S3Service;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.model.LoginParam;
+import com.web.blog.Member.model.ProfileImgDto;
 import com.web.blog.Member.model.SignupParam;
 import com.web.blog.Member.repository.MemberRepository;
 import com.web.blog.Member.service.EmailService;
 import com.web.blog.Member.service.KakaoService;
+import com.web.blog.Member.service.ProfileImgService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +33,19 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.commons.CommonsMultipartFile;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -45,6 +60,8 @@ public class SignController {
     private final PasswordEncoder passwordEncoder;
     private final BoardService boardService;
     private final KakaoService kakaoService;
+    private final S3Service s3Service;
+    private final ProfileImgService profileImgService;
 
     private static final Logger logger = LoggerFactory.getLogger(SignController.class);
     @Autowired
@@ -67,7 +84,7 @@ public class SignController {
 
     @ApiOperation(value = "회원가입", notes = "회원가입")
     @PostMapping("/up")
-    public CommonResult register(@Valid @RequestBody SignupParam signupParam) {
+    public CommonResult register(@Valid @RequestBody SignupParam signupParam) throws IOException {
         String id = signupParam.getUid();
         String password = signupParam.getPassword1();
         String passwordChk = signupParam.getPassword2();
@@ -95,7 +112,28 @@ public class SignController {
                 .nickname(nickname)
                 .roles(Collections.singletonList("ROLE_USER"))
                 .build());
+        Optional<Member> newUser = repository.findByNickname(nickname);
         boardService.createBoard(id, "나의 Answers");
+//        URL url = new URL("https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg");
+//        File file = new File("");
+//        FileUtils.copyURLToFile(url, file);
+        URL url = new URL("https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg");
+        BufferedImage img = ImageIO.read(url);
+        File file = new File("default_img.jpg");
+        ImageIO.write(img, "jpg", file);
+        FileItem fileItem = new DiskFileItem("mainFile", Files.probeContentType(file.toPath()), false, file.getName(), (int) file.length(), file.getParentFile());
+        try {
+            IOUtils.copy(new FileInputStream(file), fileItem.getOutputStream());
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        MultipartFile multipartFile = new CommonsMultipartFile(fileItem);
+        String imgPath = s3Service.upload(multipartFile, newUser.get().getMsrl(),999, newUser.get().getNickname());
+        ProfileImgDto profileImgDto = new ProfileImgDto();
+        profileImgDto.setFilePath(imgPath);
+        profileImgDto.setMsrl(newUser.get().getMsrl());
+        profileImgService.savePost(profileImgDto);
         return responseService.getSuccessResult();
     }
 
