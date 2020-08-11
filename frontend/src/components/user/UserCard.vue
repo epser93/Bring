@@ -14,11 +14,24 @@
                         <span><a href="" style="color:gray"><i class="fas fa-user-friends"></i> {{userInfo.followersCnt}} follower</a></span>
                         <span> · </span>
                         <span><a href="" style="color:gray"> {{userInfo.followingCnt}} follower</a></span>
-                        
-                        <button class="btn btn-outline-info btn-sm mx-1 mt-2" @click="gotoEdit">
-                            <i class="fas fa-user-tie"></i> Edit profile
-                        </button>
-                        <br>
+                        <div v-if="loginNickname == userNickname"> 
+                            <button class="btn btn-outline-info btn-sm mx-1 mt-2" @click="gotoEdit">
+                                <i class="fas fa-user-tie"></i> Edit profile
+                            </button>
+                        </div>
+                        <div v-else>
+                            <div v-if="userFCheck==false">
+                                <button class="btn btn-outline-success btn-sm mx-1 mt-2" @click="doFollow">
+                                    <i class="fas fa-user-tie"></i> 팔로우 하기
+                                </button>
+                            </div>
+                            <div v-else>
+                                <button class="btn btn-outline-danger btn-sm mx-1 mt-2" @click="unFollow">
+                                    <i class="fas fa-user-tie"></i> 팔로우 취소
+                                </button>
+                            </div>
+                        </div>
+                  
 
                     </div>
 
@@ -60,15 +73,14 @@
                     </div>
                 </div>
                 <hr>
-        <!--  TIL  이거 주소다 있음  -->
-        <!-- https://github.com/julienr114/vue-calendar-heatmap#usage -->
+        <!--  TIL   -->
             <h4><b>Today I Post</b></h4>
             
             <calendar-heatmap
             :values="valPostList"
             :end-date= "todays"
             tooltip-unit="posts"
-            :max="4"
+            :max="10"
             :range-color="['ebedf0', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']" />
             <!-- :range-color="['ebedf0', 'dae2ef', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']" -->
             <hr>
@@ -108,9 +120,12 @@ export default {
         //changeNickname: null,
         loginNickname: null,
         userNickname: null,
-        userInfo: null,
-        userPostList:[],
-        userThumbnail: null,
+        userInfo: null, // 0번
+        userFCheck: null, // 1번
+        userFerList: null, // 2번
+        userFingList: null, // 3번
+        userPostList:[], // 4번
+        userThumbnail: null, // 5번
         userScore: '',
         userRank: [],
         allUsers: '', // 회원가입한 전체 User 수
@@ -128,7 +143,11 @@ export default {
     changeNickname: {
         type: String,
         default: null
-    }
+    },
+    // userNickname: {
+    //     type: String,
+    //     default: null
+    // }
   },
   
   created() {
@@ -137,25 +156,21 @@ export default {
         'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
         }
     }
+    
+    this.userNickname = this.$route.params.userNickname
+    console.log(this.loginNickname)
     this.loginNickname = this.$cookies.get('nickname')
-    // console.log("파람")
-    // console.log(this.$route.params.changeNickname)
-    // console.log(this.changeNickname)
-    this.userNickname = this.$cookies.get('nickname')
-    // if(this.$route.params.changeNickname != null){
-    //     this.userNickname = this.$route.params.changeNickname
-    // }
-    // else{
-    //     this.userNickname = this.$cookies.get('nickname') // 나  일단 이걸로 사용 그 다음에는 넘겨줄때의 nickname으로 대체해야함
-    // }
-    // user정보 가져오기
+
     axios.get(`${BACK_URL}/member/${this.userNickname}/profile`,config)
     .then(res => {
-        // console.log(res)
+        console.log(res)
         this.userInfo = res.data.list[0].list[0]
-        this.userPostList = res.data.list[3].list
-        this.userThumbnail = res.data.list[4].list[0]
-        
+        this.userFCheck = res.data.list[1].list[0]
+        this.userFerList = res.data.list[2]
+        this.userFingList = res.data.list[3]
+        this.userPostList = res.data.list[4].list
+        this.userThumbnail = res.data.list[5].list[0]
+       
         for(var i=0; i<this.userPostList.length; i++){
             this.userPostList[i] = moment(this.userPostList[i], "YYYY-MM-DD").format().slice(0,10)
             if(this.userPostList[i] in this.cntPostList){
@@ -166,31 +181,10 @@ export default {
             }
         }
         for(var key in this.cntPostList){
-            console.log("vhvh")
             var tmp = {date:key, count:this.cntPostList[key]}
             this.valPostList.push(tmp)
-            console.log(this.valPostList)
-            console.log(this.cntPostList[key])
-            console.log(this.valPostList)
-            console.log("vhvh")
-        }
-        console.log("아래는 딕셔너리로 뽑기")
-        console.log(this.cntPostList)
-        console.log("위에는 딕셔너리로 뽑기")
-        
-
-        console.log("유저 정보")
-        console.log(this.userInfo)
-        console.log("유저 게시글 날짜")
-        console.log(this.userPostList)
-        console.log("유저 썸네일")
-        console.log(this.userThumbnail)
-         
+        }         
         this.userScore = this.userInfo.score
-
-        console.log("유저 점수")
-        console.log(this.userScore)
-
     })
     .catch((err) => {
         console.error(err)
@@ -199,30 +193,29 @@ export default {
     // 유저 랭크 가져오기
     axios.get(`${BACK_URL}/member/rank`)
     .then(res => {
-        console.log("유저 랭크")
-        // console.log(res)
         this.userRank = res.data.list
         this.allUsers = this.userRank.length
-        console.log(this.userRank)
+    })
+    .catch((err) => {
+        console.error(err)
+    }),
+
+    // 팔로우 목록 가져오기
+    axios.get(`${BACK_URL}/follow/ings/${this.userNickname.msrl}`)
+    .then(res => {
+        console.log(res)
     })
     .catch((err) => {
         console.error(err)
     })
+
   },
 
   watch: {
       
   },
   computed: {
-    // computedPost(){
-    // // 유저 게시글 날짜 계산
-    //     for(var i=0; this.userPostList.length; i++){
-    //         let tmp = this.userPostList[i]
-    //     }
-    //     return 0
-    // },
     computedScore(){
-          // console.log('computed');
           const bronze = 0;
           const silver = 30;
           const gold = 60;
@@ -341,21 +334,44 @@ export default {
     callFunction() {  
         var currentDateWithFormat = new Date().toJSON().slice(0,10);
         this.todays = currentDateWithFormat
-        console.log(currentDateWithFormat);
-        console.log(this.today + "ㅅㅅㅅㅅㅅ")
-     
       },
       gotoEdit() {
           this.$router.push({ name : "Edit" })
-      }
+      },
+      doFollow() {
+        const config = {
+            headers: {
+                'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
+                }
+        }
+        axios.post(`${BACK_URL}/follow/${this.userInfo.msrl}`, config)
+            .then(() => {
+                console.log("팔로우완료")
+            })
+            .catch((err) => {
+                console.error(err)
+            })
+        },
+        unFollow() {
+        const config = {
+            headers: {
+                'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
+                }
+        }
+        axios.delete(`${BACK_URL}/follow/${this.userInfo.msrl}`, config)
+            .then(() => {
+                console.log("팔로우취소")
+            })
+            .catch((err) => {
+                console.error(err)
+            })
+        },
   },
   mounted () {
       this.callFunction()
     }
-
-
-
-};
+  
+}
 </script>
 
 <style scoped>
