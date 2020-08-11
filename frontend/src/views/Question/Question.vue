@@ -15,10 +15,11 @@
         
         </b-jumbotron>
         <hr>
-
+        
         <div class="container">
             <ul >
                 <li v-for="qArticle in qPost" :key="qArticle.qpostId">
+                    
                     번호: {{qArticle.qpostId}}
                     제목: {{qArticle.subject}}
                     <h5>내용: {{qArticle.content}}</h5>
@@ -72,16 +73,21 @@ export default {
     methods:{
         // 전체 질문 리스트 최신글
         getAllQna() {
-            console.log(this.qPost)
-            axios.get(`${BACK_URL}/questions/recent`)
+            const config={
+                headers:{
+                    'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN')
+                }
+            }
+            axios.get(`${BACK_URL}/questions/recent`,config)
             .then(res => {
+                console.log(res)
                 this.qPost = res.data.list
-                
             })
             .catch(err => {
                 console.log(err)
             })
         },
+        // 게시물 디테일 페이지로 이동
         getQnaDetail(qArticle){
             this.$router.push({ name: 'QuestionDetail', params: {nickname: qArticle.writer, qpostId: qArticle.qpostId}})
         }
