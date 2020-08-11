@@ -23,7 +23,7 @@
                     제목: {{qArticle.subject}}
                     <h5>내용: {{qArticle.content}}</h5>
                     <!-- 태그: {{qArticle.tags}} -->
-                    글쓴이: {{qArticle.writer}}
+                    글쓴이: {{qArticle.member_nickname}}
                     조회수: {{qArticle.views}}
                     
                     <!--heart icon-->
@@ -83,7 +83,7 @@ export default {
             })
         },
         getQnaDetail(qArticle){
-            this.$router.push({ name: 'QuestionDetail', params: {nickname: qArticle.writer, qpostId: qArticle.qpostId}})
+            this.$router.push({ name: 'QuestionDetail', params: {nickname: qArticle.member_nickname, qpostId: qArticle.qpostId}})
         }
     },
     created(){

@@ -15,7 +15,8 @@
             <div class="text-left ml-5 mt-5" v-if="postList.length == 0">
                 <h3>현재 등록된 글이 없습니다</h3>
             </div>
-            <div class="row">
+            <div class="row"
+            >
                 <div v-for="(item, index) in postList" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
                     <div class="card" style="width: 75%;">
                         <img class="card-img-top" :src="cardImage" alt="Card image cap">
@@ -128,7 +129,7 @@ export default {
 
         // 포스트 디테일
         gotoDetail(post) {
-            this.$router.push({ name : "QuestionDetail" , params: { nickname : post.writer, qpostId : post.qpostId }})
+            this.$router.push({ name : "QuestionDetail" , params: { nickname : post.member_nickname, qpostId : post.qpostId }})
         },    
 
         // 좋아요
@@ -141,7 +142,7 @@ export default {
             }
             // 좋아요 현 상태로 구분
             if (likeit === false) {
-                axios.post(`${BACK_URL}/blog/${post.writer}/like/${post.postId}`, likeit, config)
+                axios.post(`${BACK_URL}/blog/${post.member_nickname}/like/${post.postId}`, likeit, config)
                     .then(res => {
                         // 좋아요 수 바꾸기(화면에서)
                         this.$refs[`like-count-${post.postId}`][0].innerText = res.data.data    
@@ -151,7 +152,7 @@ export default {
                         console.log(err)
                     })   
             } else {
-                axios.post(`${BACK_URL}/blog/${post.writer}/like/${post.postId}`, likeit, config)
+                axios.post(`${BACK_URL}/blog/${post.member_nickname}/like/${post.postId}`, likeit, config)
                     .then(res => {
                         // 좋아요 수 바꾸기(화면에서)
                         this.$refs[`like-count-${post.postId}`][0].innerText = res.data.data   

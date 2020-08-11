@@ -11,7 +11,7 @@
                 <b-col></b-col>
             <b-col>
                 
-                작성자: {{qPost.writer}}
+                작성자: {{qPost.member_nickname}}
                 <span class="text-muted ">작성시간: {{qPost.createdAt}}</span>
 
             </b-col>
@@ -31,7 +31,7 @@
                       <div class="col">
                           
                           <!-- 분기처리/ 작성자와 현재 사용자의 이름이 같으면 삭제표시되게끔-->
-                          <div v-if="this.nickname===qPost.writer">
+                          <div v-if="this.nickname===qPost.member_nickname">
                           <b-button @click="deleteQna" class="mr-1" ><b-icon icon="trash"></b-icon> 삭제</b-button>
                           <b-button @click="modifyQna(qpost_id)" variant="warning" class="ml-2">수정</b-button>
                           
@@ -46,12 +46,12 @@
         
 
         <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded" v-for="aArticle in aPost" :key="aArticle.aPostId">
-            <p>글쓴이: {{aArticle.writer}}<span class="ml-5"> 좋아요 수: {{aArticle.likes}}</span></p> 
+            <p>글쓴이: {{aArticle.member_nickname}}<span class="ml-5"> 좋아요 수: {{aArticle.likes}}</span></p> 
             <span>채택여부: {{aArticle.selected}}</span>
             
-            <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="nickname===aArticle.writer">삭제</b-button>
+            <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="nickname===aArticle.member_nickname">삭제</b-button>
              
-            <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="nickname===qPost.writer">채택</b-button>
+            <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="nickname===qPost.member_nickname">채택</b-button>
  
             <hr>
             {{aArticle.answer}}
@@ -78,7 +78,7 @@
             <!-- 누르면 새로 렌더해주게끔 로직짜야함-->
             
         </span>
-        <span v-else-if="this.nickname!=qPost.writer">
+        <span v-else-if="this.nickname!=qPost.member_nickname">
             <button class="btn btn-success btn-sm mx-1" @click='commentOpen' >답변창 열기</button>
         </span>
 
@@ -219,8 +219,8 @@ export default {
             if (likeit === false) {
                 console.log(aArticle)
                 console.log(aArticle.apostId)
-                console.log(aArticle.writer)
-                axios.post(`${BACK_URL}/answers/like/${aArticle.apostId}/${aArticle.writer}`,likeit,config)
+                console.log(aArticle.member_nickname)
+                axios.post(`${BACK_URL}/answers/like/${aArticle.apostId}/${aArticle.member_nickname}`,likeit,config)
                     .then(res=>{
                         console.log(res)
                         this.$refs[`like-count-${aArticle.apostId}`][0].innerText = res.data.data
@@ -232,7 +232,7 @@ export default {
             }else{
                 console.log(aArticle)
                 
-                axios.post(`${BACK_URL}/answers/like/${aArticle.apostId}/${aArticle.writer}`,likeit,config)
+                axios.post(`${BACK_URL}/answers/like/${aArticle.apostId}/${aArticle.member_nickname}`,likeit,config)
                     .then(res=>{
                         this.$refs[`like-count-${aArticle.apostId}`][0].innerText = res.data.data 
                         this.getAnswer()
