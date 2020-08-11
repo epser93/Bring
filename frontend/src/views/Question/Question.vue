@@ -22,13 +22,14 @@
                     
                     번호: {{qArticle.qpostId}}
                     제목: {{qArticle.subject}}
+                    태그: {{qArticle.tags}}
                     <h5>내용: {{qArticle.content}}</h5>
                     <!-- 태그: {{qArticle.tags}} -->
                     글쓴이: {{qArticle.member_nickname}}
                     조회수: {{qArticle.views}}
+                    작성시간: {{qArticle.createdAt}}
                     
                     <!--heart icon-->
-                <b-icon icon="heart" scale="1"></b-icon>
                 <p><button class="btn btn-primary" @click="getQnaDetail(qArticle)">글 자세히</button></p>
                 </li>
                 
@@ -80,8 +81,9 @@ export default {
             }
             axios.get(`${BACK_URL}/questions/recent`,config)
             .then(res => {
-                console.log(res)
-                this.qPost = res.data.list
+                console.log(res.data.list)
+                console.log(res.data.list[0].list)
+                this.qPost = res.data.list[0].list
             })
             .catch(err => {
                 console.log(err)

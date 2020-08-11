@@ -40,6 +40,12 @@
     <!-- 글 에디터 부분 -->
     <v-md-editor class="text-left" v-model="aboutText.post.content" height="600px"></v-md-editor>
     <br>
+
+    <!-- 태그 -->
+    <div class="tag">
+      <span v-for="(tag,index) in aboutText.post.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2" @click="deleteTag(index)">{{ tag }}</span>
+    </div>
+    <input placeholder="태그를 입력해주세요" class="mb-5 tag-input" type="text" v-model="tag" @keydown.enter="postTag">
     
   </div>
 </template>
@@ -62,13 +68,14 @@ export default {
         post: {
                 content: "",
                 subject: "",
-                tags: ['']
+                tags: []
               },
         nickname: this.$route.params.nickname,
         
       },
       categoryList: [],
       thumbnail: '',
+      tag: null,
     }
   },
   methods: {
@@ -90,6 +97,18 @@ export default {
             alert('필수 항목을 모두 입력해 주세요')
             console.error(err)
           })
+    },
+    postTag() {
+      if (!this.aboutText.post.tags.includes(this.tag)) {
+        this.aboutText.post.tags.push(this.tag)
+        this.tag = ""
+      } else {
+        alert('중복된 태그입니다.')
+        this.tag= ""
+      }
+    },
+    deleteTag(index) {
+      this.aboutText.post.tags.splice(index,1)
     },
     getCategory() {
         axios.get(`${BACK_URL}/blog/${this.aboutText.nickname}/categories`)
@@ -135,7 +154,15 @@ export default {
   }
 };
 </script>
+<style scoped>
+.tag-input {
+  width: 100%
+}
 
+.badge {
+  cursor: pointer;
+}
+</style>
 
 
 

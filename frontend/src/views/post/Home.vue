@@ -62,7 +62,7 @@ export default {
         } else {
           axios.get(`${BACK_URL}/questions/recent`, config)
             .then (res => {
-              this.posts = res.data.list
+              this.posts = res.data.list[0].list
             })
         }
       } else {
@@ -71,7 +71,7 @@ export default {
             .then (res => {
               this.posts = res.data.list[0].list
               if (res.data.list[2].list[0]) {
-                this.thumbnail = res.data.list[2].list[0]
+                this.thumbnail = res.data.list[2].list
               } 
             })
             .catch (err => console.log(err))
@@ -89,7 +89,7 @@ export default {
       mode: "blog",
       modeText : 'QnA',
       posts: [],
-      thumbnail: []
+      thumbnail: ''
     }
   }
 }
