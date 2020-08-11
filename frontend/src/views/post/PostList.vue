@@ -85,7 +85,7 @@ export default {
     // },
     gotoUserInfo(userNickname) {
       console.log(userNickname)
-      this.$router.push({ name : "Profile" , params: { userNickname : userNickname }})
+      this.$router.push({ name : "Profile" , query: { nickname : userNickname }})
     },
     getRanking() {
       axios.get(`${BACK_URL}/member/rank`)
