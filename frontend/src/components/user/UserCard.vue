@@ -151,7 +151,7 @@ export default {
         }
     }
     
-    this.userNickname = this.$route.params.userNickname
+    this.userNickname = this.$route.query.nickname
     console.log(this.loginNickname)
     this.loginNickname = this.$cookies.get('nickname')
 
@@ -301,6 +301,7 @@ export default {
         const myNick = this.userInfo.nickname
         const lenUserList = this.allUsers
         let ranks = this.userRank
+        console.log(ranks)
         let rank = 0
         ranks.sort(compareSecondColumn);
 

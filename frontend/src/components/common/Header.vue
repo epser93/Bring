@@ -17,7 +17,7 @@
                         <router-link v-if="!isLogin" :to="{ name: 'Signup' }" class="nav-link">회원가입</router-link>
                     </li>
                     <li class="nav-item">
-                        <router-link v-if="isLogin" :to="{ name: 'Profile', params: { userNickname: this.nickname }}" class="nav-link">프로필</router-link> 
+                        <router-link v-if="isLogin" :to="{ name: 'Profile', query: { nickname: this.nickname }}" class="nav-link">프로필</router-link> 
                     </li>
                     <li class="nav-item">
                         <router-link v-if="isLogin" :to="{ name: 'MyBlog', params: { nickname: this.nickname }}" class="nav-link">블로그</router-link> 
