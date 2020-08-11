@@ -66,8 +66,9 @@
             <small :ref="'like-count-' + aArticle.apostId">{{ aArticle.likes }}</small><small>개의 좋아요</small>
             
             <!-- 답변 수정-->
-            
-            <b-button variant="warning" @click='modifyAnswer(aArticle.apostId)' v-if="nickname===aArticle.member_nickname">수정</b-button>
+            <b-button variant="warning" @click='commentOpen' v-if="nickname===aArticle.member_nickname">수정</b-button>
+
+            <!-- <b-button variant="warning" @click='modifyAnswer(aArticle.apostId)' v-if="nickname===aArticle.member_nickname">수정</b-button> -->
 
         </div>
 
@@ -81,7 +82,8 @@
                     v-model="answerData.answer"
                 ></b-form-textarea>
             </div>
-            <button class="btn btn-success btn-sm mx-1" @click='writeAnswer' >답변 달기</button>
+            <button class="btn btn-success btn-sm mx-1" v-if="answerUpdate" @click='writeAnswer' >답변 달기</button>
+            <button class="btn btn-success btn-sm mx-1"  v-if="!answerUpdate" @click='writeAnswer' >답변 수정</button>
             <button class="btn btn-success btn-sm mx-1" @click='commentClose'>답변창 닫기</button>
             <!-- 누르면 새로 렌더해주게끔 로직짜야함-->
             
@@ -117,6 +119,7 @@ export default {
             },
             aPost:[],
             apost_id: this.$route.params.apostId,
+            answerUpdate:false,
            
             // 답변 추천(좋아요)
             answerer: this.$cookies.get('nickname'),
@@ -146,12 +149,13 @@ export default {
         },
         // 게시물 삭제
         deleteQna(){
-            
             const config = {
               headers: {
                 'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
               }
             }
+            const questionDelete = confirm("질문을 삭제 하시겠습니까?")
+            if (questionDelete===true) {
             axios.delete(`${BACK_URL}/questions/${this.qpost_id}`,config)
             .then(res=>{
                 console.log(res)
@@ -159,16 +163,17 @@ export default {
                 this.$router.push({ name: 'Question' })
             })
             .catch(err=>{
-                alert('답변이 등록 된 질문이거나 권한이 없습니다.')
+                alert('채택 된 질문이 있다면 삭제 할 수 없습니다')
                 console.log(err)
             })
+            }
         },
         // 게시물 수정
         modifyQna(qpost_id){
             console.log(this.qpost_id)
             this.$router.push({name:'QuestionUpdate', params:{qpostId: qpost_id}})
         },
-        // 답변 작성 (페이지 리로딩 하는 방식 고민해볼것)
+        // 답변 작성
         writeAnswer(){
             const config = {
               headers: {
@@ -180,8 +185,6 @@ export default {
                 this.getAnswer() // 페이지 리로딩
                 this.writeComment = false
                 this.answerData.answer=""
-                // 새로고침 하는 방법도 고민
-
                 console.log(res)
             })
             .catch(err=>{
@@ -207,6 +210,8 @@ export default {
                 'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
               }
             }
+            const askDelete = confirm("답변을 삭제 하시겠습니까?")
+            if (askDelete===true) {
             axios.delete(`${BACK_URL}/answers/${aPostId}`,config)
             .then(res=>{
                 alert('삭제가 완료 되었습니다.')
@@ -217,6 +222,7 @@ export default {
                 alert('권한이 없습니다.')
                 console.log(err)
             })
+            }
         },
         // 답변 추천(좋아요) 아직 안됨
         likeAnswer(aArticle,likeit){
@@ -275,7 +281,7 @@ export default {
             })
             }
         },
-        // 답변 수정
+        // 답변 수정 (더 고민)
         modifyAnswer(aPostId){
             const config={
                 headers:{

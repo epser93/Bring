@@ -15,28 +15,27 @@
         
         </b-jumbotron>
         <hr>
-        
-        <div class="container">
-            <ul >
-                <li v-for="qArticle in qPost" :key="qArticle.qpostId">
-                    
-                    번호: {{qArticle.qpostId}}
-                    제목: {{qArticle.subject}}
-                    태그: {{qArticle.tags}}
-                    <h5>내용: {{qArticle.content}}</h5>
-                    <!-- 태그: {{qArticle.tags}} -->
-                    글쓴이: {{qArticle.member_nickname}}
-                    조회수: {{qArticle.views}}
-                    작성시간: {{qArticle.createdAt}}
-                    
-                    <!--heart icon-->
-                <p><button class="btn btn-primary" @click="getQnaDetail(qArticle)">글 자세히</button></p>
-                </li>
-                
-            </ul>
-            
-             
 
+        <!-- 썸네일 default 값 고민해볼것-->
+        <div class="row">
+            <div v-for="(qArticle,index) in qPost" :key="qArticle.qpostId" class="p-0 mb-5 col-12 col-lg-3">
+                <div class="card" style="width: 18rem;">
+                    <img class="card-img-top" :src="thumbnail[index]" alt="Card image cap">
+                    <div class="card-body pb-0">
+                        <h5 class="card-title">{{ qArticle.subject.slice(0, 10) + '...'  }}</h5>
+                        <p class="card-text mb-3">{{ qArticle.content.slice(0, 20) + '...' }}</p>
+                        <!-- 태그: {{qArticle.tags}} -->
+                        <!-- 작성시간: {{qArticle.createdAt}} -->
+                        <h5>글쓴이: {{qArticle.member_nickname}} / 조회수:{{qArticle.views}} </h5>
+                    </div>
+                    <div class="card-footer bg-transparent">
+                        <button class="btn btn-primary" @click="getQnaDetail(qArticle)">글 자세히</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
             <!--pagination-->
             <div class="mt-5 container">
                 <div class="row justify-content-center">
@@ -45,10 +44,9 @@
             </div>
         
         </div>
-
-            <div class="container-fluid">
-              <router-view></router-view>
-            </div>
+        <div class="container-fluid">
+            <router-view></router-view>
+        </div>
     </div>
 </template>
 
@@ -68,8 +66,15 @@ export default {
             articles:10,
             count:5,
             qPost: [],
+            thumbnail: [],
       
       }
+    },
+    props:{
+        cardImage: {
+            type: String,
+            default: require("@/assets/img/card.jpg")
+        },
     },
     methods:{
         // 전체 질문 리스트 최신글
@@ -81,9 +86,8 @@ export default {
             }
             axios.get(`${BACK_URL}/questions/recent`,config)
             .then(res => {
-                console.log(res.data.list)
-                console.log(res.data.list[0].list)
-                this.qPost = res.data.list[0].list
+                this.thumbnail=res.data.list[1].list
+                this.qPost=res.data.list[0].list
             })
             .catch(err => {
                 console.log(err)
