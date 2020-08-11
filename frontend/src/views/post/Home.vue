@@ -7,7 +7,7 @@
       <router-link v-if="mode==='QnA'" :to="{ name: 'HotPost'}"><h4 class="d-inline ml-5">인기질문</h4></router-link>
     </div>
     <hr>
-    <router-view :mode="mode" :posts="posts"></router-view>
+    <router-view :mode="mode" :posts="posts" :thumbnail="thumbnail"></router-view>
     <div id="modeToggler">
       <button @click="changeMode">{{ modeText }}보러 가기</button>   
     </div>
@@ -53,6 +53,10 @@ export default {
           axios.get(`${BACK_URL}/blog/recent`, config)
             .then (res => {
               this.posts = res.data.list[0].list
+              if (res.data.list[2].list[0]) {
+                this.thumbnail = res.data.list[2].list
+              }
+              // console.log(this.thumbnail)
             })
             .catch (err => console.log(err))
         } else {
@@ -66,6 +70,9 @@ export default {
           axios.get(`${BACK_URL}/blog/recent`)
             .then (res => {
               this.posts = res.data.list[0].list
+              if (res.data.list[2].list[0]) {
+                this.thumbnail = res.data.list[2].list[0]
+              } 
             })
             .catch (err => console.log(err))
         } else {
@@ -82,6 +89,7 @@ export default {
       mode: "blog",
       modeText : 'QnA',
       posts: [],
+      thumbnail: []
     }
   }
 }

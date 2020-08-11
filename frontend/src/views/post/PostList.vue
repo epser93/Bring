@@ -1,10 +1,10 @@
 <template>
   <div class="wrapB container-fluid">
     <section v-if="mode==='blog'" class="cards row">
-      <div v-for="post in posts" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
+      <div v-for="(post, index) in posts" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
         <div class="cardwrap">
           <div class="card-body p-0" @click="gotoDetail(post)">
-            <div class="img-section">
+            <div class="img-section" :style="{ 'background-image' : `url(${thumbnail[index]})`}">
               <a href=""></a>
             </div>
             <div class="contents">
@@ -66,6 +66,7 @@ export default {
   props: {
     mode: String,
     posts: Array,
+    thumbnail : Array
   },
   data() {
     return {
@@ -86,7 +87,7 @@ export default {
       axios.get(`${BACK_URL}/member/rank`)
         .then(res => {
           this.unsortedRank = res.data.list
-          console.log(this.unsortedRank)
+          // console.log(this.unsortedRank)
         })
         .catch(err => console.log(err))
     }
@@ -147,6 +148,8 @@ h2 {
   width: 100%;
   height: 200px;
   background-image: url(https://picsum.photos/600/300/?image=25);
+  background-repeat : no-repeat;
+	background-size : 100% 100%;
   border-top-right-radius: 6px;
   border-top-left-radius: 6px;
   border: 1px solid rgba(0,0,0,0.1);
