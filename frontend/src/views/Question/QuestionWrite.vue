@@ -3,8 +3,12 @@
 <div class="container mb-5 ">
     <b-container class="mt-5">
       <h2>글쓰기</h2>
-      
       <hr>
+  <div class="row ml-1 mt-5 mb-5">
+      <label for="thumbnailInput">썸네일 : </label>
+      <input @change="thumbnailSelect" type="file" ref="thumbnailImage" id="thumbnailInput">
+    </div>
+
     <b-row class="my-1">
       <b-col sm="3">
         <label>제목</label>
@@ -42,9 +46,11 @@ export default {
           subject:"",       
           tags:[],
         },
+        thumbnail: '',
       }
     },
     methods: {
+      // 게시물 작성
       qnaWrite(){
         console.log(this.questionData)
         const config = {
@@ -55,12 +61,38 @@ export default {
         axios.post(`${BACK_URL}/questions/ask`,this.questionData,config)
         .then(res=>{
           console.log(res)
+          this.thumbnailPost()
           this.$router.push({name : 'Question'})
         })
         .catch(err=>{
           console.log(err)
         })
-      }
+      },
+      // 썸네일
+      thumbnailSelect() {
+        this.thumbnail = this.$refs.thumbnailImage.files[0]
+      },
+      // 썸네일 게시
+      thumbnailPost() {
+        const formData = new FormData()
+        formData.append('files', this.thumbnail)
+
+        const config = {
+            headers: {
+              'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
+              'Content-Type' : 'multipart/form-data'
+            }
+          }
+          axios.post(
+            `${BACK_URL}/questions/ask/uploads`, formData, config)
+            .then((res) =>{
+              console.log(res)
+            })
+            .catch((err) => {
+              console.error(err)
+            })      
+        }
+
     }
       }
 

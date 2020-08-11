@@ -60,7 +60,18 @@
             <span v-if="answerLike[aArticle.apostId]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="likeAnswer(aArticle, true)"><i class="fas fa-heart"></i></span>
             <span v-if="!answerLike[aArticle.apostId]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="likeAnswer(aArticle, false)"><i class="fas fa-heart"></i></span>
             <small :ref="'like-count-' + aArticle.apostId">{{ aArticle.likes }}</small><small>개의 좋아요</small>
-            {{answerLike}}
+            
+            <b-button variant="warning" @click='commentOpen' v-if="nickname===aArticle.writer">수정</b-button>
+            <div v-if="commentOpen">
+                <b-form-textarea
+                    id="textarea-rows"
+                    placeholder="Tall textarea"
+                    rows="8"
+                    v-model="answerData.answer"
+                ></b-form-textarea>
+            </div>
+
+            <b-button variant="warning" @click="modifyAnswer(aArticle.apostId)" v-if="nickname===aArticle.writer">수정</b-button>
         </div>
 
         <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded">
@@ -116,9 +127,11 @@ export default {
         }
      },
     methods: {
+        // 답변창 열기
         commentOpen() {
             this.writeComment = true
         },
+        // 답변창 닫기
         commentClose() {
             this.writeComment = false
         },
@@ -251,7 +264,7 @@ export default {
                     'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN')
                 }
             }
-            axios.post(`${BACK_URL}/answers/select/${aPostId}`,config)
+            axios.post(`${BACK_URL}/answers/select/${aPostId}`,this.answerData,config)
             .then(res=>{
                 alert("채택 되었습니다")
                 this.getAnswer()
@@ -262,6 +275,22 @@ export default {
                 alert("더 이상 답변을 채택할 수 없습니다")
             })
         },
+        // 답변 수정
+        modifyAnswer(aPostId){
+            const config={
+                headers:{
+                    'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN')
+                }
+            }
+            axios.put(`${BACK_URL}/answers/${aPostId}`,config)
+            .then(res=>{
+                console.log(res)
+            })
+            .catch(err=>{
+                console.log(err)
+            })
+        },
+        
         
     },
     
