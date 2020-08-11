@@ -62,7 +62,7 @@ export default {
         } else {
           axios.get(`${BACK_URL}/questions/recent`, config)
             .then (res => {
-              this.posts = res.data.list
+              this.posts = res.data.list[0].list
             })
         }
       } else {
