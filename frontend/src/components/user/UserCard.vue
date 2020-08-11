@@ -9,7 +9,10 @@
                         <div v-else>
                             <img class="rounded-circle mx-auto d-block" :src=userThumbnail alt="Card image cap" style="width:120px; height:120px;">
                         </div>
-                        <h5 class="text-sm-center mt-2 mb-1"><b class="mr-3">{{ userInfo.nickname }}</b></h5>
+                        <div class="d-flex justify-content-center">
+                            <h5 class="mt-2 mb-1"><b class="mr-3">{{ userInfo.nickname }}</b></h5>
+                            <button class="btn btn-success btn-sm" @click="gotoBlog"><i class="fas fa-home"></i></button>
+                        </div>
                         <div class="location text-sm-center"><i class="far fa-envelope"></i>  {{ userInfo.uid }}</div>
                         <span><a href="" style="color:gray"><i class="fas fa-user-friends"></i> {{userInfo.followersCnt}} follower</a></span>
                         <span> · </span>
@@ -364,6 +367,10 @@ export default {
                 console.error(err)
             })
         },
+      gotoBlog(){
+          this.$router.push({ name: 'MyBlog', params: { nickname: this.userNickname }})
+
+      }
   },
   mounted () {
       this.callFunction()
