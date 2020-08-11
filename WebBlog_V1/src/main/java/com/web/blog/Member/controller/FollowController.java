@@ -1,6 +1,5 @@
 package com.web.blog.Member.controller;
 
-import com.web.blog.Common.advice.exception.CUserExistException;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
 import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
@@ -37,6 +36,7 @@ public class FollowController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> member = memberRepository.findByUid(uid);
+        if(member.isPresent()) System.out.println("fasdfasdfasdgasgas");
         long from = member.get().getMsrl();
         if (from != msrl) {
             Member fromm = memberRepository.findById(from).orElseThrow(CUserNotFoundException::new);

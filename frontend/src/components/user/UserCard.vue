@@ -196,7 +196,7 @@ export default {
     }),
 
     // 팔로우 목록 가져오기
-    axios.get(`${BACK_URL}/follow/ings/${this.userNickname.msrl}`)
+    axios.get(`${BACK_URL}/follow/ings/${this.userInfo.msrl}`)
     .then(res => {
         console.log(res)
     })

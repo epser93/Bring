@@ -6,9 +6,11 @@ import com.web.blog.Board.repository.*;
 import com.web.blog.Common.advice.exception.CNotOwnerException;
 import com.web.blog.Common.advice.exception.CResourceNotExistException;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
+import com.web.blog.Common.model.Paging;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -100,8 +102,8 @@ public class BoardService {
 
     //게시판 내 포스트  list 조회
     @Transactional
-    public List<OnlyPostMapping> CategoryPostList(long board_id) {
-        return postRepository.findAllByBoard_BoardId(board_id);
+    public List<OnlyPostMapping> CategoryPostList(long board_id, Paging paging) {
+        return postRepository.findAllByBoard_BoardId(board_id, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
     }
 
     //한 게시판 내의 게시글 전체 삭제
