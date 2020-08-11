@@ -15,6 +15,7 @@
     "core-js": "^3.6.5",
     "lodash": "^4.17.19",
     "marked": "^1.1.1",
+    "moment": "^2.27.0",
     "url-search-params-polyfill": "^8.1.0",
     "vue": "^2.6.11",
     "vue-calendar-heatmap": "^0.8.4",

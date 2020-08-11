@@ -61,18 +61,18 @@
                 </div>
                 <hr>
         <!--  TIL  이거 주소다 있음  -->
-            ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>                                
-            <br>
-            <br>
-            <br>
-            ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-               <hr>
+        <!-- https://github.com/julienr114/vue-calendar-heatmap#usage -->
+            <h4><b>Today I Post</b></h4>
             
+            <calendar-heatmap
+            :values="valPostList"
+            :end-date= "todays"
+            tooltip-unit="posts"
+            :max="4"
+            :range-color="['ebedf0', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']" />
+            <!-- :range-color="['ebedf0', 'dae2ef', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']" -->
+            <hr>
+            {{computedPost}}
 
         <!-- 여기다가는 chart 할거임 이것도 -->
             ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
@@ -92,12 +92,17 @@
 
 <script>
 import axios from 'axios'
+import moment from 'moment'
+import { CalendarHeatmap } from 'vue-calendar-heatmap'
 
 const BACK_URL = 'http://127.0.0.1:8080'
 
 export default {
   name: "UserCard",
-
+  components:{
+      CalendarHeatmap
+  },
+    
   data() {
     return {
         //changeNickname: null,
@@ -109,6 +114,9 @@ export default {
         userScore: '',
         userRank: [],
         allUsers: '', // 회원가입한 전체 User 수
+        todays: null,
+        cntPostList: {},
+        valPostList: [],
     };
   },
 
@@ -148,6 +156,29 @@ export default {
         this.userPostList = res.data.list[3].list
         this.userThumbnail = res.data.list[4].list[0]
         
+        for(var i=0; i<this.userPostList.length; i++){
+            this.userPostList[i] = moment(this.userPostList[i], "YYYY-MM-DD").format().slice(0,10)
+            if(this.userPostList[i] in this.cntPostList){
+                this.cntPostList[this.userPostList[i]] += 1
+            }
+            else{
+                this.cntPostList[this.userPostList[i]] = 1
+            }
+        }
+        for(var key in this.cntPostList){
+            console.log("vhvh")
+            var tmp = {date:key, count:this.cntPostList[key]}
+            this.valPostList.push(tmp)
+            console.log(this.valPostList)
+            console.log(this.cntPostList[key])
+            console.log(this.valPostList)
+            console.log("vhvh")
+        }
+        console.log("아래는 딕셔너리로 뽑기")
+        console.log(this.cntPostList)
+        console.log("위에는 딕셔너리로 뽑기")
+        
+
         console.log("유저 정보")
         console.log(this.userInfo)
         console.log("유저 게시글 날짜")
@@ -169,7 +200,7 @@ export default {
     axios.get(`${BACK_URL}/member/rank`)
     .then(res => {
         console.log("유저 랭크")
-        console.log(res)
+        // console.log(res)
         this.userRank = res.data.list
         this.allUsers = this.userRank.length
         console.log(this.userRank)
@@ -177,10 +208,19 @@ export default {
     .catch((err) => {
         console.error(err)
     })
-
   },
 
+  watch: {
+      
+  },
   computed: {
+    // computedPost(){
+    // // 유저 게시글 날짜 계산
+    //     for(var i=0; this.userPostList.length; i++){
+    //         let tmp = this.userPostList[i]
+    //     }
+    //     return 0
+    // },
     computedScore(){
           // console.log('computed');
           const bronze = 0;
@@ -298,13 +338,21 @@ export default {
   
 
   methods : {
-      is_img() {
-          
+    callFunction() {  
+        var currentDateWithFormat = new Date().toJSON().slice(0,10);
+        this.todays = currentDateWithFormat
+        console.log(currentDateWithFormat);
+        console.log(this.today + "ㅅㅅㅅㅅㅅ")
+     
       },
       gotoEdit() {
           this.$router.push({ name : "Edit" })
       }
   },
+  mounted () {
+      this.callFunction()
+    }
+
 
 
 };
