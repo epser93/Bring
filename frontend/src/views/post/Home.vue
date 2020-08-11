@@ -89,7 +89,7 @@ export default {
       mode: "blog",
       modeText : 'QnA',
       posts: [],
-      thumbnail: ''
+      thumbnail: []
     }
   }
 }

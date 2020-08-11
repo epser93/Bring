@@ -15,10 +15,16 @@
     </b-row>
   <v-md-editor class="text-left" v-model="questionData.content" height="600px"></v-md-editor>
 
-<!--태그 추가-->
+<!-- 수빈 태그 추가
   <div>
     <b-form-tags input-id="tags-basic" v-model="questionData.tags" class="mb-2" label="파일 추가:" label-cols-sm="1"></b-form-tags>
+  </div> -->
+
+  <!--태그 추가-->
+  <div class="tag mt-3">
+    <span v-for="(tag,index) in questionData.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2" @click="deleteTag(index)">{{ tag }}</span>
   </div>
+  <input placeholder="태그를 입력해주세요" class="mb-5 tag-input" type="text" v-model="tag" @keydown.enter="postTag">
 
   <div>
     <b-button @click="modifyQuestion" variant="outline-primary">수정</b-button>
@@ -42,6 +48,9 @@ export default {
                 content:"",
                 subject:"",       
                 tags:[],
+
+                // 태그
+                tag:""
             },
         }
     },
@@ -68,11 +77,26 @@ export default {
             axios.get(`${BACK_URL}/questions/${this.qpost_id}`)
             .then(res => {
                 this.questionData.subject=res.data.list[0].list[0].subject
-                this.questionData.content=res.data.list[0].list[0].content                
+                this.questionData.content=res.data.list[0].list[0].content
+                // 태그
+                this.questionData.tags = res.data.list[1].list                  
             })
             .catch(err => {
                 console.log(err)
             })
+        },
+        // 태그
+        postTag() {
+          if (!this.questionData.tags.includes(this.tag)) {
+            this.questionData.tags.push(this.tag)
+            this.tag = ""
+          } else {
+            alert('중복된 태그입니다.')
+            this.tag= ""
+          }
+        },
+        deleteTag(index) {
+          this.questionData.tags.splice(index,1)
         },
     },
      created(){
@@ -86,6 +110,12 @@ export default {
 
 </script>
 
-<style>
+<style scoped>
+.badge {
+  cursor: pointer;
+}
 
+.tag-input {
+  width: 100%
+}
 </style>

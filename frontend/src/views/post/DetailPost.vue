@@ -316,4 +316,8 @@ export default {
   display: flex;
   justify-content: center;
 }
+
+.badge {
+  cursor: pointer;
+}
 </style>
