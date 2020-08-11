@@ -5,8 +5,8 @@
             <h5>태그</h5>
             <hr class="ml-0" style="width:70%;">
             <button id="category-all" @click="getAllPosts" type="button" class="btn mb-3 p-0 text-left">전체보기()</button>
-            <div id="category-menu" v-for="category in categoryList" :key="category.boardId">
-                <button type="button" class="btn mb-3 p-0">{{ category.name }}({{  }})</button>
+            <div id="category-menu" v-for="(tag, index) in tagList" :key="tag.boardId">
+                <button type="button" class="btn mb-3 p-0">{{ tag.name }}({{ tagNum[index] }})</button>
             </div>
         </div>
 
@@ -15,8 +15,7 @@
             <div class="text-left ml-5 mt-5" v-if="postList.length == 0">
                 <h3>현재 등록된 글이 없습니다</h3>
             </div>
-            <div class="row"
-            >
+            <div class="row">
                 <div v-for="(item, index) in postList" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
                     <div class="card" style="width: 75%;">
                         <img class="card-img-top" :src="cardImage" alt="Card image cap">
@@ -89,11 +88,16 @@ export default {
 
     methods: {
         getAllPosts() {
+            const config = {
+                headers: {
+                    'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
+                }
+            }
+
             this.categoryOn = 1
-            axios.get(`${BACK_URL}/questions/${this.nickname}/qlist`)
+            axios.get(`${BACK_URL}/questions/${this.nickname}/qlist`, config)
                 .then(res => {
                     // 포스트 정보
-                    console.log(res.data.list)
                     this.postList = res.data.list
                     // 포스트에 사용자가 좋아요를 눌렀는지에 대한 불린 값
                     // this.postLike1 = res.data.list
@@ -104,10 +108,12 @@ export default {
                 })
         },
        
-        getCategory() {
-            axios.get(`${BACK_URL}/blog/${this.nickname}/categories`)
+        getTags() {
+            this.msrl = this.$cookies.get('msrl')
+            axios.get(`${BACK_URL}/tags/list/${this.msrl}`)
                 .then(res => {
-                    this.categoryList = res.data.list
+                    this.tagList = res.data.list[0].list
+                    this.tagNum = res.data.list[1].list
                 })
                 .catch(err => {
                     console.log(err)
@@ -167,7 +173,7 @@ export default {
     
     created() {
         this.getAllPosts(),
-        this.getCategory()
+        this.getTags()
         
     },
     data() {
@@ -179,7 +185,9 @@ export default {
             postList: [],
             postListCategory: [],
             postListKeyword: [],
-            categoryList: [],
+            tagList: [],
+            tagNum: [],
+            msrl: '',
             currentCategory: '',
             
             // 검색 관련

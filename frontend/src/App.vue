@@ -25,6 +25,11 @@ export default {
     return {
       isLogin: false,
       userNickname: '',
+      forLogin: {
+        id : '',
+        password: '',
+      }
+
     } 
   },
   created() {
@@ -38,16 +43,17 @@ export default {
       this.$cookies.set('X-AUTH-TOKEN', token)
       this.isLogin = true
     },
-    setNickname(nickname) {
+    setNickname(nickname, msrl) {
       this.userNickname = nickname
       this.$cookies.set('nickname', nickname)
+      this.$cookies.set('msrl', msrl)
     },
     login(loginData) {
       axios.post(`${BACK_URL}/sign/in`, loginData)
         .then(res => {
           this.setCookie(res.data.data1)
           this.isLogin = true
-          this.setNickname(res.data.data2.nickname)
+          this.setNickname(res.data.data2.nickname, res.data.data2.msrl)
           this.$router.replace({ name : 'Home' })
           location.reload() // 새로고침이 답인가?
         })
@@ -62,6 +68,9 @@ export default {
       axios.post(`${BACK_URL}/sign/up`, signupData)
         .then(res => {
           console.log(res)
+          this.forLogin.id = signupData.uid
+          this.forLogin.password = signupData.password1
+          this.login(this.forLogin)
           this.$router.push('/')
         })
         .catch(err =>{
