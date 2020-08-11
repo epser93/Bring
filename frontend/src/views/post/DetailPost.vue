@@ -6,8 +6,8 @@
         <div class="info">
             <h1 class="mb-3">{{subject}}</h1>
             <div class="text-right">
-              <button class="btn btn-outline-warning btn-sm mx-1" v-if="(writer === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="updatePost"><b-icon icon="trash"></b-icon> 수정</button>
-              <button class="btn btn-outline-danger btn-sm mx-1" v-if="(writer === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="deletePost"><b-icon icon="trash"></b-icon> 삭제</button>
+              <button class="btn btn-outline-warning btn-sm mx-1" v-if="(member_nickname === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="updatePost"><b-icon icon="trash"></b-icon> 수정</button>
+              <button class="btn btn-outline-danger btn-sm mx-1" v-if="(member_nickname === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="deletePost"><b-icon icon="trash"></b-icon> 삭제</button>
           </div>
         </div>
         
@@ -20,7 +20,7 @@
 
         <!-- 포스트 정보 박스 -->
         <div class="bg-light" style="margin: 100px 0 50px;">
-            <span class="mr-2"><strong>{{ writer }}</strong></span>
+            <span class="mr-2"><strong>{{ member_nickname }}</strong></span>
             <span class="text-muted">{{ createdAt }}</span>
             <p>조회수: {{ views }}</p>
             
@@ -56,12 +56,12 @@
         <!-- 댓글 목록부분 -->
         <h3 class="mt-5">{{ recentlyComments.length }} Comments</h3>
         <div class="ml-3" v-for="comment in recentlyComments" :key="comment.replyId">
-          <p>{{ comment.writer }}</p>
+          <p>{{ comment.member_nickname }}</p>
           <p>{{ comment.reply }}</p>
           <small>이 댓글을{{ comment.likes}}명이 좋아합니다</small>
           <p>{{ comment.createdAt }}</p>
-          <button class="btn btn-outline-success btn-sm mx-1" v-if="$cookies.get('nickname') === comment.writer" @click="commentDelete(comment)">삭제</button>
-          <button class="btn btn-outline-success btn-sm" v-if="$cookies.get('nickname') === comment.writer" @click="openCommentUpdate(comment), setXY($event)">수정</button>
+          <button class="btn btn-outline-success btn-sm mx-1" v-if="$cookies.get('nickname') === comment.member_nickname" @click="commentDelete(comment)">삭제</button>
+          <button class="btn btn-outline-success btn-sm" v-if="$cookies.get('nickname') === comment.member_nickname" @click="openCommentUpdate(comment), setXY($event)">수정</button>
         </div>
     </div>
   </div>
@@ -85,7 +85,7 @@ export default {
             board_name : this.$route.params.boardName,
 
             subject: null,
-            writer: null,
+            member_nickname: null,
             content: null,
             createdAt: null,
             views: null,
@@ -158,7 +158,7 @@ export default {
           }
           const askDelete = confirm("정말 삭제하시겠습니까?")
           if (askDelete === true) {
-            if (comment.writer === this.$cookies.get('nickname')) {
+            if (comment.member_nickname === this.$cookies.get('nickname')) {
               axios.delete(`${BACK_URL}/reply/${comment.replyId}`, config)
                 .then(() => {
                   this.getComment()
@@ -173,13 +173,13 @@ export default {
         getComment() {
           axios.get(`${BACK_URL}/reply/${this.post_id}/replies`)
             .then(res => {
-              console.log(res)
+              console.log(res.data.list[0])
               this.comments = res.data.list
               })
             .catch(err => console.log(err))
         },
         updatePost() {
-          this.$router.push({ name : 'UpdateForm' , params: { nickname : this.writer, boardName : this.board_name, post_id : this.post_id}})
+          this.$router.push({ name : 'UpdateForm' , params: { nickname : this.member_nickname, boardName : this.board_name, post_id : this.post_id}})
         },
         fetchPost() {
           const config = {
@@ -189,7 +189,7 @@ export default {
           }
           axios.get(`${BACK_URL}/blog/${this.nickname}/${this.board_name}/${this.post_id}`,config)
             .then(res => {
-              this.writer = res.data.list[0].list[0].writer
+              this.member_nickname = res.data.list[0].list[0].member_nickname
               this.subject = res.data.list[0].list[0].subject
               this.content = res.data.list[0].list[0].content
               this.createdAt = res.data.list[0].list[0].createdAt
@@ -227,7 +227,7 @@ export default {
             // 좋아요 현 상태로 구분
             
             if (likeit === false) {
-                axios.post(`${BACK_URL}/blog/${this.writer}/like/${this.post_id}`, likeit, config)
+                axios.post(`${BACK_URL}/blog/${this.member_nickname}/like/${this.post_id}`, likeit, config)
                     .then(res => {
                         // 좋아요 수 바꾸기(화면에서)
                         this.$refs[`like-count-${this.post_id}`].innerText = res.data.data    
@@ -237,7 +237,7 @@ export default {
                         console.log(err)
                     })   
             } else {
-                axios.post(`${BACK_URL}/blog/${this.writer}/like/${this.post_id}`, likeit, config)
+                axios.post(`${BACK_URL}/blog/${this.member_nickname}/like/${this.post_id}`, likeit, config)
                     .then(res => {
                         // 좋아요 수 바꾸기(화면에서)
                         this.$refs[`like-count-${this.post_id}`].innerText = res.data.data   

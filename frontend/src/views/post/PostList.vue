@@ -14,7 +14,7 @@
             </div>
           </div>
           <div class="writer-info">
-            <button class="btn btn-sm" @click="gotoUserInfo(post.writer)">{{ post.writer }}</button>
+            <button class="btn btn-sm" @click="gotoUserInfo(post.member_nickname)">{{ post.member_nickname }}</button>
             <p>♥ {{ post.likes }}</p>
           </div>
         </div>
@@ -36,7 +36,7 @@
               </div>
             </div>
             <div class="writer-info">
-              <button class="btn btn-sm" @click="gotoUserInfo(post.writer)">{{ post.writer }}</button>
+              <button class="btn btn-sm" @click="gotoUserInfo(post.member_nickname)">{{ post.member_nickname }}</button>
               <p><i class="far fa-eye"></i> {{ post.views }}</p>
             </div>
           </div>
@@ -75,10 +75,10 @@ export default {
   },
   methods : {
     gotoDetail(post) {
-      this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.writer, post_id : post.postId }})
+      this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.member_nickname, post_id : post.postId }})
     },
     gotoQuestionDetail(post) {
-      this.$router.push({ name : "QuestionDetail" , params: { nickname : post.writer, qpostId : post.qpostId }})
+      this.$router.push({ name : "QuestionDetail" , params: { nickname : post.member_nickname, qpostId : post.qpostId }})
     },
     gotoUserInfo(userNickname) {
       this.$router.push({ name : "MyBlog" , params: { nickname : userNickname }})

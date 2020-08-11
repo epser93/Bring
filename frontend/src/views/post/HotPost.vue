@@ -12,7 +12,7 @@
             <p class="comment-date">{{ post.createdAt}} · {{ post.replyCnt }}개의 댓글</p>
           </div>
           <div class="writer-info">
-            <p>{{ post.writer }}</p>
+            <p>{{ post.member_nickname }}</p>
             <p>♥ {{ post.likes}}</p>
           </div>
         </div>
@@ -32,7 +32,7 @@
               <p class="comment-date">{{ question.createdAt }} · {{ question.answerCnt }}개의 댓글</p>
             </div>
             <div class="writer-info">
-              <p>{{ question.writer }}</p>
+              <p>{{ question.member_nickname }}</p>
               <p>♥ {{ question.views }}</p>
             </div>
           </div>
@@ -75,10 +75,10 @@ export default {
   },
   methods: {
     gotoDetail(post) {
-      this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.writer, post_id : post.postId }})
+      this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.member_nickname, post_id : post.postId }})
     },
     gotoQuestionDetail(question) {
-      this.$router.push({ name : "DetailPost" , params: { post: question, nickname : question.writer, post_id : question.qpost_id }})
+      this.$router.push({ name : "DetailPost" , params: { post: question, nickname : question.member_nickname, post_id : question.qpost_id }})
     },
     getHotPost() {
       if (this.mode === "blog") {

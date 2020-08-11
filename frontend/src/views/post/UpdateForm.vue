@@ -65,7 +65,7 @@ export default {
         tags: [''],
       },
 
-      writer: null,
+      member_nickname: null,
       createdAt: null,
       categoryList: [],
 
@@ -97,7 +97,7 @@ export default {
       getPostInfo() {
         axios.get(`${BACK_URL}/blog/${this.nickname}/${this.boardName}/${this.post_id}`)
           .then(res => {
-            this.writer = res.data.list[0].list[0].writer
+            this.member_nickname = res.data.list[0].list[0].member_nickname
             this.postData.subject = res.data.list[0].list[0].subject
             this.postData.content = res.data.list[0].list[0].content
             this.createdAt = res.data.list[0].list[0].createdAt

@@ -4,9 +4,9 @@
         <div class="nav col-2 flex-column text-left">
             <h5>카테고리</h5>
             <hr class="ml-0" style="width:70%;">
-            <button id="category-all" @click="getAllPosts" type="button" class="btn mb-3 p-0 text-left">전체보기()</button>
+            <button id="category-all" @click="getAllPosts" type="button" class="btn mb-3 p-0 text-left">전체보기 ({{ numOfPosts }})</button>
             <div id="category-menu" v-for="category in categoryList" :key="category.boardId">
-                <button @click="getSomePosts(category.name)" type="button" class="btn mb-3 p-0">{{ category.name }}({{  }})</button>
+                <button @click="getSomePosts(category.name)" type="button" class="btn mb-3 p-0">{{ category.name }} ({{ category.postCnt }})</button>
             </div>
                 
             <!-- 검색창 -->
@@ -167,6 +167,7 @@ export default {
             axios.get(`${BACK_URL}/blog/${this.nickname}/categories`)
                 .then(res => {
                     this.categoryList = res.data.list
+                    this.calPostsSum()
                 })
                 .catch(err => {
                     console.log(err)
@@ -218,7 +219,7 @@ export default {
         },
         // 포스트 디테일
         gotoDetail(post) {
-            this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.writer, post_id : post.postId }})
+            this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.member_nickname, post_id : post.postId }})
         },    
 
         // 좋아요
@@ -232,7 +233,7 @@ export default {
             // 좋아요 현 상태로 구분
             
             if (likeit === false) {
-                axios.post(`${BACK_URL}/blog/${post.writer}/like/${post.postId}`, likeit, config)
+                axios.post(`${BACK_URL}/blog/${post.member_nickname}/like/${post.postId}`, likeit, config)
                     .then(res => {
                         // 좋아요 수 바꾸기(화면에서)
                         this.$refs[`like-count-${post.postId}`][0].innerText = res.data.data    
@@ -249,7 +250,7 @@ export default {
                         console.log(err)
                     })   
             } else {
-                axios.post(`${BACK_URL}/blog/${post.writer}/like/${post.postId}`, likeit, config)
+                axios.post(`${BACK_URL}/blog/${post.member_nickname}/like/${post.postId}`, likeit, config)
                     .then(res => {
                         // 좋아요 수 바꾸기(화면에서)
                         this.$refs[`like-count-${post.postId}`][0].innerText = res.data.data   
@@ -265,13 +266,20 @@ export default {
                         console.log(err)
                     })   
             }        
+        },
+
+        calPostsSum() {
+            for (const item in this.categoryList) {
+                console.log(this.categoryList[item].postCnt)
+                this.numOfPosts = this.numOfPosts + this.categoryList[item].postCnt
+            }
+            console.log(this.numOfPosts)
         }
     },
     
     created() {
         this.getAllPosts(),
         this.getCategory()
-        
     },
     data() {
         return{
@@ -287,6 +295,7 @@ export default {
             thumbnail1: [],
             thumbnail2: [],
             thumbnail3: [],
+            numOfPosts: 0,
             
             // 검색 관련
             keywordType: {
