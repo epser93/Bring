@@ -58,7 +58,10 @@
         <div class="ml-3" v-for="comment in recentlyComments" :key="comment.replyId">
           <p>{{ comment.member_nickname }}</p>
           <p>{{ comment.reply }}</p>
-          <small>이 댓글을{{ comment.likes}}명이 좋아합니다</small>
+          <!-- 좋아요 -->
+          <b-icon icon="heart-fill" v-if="commentsLike[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="commentLike(comment.replyId, comment.member_nickname, false)"></b-icon>
+          <b-icon icon="heart" v-if="!commentsLike[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="commentLike(comment.replyId, comment.member_nickname, true)"></b-icon>          
+          <span :ref="'like-comment-' + comment.replyId">{{ comment.likes }}</span>
           <p>{{ comment.createdAt }}</p>
           <button class="btn btn-outline-success btn-sm mx-1" v-if="$cookies.get('nickname') === comment.member_nickname" @click="commentDelete(comment)">삭제</button>
           <button class="btn btn-outline-success btn-sm" v-if="$cookies.get('nickname') === comment.member_nickname" @click="openCommentUpdate(comment), setXY($event)">수정</button>
@@ -97,7 +100,8 @@ export default {
             commentUpdateToggle : false,
             Y : 0,
             comment_id : 0,
-            tags : ''
+            tags : '',
+            commentsLike: []
         }
      },
     methods: {
@@ -172,10 +176,16 @@ export default {
           }
         },
         getComment() {
-          axios.get(`${BACK_URL}/reply/${this.post_id}/replies`)
+          const config = {
+            headers: {
+              'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
+            }
+          }
+          axios.get(`${BACK_URL}/reply/${this.post_id}/replies`, config)
             .then(res => {
               console.log(res.data.list[0])
-              this.comments = res.data.list
+              this.comments = res.data.list[0].list
+              this.commentsLike = res.data.list[1].list
               })
             .catch(err => console.log(err))
         },
@@ -252,7 +262,7 @@ export default {
             }        
         },
         // 댓글 좋아요
-        commentLike(replyId, replyer, likeit) {
+        commentLike(replyId, replyer, likeit) {          
             const config = {
                 headers: {
                     'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
@@ -261,24 +271,29 @@ export default {
             }
 
             if (likeit === false) {
-                axios.post(`${BACK_URL}/reply/like/${replyId}/${replyer}`, likeit, config)
-                    .then(res => {
-                        this.$refs[`like-count-${replyId}`].innerText = res.data.data   
-                        this.getComment()       
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })   
+              axios.post(`${BACK_URL}/reply/like/${replyId}/${replyer}`, likeit, config)
+                  .then(res => {
+                    console.log(this.$refs)
+                    console.log(res.data.data)
+                      this.$refs[`like-comment-${replyId}`][0].innerText = res.data.data 
+                      this.getComment()       
+                  })
+                  .catch(err => {
+                      console.log(err)
+                  })   
             } else {
-                axios.post(`${BACK_URL}/reply/like/${replyId}/${replyer}`, likeit, config)
-                    .then(res => {
-                        this.$refs[`like-count-${replyId}`].innerText = res.data.data 
-                        this.getComment()   
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })   
-            }        
+              axios.post(`${BACK_URL}/reply/like/${replyId}/${replyer}`, likeit, config)
+                  .then(res => {
+                      console.log(this.$refs)
+                      console.log(res.data.data)
+                      this.$refs[`like-comment-${replyId}`][0].innerText = res.data.data
+                      this.getComment()   
+                  })
+                  .catch(err => {
+                      console.log(err)
+                  })
+            }   
+
         }
     },
     created(){
