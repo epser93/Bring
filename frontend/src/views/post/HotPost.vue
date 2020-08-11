@@ -3,7 +3,7 @@
     <section v-if="mode==='blog'" class="cards row">
       <div v-for="post in postings" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
         <div class="cardwrap" @click="gotoDetail(post)">
-          <div class="img-section">
+          <div class="img-section" :style="{ 'background-image' : `url(${thumbnail})`}">
             <a href=""></a>
           </div>
           <div class="contents">
@@ -61,6 +61,7 @@ export default {
   props: {
     mode: String,
     posts: Array,
+    thumbnail : Array
   },
   data() {
     return {
@@ -84,7 +85,7 @@ export default {
         axios.get(`${BACK_URL}/blog/trend`)
           .then(res => {
             this.postings = res.data.list[0].list
-            console.log(this.postings)
+            // console.log(this.postings)
           })
           .catch(err => console.log(err))
       } else {
@@ -99,7 +100,7 @@ export default {
       axios.get(`${BACK_URL}/member/rank`)
         .then(res => {
           this.unsortedRank = res.data.list
-          console.log(this.unsortedRank)
+          // console.log(this.unsortedRank)
         })
         .catch(err => console.log(err))
     }
@@ -160,6 +161,8 @@ h2 {
   width: 100%;
   height: 200px;
   background-image: url(https://picsum.photos/600/300/?image=25);
+  background-repeat : no-repeat;
+	background-size : 100% 100%;
   border-top-right-radius: 6px;
   border-top-left-radius: 6px;
   border: 1px solid rgba(0,0,0,0.1);
