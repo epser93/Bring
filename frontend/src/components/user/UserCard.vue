@@ -117,7 +117,6 @@ export default {
     
   data() {
     return {
-        //changeNickname: null,
         loginNickname: null,
         userNickname: null,
         userInfo: null, // 0번
@@ -144,10 +143,6 @@ export default {
         type: String,
         default: null
     },
-    // userNickname: {
-    //     type: String,
-    //     default: null
-    // }
   },
   
   created() {
@@ -344,23 +339,26 @@ export default {
                 'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
                 }
         }
+        console.log(this.userInfo.msrl)
         axios.post(`${BACK_URL}/follow/${this.userInfo.msrl}`, config)
             .then(() => {
                 console.log("팔로우완료")
+                // this.$router.push({ name: 'Profile' })
             })
             .catch((err) => {
                 console.error(err)
             })
         },
-        unFollow() {
+      unFollow() {
         const config = {
             headers: {
                 'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
                 }
-        }
+            }
         axios.delete(`${BACK_URL}/follow/${this.userInfo.msrl}`, config)
             .then(() => {
                 console.log("팔로우취소")
+                // this.$router.push({ name: "Profile" })
             })
             .catch((err) => {
                 console.error(err)
