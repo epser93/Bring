@@ -55,7 +55,7 @@
 
         <!-- 댓글 목록부분 -->
         <h3 class="mt-5">{{ recentlyComments.length }} Comments</h3>
-        <div class="ml-3" v-for="comment in recentlyComments" :key="comment.replyId">
+        <div class="ml-3" v-for="(comment,index) in recentlyComments" :key="comment.replyId">
           <p>{{ comment.member_nickname }}</p>
           <p>{{ comment.reply }}</p>
           <!-- 좋아요 -->

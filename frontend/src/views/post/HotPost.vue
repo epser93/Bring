@@ -1,9 +1,9 @@
 !<template>
   <div class="wrapB container-fluid">
     <section v-if="mode==='blog'" class="cards row">
-      <div v-for="post in postings" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
+      <div v-for="(post,index) in postings" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
         <div class="cardwrap" @click="gotoDetail(post)">
-          <div class="img-section" :style="{ 'background-image' : `url(${thumbnail})`}">
+          <div class="img-section" :style="{ 'background-image' : `url(${hotThumbnail[index]})`}">
             <a href=""></a>
           </div>
           <div class="contents">
@@ -61,12 +61,12 @@ export default {
   props: {
     mode: String,
     posts: Array,
-    thumbnail : Array
   },
   data() {
     return {
       postings: null,
-      unsortedRank: []
+      unsortedRank: [],
+      hotThumbnail: ''
     }
   },
   created() {
@@ -84,8 +84,8 @@ export default {
       if (this.mode === "blog") {
         axios.get(`${BACK_URL}/blog/trend`)
           .then(res => {
+            this.hotThumbnail = res.data.list[2].list
             this.postings = res.data.list[0].list
-            // console.log(this.postings)
           })
           .catch(err => console.log(err))
       } else {
