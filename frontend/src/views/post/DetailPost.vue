@@ -13,7 +13,7 @@
         
         <!-- 태그부분 -->
         <div class="tag">
-            <span class="badge badge-pill badge-light">tag</span>
+            <span v-for="(tag,index) in this.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2">{{ tag }}</span>
         </div>
         <hr>
         <p v-html="compiledMarkdown"></p>
@@ -96,7 +96,8 @@ export default {
             comment_content: '',
             commentUpdateToggle : false,
             Y : 0,
-            comment_id : 0
+            comment_id : 0,
+            tags : ''
         }
      },
     methods: {
@@ -197,6 +198,8 @@ export default {
               this.views = res.data.list[0].list[0].views
               // 좋아요 했는지
               this.likeItOrNot = res.data.list[4].list[0]
+              this.tags = res.data.list[1].list
+              console.log('fetch',res.data)
             })
             .catch(err => console.log(err))
         },
