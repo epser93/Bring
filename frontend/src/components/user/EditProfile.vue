@@ -11,7 +11,7 @@
         <div class="section">
           <h5 class="title"><b>이메일</b></h5>
           <div class="d-flex justify-content-between align-items-center">
-            <p id="infoEmail"><b>{{ myProfile.uid }}</b></p>
+            <p id="infoEmail"><b>{{ userInfo.uid }}</b></p>
             <!-- 회원탈퇴 -->
             <button button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">
               <i class="fa fa-ban"></i> 회원 탈퇴
@@ -69,16 +69,28 @@
         </div>       
 
       <!-- 프로필 사진 변경 -->
-        <div class="section" style="margin-bottom:0">
+        <!-- <div class="section" style="margin-bottom:0">
           <h5 class="title"><b>프로필 사진 변경</b></h5>
-          <!-- <img class="popupImageItem" :src="uploadImageFile"> -->
+
           <div class="filebox" style="margin-top:0">
             <label for="ex_file"><i class="far fa-images"></i> 사진 변경 </label>
             <input type="file" id="ex_file" v-on:change="upload">
           </div>
           <div class="previewBg">
-            <img class="previewImg" :src="changeData.uploadFile"> 
+            <img class="previewImg" :src="uploadFile"> 
           </div>
+        </div> -->
+
+
+        <div class="section" style="margin-bottom:0">
+          <h5 class="title"><b>프로필 사진 변경</b></h5>
+          <div class="filebox" style="margin-top:0">
+            <label for="ex_file"><i class="far fa-images"></i> 사진 변경 </label>
+            <input type="file" id="ex_file" ref="files" v-on:change="uploadImage">
+          </div>
+          <!-- <div class="previewBg">
+            <img class="previewImg" :src="galleryData.filePath"> 
+          </div> -->
         </div>
 
 
@@ -110,20 +122,25 @@ export default {
 
     data() {
     return {
-        myProfile: "",
+        loginNickname:"",
+        userInfo: "",
         inputText:"",
-        newImgSrc:"",
+        file:[],
+        // galleryData:[],
         changeData:{
           nickname:null,
           password1:null,
           password2:null,
           password3:null,
-          uploadFile:null,
         },
         password1Type:"password",
         password2Type:"password",
         password3Type:"password",
       }
+    },
+
+    mounted(){
+
     },
 
     created() {
@@ -132,13 +149,13 @@ export default {
           'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
           }
       }
-      // console.log(config)
-      axios.get(`${BACK_URL}/member/mypage`,config)
+      this.loginNickname = this.$cookies.get('nickname')
+
+      axios.get(`${BACK_URL}/member/${this.loginNickname}/profile`,config)
       .then(res => {
           console.log(res)
-          this.myProfile = res.data.data
-          this.changeData.nickname = res.data.data.nickname
-          this.changeData.uploadFile = res.data.data.uploadfile
+          this.userInfo = res.data.list[0].list[0]
+          this.changeData.nickname = this.userInfo.nickname
       })
       .catch((err) => {
           console.error(err)
@@ -155,7 +172,7 @@ export default {
 
         var deleteText = "역사는 산 사람이 쓴다";
         if(deleteText == this.inputText){
-          axios.delete(`${BACK_URL}/member/delete/${this.myProfile.msrl}`,config)
+          axios.delete(`${BACK_URL}/member/delete/${this.userInfo.msrl}`,config)
 
           .then(() => {
                 this.$cookies.remove('X-AUTH-TOKEN')
@@ -176,6 +193,7 @@ export default {
         //this.$router.push('/')
         this.$router.push({ name : "Profile" }) 
       },
+
       changeInfo(){
         const config = {
           headers: {
@@ -187,15 +205,14 @@ export default {
               password1 : this.changeData.password1,
               password2 : this.changeData.password2,
               password3 : this.changeData.password3,
-              uploadFile : this.changeData.uploadFile
-
-            }
+        }
         console.log(paramMember)
         axios.put(`${BACK_URL}/member/update`,paramMember, config)
           .then(() => {
                 console.log("수정완료")
+                this.$cookies.set('nickname', this.changeData.nickname)
                 //this.$router.go(-1)
-                this.$router.push({ name : "Profile" })                
+                this.$router.push({ name: 'Profile', params: {changeNickname: this.changeData.nickname} })                
           })
           .catch((err) => {
             console.log('에러보기')
@@ -204,17 +221,67 @@ export default {
           })
 
       },
-      upload(e){
-        let file = e.target.files;
-        let reader = new FileReader();
+
+      // upload(e){
+      //   const config = {
+      //     headers: {
+      //     'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
+      //      }
+      //    }
+
+      //   let file = e.target.files;
+      //   let reader = new FileReader();
         
-        reader.readAsDataURL(file[0]);
-        reader.onload = e => {
-        // console.log(e.target.result);
-        this.changeData.uploadFile = e.target.result;
-        console.log(this.changeData)
-        }
+      //   reader.readAsDataURL(file[0]);
+      //   reader.onload = e => {
+      //   // console.log(e.target.result);
+      //   this.uploadFile = e.target.result;
+      //   // console.log(this.userInfo.msrl)
+      //   console.log(this.uploadFile)
+      //   }
+
+      //   axios.post(`${BACK_URL}/member/profile/image/${this.userInfo.msrl}`,this.uploadFile, config)
+      //     .then(() => {
+      //           console.log("수정완료")
+      //           this.$router.push({ name : "Profile" })                
+      //     })
+      //     .catch((err) => {
+      //       console.log('에러보기')
+      //       console.error(err)
+      //       alert('사진부분에러남.')
+      //     })
+      // }
+
+
+      uploadImage(){
+        const config = {
+          headers: {
+          'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
+           }
+         }
+        this.file = this.$refs.files.files;
+        console.log(this.$refs.files.files)
+
+
+        let formData = new FormData();
+        formData.append('file', this.file[0]);
+        console.log(this.file[0])
+
+
+        console.log(formData[0])
+
+        axios.post(`${BACK_URL}/member/profile/image/${this.userInfo.msrl}`, formData, config)
+          .then(() => {
+                console.log("사진완료")
+                this.$router.push({ name : "Profile" })                
+          })
+          .catch((err) => {
+            console.error(err)
+            alert('사진부분에러남.')
+          })
+
       }
+
     }
 
 }

@@ -17,6 +17,9 @@ import VModal from 'vue-js-modal'
 // vue-cookies
 import VueCookies from 'vue-cookies'
 
+// vue-calendar
+import VueCalendarHeatmap from 'vue-calendar-heatmap'
+
 VueMarkdownEditor.use(vuepressTheme);
 VueMarkdownEditor.lang.use('en-US', enUS);
 Vue.use(VueMarkdownEditor);
@@ -28,6 +31,7 @@ Vue.use(VueCookies)
 
 Vue.use(VModal, { dynamic: true })
 
+Vue.use(VueCalendarHeatmap)
 
 Vue.config.productionTip = false
 
