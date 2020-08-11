@@ -137,6 +137,8 @@ public class MemberController {
                 }
             } else { //프로필 본인이면~(마이페이지)
                 result.add(responseService.getListResult(profile)); //내 정보
+                amIInTheList.add(false);
+                result.add(responseService.getListResult(amIInTheList));
                 result.add(responseService.getListResult(followService.followingList(member))); //팔로잉 리스트(조회하려는 멤버가 구독중인 멤버 리스트)
                 result.add(responseService.getListResult(followService.followersList(member))); //팔로워 리스트(조회하려는 멤버를 구독중인 멤버 리스트)
                 result.add(responseService.getListResult(createdAt)); //모든 포스트의 각 게시 시간
@@ -152,6 +154,8 @@ public class MemberController {
             }
         } else {
             result.add(responseService.getListResult(profile)); //조회하려는 멤버 설정
+            amIInTheList.add(false);
+            result.add(responseService.getListResult(amIInTheList));
             result.add(responseService.getListResult(followService.followingList(member))); //팔로잉 리스트(조회하려는 멤버가 구독중인 멤버 리스트)
             result.add(responseService.getListResult(followService.followersList(member))); //팔로워 리스트(조회하려는 멤버를 구독중인 멤버 리스트)
             result.add(responseService.getListResult(createdAt)); //모든 포스트의 각 게시 시간
