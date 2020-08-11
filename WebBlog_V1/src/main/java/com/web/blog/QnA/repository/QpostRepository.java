@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QpostRepository extends JpaRepository<Qpost, Long> {
-    List<OnlyQpostMapping> findByWriter(String writer);
+    List<OnlyQpostMapping> findByMember_Nickname(String writer);
 
     Optional<Qpost> findById(long qpost_id);
 
     List<OnlyQpostMapping> findByQpostId(long qpost_id);
 
-    Optional<List<Qpost>> findAllByWriter(String writer);
+    Optional<List<Qpost>> findAllByMember_Nickname(String writer);
 
     @Modifying
     @Transactional
@@ -51,7 +51,7 @@ public interface QpostRepository extends JpaRepository<Qpost, Long> {
 
     //모든 질문글 통합 검색
 //    @Query(value = "select distinct * from qpost where (subject like concat('%',:keyword,'%') or content like concat('%',:keyword,'%') or writer like concat('%',:keyword,'%'))", nativeQuery = true)
-    List<Qpost> findDistinctBySubjectContainingOrContentContainingOrWriterContaining(String keyword1, String keyword2, String keyword3);
+    List<Qpost> findDistinctBySubjectContainingOrContentContainingOrMember_NicknameContaining(String keyword1, String keyword2, String keyword3);
 
     //모든 질문글 제목 검색
     List<Qpost> findBySubjectContaining(String keyword);
@@ -60,7 +60,7 @@ public interface QpostRepository extends JpaRepository<Qpost, Long> {
     List<Qpost> findByContentContaining(String keyword);
 
     //모든 질문글 작성자 검색
-    List<Qpost> findByWriterContaining(String keyword);
+    List<Qpost> findByMember_NicknameContaining(String keyword);
 
     //사이트의 모든 포스트 리스트(최신글)
     List<OnlyQpostMapping> findByCreatedAtLessThanEqualOrderByCreatedAtDesc(LocalDateTime date);

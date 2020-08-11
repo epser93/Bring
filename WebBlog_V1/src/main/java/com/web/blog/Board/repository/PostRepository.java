@@ -22,7 +22,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Optional<OnlyPostMapping> findAllByPostId(long post_id);
 
-    Optional<List<Post>> findByBoard_BoardIdAndWriter(long boardId, String writer);
+    Optional<List<Post>> findByBoard_BoardIdAndMember_Nickname(long boardId, String writer);
 
     @Modifying
     @Transactional
@@ -66,17 +66,17 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
 
     //한 블로그 내 모든 포스트 리스트
-    List<OnlyPostMapping> findAllByWriter(String writer);
+    List<OnlyPostMapping> findAllByMember_Nickname(String writer);
 
     //한 블로그 내 모든 포스트 통합 검색(or 블로그 내 모든 포스트 리스트)
-//    @Query(value = "select distinct * from post where writer = :writer and (subject like concat('%',:keyword,'%') or content like concat('%',:keyword,'%'))", nativeQuery = true)
-    List<OnlyPostMapping> findDistinctByWriterAndSubjectContainingOrWriterAndContentContaining(String writer1, String keyword1, String writer2, String keyword2);
+//    @Query(value = "select distinct * from post where nickname = :nickname and (subject like concat('%',:keyword,'%') or content like concat('%',:keyword,'%'))", nativeQuery = true)
+    List<OnlyPostMapping> findDistinctByMember_NicknameAndSubjectContainingOrMember_NicknameAndContentContaining(String writer1, String keyword1, String writer2, String keyword2);
 
     //한 블로그 내 모든 포스트 제목 검색
-    List<OnlyPostMapping> findByWriterAndSubjectContaining(String writer, String keyword);
+    List<OnlyPostMapping> findByMember_NicknameAndSubjectContaining(String writer, String keyword);
 
     //한 블로그 내 모든 포스트 내용 검색
-    List<OnlyPostMapping> findByWriterAndContentContaining(String writer, String keyword);
+    List<OnlyPostMapping> findByMember_NicknameAndContentContaining(String writer, String keyword);
 
 
     //사이트의 모든 포스트 리스트(최신글)
@@ -88,7 +88,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     //사이트의 모든 포스트 통합 검색(or 사이트 내 모든 포스트 리스트)
 //    @Query(value = "select distinct * from post where (subject like concat('%',:keyword,'%') or content like concat('%',:keyword,'%') or writer like concat('%',:keyword,'%'))", nativeQuery = true)
-    List<OnlyPostMapping> findDistinctBySubjectContainingOrContentContainingOrWriterContaining(String keyword1, String keyword2, String keyword3);
+    List<OnlyPostMapping> findDistinctBySubjectContainingOrContentContainingOrMember_NicknameContaining(String keyword1, String keyword2, String keyword3);
 
     //사이트의 모든 포스트 제목 검색
     List<OnlyPostMapping> findBySubjectContaining(String keyword);
@@ -97,5 +97,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<OnlyPostMapping> findByContentContaining(String keyword);
 
     //사이트의 모든 포스트 작성자 검색
-    List<OnlyPostMapping> findByWriterContaining(String keyword);
+    List<OnlyPostMapping> findByMember_NicknameContaining(String keyword);
 }

@@ -3,9 +3,7 @@ package com.web.blog.Board.entity;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.web.blog.QnA.entity.Apost;
-import com.web.blog.QnA.entity.ApostMember;
-import com.web.blog.QnA.entity.Qpost;
+import com.web.blog.Member.entity.Member;
 import lombok.*;
 
 import javax.persistence.*;
@@ -26,8 +24,8 @@ public class Reply extends CommonDateEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long replyId;
 
-    @Column(nullable = false, length = 50)
-    private String writer;
+//    @Column(nullable = false, length = 50)
+//    private String writer;
 
     @Column(columnDefinition = "LONGTEXT")
     private String reply;
@@ -41,7 +39,12 @@ public class Reply extends CommonDateEntity implements Serializable {
     private Post post;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @OneToMany(mappedBy = "reply", fetch = FetchType.EAGER)
+    @ManyToOne
+    @JoinColumn(name = "msrl")
+    private Member member;
+
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @OneToMany(mappedBy = "reply", fetch = FetchType.LAZY)
     private List<ReplyMember> replyMembers = new ArrayList<>();
 
     public Reply setUpdate(String reply) {

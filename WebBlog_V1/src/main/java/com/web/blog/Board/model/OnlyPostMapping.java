@@ -2,7 +2,6 @@ package com.web.blog.Board.model;
 
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 public interface OnlyPostMapping {
     Long getPostId();
@@ -11,7 +10,7 @@ public interface OnlyPostMapping {
 
     LocalDateTime getUpdatedAt();
 
-    String getWriter();
+    String getMember_nickname();
 
     String getSubject();
 
@@ -26,6 +25,8 @@ public interface OnlyPostMapping {
     String getBoard_name();
 
     Long getOriginal();
+
+    String getMember_uid();
 
 //    Set<String> getTags();
 }

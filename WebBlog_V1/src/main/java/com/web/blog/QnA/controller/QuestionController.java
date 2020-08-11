@@ -151,7 +151,7 @@ public class QuestionController {
         List<String> filePaths = new ArrayList<>();
         LocalDateTime date = LocalDateTime.now();
         date.minus(30, ChronoUnit.DAYS);
-        List<OnlyQpostMapping> list = qpostRepository.findByWriter(nickname);
+        List<OnlyQpostMapping> list = qpostRepository.findByMember_Nickname(nickname);
         if (logined.isPresent()) {
             for (OnlyQpostMapping qm : list) {
                 long qpostId = qm.getQpostId();
@@ -199,11 +199,12 @@ public class QuestionController {
     @ApiOperation(value = "질문 작성", notes = "질문 작성")
     @PostMapping(value = "/ask")
     public ListResult<SingleResult> writeQuestion(@Valid @RequestBody ParamQpost paramQpost) throws IOException {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Member member = (Member) principal;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> member = Optional.ofNullable(memberRepository.findAllByUid(uid));
         Set<String> tags = paramQpost.getTags();
         List<SingleResult> result = new ArrayList<>();
-        Qpost qpost = qnaService.writeQuestion(member, paramQpost);
+        Qpost qpost = qnaService.writeQuestion(member.get(), paramQpost);
         if (!tags.isEmpty()) {
             for (String tag : tags) {
                 qTagService.insertTags(qpost, tag);
@@ -239,9 +240,9 @@ public class QuestionController {
         List<OnlyApostMapping> apost = apostRepository.findByQpost(qpost);
         for (OnlyApostMapping oam : apost) {
             //블로그 Q&A 게시판
-            OnlyMemberMapping oamMem = memberRepository.findAllByNickname(oam.getWriter()).orElseThrow(CUserNotFoundException::new);
+            OnlyMemberMapping oamMem = memberRepository.findAllByNickname(oam.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
             StringBuilder sb = new StringBuilder();
-            sb.append("Q. " + qpost.getSubject() + "(Q writer: " + qpost.getWriter() + ", Q number: " + qpostId + ")" + System.getProperty("line.separator"));
+            sb.append("Q. " + qpost.getSubject() + "(Q writer: " + qpost.getMember().getNickname() + ", Q number: " + qpostId + ")" + System.getProperty("line.separator"));
             sb.append("\t" + qpost.getContent() + System.getProperty("line.separator"));
             paramPost.setSubject(sb.toString());
             paramPost.setContent(oam.getAnswer());
@@ -289,7 +290,7 @@ public class QuestionController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
-        Optional<List<Qpost>> list = qpostRepository.findAllByWriter(logined.getNickname());
+        Optional<List<Qpost>> list = qpostRepository.findAllByMember_Nickname(logined.getNickname());
         if (list.isPresent()) {
             Qpost qpost = list.get().get(list.get().size() - 1); //찾은 리스트 중 마지막 댓글 가져오기
             long qpostId = qpost.getQpostId();

@@ -3,6 +3,7 @@ package com.web.blog.Board.entity;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.web.blog.Member.entity.Member;
 import lombok.*;
 
 import javax.persistence.*;
@@ -23,8 +24,8 @@ public class Post extends CommonDateEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long postId;
 
-    @Column(nullable = false, length = 50)
-    private String writer;
+//    @Column(nullable = false, length = 50)
+//    private String writer;
 
     @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String subject;
@@ -48,7 +49,11 @@ public class Post extends CommonDateEntity implements Serializable {
     @JoinColumn(name = "board_id")
     private Board board;
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.EAGER)
+    @ManyToOne
+    @JoinColumn(name = "msrl")
+    private Member member;
+
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<PostMember> postMembers = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")

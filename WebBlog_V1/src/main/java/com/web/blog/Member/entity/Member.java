@@ -4,10 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import com.web.blog.Board.entity.CommonDateEntity;
-import com.web.blog.Board.entity.PostMember;
-import com.web.blog.Board.entity.ReplyMember;
+import com.web.blog.Board.entity.*;
+import com.web.blog.QnA.entity.Apost;
 import com.web.blog.QnA.entity.ApostMember;
+import com.web.blog.QnA.entity.Qpost;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -73,11 +73,15 @@ public class Member extends CommonDateEntity implements UserDetails, Serializabl
 
     private int totalCnt;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) //No serializer found for class org.hibernate.proxy.pojo.bytebuddy.ByteBuddyInterceptor and no properties discovered to create BeanSerializer //아마 LAZY 로딩으로 인한 오류같음. hibernateLazyInitializer로 수정.
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<Board> boards = new ArrayList<>();
+
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> roles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<PostMember> postMembers = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
@@ -87,10 +91,22 @@ public class Member extends CommonDateEntity implements UserDetails, Serializabl
     private List<ReplyMember> replyMembers = new ArrayList<>();
 
     @OneToMany(mappedBy = "from", cascade = CascadeType.REMOVE)
-    private List<Follow> following;
+    private List<Follow> following = new ArrayList<>();
 
     @OneToMany(mappedBy = "to", cascade = CascadeType.REMOVE)
-    private List<Follow> followers;
+    private List<Follow> followers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<Reply> replies = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<Qpost> qposts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<Apost> aposts = new ArrayList<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

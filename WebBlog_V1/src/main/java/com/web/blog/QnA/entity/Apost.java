@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.web.blog.Board.entity.CommonDateEntity;
+import com.web.blog.Member.entity.Member;
 import lombok.*;
 
 import javax.persistence.*;
@@ -24,8 +25,8 @@ public class Apost extends CommonDateEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long apostId;
 
-    @Column(nullable = false, length = 50)
-    private String writer;
+//    @Column(nullable = false, length = 50)
+//    private String writer;
 
     @Column(columnDefinition = "LONGTEXT")
     private String answer;
@@ -44,8 +45,12 @@ public class Apost extends CommonDateEntity implements Serializable {
     @JoinColumn(name = "qpost_id")
     private Qpost qpost;
 
+    @ManyToOne
+    @JoinColumn(name = "msrl")
+    private Member member;
+
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @OneToMany(mappedBy = "apost", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "apost", fetch = FetchType.LAZY)
     private List<ApostMember> apostMembers = new ArrayList<>();
 
     public Apost setUpdate(String answer) {

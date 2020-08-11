@@ -28,11 +28,11 @@ public class SearchService {
     //블로그 내 포스트 검색
     public List<OnlyPostMapping> BlogPostSearch(int which, String writer, String keyword) { //검색: which = 1~3
         if (which == 1) { //제목 검색
-            return postRepository.findByWriterAndSubjectContaining(writer, keyword);
+            return postRepository.findByMember_NicknameAndSubjectContaining(writer, keyword);
         } else if (which == 2) { //내용 검색
-            return postRepository.findByWriterAndContentContaining(writer, keyword);
+            return postRepository.findByMember_NicknameAndContentContaining(writer, keyword);
         } else { //통합검색
-            return postRepository.findDistinctByWriterAndSubjectContainingOrWriterAndContentContaining(writer, keyword, writer, keyword);
+            return postRepository.findDistinctByMember_NicknameAndSubjectContainingOrMember_NicknameAndContentContaining(writer, keyword, writer, keyword);
         }
     }
 
@@ -43,9 +43,9 @@ public class SearchService {
         } else if (which == 2) { //내용 검색
             return postRepository.findByContentContaining(keyword);
         } else if (which == 3) { //작성자 검색
-            return postRepository.findByWriterContaining(keyword);
+            return postRepository.findByMember_NicknameContaining(keyword);
         } else { //통합검색
-            return postRepository.findDistinctBySubjectContainingOrContentContainingOrWriterContaining(keyword, keyword, keyword);
+            return postRepository.findDistinctBySubjectContainingOrContentContainingOrMember_NicknameContaining(keyword, keyword, keyword);
         }
     }
 }

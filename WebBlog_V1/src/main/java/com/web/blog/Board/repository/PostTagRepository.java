@@ -13,6 +13,8 @@ import java.util.List;
 public interface PostTagRepository extends JpaRepository<PostTag, Long> {
     List<PostTag> findByPost(Post post);
 
+    List<PostTag> findByPost_PostId(long postId);
+
     @Modifying
     @Transactional
     @Query(value = "insert into post_tag (post_id, tag_id) values (:post_id, :tag_id)", nativeQuery = true)

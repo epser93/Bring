@@ -25,8 +25,8 @@ public class Qpost extends CommonDateEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long qpostId;
 
-    @Column(nullable = false, length = 50)
-    private String writer;
+//    @Column(nullable = false, length = 50)
+//    private String writer;
 
     @Column(nullable = false, length = 300)
     private String subject;
@@ -54,7 +54,7 @@ public class Qpost extends CommonDateEntity implements Serializable {
     @JoinColumn(name = "msrl")
     private Member member;
 
-    @OneToMany(mappedBy = "tag", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "tag", fetch = FetchType.LAZY)
     private List<QpostTag> qpostTags = new ArrayList<>();
 
     public Qpost setUpdate(String subject, String content) {

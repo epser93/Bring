@@ -78,7 +78,7 @@ public class PostService {
     }
 
     //게시글 작성
-    public Post writePost(String nickname, String boardName, ParamPost paramPost, Member member, String originWriter) { //, MultipartFile[] files
+    public Post writePost(String boardName, ParamPost paramPost, Member member, String originWriter) {
         Board board = boardService.findBoard(boardName, member);
 
         Post result = null;
@@ -87,7 +87,7 @@ public class PostService {
             OnlyPostMapping opm = originalPost.get(0);
 
             StringBuilder sb = new StringBuilder();
-            sb.append("[출처]@" + originWriter);
+            sb.append("[출처]" + originWriter);
             sb.append(" ");
             String subject = paramPost.getSubject();
             sb.append(subject);
@@ -99,25 +99,27 @@ public class PostService {
             sb.append(System.getProperty("line.separator"));
             sb.append(System.getProperty("line.separator"));
             sb.append(System.getProperty("line.separator"));
-            sb.append("[Copyright by @" + originWriter);
+            sb.append("[Copyright by " + originWriter);
             sb.append("  Category: " + opm.getBoard_name() + "  Post ID: " + paramPost.getOriginal() + "]");
             content = sb.toString();
 
             result = postRepository.save(Post.builder()
                     .board(board)
-                    .writer(nickname)
+                    .member(member)
                     .subject(subject)
                     .content(content)
                     .original(paramPost.getOriginal())
                     .build());
+            boardRepository.updatePostCnt(board.getBoardId());
         } else {
             result = postRepository.save(Post.builder()
                     .board(board)
-                    .writer(nickname)
+                    .member(member)
                     .subject(paramPost.getSubject())
                     .content(paramPost.getContent())
                     .original(paramPost.getOriginal())
                     .build());
+            boardRepository.updatePostCnt(board.getBoardId());
         }
         return result;
     }
@@ -127,14 +129,14 @@ public class PostService {
         long msrl = member.getMsrl(); //좋아요를 누른 사람
         long postId = post.getPostId();
         long original = post.getOriginal();
-        String nickname = post.getWriter();
+        String nickname = post.getMember().getNickname();
         Member writer = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new); //post의 작성자
         List<OnlyPostMapping> originalPost = null;
         if (like) {
             postRepository.updateLikeCntPlus(postId); //해당 포스트 글의 좋아요 업데이트
             if (original != -1) { //포스트의 오리지널이 존재하면
                 originalPost = postRepository.findByPostId(original);
-                String originWriter = originalPost.get(0).getWriter();
+                String originWriter = originalPost.get(0).getMember_nickname();
                 Member originMember = memberRepository.findByNickname(originWriter).orElseThrow(CUserNotFoundException::new);
                 postRepository.updateLikeCntPlus(original); //공유된 포스트 좋아요 업데이트(원래 포스트)
                 Post originalPost1 = postRepository.findById(original).orElseThrow(CResourceNotExistException::new);
@@ -152,7 +154,7 @@ public class PostService {
             postRepository.updateLikeCntMinus(postId);
             if (original != -1) {
                 originalPost = postRepository.findByPostId(original);
-                String originWriter = originalPost.get(0).getWriter();
+                String originWriter = originalPost.get(0).getMember_nickname();
                 Member originMember = memberRepository.findByNickname(originWriter).orElseThrow(CUserNotFoundException::new);
                 postRepository.updateLikeCntMinus(original); //공유된 포스트 좋아요 업데이트(원래 포스트)
                 postMemberRepository.deleteLike(msrl, original); //공유된 포스트 좋아요 연결 해제
@@ -229,14 +231,14 @@ public class PostService {
     //게시글 삭제
     public boolean deletePost(long postId, Member member) {
         Post post = postRepository.findById(postId).orElseThrow(CResourceNotExistException::new);
-        String writer = post.getWriter();
+        String writer = post.getMember().getNickname();
         Optional<Member> member2 = memberRepository.findByNickname(writer);
         if (!member2.get().getNickname().equals(member.getNickname())) throw new CNotOwnerException();
         tagService.deleteTags(post);
         replyService.deleteReplies(post);
         deleteLikes(post);
         postRepository.delete(post);
-
+        boardRepository.updatePostCntMinus(post.getBoard().getBoardId());
         if (postUploadsRepository.findByPostId(postId).isPresent()) { //포스트에 사진이 한장이라도 존재하면~
             List<PostUploads> beforeDelete = postUploadsRepository.findAllByPostId(postId);
             postUploadsService.deleteImgs(postId); //해당하는 포스트의 모든 사진 정보 db에서 삭제

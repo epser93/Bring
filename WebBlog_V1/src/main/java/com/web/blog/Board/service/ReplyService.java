@@ -74,7 +74,7 @@ public class ReplyService {
         postRepository.updateReplyCnt(post.getPostId());
         return replyRepository.save(Reply.builder()
                 .post(post)
-                .writer(member.getNickname())
+                .member(member)
                 .reply(paramReply.getReply())
                 .build());
     }
@@ -90,11 +90,11 @@ public class ReplyService {
     public boolean deleteReply(long reply_id, Member member) {
         Reply reply = replyRepository.findById(reply_id).orElseThrow(CResourceNotExistException::new);
         Post post = reply.getPost();
-        if (reply.getWriter().equals(member.getNickname())) {
+        if (reply.getMember().getNickname().equals(member.getNickname())) {
             replyRepository.delete(reply);
             postRepository.updateReplyCntMinus(post.getPostId());
             return true;
-        } else if (!reply.getWriter().equals(member.getNickname())) throw new CNotOwnerException();
+        } else if (!reply.getMember().getNickname().equals(member.getNickname())) throw new CNotOwnerException();
 
         if (replyUploadsRepository.findByReplyId(reply_id).isPresent()) { //댓글에 사진이 한장이라도 존재하면~
             List<ReplyUploads> beforeDelete = replyUploadsRepository.findAllByReplyId(reply_id);
@@ -111,7 +111,7 @@ public class ReplyService {
     public void likeThisReply(Member member, Reply reply, Boolean like) { //member는 로그인 한 사용자
         long msrl = member.getMsrl();
         long reply_id = reply.getReplyId();
-        String writer = reply.getWriter();
+        String writer = reply.getMember().getNickname();
         Member answerer = memberRepository.findByNickname(writer).orElseThrow(CUserNotFoundException::new); //answerer은 답변자
         if (like) {
             memberRepository.updateScoreIfLiked(answerer.getMsrl());
