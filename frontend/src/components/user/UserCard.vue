@@ -84,7 +84,6 @@
             :range-color="['ebedf0', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']" />
             <!-- :range-color="['ebedf0', 'dae2ef', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']" -->
             <hr>
-            {{computedPost}}
 
         <!-- 여기다가는 chart 할거임 이것도 -->
             ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
@@ -193,16 +192,16 @@ export default {
     })
     .catch((err) => {
         console.error(err)
-    }),
+    })
 
     // 팔로우 목록 가져오기
-    axios.get(`${BACK_URL}/follow/ings/${this.userInfo.msrl}`)
-    .then(res => {
-        console.log(res)
-    })
-    .catch((err) => {
-        console.error(err)
-    })
+    // axios.get(`${BACK_URL}/follow/ings/${this.userInfo.msrl}`)
+    // .then(res => {
+    //     console.log(res)
+    // })
+    // .catch((err) => {
+    //     console.error(err)
+    // })
 
   },
 
