@@ -21,9 +21,9 @@
 
 <!--태그 추가-->
   <div>
-    <!-- <b-form-input v-model="questionData.tags" placeholder="Enter your name" label="파일 첨부 "></b-form-input> -->
-    <!-- <b-form-tags input-id="tags-basic" v-model="questionData.tag" class="mb-2" label="파일 추가:" label-cols-sm="1"></b-form-tags> -->
-    <!-- <p>태그: {{ category }}</p> 이부분에 나오게 해야함 -->
+    
+    <b-form-tags input-id="tags-basic" v-model="questionData.tags" class="mb-2" label="파일 추가:" label-cols-sm="1"></b-form-tags>
+    
   </div>
 
   <div>
