@@ -19,12 +19,18 @@
     </b-row>
   <v-md-editor class="text-left" v-model="questionData.content" height="600px"></v-md-editor>
 
-<!--태그 추가-->
+<!-- 수빈태그 추가
   <div>
     
     <b-form-tags input-id="tags-basic" v-model="questionData.tags" class="mb-2" label="파일 추가:" label-cols-sm="1"></b-form-tags>
     
+  </div> -->
+
+  <!--태그 추가-->
+  <div class="tag mt-3">
+    <span v-for="(tag,index) in questionData.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2" @click="deleteTag(index)">{{ tag }}</span>
   </div>
+  <input placeholder="태그를 입력해주세요" class="mb-5 tag-input" type="text" v-model="tag" @keydown.enter="postTag">
 
   <div>
     <b-button @click="qnaWrite" variant="outline-primary">작성</b-button>
@@ -47,6 +53,8 @@ export default {
           tags:[],
         },
         thumbnail: '',
+        // 태그
+        tag: ""
       }
     },
     methods: {
@@ -91,9 +99,35 @@ export default {
             .catch((err) => {
               console.error(err)
             })      
-        }
+      },
+      // 태그
+      postTag() {
+          if (!this.questionData.tags.includes(this.tag)) {
+            this.questionData.tags.push(this.tag)
+            this.tag = ""
+          } else {
+            alert('중복된 태그입니다.')
+            this.tag= ""
+          }
+        },
+      deleteTag(index) {
+        this.questionData.tags.splice(index,1)
+      },
+        
+
+        
 
     }
       }
 
 </script>
+
+<style scoped>
+.badge {
+  cursor: pointer;
+}
+
+.tag-input {
+  width: 100%
+}
+</style>

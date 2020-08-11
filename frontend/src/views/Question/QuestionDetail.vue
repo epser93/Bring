@@ -11,6 +11,11 @@
                 <b-col></b-col>
             <b-col>
                 
+                <!-- 태그부분 -->
+                <div class="tag">
+                    <span v-for="(tag,index) in this.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2">{{ tag }}</span>
+                </div>
+                
                 작성자: {{qPost.member_nickname}}
                 <span class="text-muted ">작성시간: {{qPost.createdAt}}</span>
 
@@ -125,6 +130,9 @@ export default {
             answerer: this.$cookies.get('nickname'),
             answerLike:[],      
             like:null,
+
+            // 태그
+            tags: ''
         }
      },
     methods: {
@@ -141,6 +149,8 @@ export default {
             axios.get(`${BACK_URL}/questions/${this.qpost_id}`)
             .then(res => {
                 this.qPost = res.data.list[0].list[0]
+                // 태그
+                this.tags = res.data.list[1].list
                 
             })
             .catch(err => {
