@@ -3,6 +3,7 @@ package com.web.blog.Board.repository;
 import com.web.blog.Board.entity.Board;
 import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.model.OnlyPostMapping;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -16,7 +17,7 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByBoard(Board board);
 
-    List<OnlyPostMapping> findAllByBoard_BoardId(long board_id);
+    List<OnlyPostMapping> findAllByBoard_BoardId(long board_id, Pageable pageable);
 
     List<OnlyPostMapping> findByPostId(long post_id);
 

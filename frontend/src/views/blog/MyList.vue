@@ -270,10 +270,8 @@ export default {
 
         calPostsSum() {
             for (const item in this.categoryList) {
-                console.log(this.categoryList[item].postCnt)
                 this.numOfPosts = this.numOfPosts + this.categoryList[item].postCnt
             }
-            console.log(this.numOfPosts)
         }
     },
     

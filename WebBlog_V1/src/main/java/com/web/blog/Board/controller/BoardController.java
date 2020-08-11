@@ -10,6 +10,7 @@ import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Board.repository.PostUploadsRepository;
 import com.web.blog.Board.service.*;
 import com.web.blog.Common.advice.exception.*;
+import com.web.blog.Common.model.Paging;
 import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.response.SingleResult;
@@ -122,16 +123,17 @@ public class BoardController {
     })
     @ApiOperation(value = "게시판 포스트 리스트", notes = "한 카테고리 내 모든 포스트 리스트")
     @GetMapping(value = "/blog/{nickname}/{boardName}/post_list")
-    public ListResult<ListResult> listPosts(@PathVariable String boardName, @PathVariable String nickname) {
+    public ListResult<ListResult> listPosts(@PathVariable String boardName, @PathVariable String nickname, @RequestParam(required = false, defaultValue = "1") long no) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
         List<ListResult> result = new ArrayList<>();
         List<Boolean> amIInTheList = new ArrayList<>();
         List<String> filePaths = new ArrayList<>();
+        Paging paging = new Paging(no);
         Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
         Board board = boardService.findBoard(boardName, member);
-        List<OnlyPostMapping> list = boardService.CategoryPostList(board.getBoardId()); //포스트 리스트
+        List<OnlyPostMapping> list = boardService.CategoryPostList(board.getBoardId(), paging); //포스트 리스트
         result.add(responseService.getListResult(list)); //포스트 리스트 데이터 넘기기
         int cnt = 0;
         if (logined.isPresent()) {

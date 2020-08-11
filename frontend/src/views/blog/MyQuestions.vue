@@ -5,8 +5,8 @@
             <h5>태그</h5>
             <hr class="ml-0" style="width:70%;">
             <button id="category-all" @click="getAllPosts" type="button" class="btn mb-3 p-0 text-left">전체보기()</button>
-            <div id="category-menu" v-for="category in categoryList" :key="category.boardId">
-                <button type="button" class="btn mb-3 p-0">{{ category.name }}({{  }})</button>
+            <div id="category-menu" v-for="(tag, index) in tagList" :key="tag.boardId">
+                <button type="button" class="btn mb-3 p-0">{{ tag.name }}({{ tagNum[index] }})</button>
             </div>
         </div>
 
@@ -15,18 +15,13 @@
             <div class="text-left ml-5 mt-5" v-if="postList.length == 0">
                 <h3>현재 등록된 글이 없습니다</h3>
             </div>
-            <div class="row"
-            >
+            <div class="row">
                 <div v-for="(item, index) in postList" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
                     <div class="card" style="width: 75%;">
-                        <img class="card-img-top" :src="cardImage" alt="Card image cap">
+                        <img class="card-img-top" :src="thumbnail1[index]" alt="Card image cap">
                         <div class="card-body pb-0">
                             <h5 class="card-title">{{ item.subject.slice(0, 10) + '...'  }}</h5>
                             <p class="card-text mb-3">{{ item.content.slice(0, 20) + '...' }}</p>
-                            <!-- 좋아요 부분 -->
-                            <span v-if="postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="postLike(item, false)"><i class="fas fa-heart"></i></span>
-                            <span v-if="!postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="postLike(item, true)"><i class="fas fa-heart"></i></span>
-                            <small :ref="'like-count-' + item.postId">{{ item.likes }}</small><small>개의 좋아요</small>
                         </div>
                         <div class="card-footer bg-transparent">
                             <button class="btn btn-sm" @click="gotoDetail(item)">글 보기</button>
@@ -89,14 +84,19 @@ export default {
 
     methods: {
         getAllPosts() {
+            const config = {
+                headers: {
+                    'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
+                }
+            }
+
             this.categoryOn = 1
-            axios.get(`${BACK_URL}/questions/${this.nickname}/qlist`)
+            axios.get(`${BACK_URL}/questions/${this.nickname}/qlist`, config)
                 .then(res => {
                     // 포스트 정보
-                    console.log(res.data.list)
-                    this.postList = res.data.list
+                    this.postList = res.data.list[0].list
                     // 포스트에 사용자가 좋아요를 눌렀는지에 대한 불린 값
-                    // this.postLike1 = res.data.list
+                    this.thumbnail1 = res.data.list[1].list
                 })
  
                 .catch(err => {
@@ -104,10 +104,13 @@ export default {
                 })
         },
        
-        getCategory() {
-            axios.get(`${BACK_URL}/blog/${this.nickname}/categories`)
+        getTags() {
+            this.msrl = this.$cookies.get('msrl')
+            axios.get(`${BACK_URL}/tags/list/${this.msrl}`)
                 .then(res => {
-                    this.categoryList = res.data.list
+                    this.tagList = res.data.list[0].list
+                    console.log(this.tagList)
+                    this.tagNum = res.data.list[1].list
                 })
                 .catch(err => {
                     console.log(err)
@@ -167,7 +170,7 @@ export default {
     
     created() {
         this.getAllPosts(),
-        this.getCategory()
+        this.getTags()
         
     },
     data() {
@@ -179,7 +182,9 @@ export default {
             postList: [],
             postListCategory: [],
             postListKeyword: [],
-            categoryList: [],
+            tagList: [],
+            tagNum: [],
+            msrl: '',
             currentCategory: '',
             
             // 검색 관련
@@ -194,7 +199,7 @@ export default {
                 3: '통합검색',
             },
             // 좋아요 관련
-            postLike1: [],
+            thumbnail1: [],
         }
     },
 }

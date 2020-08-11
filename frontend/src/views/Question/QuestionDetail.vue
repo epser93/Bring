@@ -46,32 +46,29 @@
         
 
         <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded" v-for="aArticle in aPost" :key="aArticle.aPostId">
-            <p>글쓴이: {{aArticle.member_nickname}}<span class="ml-5"> 좋아요 수: {{aArticle.likes}}</span></p> 
+            <p>글쓴이: {{aArticle.member_nickname}}<span class="ml-5"></span></p> 
             <span>채택여부: {{aArticle.selected}}</span>
+            <p>번호: {{aArticle.apostId}}</p>
             
             <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="nickname===aArticle.member_nickname">삭제</b-button>
              
+        <div>
             <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="nickname===qPost.member_nickname">채택</b-button>
+        </div>
+            
  
             <hr>
             {{aArticle.answer}}
-            {{aArticle}}
+
             <!--좋아요-->
-            <span v-if="answerLike[aArticle.apostId]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="likeAnswer(aArticle, true)"><i class="fas fa-heart"></i></span>
-            <span v-if="!answerLike[aArticle.apostId]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="likeAnswer(aArticle, false)"><i class="fas fa-heart"></i></span>
+            <span v-if="like" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="likeAnswer(aArticle, false)"><i class="fas fa-heart"></i></span>
+            <span v-if="!like" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="likeAnswer(aArticle, true)"><i class="fas fa-heart"></i></span>
             <small :ref="'like-count-' + aArticle.apostId">{{ aArticle.likes }}</small><small>개의 좋아요</small>
             
-            <b-button variant="warning" @click='commentOpen' v-if="nickname===aArticle.writer">수정</b-button>
-            <div v-if="commentOpen">
-                <b-form-textarea
-                    id="textarea-rows"
-                    placeholder="Tall textarea"
-                    rows="8"
-                    v-model="answerData.answer"
-                ></b-form-textarea>
-            </div>
+            <!-- 답변 수정-->
+            
+            <b-button variant="warning" @click='modifyAnswer(aArticle.apostId)' v-if="nickname===aArticle.member_nickname">수정</b-button>
 
-            <b-button variant="warning" @click="modifyAnswer(aArticle.apostId)" v-if="nickname===aArticle.writer">수정</b-button>
         </div>
 
         <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded">
@@ -124,6 +121,7 @@ export default {
             // 답변 추천(좋아요)
             answerer: this.$cookies.get('nickname'),
             answerLike:[],      
+            like:null,
         }
      },
     methods: {
@@ -222,7 +220,7 @@ export default {
         },
         // 답변 추천(좋아요) 아직 안됨
         likeAnswer(aArticle,likeit){
-            
+            console.log(aArticle)
             const config={
                 headers:{
                     'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN'),
@@ -230,13 +228,11 @@ export default {
                 }
             }
             if (likeit === false) {
-                console.log(aArticle)
-                console.log(aArticle.apostId)
-                console.log(aArticle.member_nickname)
                 axios.post(`${BACK_URL}/answers/like/${aArticle.apostId}/${aArticle.member_nickname}`,likeit,config)
                     .then(res=>{
                         console.log(res)
                         this.$refs[`like-count-${aArticle.apostId}`][0].innerText = res.data.data
+                        this.like=false
                         this.getAnswer()
                     })
                     .catch(err=>{
@@ -248,6 +244,7 @@ export default {
                 axios.post(`${BACK_URL}/answers/like/${aArticle.apostId}/${aArticle.member_nickname}`,likeit,config)
                     .then(res=>{
                         this.$refs[`like-count-${aArticle.apostId}`][0].innerText = res.data.data 
+                        this.like=true
                         this.getAnswer()
                         console.log(res)
                     })
@@ -256,7 +253,7 @@ export default {
                     })
             }
         },
-        // 답변 채택 (되는데 모달로 할 때는 에러남// 그냥 에러남;;)
+        // 답변 채택 (되는데 하나 이상일때는 안되게)
         selectAnswer(aPostId){
             console.log(aPostId)
             const config={
@@ -264,6 +261,8 @@ export default {
                     'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN')
                 }
             }
+            const askAdopt = confirm("답변을 채택 하시겠습니까?")
+            if (askAdopt===true) {
             axios.post(`${BACK_URL}/answers/select/${aPostId}`,this.answerData,config)
             .then(res=>{
                 alert("채택 되었습니다")
@@ -274,6 +273,7 @@ export default {
                 console.log(err)
                 alert("더 이상 답변을 채택할 수 없습니다")
             })
+            }
         },
         // 답변 수정
         modifyAnswer(aPostId){
