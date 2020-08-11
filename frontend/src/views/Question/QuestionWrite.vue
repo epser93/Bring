@@ -61,7 +61,7 @@ export default {
         axios.post(`${BACK_URL}/questions/ask`,this.questionData,config)
         .then(res=>{
           console.log(res)
-          this.thumbnailPost()
+          // this.thumbnailPost()
           this.$router.push({name : 'Question'})
         })
         .catch(err=>{
