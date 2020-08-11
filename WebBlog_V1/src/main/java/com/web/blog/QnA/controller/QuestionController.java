@@ -74,6 +74,7 @@ public class QuestionController {
         LocalDateTime date = LocalDateTime.now();
         date.minus(30, ChronoUnit.DAYS);
         List<OnlyQpostMapping> list = qpostRepository.findByCreatedAtLessThanEqualOrderByCreatedAtDesc(date);
+        result.add(responseService.getListResult(list));
         if (logined.isPresent()) {
             for (OnlyQpostMapping qm : list) {
                 long qpostId = qm.getQpostId();
@@ -113,6 +114,7 @@ public class QuestionController {
         LocalDateTime date = LocalDateTime.now();
         date.minus(30, ChronoUnit.DAYS);
         List<OnlyQpostMapping> list = qpostRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualOrAnswerCntGreaterThanEqualAndCreatedAtLessThanEqualOrderByCreatedAtDesc(20, date, 1, date);
+        result.add(responseService.getListResult(list));
         if (logined.isPresent()) {
             for (OnlyQpostMapping qm : list) {
                 long qpostId = qm.getQpostId();
@@ -152,6 +154,7 @@ public class QuestionController {
         LocalDateTime date = LocalDateTime.now();
         date.minus(30, ChronoUnit.DAYS);
         List<OnlyQpostMapping> list = qpostRepository.findByMember_Nickname(nickname);
+        result.add(responseService.getListResult(list));
         if (logined.isPresent()) {
             for (OnlyQpostMapping qm : list) {
                 long qpostId = qm.getQpostId();
