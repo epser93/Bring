@@ -91,7 +91,8 @@ export default {
       } else {
         axios.get(`${BACK_URL}/questions/trend`)
           .then (res=> {
-            this.postings = res.data.list
+            this.postings = res.data.list[0].list
+            console.log(this.postings)
           })
           .catch (err => console.log(err))
       }
