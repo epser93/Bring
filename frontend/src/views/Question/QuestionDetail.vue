@@ -10,7 +10,7 @@
                 <b-col></b-col>
                 <b-col></b-col>
             <b-col>
-                
+               
                 <!-- 태그부분 -->
                 <div class="tag">
                     <span v-for="(tag,index) in this.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2">{{ tag }}</span>
@@ -37,7 +37,7 @@
                           
                           <!-- 분기처리/ 작성자와 현재 사용자의 이름이 같으면 삭제표시되게끔-->
                           <div v-if="this.nickname===qPost.member_nickname">
-                          <b-button @click="deleteQna" class="mr-1" ><b-icon icon="trash"></b-icon> 삭제</b-button>
+                          <b-button @click="deleteQna(qpost_id)" class="mr-1" ><b-icon icon="trash"></b-icon> 삭제</b-button>
                           <b-button @click="modifyQna(qpost_id)" variant="warning" class="ml-2">수정</b-button>
                           
                           </div>
@@ -58,7 +58,7 @@
             <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="nickname===aArticle.member_nickname">삭제</b-button>
              
         <div>
-            <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="nickname===qPost.member_nickname">채택</b-button>
+            <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false)">채택</b-button>
         </div>
             
  
@@ -131,6 +131,9 @@ export default {
             answerLike:[],      
             like:null,
 
+            // 답변 채택
+            selectedAnswer:false,
+
             // 태그
             tags: ''
         }
@@ -158,7 +161,8 @@ export default {
             })
         },
         // 게시물 삭제
-        deleteQna(){
+        deleteQna(qpost_id){
+            console.log(qpost_id)
             const config = {
               headers: {
                 'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
@@ -166,14 +170,14 @@ export default {
             }
             const questionDelete = confirm("질문을 삭제 하시겠습니까?")
             if (questionDelete===true) {
-            axios.delete(`${BACK_URL}/questions/${this.qpost_id}`,config)
+            axios.delete(`${BACK_URL}/questions/${qpost_id}`,config)
             .then(res=>{
                 console.log(res)
                 alert('삭제가 완료 되었습니다.')
                 this.$router.push({ name: 'Question' })
             })
             .catch(err=>{
-                alert('채택 된 질문이 있다면 삭제 할 수 없습니다')
+                alert('답변이 달린 질문은 수정이나 삭제할 수 없습니다.')
                 console.log(err)
             })
             }
@@ -269,7 +273,7 @@ export default {
                     })
             }
         },
-        // 답변 채택 (되는데 하나 이상일때는 안되게)
+        // 답변 채택
         selectAnswer(aPostId){
             console.log(aPostId)
             const config={
@@ -282,6 +286,7 @@ export default {
             axios.post(`${BACK_URL}/answers/select/${aPostId}`,this.answerData,config)
             .then(res=>{
                 alert("채택 되었습니다")
+                this.selectedAnswer=true
                 this.getAnswer()
                 console.log(res)
             })
