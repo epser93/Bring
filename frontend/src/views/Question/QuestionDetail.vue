@@ -206,7 +206,7 @@ export default {
             axios.get(`${BACK_URL}/answers/${this.qpost_id}/answers`)
             .then(res=>{
                 this.aPost=res.data.list
-                
+                console.log(res.data.list)
             })
             .catch(err=>{
                 console.log(err)
