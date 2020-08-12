@@ -9,9 +9,9 @@
                         <div v-else>
                             <img class="rounded-circle mx-auto d-block" :src=userThumbnail alt="Card image cap" style="width:120px; height:120px;">
                         </div>
-                        <div class="d-flex justify-content-center">
-                            <h5 class="mt-2 mb-1"><b class="mr-3">{{ userInfo.nickname }}</b></h5>
-                            <button class="btn btn-success btn-sm" @click="gotoBlog"><i class="fas fa-home"></i></button>
+                        <div class="d-flex justify-content-center mb-1">
+                            <h5 class="mt-1 mb-1"><b class="mr-3">{{ userInfo.nickname }}</b></h5>
+                            <button class="btn btn-success btn-sm" id="homeBt" @click="gotoBlog"><i class="fas fa-home"></i></button>
                         </div>
                         <div class="location text-sm-center"><i class="far fa-envelope"></i>  {{ userInfo.uid }}</div>
                         <span><a href="" style="color:gray"><i class="fas fa-user-friends"></i> {{userInfo.followersCnt}} follower</a></span>
@@ -401,6 +401,9 @@ export default {
 }
 .r_master {
     color: #8b00ff
+}
+#homeBt {
+    height: fit-content;
 }
 </style>
 
