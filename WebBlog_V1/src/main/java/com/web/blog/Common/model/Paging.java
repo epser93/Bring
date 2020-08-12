@@ -15,7 +15,7 @@ import java.util.List;
 public class Paging {
 
     public static final int COUNT_OF_PAGING_CONTENTS = 8;
-    public static final int COUNT_OF_PAGING = 5;
+    public static final int COUNT_OF_PAGING = 3;
 
     private int pageNo;
     private int prev;

@@ -25,7 +25,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -78,18 +77,9 @@ public class BoardController {
 
     @ApiOperation(value = "게시판 카테고리 목록", notes = "게시판 카테고리 리스트")
     @GetMapping(value = "/blog/{nickname}/categories")
-    public ListResult<ListResult> getBoards(@PathVariable String nickname) {
-        List<ListResult> results = new ArrayList<>();
+    public ListResult<Board> getBoards(@PathVariable String nickname) {
         Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
-        List<Board> boards = boardService.getBoards(member);
-        results.add(responseService.getListResult(boards));
-        List<Integer> postCnts = new ArrayList<>();
-        for(Board b : boards) {
-            int postCnt = b.getPostCnt();
-            postCnts.add(postCnt);
-        }
-        results.add(responseService.getListResult(postCnts));
-        return responseService.getListResult(results);
+        return responseService.getListResult(boardService.getBoards(member));
     }
 
     @ApiImplicitParams({
@@ -211,18 +201,17 @@ public class BoardController {
     })
     @ApiOperation(value = "게시판 내 검색", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 통합검색")
     @GetMapping(value = "/blog/{nickname}/search/category/{board_id}/{keyword}/{type}")
-    public ListResult<ListResult> searchAlgorithm(@PathVariable int type, @PathVariable long board_id, @PathVariable(required = false) String keyword, @PathVariable String nickname, @RequestParam(required = false, defaultValue = "1") long no) {
+    public ListResult<ListResult> searchAlgorithm(@PathVariable int type, @PathVariable long board_id, @PathVariable(required = false) String keyword, @PathVariable String nickname) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
         Board board = boardService.getBoard(board_id);
         Member member = board.getMember();
-        Paging paging = new Paging(no);
         List<ListResult> result = new ArrayList<>();
         List<Boolean> amIInTheList = new ArrayList<>();
         List<String> filePaths = new ArrayList<>();
         if (nickname.equals(member.getNickname())) {
-            List<OnlyPostMapping> list = searchService.CategoryPostSearch(type, board_id, keyword, paging);
+            List<OnlyPostMapping> list = searchService.CategoryPostSearch(type, board_id, keyword);
             list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
             result.add(responseService.getListResult(list));
 
@@ -291,16 +280,15 @@ public class BoardController {
     })
     @ApiOperation(value = "블로그 포스트 리스트", notes = "한 블로그 내 모든 포스트 리스트")
     @GetMapping(value = "/blog/{nickname}/post_list")
-    public ListResult<ListResult> listPosts(@PathVariable String nickname, @RequestParam(required = false, defaultValue = "1") long no) {
+    public ListResult<ListResult> listPosts(@PathVariable String nickname) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
         Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
-        Paging paging = new Paging(no);
         List<ListResult> result = new ArrayList<>();
         List<Boolean> amIInTheList = new ArrayList<>();
         List<String> filePaths = new ArrayList<>();
-        List<OnlyPostMapping> list = postRepository.findAllByMember_Nickname(nickname, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<OnlyPostMapping> list = postRepository.findAllByMember_Nickname(nickname);
         list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
         result.add(responseService.getListResult(list));
         int cnt = 0;
@@ -368,15 +356,14 @@ public class BoardController {
     })
     @ApiOperation(value = "블로그 내 검색", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 통합검색")
     @GetMapping(value = "/blog/{nickname}/search/blogPosts/{keyword}/{type}")
-    public ListResult<ListResult> searchAlgorithm(@PathVariable int type, @PathVariable String nickname, @PathVariable(required = false) String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
+    public ListResult<ListResult> searchAlgorithm(@PathVariable int type, @PathVariable String nickname, @PathVariable(required = false) String keyword) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
-        Paging paging = new Paging(no);
         List<ListResult> result = new ArrayList<>();
         List<Boolean> amIInTheList = new ArrayList<>();
         Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
-        List<OnlyPostMapping> list = searchService.BlogPostSearch(type, nickname, keyword, paging);
+        List<OnlyPostMapping> list = searchService.BlogPostSearch(type, nickname, keyword);
         list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
         result.add(responseService.getListResult(list));
         List<String> filePaths = new ArrayList<>();
@@ -444,17 +431,16 @@ public class BoardController {
     })
     @ApiOperation(value = "모든 블로그의 포스트 리스트 최신글", notes = "사이트의 모든 블로그의 포스트 리스트 인기글")
     @GetMapping(value = "/blog/recent")
-    public ListResult<ListResult> listRecentPosts(@RequestParam(required = false, defaultValue = "1") long no) {
+    public ListResult<ListResult> listRecentPosts() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
-        Paging paging = new Paging(no);
         List<ListResult> result = new ArrayList<>();
         List<Boolean> amIInTheList = new ArrayList<>();
 
         LocalDateTime date = LocalDateTime.now();
         date.minus(14, ChronoUnit.DAYS);
-        List<OnlyPostMapping> list = postRepository.findByCreatedAtLessThanEqualOrderByCreatedAtDesc(date, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<OnlyPostMapping> list = postRepository.findByCreatedAtLessThanEqualOrderByCreatedAtDesc(date);
         list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
         result.add(responseService.getListResult(list));
         List<String> filePaths = new ArrayList<>();
@@ -524,16 +510,15 @@ public class BoardController {
     })
     @ApiOperation(value = "모든 블로그의 포스트 리스트 인기글", notes = "사이트의 모든 블로그의 포스트 리스트 인기글")
     @GetMapping(value = "/blog/trend")
-    public ListResult<ListResult> listTrendPosts(@RequestParam(required = false, defaultValue = "1") long no) {
+    public ListResult<ListResult> listTrendPosts() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
-        Paging paging = new Paging(no);
         List<ListResult> result = new ArrayList<>();
         List<Boolean> amIInTheList = new ArrayList<>();
         LocalDateTime date = LocalDateTime.now();
         date.minus(14, ChronoUnit.DAYS);
-        List<OnlyPostMapping> list = postRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualOrLikesGreaterThanEqualAndCreatedAtLessThanEqualOrderByCreatedAtDesc(40, date, 20, date, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<OnlyPostMapping> list = postRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualOrLikesGreaterThanEqualAndCreatedAtLessThanEqualOrderByCreatedAtDesc(40, date, 20, date);
         list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
         result.add(responseService.getListResult(list));
         List<String> filePaths = new ArrayList<>();
@@ -586,8 +571,7 @@ public class BoardController {
                         }
                         filePaths.add(filePath);
                     } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
+
                     }
                 }
             }
@@ -604,15 +588,14 @@ public class BoardController {
     })
     @ApiOperation(value = "모든 블로그의 포스트 검색 ", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 작성자 검색, type 4: 통합검색, ")
     @GetMapping(value = "/search/all_blog_posts/{keyword}/{type}")
-    public ListResult<ListResult> searchAlgorithm(@PathVariable int type, @PathVariable(required = false) String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
+    public ListResult<ListResult> searchAlgorithm(@PathVariable int type, @PathVariable(required = false) String keyword) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
-        Paging paging = new Paging(no);
         List<ListResult> result = new ArrayList<>();
         List<Boolean> amIInTheList = new ArrayList<>();
 
-        List<OnlyPostMapping> list = searchService.SitePostSearch(type, keyword, paging);
+        List<OnlyPostMapping> list = searchService.SitePostSearch(type, keyword);
         list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
         result.add(responseService.getListResult(list));
         List<String> filePaths = new ArrayList<>();
@@ -640,8 +623,7 @@ public class BoardController {
                         }
                         filePaths.add(filePath);
                     } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
+
                     }
                 }
                 cnt++;
@@ -665,8 +647,7 @@ public class BoardController {
                         }
                         filePaths.add(filePath);
                     } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
+
                     }
                 }
             }
