@@ -55,13 +55,18 @@
             <span>채택여부: {{aArticle.selected}}</span>
             <p>번호: {{aArticle.apostId}}</p>
             
-            <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="nickname===aArticle.member_nickname">삭제</b-button>
+            <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="(nickname===aArticle.member_nickname && selectedAnswer===false)">삭제</b-button>
              
         <div>
             <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false)">채택</b-button>
         </div>
-            
- 
+
+            <!-- 만약 채택 된 답변이라면 -->
+            <div v-if="aArticle.selected===true">
+                <span><b-icon icon="patch-check-fll" variant="info"></b-icon>채택</span>
+            </div>
+
+
             <hr>
             {{aArticle.answer}}
 
@@ -133,6 +138,7 @@ export default {
 
             // 답변 채택
             selectedAnswer:false,
+            aPostSelected:null,
 
             // 태그
             tags: ''
@@ -210,7 +216,13 @@ export default {
             axios.get(`${BACK_URL}/answers/${this.qpost_id}/answers`)
             .then(res=>{
                 this.aPost=res.data.list
-                console.log(res.data.list)
+                console.log(res.data.list[0].selected)
+
+                // 채택 된 답변이 있으면 true로 바꿔줌
+                this.aPostSelected=res.data.list[0].selected
+                  if (this.aPostSelected===true){
+                    this.selectedAnswer=true
+                }
             })
             .catch(err=>{
                 console.log(err)
@@ -275,7 +287,6 @@ export default {
         },
         // 답변 채택
         selectAnswer(aPostId){
-            console.log(aPostId)
             const config={
                 headers:{
                     'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN')
@@ -286,7 +297,6 @@ export default {
             axios.post(`${BACK_URL}/answers/select/${aPostId}`,this.answerData,config)
             .then(res=>{
                 alert("채택 되었습니다")
-                this.selectedAnswer=true
                 this.getAnswer()
                 console.log(res)
             })
