@@ -31,6 +31,9 @@ import QuestionUpdate from '../views/Question/QuestionUpdate.vue'
 // 에디터(임시)
 import Editor from '../views/blog/Editor.vue'
 
+// 검색
+import Search from '../components/common/Search.vue'
+
 Vue.use(VueRouter)
 
 const routes = [{
@@ -61,6 +64,15 @@ const routes = [{
         component: UpdateForm,
         props: true
     },
+
+    // 헤더검색
+    {
+        path: '/search',
+        name: 'Search',
+        component: Search,
+
+    },
+
     // 유저 관련
     {
         path: '/user/login', // 곧 사라질 예정 로그인 모달로 처리함

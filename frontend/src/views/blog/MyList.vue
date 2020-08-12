@@ -166,7 +166,8 @@ export default {
         getCategory() {
             axios.get(`${BACK_URL}/blog/${this.nickname}/categories`)
                 .then(res => {
-                    this.categoryList = res.data.list
+                    this.categoryList = res.data.list[0].list
+                    // 전체 개시물 숫자 카운트
                     this.calPostsSum()
                 })
                 .catch(err => {
