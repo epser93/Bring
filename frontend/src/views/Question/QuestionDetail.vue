@@ -15,7 +15,7 @@
                 <div class="tag">
                     <span v-for="(tag,index) in this.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2">{{ tag }}</span>
                 </div>
-                
+                {{qPost.qpostId}}
                 작성자: {{qPost.member_nickname}}
                 <span class="text-muted ">작성시간: {{qPost.createdAt}}</span>
 
@@ -26,7 +26,7 @@
         <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded">
              <!-- <p><b-badge pill variant="success" class="mr-3">#{{qPost.tag}}</b-badge>
              </p> -->
-              <h5 class="card-text">{{qPost.content}}
+              <h5 class="card-text">{{qPost.content}}</h5>
                   
                   <br><br><br><br><br><br><br><br><br><br><br><br>
                   <hr>
@@ -39,70 +39,74 @@
                           <div v-if="this.nickname===qPost.member_nickname">
                           <b-button @click="deleteQna(qpost_id)" class="mr-1" ><b-icon icon="trash"></b-icon> 삭제</b-button>
                           <b-button @click="modifyQna(qpost_id)" variant="warning" class="ml-2">수정</b-button>
-                          
                           </div>
                       </div>
-                  </div>
-              </h5>
-
+                  </div>      
         </div>
 
-        <!-- 답변 리스트-->
-        
-
-        <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded" v-for="aArticle in aPost" :key="aArticle.aPostId">
-            <p>글쓴이: {{aArticle.member_nickname}}<span class="ml-5"></span></p> 
-            <span>채택여부: {{aArticle.selected}}</span>
-            <p>번호: {{aArticle.apostId}}</p>
-            
-            <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="(nickname===aArticle.member_nickname && selectedAnswer===false)">삭제</b-button>
-             
-        <div>
-            <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false)">채택</b-button>
-        </div>
-
-            <!-- 만약 채택 된 답변이라면 -->
-            <div v-if="aArticle.selected===true">
-                <span><b-icon icon="patch-check-fll" variant="info"></b-icon>채택</span>
-            </div>
-
-
-            <hr>
-            {{aArticle.answer}}
-
-            <!--좋아요-->
-            <span v-if="like" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="likeAnswer(aArticle, false)"><i class="fas fa-heart"></i></span>
-            <span v-if="!like" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="likeAnswer(aArticle, true)"><i class="fas fa-heart"></i></span>
-            <small :ref="'like-count-' + aArticle.apostId">{{ aArticle.likes }}</small><small>개의 좋아요</small>
-            
-            <!-- 답변 수정-->
-            <b-button variant="warning" @click='commentOpen' v-if="nickname===aArticle.member_nickname">수정</b-button>
-
-            <!-- <b-button variant="warning" @click='modifyAnswer(aArticle.apostId)' v-if="nickname===aArticle.member_nickname">수정</b-button> -->
-
-        </div>
-
+        <!-- 답변 작성 -->
         <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded">
              <span v-if="writeComment">
                  <div>
-                <b-form-textarea
-                    id="textarea-rows"
-                    placeholder="Tall textarea"
-                    rows="8"
-                    v-model="answerData.answer"
-                ></b-form-textarea>
-            </div>
-            <button class="btn btn-success btn-sm mx-1" v-if="answerUpdate" @click='writeAnswer' >답변 달기</button>
-            <button class="btn btn-success btn-sm mx-1"  v-if="!answerUpdate" @click='writeAnswer' >답변 수정</button>
-            <button class="btn btn-success btn-sm mx-1" @click='commentClose'>답변창 닫기</button>
-            <!-- 누르면 새로 렌더해주게끔 로직짜야함-->
+                    <b-form-textarea
+                        id="textarea-rows"
+                        placeholder="Tall textarea"
+                        rows="8"
+                        v-model="answerData.answer"
+                    ></b-form-textarea>
+                </div>
+                <button class="btn btn-success btn-sm mx-1" @click='writeAnswer' >답변 달기</button>
+                <button class="btn btn-success btn-sm mx-1" @click='commentClose'>답변창 닫기</button>
+            </span>
+            <span v-else-if="this.nickname!=qPost.member_nickname">
+                <button class="btn btn-success btn-sm mx-1" @click='commentOpen' >답변창 열기</button>
+            </span>
+        </div>
+        
+        <!-- 답변 리스트-->
+        <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded" v-for="(aArticle,index) in aPost" :key="aArticle.aPostId">
+            <p>글쓴이: {{aArticle.member_nickname}}
+                
+                <!-- 만약 채택 된 답변이라면 -->
+                <span v-if="aArticle.selected===true"><b-icon icon="patch-check-fll" variant="info"></b-icon>채택된 답변</span>
+                <span v-else>
+                    <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="(nickname===aArticle.member_nickname && selectedAnswer===false)">삭제</b-button>
+                    <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false)">채택</b-button>
+                    <!-- 답변 수정-->
+                    <b-button variant="warning" @click='modifyOpen(aArticle.apostId)' v-if="nickname===aArticle.member_nickname">수정</b-button>
+                    <!-- 답변 수정창 열기-->
+                    <span v-if="modifyComment">
+                        <div>
+                            <b-form-textarea
+                                id="textarea-rows"
+                                placeholder="Tall textarea"
+                                rows="8"
+                                v-model="answerData"
+                            ></b-form-textarea>
+                        </div>
+                        <button class="btn btn-success btn-sm mx-1" @click='writeAnswer(aArticle.apostId)' >답변 수정하기</button>
+                        <button class="btn btn-success btn-sm mx-1" @click='modifyClose(aArticle.apostId)'>답변창 닫기</button>
+                    </span>
+                </span>
+            </p> 
+
+            <hr>
+            {{aArticle.answer}}
+            <hr>
+
+
+            <!--좋아요-->
+            <span v-if="like[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="likeAnswer(aArticle, false)"><i class="fas fa-heart"></i></span>
+            <span v-if="!like[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="likeAnswer(aArticle, true)"><i class="fas fa-heart"></i></span>        
+            <small :ref="'like-count-' + aArticle.apostId">{{ aArticle.likes }}</small><small>개의 좋아요</small>
+            {{aArticle.likes}}
             
-        </span>
-        <span v-else-if="this.nickname!=qPost.member_nickname">
-            <button class="btn btn-success btn-sm mx-1" @click='commentOpen' >답변창 열기</button>
-        </span>
+
 
         </div>
+
+        
+
     </b-container>
   </div>
 </template>
@@ -130,15 +134,17 @@ export default {
             aPost:[],
             apost_id: this.$route.params.apostId,
             answerUpdate:false,
+            // 답변 수정
+            modifyComment: false,
            
             // 답변 추천(좋아요)
-            answerer: this.$cookies.get('nickname'),
-            answerLike:[],      
-            like:null,
+            answerer: this.$cookies.get('nickname'),   
+            likes:null,
+            like:[],
 
             // 답변 채택
             selectedAnswer:false,
-            aPostSelected:null,
+           
 
             // 태그
             tags: ''
@@ -152,6 +158,26 @@ export default {
         // 답변창 닫기
         commentClose() {
             this.writeComment = false
+        },
+        // 답변 수정창 열기
+        modifyOpen(apostId){
+            console.log(apostId)
+            console.log(this.aPost[0])
+
+            const arr=this.aPost
+            console.log(arr.apostId)
+            for (const i in arr){
+                if (apostId===i.apostId){
+                    this.modifyComment=true
+                }
+            }
+            
+            
+        },
+        // 답변 수정창 닫기
+        modifyClose(apostId){
+            console.log(apostId)
+            this.modifyComment=false
         },
         // 게시물 호출
         getQna() {
@@ -202,26 +228,30 @@ export default {
             }
             axios.post(`${BACK_URL}/answers/${this.qpost_id}`,this.answerData,config)
             .then(res=>{
-                this.getAnswer() // 페이지 리로딩
                 this.writeComment = false
                 this.answerData.answer=""
+                this.getAnswer() // 페이지 리로딩
                 console.log(res)
             })
             .catch(err=>{
                 console.log(err)
             })
+            
         },
         // 답변 목록
         getAnswer(){
             axios.get(`${BACK_URL}/answers/${this.qpost_id}/answers`)
             .then(res=>{
-                this.aPost=res.data.list
-                console.log(res.data.list[0].selected)
-
-                // 채택 된 답변이 있으면 true로 바꿔줌
-                this.aPostSelected=res.data.list[0].selected
-                  if (this.aPostSelected===true){
-                    this.selectedAnswer=true
+                this.aPost=res.data.list[0].list
+                // 좋아요 불리언 값
+                this.like=res.data.list[1].list
+                
+                // 채택된 값이 하나라도 있으면 채택 못해주게끔
+                const array=res.data.list[0].list
+                for (const i in array){
+                    if (array[i].selected===true){
+                        this.selectedAnswer=true
+                    }
                 }
             })
             .catch(err=>{
@@ -252,31 +282,31 @@ export default {
         },
         // 답변 추천(좋아요) 아직 안됨
         likeAnswer(aArticle,likeit){
-            console.log(aArticle)
             const config={
                 headers:{
                     'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN'),
                     'Content-Type': 'application/json'
                 }
             }
+            console.log(this.$refs[`like-count-${aArticle.apostId}`][0].innerText)
             if (likeit === false) {
                 axios.post(`${BACK_URL}/answers/like/${aArticle.apostId}/${aArticle.member_nickname}`,likeit,config)
                     .then(res=>{
-                        console.log(res)
+                        console.log(this.$refs)
+                        console.log(res.data.data)
                         this.$refs[`like-count-${aArticle.apostId}`][0].innerText = res.data.data
-                        this.like=false
+                       
                         this.getAnswer()
                     })
                     .catch(err=>{
                         console.log(err)
                     })
             }else{
-                console.log(aArticle)
                 
                 axios.post(`${BACK_URL}/answers/like/${aArticle.apostId}/${aArticle.member_nickname}`,likeit,config)
                     .then(res=>{
                         this.$refs[`like-count-${aArticle.apostId}`][0].innerText = res.data.data 
-                        this.like=true
+                       
                         this.getAnswer()
                         console.log(res)
                     })
