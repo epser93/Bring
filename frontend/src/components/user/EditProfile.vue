@@ -212,7 +212,8 @@ export default {
                 console.log("수정완료")
                 this.$cookies.set('nickname', this.changeData.nickname)
                 //this.$router.go(-1)
-                this.$router.push({ name: 'Profile', params: {changeNickname: this.changeData.nickname} })                
+                this.$router.push({ name: 'Profile', query: {nickname: this.changeData.nickname}})    
+                location.reload()  // 여기
           })
           .catch((err) => {
             console.log('에러보기')
@@ -273,7 +274,7 @@ export default {
         axios.post(`${BACK_URL}/member/profile/image/${this.userInfo.msrl}`, formData, config)
           .then(() => {
                 console.log("사진완료")
-                this.$router.push({ name : "Profile" })                
+                this.$router.push({ name: 'Profile', query: { nickname: this.loginNickname }})           
           })
           .catch((err) => {
             console.error(err)
