@@ -35,7 +35,7 @@
             <div class="row">
                 <div v-for="(item, index) in postList" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
                     <div class="card" style="width: 75%;">
-                        <img class="card-img-top" :src="thumbnail1[index]" alt="Card image cap">
+                        <img class="card-img-top" :src="thumbnail1[index]" alt="Card image cap" style="height: 150px;">
                         <div class="card-body pb-0">
                             <h5 class="card-title">{{ item.subject.slice(0, 10) + '...'  }}</h5>
                             <p class="card-text mb-3">{{ item.content.slice(0, 20) + '...' }}</p>
@@ -63,7 +63,7 @@
             <div class="row">
                 <div v-for="(item, index) in postListCategory" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
                     <div class="card" style="width: 75%;">
-                        <img class="card-img-top" :src="thumbnail2[index]" alt="Card image cap">
+                        <img class="card-img-top" :src="thumbnail2[index]" alt="Card image cap" style="height: 150px;">
                         <div class="card-body pb-0">
                             <h5 class="card-title">{{ item.subject.slice(0, 10) + '...'  }}</h5>
                             <p class="card-text mb-3">{{ item.content.slice(0, 20) + '...' }}</p>
@@ -91,7 +91,7 @@
             <div class="row">
                 <div v-for="(item, index) in postListKeyword" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
                     <div class="card" style="width: 75%;">
-                        <img class="card-img-top" :src="thumbnail3[index]" alt="Card image cap">
+                        <img class="card-img-top" :src="thumbnail3[index]" alt="Card image cap" style="height: 150px;">
                         <div class="card-body pb-0">
                             <h5 class="card-title">{{ item.subject.slice(0, 10) + '...'  }}</h5>
                             <p class="card-text mb-3">{{ item.content.slice(0, 20) + '...' }}</p>

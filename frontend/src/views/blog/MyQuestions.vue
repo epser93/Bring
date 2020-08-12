@@ -4,9 +4,9 @@
         <div class="nav col-2 flex-column text-left">
             <h5>태그</h5>
             <hr class="ml-0" style="width:70%;">
-            <button id="category-all" @click="getAllPosts" type="button" class="btn mb-3 p-0 text-left">전체보기()</button>
+            <button id="category-all" @click="getAllPosts" type="button" class="btn mb-3 p-0 text-left">전체보기</button>
             <div id="category-menu" v-for="(tag, index) in tagList" :key="tag.boardId">
-                <button type="button" class="btn mb-3 p-0">{{ tag.name }}({{ tagNum[index] }})</button>
+                <button type="button" @click="getSomePosts(tag)" class="btn mb-3 p-0">{{ tag }}({{ tagNum[index] }})</button>
             </div>
         </div>
 
@@ -95,8 +95,9 @@ export default {
                 .then(res => {
                     // 포스트 정보
                     this.postList = res.data.list[0].list
-                    // 포스트에 사용자가 좋아요를 눌렀는지에 대한 불린 값
+                    // 썸네일
                     this.thumbnail1 = res.data.list[1].list
+                    console.log(res.data)
                 })
  
                 .catch(err => {
@@ -109,7 +110,6 @@ export default {
             axios.get(`${BACK_URL}/tags/list/${this.msrl}`)
                 .then(res => {
                     this.tagList = res.data.list[0].list
-                    console.log(this.tagList)
                     this.tagNum = res.data.list[1].list
                 })
                 .catch(err => {
@@ -117,17 +117,8 @@ export default {
                 })
         },
         // 카테고리에 맞는 포스트만 가져오기
-        getSomePosts(categoryName) {
-            this.categoryOn = 2
-            axios.get(`${BACK_URL}/blog/${this.nickname}/${categoryName}/post_list`)
-                .then(res => {
-                    this.postListCategory = res.data.list[0].list
-                    // 카테고리 바로 에디터로 가져가기 위한 용도
-                    this.currentCategory = categoryName
-                })
-                .catch(err => {
-                    console.log(err)
-                })
+        getSomePosts(tag) {
+            console.log(tag)
         },
 
         // 포스트 디테일
