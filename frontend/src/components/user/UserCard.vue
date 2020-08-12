@@ -16,7 +16,7 @@
                         <div class="location text-sm-center"><i class="far fa-envelope"></i>  {{ userInfo.uid }}</div>
                         <span><a href="" style="color:gray"><i class="fas fa-user-friends"></i> {{userInfo.followersCnt}} follower</a></span>
                         <span> · </span>
-                        <span><a href="" style="color:gray"> {{userInfo.followingCnt}} follower</a></span>
+                        <span><a href="" style="color:gray"> {{userInfo.followingCnt}} following</a></span>
                         <div v-if="loginNickname == userNickname"> 
                             <button class="btn btn-outline-info btn-sm mx-1 mt-2" @click="gotoEdit">
                                 <i class="fas fa-user-tie"></i> Edit profile
@@ -148,64 +148,7 @@ export default {
   },
   
   created() {
-    const config = {
-        headers: {
-        'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
-        }
-    }
-    
-    this.userNickname = this.$route.query.nickname
-    console.log(this.loginNickname)
-    this.loginNickname = this.$cookies.get('nickname')
-
-    axios.get(`${BACK_URL}/member/${this.userNickname}/profile`,config)
-    .then(res => {
-        console.log(res)
-        this.userInfo = res.data.list[0].list[0]
-        this.userFCheck = res.data.list[1].list[0]
-        this.userFerList = res.data.list[2]
-        this.userFingList = res.data.list[3]
-        this.userPostList = res.data.list[4].list
-        this.userThumbnail = res.data.list[5].list[0]
-       
-        for(var i=0; i<this.userPostList.length; i++){
-            this.userPostList[i] = moment(this.userPostList[i], "YYYY-MM-DD").format().slice(0,10)
-            if(this.userPostList[i] in this.cntPostList){
-                this.cntPostList[this.userPostList[i]] += 1
-            }
-            else{
-                this.cntPostList[this.userPostList[i]] = 1
-            }
-        }
-        for(var key in this.cntPostList){
-            var tmp = {date:key, count:this.cntPostList[key]}
-            this.valPostList.push(tmp)
-        }         
-        this.userScore = this.userInfo.score
-    })
-    .catch((err) => {
-        console.error(err)
-    }),
-
-    // 유저 랭크 가져오기
-    axios.get(`${BACK_URL}/member/rank`)
-    .then(res => {
-        this.userRank = res.data.list
-        this.allUsers = this.userRank.length
-    })
-    .catch((err) => {
-        console.error(err)
-    })
-
-    // 팔로우 목록 가져오기
-    // axios.get(`${BACK_URL}/follow/ings/${this.userInfo.msrl}`)
-    // .then(res => {
-    //     console.log(res)
-    // })
-    // .catch((err) => {
-    //     console.error(err)
-    // })
-
+      this.Init()
   },
 
   watch: {
@@ -333,26 +276,26 @@ export default {
         var currentDateWithFormat = new Date().toJSON().slice(0,10);
         this.todays = currentDateWithFormat
       },
-      gotoEdit() {
+    gotoEdit() {
           this.$router.push({ name : "Edit" })
       },
-      doFollow() {
+     doFollow() {
         const config = {
             headers: {
                 'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
                 }
         }
         console.log(this.userInfo.msrl)
-        axios.post(`${BACK_URL}/follow/${this.userInfo.msrl}`, config)
+        axios.post(`${BACK_URL}/follow/${this.userInfo.msrl}`, {msrl:this.userInfo.msrl}, config)
             .then(() => {
                 console.log("팔로우완료")
-                // this.$router.push({ name: 'Profile' })
+                this.Init()
             })
             .catch((err) => {
                 console.error(err)
             })
         },
-      unFollow() {
+    unFollow() {
         const config = {
             headers: {
                 'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
@@ -361,16 +304,75 @@ export default {
         axios.delete(`${BACK_URL}/follow/${this.userInfo.msrl}`, config)
             .then(() => {
                 console.log("팔로우취소")
-                // this.$router.push({ name: "Profile" })
+                this.Init()
             })
             .catch((err) => {
                 console.error(err)
             })
         },
-      gotoBlog(){
+    gotoBlog(){
           this.$router.push({ name: 'MyBlog', params: { nickname: this.userNickname }})
+      },
 
-      }
+    Init() {
+        const config = {
+            headers: {
+            'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
+            }
+        }
+    
+        this.userNickname = this.$route.query.nickname
+        console.log(this.loginNickname)
+        this.loginNickname = this.$cookies.get('nickname')
+
+        axios.get(`${BACK_URL}/member/${this.userNickname}/profile`,config)
+        .then(res => {
+            console.log(res)
+            this.userInfo = res.data.list[0].list[0]
+            this.userFCheck = res.data.list[1].list[0]
+            this.userFerList = res.data.list[2]
+            this.userFingList = res.data.list[3]
+            this.userPostList = res.data.list[4].list
+            this.userThumbnail = res.data.list[5].list[0]
+        
+            for(var i=0; i<this.userPostList.length; i++){
+                this.userPostList[i] = moment(this.userPostList[i], "YYYY-MM-DD").format().slice(0,10)
+                if(this.userPostList[i] in this.cntPostList){
+                    this.cntPostList[this.userPostList[i]] += 1
+                }
+                else{
+                    this.cntPostList[this.userPostList[i]] = 1
+                }
+            }
+            for(var key in this.cntPostList){
+                var tmp = {date:key, count:this.cntPostList[key]}
+                this.valPostList.push(tmp)
+            }         
+            this.userScore = this.userInfo.score
+        })
+        .catch((err) => {
+            console.error(err)
+        }),
+
+        // 유저 랭크 가져오기
+        axios.get(`${BACK_URL}/member/rank`)
+        .then(res => {
+            this.userRank = res.data.list
+            this.allUsers = this.userRank.length
+        })
+        .catch((err) => {
+            console.error(err)
+        })
+
+        // 팔로우 목록 가져오기
+        // axios.get(`${BACK_URL}/follow/ings/${this.userInfo.msrl}`)
+        // .then(res => {
+        //     console.log(res)
+        // })
+        // .catch((err) => {
+        //     console.error(err)
+        // })
+    }   
   },
   mounted () {
       this.callFunction()
