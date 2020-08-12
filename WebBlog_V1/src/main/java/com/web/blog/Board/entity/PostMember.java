@@ -1,5 +1,6 @@
 package com.web.blog.Board.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.web.blog.Member.entity.Member;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,10 +17,12 @@ public class PostMember {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne
     @JoinColumn(name = "msrl")
     private Member member;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;

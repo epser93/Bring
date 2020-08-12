@@ -234,9 +234,9 @@ public class PostService {
         String writer = post.getMember().getNickname();
         Optional<Member> member2 = memberRepository.findByNickname(writer);
         if (!member2.get().getNickname().equals(member.getNickname())) throw new CNotOwnerException();
-        tagService.deleteTags(post);
-        replyService.deleteReplies(post);
-        deleteLikes(post);
+//        tagService.deleteTags(post);
+//        replyService.deleteReplies(post);
+//        deleteLikes(post);
         postRepository.delete(post);
         boardRepository.updatePostCntMinus(post.getBoard().getBoardId());
         if (postUploadsRepository.findByPostId(postId).isPresent()) { //포스트에 사진이 한장이라도 존재하면~
