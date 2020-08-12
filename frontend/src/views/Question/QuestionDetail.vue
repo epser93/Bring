@@ -73,9 +73,9 @@
                     <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="(nickname===aArticle.member_nickname && selectedAnswer===false)">삭제</b-button>
                     <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false)">채택</b-button>
                     <!-- 답변 수정-->
-                    <b-button variant="warning" @click='modifyOpen(aArticle.apostId)' v-if="nickname===aArticle.member_nickname">수정</b-button>
+                    <b-button variant="warning"  v-if="nickname===aArticle.member_nickname">수정</b-button>
                     <!-- 답변 수정창 열기-->
-                    <span v-if="modifyComment">
+                    <!-- <span v-if="modifyComment">
                         <div>
                             <b-form-textarea
                                 id="textarea-rows"
@@ -86,7 +86,7 @@
                         </div>
                         <button class="btn btn-success btn-sm mx-1" @click='writeAnswer(aArticle.apostId)' >답변 수정하기</button>
                         <button class="btn btn-success btn-sm mx-1" @click='modifyClose(aArticle.apostId)'>답변창 닫기</button>
-                    </span>
+                    </span> -->
                 </span>
             </p> 
 
@@ -135,7 +135,8 @@ export default {
             apost_id: this.$route.params.apostId,
             answerUpdate:false,
             // 답변 수정
-            modifyComment: false,
+            // modifyComment: false,
+            // id:0,
            
             // 답변 추천(좋아요)
             answerer: this.$cookies.get('nickname'),   
@@ -160,25 +161,23 @@ export default {
             this.writeComment = false
         },
         // 답변 수정창 열기
-        modifyOpen(apostId){
-            console.log(apostId)
-            console.log(this.aPost[0])
+        // modifyOpen(apostId){
+        //     // console.log(arr)
+        //     this.id=apostId
+        //     console.log(apostId)
+        //     console.log(this.id)
+            
+        //     if (apostId===this.aPost[this.id-1].apostId){
+        //         this.modifyComment=true
+        //         break;
+        //     } 
+        // },
+        // // 답변 수정창 닫기
+        // modifyClose(apostId){
+        //     console.log(apostId)
+        //     this.modifyComment=false
+        // },
 
-            const arr=this.aPost
-            console.log(arr.apostId)
-            for (const i in arr){
-                if (apostId===i.apostId){
-                    this.modifyComment=true
-                }
-            }
-            
-            
-        },
-        // 답변 수정창 닫기
-        modifyClose(apostId){
-            console.log(apostId)
-            this.modifyComment=false
-        },
         // 게시물 호출
         getQna() {
             axios.get(`${BACK_URL}/questions/${this.qpost_id}`)
@@ -351,10 +350,7 @@ export default {
                 console.log(err)
             })
         },
-        
-        
     },
-    
     created(){
         this.getQna()
         this.getAnswer()
