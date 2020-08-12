@@ -6,7 +6,7 @@
     </div>
 
     <!-- 모달 -->
-    <div v-if="categoryList.length === 0">
+    <div v-if="modal">
       <CreateCategoryWarning />
     </div>
 
@@ -76,11 +76,11 @@ export default {
       categoryList: [],
       thumbnail: '',
       tag: null,
+      modal: false,
     }
   },
   methods: {
     postText() {
-      console.log(this.aboutText)
       const config = {
           headers: {
             'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
@@ -120,6 +120,11 @@ export default {
                 console.log(err)
             })
     },
+    getModal() {
+      if (this.categoryList.length === 0) {
+        this.modal = true 
+      }
+    },
 
     // 썸네일 관련
     thumbnailSelect() {
@@ -151,6 +156,12 @@ export default {
   created() {
     this.getCategory(),
     this.aboutText.boardName = this.$route.params.category
+    
+  },
+  watch: {
+    'categoryList' () {
+        this.getModal()
+    }
   }
 };
 </script>

@@ -60,7 +60,6 @@ export default {
     methods: {
       // 게시물 작성
       qnaWrite(){
-        console.log(this.questionData)
         const config = {
               headers: {
                 'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
@@ -69,8 +68,9 @@ export default {
         axios.post(`${BACK_URL}/questions/ask`,this.questionData,config)
         .then(res=>{
           console.log(res)
-          // this.thumbnailPost()
+          this.thumbnailPost()
           this.$router.push({name : 'Question'})
+          this.$router.go(0) // 이 부분 안해주면 question으로 돌아갈 때 썸네일이 안보임
         })
         .catch(err=>{
           console.log(err)
