@@ -8,6 +8,7 @@ import com.web.blog.Board.repository.PostMemberRepository;
 import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Board.service.BoardService;
 import com.web.blog.Board.service.PostService;
+import com.web.blog.Common.advice.exception.CNicknameExistException;
 import com.web.blog.Common.advice.exception.CPasswordDoesntMatch;
 import com.web.blog.Common.advice.exception.CPasswordLengthException;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
@@ -175,35 +176,6 @@ public class MemberController {
         return responseService.getListResult(result); //출력
     }
 
-//    @Transactional
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
-//    })
-//    @ApiOperation(value = "마이페이지 조회", notes = "마이페이지 조회")
-//    @GetMapping("/mypage")
-//    public String mypage() throws JsonProcessingException {
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String id = authentication.getName();
-//        Optional<Member> logined = repository.findByUid(id);
-//        Optional<OnlyMemberMapping> omm = repository.findByMsrl(logined.get().getMsrl());
-//        StringBuilder sb = new StringBuilder();
-//        ObjectMapper mapper = new ObjectMapper();
-//
-//        String json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getSingleResult(omm.get())); //조회하려는 멤버와 불린값 맵 설정
-//        sb.append(json);
-//        if(profileImgRepository.findByMsrl(logined.get().getMsrl()).isPresent()) {
-//            ProfileImgDto profileImgDto = profileImgService.getOneImg(logined.get().getMsrl());
-//            String filePath = "";
-//            if(profileImgDto != null) {
-//                filePath = profileImgDto.getImgFullPath();
-//            }
-//            json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getSingleResult(filePath)); //프로필 사진
-//            sb.append(",\n");
-//            sb.append(json);
-//        }
-//        return sb.toString();
-//    }
-
     @ApiOperation(value = "좋아요 글 목록", notes = "좋아요한 글의 목록을 보여준다.")
     @GetMapping(value = "/{nickname}/likedposts")
     public List<Post> listLiked(@PathVariable String nickname) {
@@ -244,7 +216,8 @@ public class MemberController {
 
             //닉네임 변경(값 존재하면!)
             if(nickname.isPresent()) {
-                member.setNickname(nickname.get());
+                if(!repository.findByNickname(nickname.get()).isPresent()) member.setNickname(nickname.get());
+                else throw new CNicknameExistException();
             }
         }
         ObjectMapper mapper = new ObjectMapper();
@@ -286,8 +259,8 @@ public class MemberController {
             s3Service.delete(profileImgRepository.findByMsrl(msrl).get().getFilePath());
             profileImgRepository.deleteByMsrl(msrl);
         }
-        boardService.deletePosts(msrl);
-        boardService.deleteBoards(msrl);
+//        boardService.deletePosts(msrl);
+//        boardService.deleteBoards(msrl);
         repository.deleteById(msrl);
         return responseService.getSuccessResult();
     }

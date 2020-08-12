@@ -45,18 +45,26 @@ public class Post extends CommonDateEntity implements Serializable {
     @Column(nullable = true)
     private Long original;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board;
 
-    @ManyToOne
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "msrl")
     private Member member;
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private List<Reply> replies;
+
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<PostMember> postMembers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
     private List<PostTag> postTags = new ArrayList<>();
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})

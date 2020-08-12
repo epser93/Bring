@@ -68,11 +68,12 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     //한 블로그 내 모든 포스트 리스트
     List<OnlyPostMapping> findAllByMember_Nickname(String writer, Pageable pageable);
+
     List<OnlyPostMapping> findAllByMember_Nickname(String writer);
 
     //한 블로그 내 모든 포스트 통합 검색(or 블로그 내 모든 포스트 리스트)
 //    @Query(value = "select distinct * from post where nickname = :nickname and (subject like concat('%',:keyword,'%') or content like concat('%',:keyword,'%'))", nativeQuery = true)
-    List<OnlyPostMapping> findDistinctByMember_NicknameAndSubjectContainingOrMember_NicknameAndContentContaining(String writer1, String keyword1, String writer2, String keyword2,Pageable pageable);
+    List<OnlyPostMapping> findDistinctByMember_NicknameAndSubjectContainingOrMember_NicknameAndContentContaining(String writer1, String keyword1, String writer2, String keyword2, Pageable pageable);
 
     //한 블로그 내 모든 포스트 제목 검색
     List<OnlyPostMapping> findByMember_NicknameAndSubjectContaining(String writer, String keyword, Pageable pageable);

@@ -39,12 +39,12 @@ public class Reply extends CommonDateEntity implements Serializable {
     private Post post;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "msrl")
     private Member member;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @OneToMany(mappedBy = "reply", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "reply", cascade = CascadeType.REMOVE)
     private List<ReplyMember> replyMembers = new ArrayList<>();
 
     public Reply setUpdate(String reply) {

@@ -1,5 +1,6 @@
 package com.web.blog.QnA.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.web.blog.Board.entity.Tag;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,10 +17,12 @@ public class QpostTag {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne
     @JoinColumn(name = "tag_id")
     private Tag tag;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne
     @JoinColumn(name = "qpost_id")
     private Qpost qpost;

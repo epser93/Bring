@@ -74,10 +74,10 @@ public class BoardService {
     public boolean deleteBoard(long boardId, long msrl) {
         Board board = getBoard(boardId);
         Member member = board.getMember();
-        List<Post> list = postRepository.findByBoard(board);
-        for (Post p : list) {
-            deletePost(p.getPostId());
-        }
+//        List<Post> list = postRepository.findByBoard(board);
+//        for (Post p : list) {
+//            deletePost(p.getPostId());
+//        }
         if (msrl != member.getMsrl())
             throw new CNotOwnerException();
         boardRepository.delete(board);

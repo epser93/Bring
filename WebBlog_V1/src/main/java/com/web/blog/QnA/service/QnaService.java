@@ -113,11 +113,12 @@ public class QnaService {
     //질문 삭제
     public boolean deleteQuestion(long qpost_id, Member member) {
         Qpost qpost = qpostRepository.findById(qpost_id).orElseThrow(CResourceNotExistException::new);
+        if(qpost.getAnswerCnt() > 0) throw new CAnsweredQuestionException();
         if(!member.getMsrl().equals(qpost.getMember().getMsrl())) {
             throw new CNotOwnerException();
         } else {
             if (qpost.getAnswerCnt() == 0) {
-                qTagService.deleteQtags(qpost);
+//                qTagService.deleteQtags(qpost);
                 qpostRepository.delete(qpost);
                 return true;
             } else if (qpost.getAnswerCnt() > 0) throw new CAnsweredQuestionException();

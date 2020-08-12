@@ -5,10 +5,7 @@ import com.web.blog.Board.model.ParamPost;
 import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Board.service.PostService;
 import com.web.blog.Board.service.TagService;
-import com.web.blog.Common.advice.exception.CResourceNotExistException;
-import com.web.blog.Common.advice.exception.CSelectedAnswerException;
-import com.web.blog.Common.advice.exception.CUserExistException;
-import com.web.blog.Common.advice.exception.CUserNotFoundException;
+import com.web.blog.Common.advice.exception.*;
 import com.web.blog.Common.model.Paging;
 import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
@@ -390,6 +387,7 @@ public class QuestionController {
         List<SingleResult> result = new ArrayList<>();
         Qpost qpost1 = qpostRepository.findById(qpostId).get();
         if (qpost1.getSelectOver()) throw new CSelectedAnswerException();
+        if (qpost1.getAnswerCnt() > 0) throw new CAnsweredQuestionException();
         Qpost qpost = qnaService.updateQuestion(member, qpostId, paramQpost);
         if (!tags.isEmpty()) {
             for (String tag : tags) {

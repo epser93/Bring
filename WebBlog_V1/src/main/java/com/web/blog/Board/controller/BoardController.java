@@ -832,8 +832,16 @@ public class BoardController {
 
     @ApiOperation(value = "전체 태그 리스트", notes = "전체 태그 리스트")
     @GetMapping(value = "/tags/list")
-    public ListResult<OnlyTagMapping> allTagList() {
-        return responseService.getListResult(tagService.getAllTags());
+    public ListResult<ListResult> allTagList() {
+        List<ListResult> results = new ArrayList<>();
+        List<OnlyTagMapping> list = tagService.getAllTags();
+        results.add(responseService.getListResult(list));
+        List<Integer> cnts = new ArrayList<>();
+        for(OnlyTagMapping otm : list) {
+            cnts.add(otm.getTagUsageCnt());
+        }
+        results.add(responseService.getListResult(cnts));
+        return responseService.getListResult(results);
     }
 
     @ApiOperation(value = "사용자 태그 리스트", notes = "사용자 태그 리스트")
