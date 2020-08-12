@@ -278,8 +278,6 @@ export default {
             if (likeit === false) {
               axios.post(`${BACK_URL}/reply/like/${replyId}/${replyer}`, likeit, config)
                   .then(res => {
-                    console.log(this.$refs)
-                    console.log(res.data.data)
                       this.$refs[`like-comment-${replyId}`][0].innerText = res.data.data 
                       this.getComment()       
                   })
@@ -289,8 +287,6 @@ export default {
             } else {
               axios.post(`${BACK_URL}/reply/like/${replyId}/${replyer}`, likeit, config)
                   .then(res => {
-                      console.log(this.$refs)
-                      console.log(res.data.data)
                       this.$refs[`like-comment-${replyId}`][0].innerText = res.data.data
                       this.getComment()   
                   })
