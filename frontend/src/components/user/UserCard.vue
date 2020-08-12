@@ -9,7 +9,10 @@
                         <div v-else>
                             <img class="rounded-circle mx-auto d-block" :src=userThumbnail alt="Card image cap" style="width:120px; height:120px;">
                         </div>
-                        <h5 class="text-sm-center mt-2 mb-1"><b class="mr-3">{{ userInfo.nickname }}</b></h5>
+                        <div class="d-flex justify-content-center mb-1">
+                            <h5 class="mt-1 mb-1"><b class="mr-3">{{ userInfo.nickname }}</b></h5>
+                            <button class="btn btn-success btn-sm" id="homeBt" @click="gotoBlog"><i class="fas fa-home"></i></button>
+                        </div>
                         <div class="location text-sm-center"><i class="far fa-envelope"></i>  {{ userInfo.uid }}</div>
                         <span><a href="" style="color:gray"><i class="fas fa-user-friends"></i> {{userInfo.followersCnt}} follower</a></span>
                         <span> · </span>
@@ -84,7 +87,6 @@
             :range-color="['ebedf0', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']" />
             <!-- :range-color="['ebedf0', 'dae2ef', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']" -->
             <hr>
-            {{computedPost}}
 
         <!-- 여기다가는 chart 할거임 이것도 -->
             ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
@@ -251,6 +253,7 @@ export default {
         const myNick = this.userInfo.nickname
         const lenUserList = this.allUsers
         let ranks = this.userRank
+        console.log(ranks)
         let rank = 0
         ranks.sort(compareSecondColumn);
 
@@ -407,6 +410,9 @@ export default {
 }
 .r_master {
     color: #8b00ff
+}
+#homeBt {
+    height: fit-content;
 }
 </style>
 

@@ -2,7 +2,6 @@ package com.web.blog.QnA.service;
 
 import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Common.advice.exception.*;
-import com.web.blog.Common.model.Paging;
 import com.web.blog.Common.service.S3Service;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.repository.MemberRepository;
@@ -15,7 +14,6 @@ import com.web.blog.QnA.repository.ApostRepository;
 import com.web.blog.QnA.repository.QpostRepository;
 import com.web.blog.QnA.repository.QpostUploadsRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -73,15 +71,15 @@ public class QnaService {
     }
 
     //모든 질문글 검색
-    public List<OnlyQpostMapping> QuestionSearch(int which, String keyword, Paging paging) { //검색: which = 1~4
+    public List<Qpost> QuestionSearch(int which, long board_id, String keyword) { //검색: which = 1~4
         if (which == 1) { //제목 검색
-            return qpostRepository.findBySubjectContaining(keyword, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return qpostRepository.findBySubjectContaining(keyword);
         } else if (which == 2) { //내용 검색
-            return qpostRepository.findByContentContaining(keyword, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return qpostRepository.findByContentContaining(keyword);
         } else if (which == 3) { //작성자 검색
-            return qpostRepository.findByMember_NicknameContaining(keyword, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return qpostRepository.findByMember_NicknameContaining(keyword);
         } else { //통합검색
-            return qpostRepository.findDistinctBySubjectContainingOrContentContainingOrMember_NicknameContaining(keyword, keyword, keyword, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return qpostRepository.findDistinctBySubjectContainingOrContentContainingOrMember_NicknameContaining(keyword, keyword, keyword);
         }
     }
 
