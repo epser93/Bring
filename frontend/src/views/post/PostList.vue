@@ -10,7 +10,7 @@
             <div class="contents">
               <h4>{{ post.subject }}</h4>
               <p>{{ post.content }}</p>
-              <p class="comment-date">{{ post.createdAt}} · {{ post.replyCnt }}개의 댓글</p>
+              <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.replyCnt }}개의 댓글</p>
             </div>
           </div>
           <div class="writer-info">
@@ -32,7 +32,7 @@
               <div class="contents">
                 <h4>{{ post.subject }}</h4>
                 <p>{{ post.content }}</p>
-                <p class="comment-date">{{ post.createdAt}} · {{ post.answerCnt }}개의 답변</p>
+                <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.answerCnt }}개의 답변</p>
               </div>
             </div>
             <div class="writer-info">

@@ -152,7 +152,13 @@ export default {
   },
 
   watch: {
-      
+      '$route.params.query' : {
+          handler : function () {
+            this.Init()
+          },
+        deep: true,
+        immediate : true
+      } 
   },
   computed: {
     computedScore(){
@@ -349,6 +355,7 @@ export default {
                 this.valPostList.push(tmp)
             }         
             this.userScore = this.userInfo.score
+            
         })
         .catch((err) => {
             console.error(err)
@@ -376,7 +383,7 @@ export default {
   },
   mounted () {
       this.callFunction()
-    }
+  },
   
 }
 </script>
