@@ -16,6 +16,9 @@
             <span v-for="(tag,index) in this.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2">{{ tag }}</span>
         </div>
         <hr>
+        <div class="text-center mb-5">
+          <img :src="thumbnail">
+        </div>
         <p v-html="compiledMarkdown"></p>
 
         <!-- 포스트 정보 박스 -->
@@ -58,6 +61,7 @@
         <div class="ml-3" v-for="(comment,index) in recentlyComments" :key="comment.replyId">
           <p>{{ comment.member_nickname }}</p>
           <p>{{ comment.reply }}</p>
+          <p>{{ comment.replyId }}</p>
           <!-- 좋아요 -->
           <b-icon icon="heart-fill" v-if="commentsLike[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="commentLike(comment.replyId, comment.member_nickname, false)"></b-icon>
           <b-icon icon="heart" v-if="!commentsLike[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="commentLike(comment.replyId, comment.member_nickname, true)"></b-icon>          
@@ -94,6 +98,7 @@ export default {
             views: null,
             likes: null,
             likeItOrNot: null,
+            thumbnail: null,
 
             comments: null,
             comment_content: '',
@@ -183,9 +188,8 @@ export default {
           }
           axios.get(`${BACK_URL}/reply/${this.post_id}/replies`, config)
             .then(res => {
-              console.log(res.data.list[0])
               this.comments = res.data.list[0].list
-              this.commentsLike = res.data.list[1].list
+              this.commentsLike = res.data.list[1].list.reverse()
               })
             .catch(err => console.log(err))
         },
@@ -206,6 +210,7 @@ export default {
               this.createdAt = res.data.list[0].list[0].createdAt
               this.likes = res.data.list[0].list[0].likes
               this.views = res.data.list[0].list[0].views
+              this.thumbnail = res.data.list[5].list[0]
               // 좋아요 했는지
               this.likeItOrNot = res.data.list[4].list[0]
               this.tags = res.data.list[1].list
