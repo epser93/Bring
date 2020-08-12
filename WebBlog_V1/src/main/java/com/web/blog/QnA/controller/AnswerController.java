@@ -68,10 +68,37 @@ public class AnswerController {
     }
 
     //한 포스트의 답변 리스트 조회
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
     @ApiOperation(value = "답변 목록", notes = "답변 목록")
     @GetMapping(value = "/{qpostId}/answers")
-    public ListResult<OnlyApostMapping> getAllAnswersinOneQpost(@PathVariable long qpostId) {
-        return responseService.getListResult(qnaService.getApostsofOneQpost(qpostId));
+    public ListResult<ListResult> getAllAnswersinOneQpost(@PathVariable long qpostId) {
+        List<Boolean> amIInTheList = new ArrayList<>();
+        List<OnlyApostMapping> list = qnaService.getApostsofOneQpost(qpostId);
+        List<ListResult> result = new ArrayList<>();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        int cnt = 0;
+        if (logined.isPresent()) {
+            for (OnlyApostMapping oam : list) {
+                long apostId = oam.getApostId();
+                amIInTheList.add(false);
+                if (apostMemberRepository.findApostMemberByMember_MsrlAndApost_ApostId(logined.get().getMsrl(), apostId).isPresent()) {
+                    amIInTheList.remove(cnt);
+                    amIInTheList.add(true);
+                }
+                cnt++;
+            }
+        } else {
+            for (OnlyApostMapping oam : list) {
+                amIInTheList.add(false);
+            }
+        }
+        result.add(responseService.getListResult(list));
+        result.add(responseService.getListResult(amIInTheList));
+        return responseService.getListResult(result);
     }
 
     //답변 작성
@@ -80,13 +107,18 @@ public class AnswerController {
     })
     @ApiOperation(value = "답변 작성", notes = "답변 작성")
     @PostMapping(value = "/{qpostId}")
-    public SingleResult<Apost> answerTheQuestion(@PathVariable long qpostId, @Valid @RequestBody ParamApost paramApost) throws IOException {
+    public ListResult<ListResult> answerTheQuestion(@PathVariable long qpostId, @Valid @RequestBody ParamApost paramApost) throws IOException {
         Optional<Qpost> qpost = qpostRepository.findById(qpostId);
         Member asker = qpost.get().getMember();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
         ParamPost paramPost = new ParamPost();
+        List<ListResult> result = new ArrayList<>();
+
+        if(qpost.get().getSelectOver() == true) {
+            throw new CSelectedAnswerException();
+        }
 
         if (asker.getMsrl() == logined.get().getMsrl()) {
             throw new CAskedQuestionException();
@@ -113,8 +145,12 @@ public class AnswerController {
             }
         }
         Apost apost = qnaService.writeAnswer(qpost.get(), logined.get(), paramApost, answer.getPostId());
+        List<Apost> list = new ArrayList<>();
+        list.add(apost);
+        result.add(responseService.getListResult(list));
+        result.add(responseService.getListResult(qTagService.getTags(qpostId)));
         if (qpostRepository.isSelectedAnswerExist(qpostId)) return null;
-        return responseService.getSingleResult(apost);
+        return responseService.getListResult(result);
     }
 
     //답변 수정
@@ -130,6 +166,10 @@ public class AnswerController {
         long qpostId = apost.get().getQpost().getQpostId();
         Qpost qpost = qpostRepository.findById(qpostId).orElseThrow(CResourceNotExistException::new);
         ParamPost paramPost = new ParamPost();
+
+        if(qpost.getSelectOver() == true) {
+            throw new CSelectedAnswerException();
+        }
 
         if (!logined.getNickname().equals(apost.get().getMember().getNickname())) {
             throw new CNotOwnerException();

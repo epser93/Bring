@@ -1,5 +1,6 @@
 package com.web.blog.QnA.service;
 
+import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Common.advice.exception.*;
 import com.web.blog.Common.service.S3Service;
 import com.web.blog.Member.entity.Member;
@@ -33,6 +34,7 @@ public class QnaService {
     private final QpostUploadsService qpostUploadsService;
     private final QpostUploadsRepository qpostUploadsRepository;
     private final S3Service s3Service;
+    private final PostRepository postRepository;
 
     public boolean saveFiles(long qpostId, String nickname, MultipartFile[] files) throws IOException {
         if(files != null) {
@@ -109,12 +111,15 @@ public class QnaService {
     //질문 삭제
     public boolean deleteQuestion(long qpost_id, Member member) {
         Qpost qpost = qpostRepository.findById(qpost_id).orElseThrow(CResourceNotExistException::new);
-        if (qpost.getAnswerCnt() == 0 && member.getMsrl().equals(qpost.getMember().getMsrl())) {
-            qTagService.deleteQtags(qpost);
-            qpostRepository.delete(qpost);
-            return true;
-        } else if (qpost.getAnswerCnt() > 0) throw new CAnsweredQuestionException();
-        else if (!member.getMsrl().equals(qpost.getMember().getMsrl())) throw new CNotOwnerException();
+        if(!member.getMsrl().equals(qpost.getMember().getMsrl())) {
+            throw new CNotOwnerException();
+        } else {
+            if (qpost.getAnswerCnt() == 0) {
+                qTagService.deleteQtags(qpost);
+                qpostRepository.delete(qpost);
+                return true;
+            } else if (qpost.getAnswerCnt() > 0) throw new CAnsweredQuestionException();
+        }
 
         if (qpostUploadsRepository.findByQpostId(qpost_id).isPresent()) { //질문에 사진이 한장이라도 존재하면~
             System.out.println(true);
@@ -179,16 +184,19 @@ public class QnaService {
     public void likeThisAnswer(Member member, Apost apost, Boolean like) { //member는 로그인 한 사용자
         long msrl = member.getMsrl();
         long apost_id = apost.getApostId();
+        long post_id = apost.getPostId();
         String writer = apost.getMember().getNickname();
         Member answerer = memberRepository.findByNickname(writer).orElseThrow(CUserNotFoundException::new); //answerer은 답변자
         if (like) {
             memberRepository.updateScoreIfLiked(answerer.getMsrl());
             apostRepository.updateLikeCntPlus(apost_id);
             apostMemberRepository.insertLike(msrl, apost_id);
+            postRepository.updateLikeCntPlus(post_id);
         } else {
             memberRepository.updateScoreIfUnliked(answerer.getMsrl());
             apostRepository.updateLikeCntMinus(apost_id);
             apostMemberRepository.deleteLike(msrl, apost_id);
+            postRepository.updateLikeCntMinus(post_id);
         }
     }
 

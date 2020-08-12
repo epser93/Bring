@@ -42,7 +42,7 @@ answeredQuestion:
   msg: "The question that has solution cannot be deleted."
 selectedAnswer:
   code: "-8001"
-  msg: "Selected Answer cannot be deleted."
+  msg: "Selected Answer cannot be deleted, updated, or cannot write another answer."
 youAskedQuestion:
   code: "-7001"
   msg: "You asked this question. You cannot select on this question's your reply."
