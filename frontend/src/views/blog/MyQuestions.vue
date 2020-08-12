@@ -1,5 +1,6 @@
 <template>
-    <div id="myquestions" class="row">
+  <transition name="fade">
+    <div v-if="show" id="myquestions" class="row">
         <!-- 사이드 바 -->
         <div class="nav col-2 flex-column text-left">
             <h5>태그</h5>
@@ -59,6 +60,7 @@
             </div>
         </div>
     </div>
+  </transition>
 </template>
 
 <script>
@@ -164,6 +166,9 @@ export default {
         this.getTags()
         
     },
+    mounted() {
+        this.show = !this.show
+    },
     data() {
         return{
             userNow: this.$cookies.get('nickname'), 
@@ -191,6 +196,8 @@ export default {
             },
             // 좋아요 관련
             thumbnail1: [],
+
+            show: false,
         }
     },
 }
@@ -220,5 +227,13 @@ export default {
 .card {
     box-shadow: 10px 0px 60px -40px black;
 }
-
+/* 트렌지션 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>
