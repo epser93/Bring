@@ -14,9 +14,10 @@
                             <button class="btn btn-success btn-sm" id="homeBt" @click="gotoBlog"><i class="fas fa-home"></i></button>
                         </div>
                         <div class="location text-sm-center"><i class="far fa-envelope"></i>  {{ userInfo.uid }}</div>
-                        <span><a href="" style="color:gray"><i class="fas fa-user-friends"></i> {{userInfo.followersCnt}} follower</a></span>
+                        <span><a data-toggle="modal" data-target="#staticBackdrop" style="color:gray" @click="seeFollower"><i class="fas fa-user-friends"></i> {{userInfo.followersCnt}} follower</a></span> 
+                        <!-- 여기 위에 수정함 data-toggle & href 처리방법 연구필요 -->
                         <span> · </span>
-                        <span><a href="" style="color:gray"> {{userInfo.followingCnt}} following</a></span>
+                        <span><a href="" style="color:gray" @click="seeFollowing"> {{userInfo.followingCnt}} following</a></span>
                         <div v-if="loginNickname == userNickname"> 
                             <button class="btn btn-outline-info btn-sm mx-1 mt-2" @click="gotoEdit">
                                 <i class="fas fa-user-tie"></i> Edit profile
@@ -35,6 +36,40 @@
                             </div>
                         </div>
                     </div>
+
+<!-- <toggle-button @change="onChangeEventHandler"/>
+ 
+<toggle-button v-model="myDataVariable"/> -->
+
+<!-- <input type="checkbox" data-toggle="switchbutton" checked data-onstyle="primary"> -->
+
+                    
+                    <!-- 밑에 부분은 modal -->
+
+                    <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
+                                    <input type="checkbox" data-toggle="switchbutton" checked data-onstyle="primary">
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>
+                                        간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라
+                                    </p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
 
                     <!-- 육성게임 -->
                     <div class="col-6 mx-3 mt-3"> 
@@ -109,10 +144,14 @@ import { CalendarHeatmap } from 'vue-calendar-heatmap'
 
 const BACK_URL = 'http://127.0.0.1:8080'
 
+
+
+
+
 export default {
   name: "UserCard",
   components:{
-      CalendarHeatmap
+      CalendarHeatmap,
   },
     
   data() {
@@ -131,6 +170,9 @@ export default {
         todays: null,
         cntPostList: {},
         valPostList: [],
+        showFollower: false,
+        showFollowing: false,
+        
     };
   },
 
@@ -156,7 +198,7 @@ export default {
           },
         deep: true,
         immediate : true
-      } 
+      },
   },
   computed: {
     computedScore(){
@@ -276,6 +318,13 @@ export default {
   
 
   methods : {
+    seeFollower() {
+        this.showFollower = true
+        // this.$router.push({})
+    },
+    seeFollowing() {
+        this.showFollowing = true
+    },
     callFunction() {  
         var currentDateWithFormat = new Date().toJSON().slice(0,10);
         this.todays = currentDateWithFormat
@@ -283,7 +332,7 @@ export default {
     gotoEdit() {
           this.$router.push({ name : "Edit" })
       },
-     doFollow() {
+    doFollow() {
         const config = {
             headers: {
                 'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
