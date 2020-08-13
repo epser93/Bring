@@ -22,9 +22,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Transactional
@@ -38,9 +36,96 @@ public class TagService {
     private final QpostRepository qpostRepository;
     private final ResponseService responseService;
 
+    public static LinkedHashMap<String, Integer> sortMapByValue(Map<String, Integer> map) {
+        List<Map.Entry<String, Integer>> entries = new LinkedList<>(map.entrySet());
+        Collections.sort(entries, (o1, o2) -> o2.getValue().compareTo(o1.getValue()));
+
+        LinkedHashMap<String, Integer> result = new LinkedHashMap<>();
+        for (Map.Entry<String, Integer> entry : entries) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+        return result;
+    }
+
     //전체 태그 리스트
     public List<OnlyTagMapping> getAllTags() {
         return tagRepository.findAllByOrderByTagUsageCntAsc();
+    }
+
+    //블로그의 태그 리스트
+    public List<ListResult> getOnesBlogTags(long msrl) {
+        Member member = memberRepository.findById(msrl).orElseThrow(CUserNotFoundException::new);
+        List<OnlyPostMapping> listp = postRepository.findAllByMember_Nickname(member.getNickname()); //포스트
+        List<String> tagsS = new ArrayList<>(); //태그 목록
+        List<Integer> tagsC = new ArrayList<>(); //태그 카운트 목록
+        List<PostTag> postTags = new ArrayList<>();
+
+        //포스트의 태그들
+        for(OnlyPostMapping opm : listp) {
+            long postId = opm.getPostId();
+            postTags = postTagRepository.findByPost_PostId(postId);
+            for(PostTag tag : postTags) {
+                Tag t = tag.getTag();
+                if(tagsS.contains(t.getTag())) { //이미 존재하면 카운팅 + 1
+                    int idx = tagsS.indexOf(t.getTag());
+                    tagsC.add(idx, tagsC.get(idx)+1);
+                    tagsC.remove(idx+1);
+                } else {
+                    tagsS.add(t.getTag());
+                    tagsC.add(1);
+                }
+            }
+        }
+        Map<String, Integer> map = new LinkedHashMap<>();
+        for(int i = 0 ; i < tagsS.size() ; i++) {
+            map.put(tagsS.get(i), tagsC.get(i));
+        }
+        Map<String, Integer> sortMap = sortMapByValue(map);
+        tagsS = new ArrayList<>(sortMap.keySet());
+        tagsC = new ArrayList<>(sortMap.values());
+
+        List<ListResult> result = new ArrayList<>();
+        result.add(responseService.getListResult(tagsS));
+        result.add(responseService.getListResult(tagsC));
+        return result;
+    }
+
+    //지식인의 태그 리스트
+    public List<ListResult> getOnesQuestionTags(long msrl) {
+        Member member = memberRepository.findById(msrl).orElseThrow(CUserNotFoundException::new);
+        List<OnlyQpostMapping> listq = qpostRepository.findByMember_Nickname(member.getNickname()); //질문글
+        List<String> tagsS = new ArrayList<>(); //태그 목록
+        List<Integer> tagsC = new ArrayList<>(); //태그 카운트 목록
+        List<QpostTag> qpostTags = new ArrayList<>();
+
+        //질문들의 태그들
+        for(OnlyQpostMapping oqm : listq) {
+            long qpostId = oqm.getQpostId();
+            qpostTags = qpostTagRepository.findByQpost_QpostId(qpostId);
+            for(QpostTag tag : qpostTags) {
+                Tag t = tag.getTag();
+                if(tagsS.contains(t.getTag())) { //이미 존재하면 카운팅 + 1
+                    int idx = tagsS.indexOf(t.getTag());
+                    tagsC.add(idx, tagsC.get(idx)+1);
+                    tagsC.remove(idx+1);
+                } else {
+                    tagsS.add(t.getTag());
+                    tagsC.add(1);
+                }
+            }
+        }
+        Map<String, Integer> map = new LinkedHashMap<>();
+        for(int i = 0 ; i < tagsS.size() ; i++) {
+            map.put(tagsS.get(i), tagsC.get(i));
+        }
+        Map<String, Integer> sortMap = sortMapByValue(map);
+        tagsS = new ArrayList<>(sortMap.keySet());
+        tagsC = new ArrayList<>(sortMap.values());
+
+        List<ListResult> result = new ArrayList<>();
+        result.add(responseService.getListResult(tagsS));
+        result.add(responseService.getListResult(tagsC));
+        return result;
     }
 
     //msrl 별 태그리스트
@@ -87,6 +172,89 @@ public class TagService {
                 }
             }
         }
+
+        Map<String, Integer> map = new LinkedHashMap<>();
+        for(int i = 0 ; i < tagsS.size() ; i++) {
+            map.put(tagsS.get(i), tagsC.get(i));
+        }
+        Map<String, Integer> sortMap = sortMapByValue(map);
+
+        tagsS = new ArrayList<>(sortMap.keySet());
+        tagsC = new ArrayList<>(sortMap.values());
+
+        List<ListResult> result = new ArrayList<>();
+        result.add(responseService.getListResult(tagsS));
+        result.add(responseService.getListResult(tagsC));
+        return result;
+    }
+
+    //전체 사용자의 포스트 태그 리스트
+    public List<ListResult> getAllBlogTags() {
+        List<OnlyPostMapping> listp = postRepository.findAllByOrderByPostIdAsc(); //포스트
+        List<String> tagsS = new ArrayList<>(); //태그 목록
+        List<Integer> tagsC = new ArrayList<>(); //태그 카운트 목록
+        List<PostTag> postTags = new ArrayList<>();
+
+        //포스트의 태그들
+        for(OnlyPostMapping opm : listp) {
+            long postId = opm.getPostId();
+            postTags = postTagRepository.findByPost_PostId(postId);
+            for(PostTag tag : postTags) {
+                Tag t = tag.getTag();
+                if(tagsS.contains(t.getTag())) { //이미 존재하면 카운팅 + 1
+                    int idx = tagsS.indexOf(t.getTag());
+                    tagsC.add(idx, tagsC.get(idx)+1);
+                    tagsC.remove(idx+1);
+                } else {
+                    tagsS.add(t.getTag());
+                    tagsC.add(1);
+                }
+            }
+        }
+        Map<String, Integer> map = new LinkedHashMap<>();
+        for(int i = 0 ; i < tagsS.size() ; i++) {
+            map.put(tagsS.get(i), tagsC.get(i));
+        }
+        Map<String, Integer> sortMap = sortMapByValue(map);
+        tagsS = new ArrayList<>(sortMap.keySet());
+        tagsC = new ArrayList<>(sortMap.values());
+
+        List<ListResult> result = new ArrayList<>();
+        result.add(responseService.getListResult(tagsS));
+        result.add(responseService.getListResult(tagsC));
+        return result;
+    }
+
+    //전체 사용자의 질문글 태그 리스트
+    public List<ListResult> getAllQuestionTags() {
+        List<OnlyQpostMapping> listq = qpostRepository.findAllByOrderByQpostIdAsc(); //질문글
+        List<String> tagsS = new ArrayList<>(); //태그 목록
+        List<Integer> tagsC = new ArrayList<>(); //태그 카운트 목록
+        List<QpostTag> qpostTags = new ArrayList<>();
+
+        //질문들의 태그들
+        for(OnlyQpostMapping oqm : listq) {
+            long qpostId = oqm.getQpostId();
+            qpostTags = qpostTagRepository.findByQpost_QpostId(qpostId);
+            for(QpostTag tag : qpostTags) {
+                Tag t = tag.getTag();
+                if(tagsS.contains(t.getTag())) { //이미 존재하면 카운팅 + 1
+                    int idx = tagsS.indexOf(t.getTag());
+                    tagsC.add(idx, tagsC.get(idx)+1);
+                    tagsC.remove(idx+1);
+                } else {
+                    tagsS.add(t.getTag());
+                    tagsC.add(1);
+                }
+            }
+        }
+        Map<String, Integer> map = new LinkedHashMap<>();
+        for(int i = 0 ; i < tagsS.size() ; i++) {
+            map.put(tagsS.get(i), tagsC.get(i));
+        }
+        Map<String, Integer> sortMap = sortMapByValue(map);
+        tagsS = new ArrayList<>(sortMap.keySet());
+        tagsC = new ArrayList<>(sortMap.values());
 
         List<ListResult> result = new ArrayList<>();
         result.add(responseService.getListResult(tagsS));

@@ -17,6 +17,8 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByBoard(Board board);
 
+    List<OnlyPostMapping> findAllByOrderByPostIdAsc();
+
     List<OnlyPostMapping> findAllByBoard_BoardId(long board_id, Pageable pageable);
 
     List<OnlyPostMapping> findByPostId(long post_id);
