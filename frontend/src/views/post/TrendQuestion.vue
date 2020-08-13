@@ -1,22 +1,33 @@
 !<template>
   <div class="wrapB container-fluid">
     <section class="cards row">
-      <div v-for="(post,index) in list" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-        <div class="cardwrap" @click="gotoDetail(post)">
-          <div class="img-section" :style="{ 'background-image' : `url(${hotThumbnail[index]})`}">
-            <a href=""></a>
-          </div>
-          <div class="contents">
-            <h4>{{ post.subject }}</h4>
-            <p>{{ post.content }}</p>
-            <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.replyCnt }}개의 댓글</p>
-          </div>
-          <div class="writer-info">
-            <p>{{ post.member_nickname }}</p>
-            <p>♥ {{ post.likes}}</p>
+      <div class="col-lg-10 row">
+        <div v-for="question in list" :key="question.qpostId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
+          <div class="cardwrap" @click="gotoQuestionDetail(question)">
+            <div class="img-section">
+              <a href=""></a>
+            </div>
+            <div class="contents">
+              <h4>{{ question.subject }}</h4>
+              <p>{{ question.content }}</p>
+              <p class="comment-date">{{ question.createdAt.substring(0,10) }} · {{ question.answerCnt }}개의 댓글</p>
+            </div>
+            <div class="writer-info">
+              <p>{{ question.member_nickname }}</p>
+              <p>♥ {{ question.views }}</p>
+            </div>
           </div>
         </div>
       </div>
+
+      <div class="tag-list-wrap col-lg-2">
+        <h4>명예의전당</h4>
+        <ul class="tag-list">
+          <li v-for="(ranker, index) in sortRanking.slice(0,5)" :key="index">
+              {{ index + 1 }}등 : {{ranker.nickname}}({{ ranker.score}}점)
+          </li> 
+        </ul>
+      </div>   
     </section>
     <infinite-loading @infinite="infiniteHandler"></infinite-loading>
   </div>
@@ -25,7 +36,7 @@
 
 <script>
 import axios from 'axios'
-// import _ from 'lodash'
+import _ from 'lodash'
 const BACK_URL = 'http://localhost:8080'
 export default {
   name: 'HotPost',
@@ -35,23 +46,21 @@ export default {
   data() {
     return {
       list: [],
-      hotThumbnail: [],
+      unsortedRank: [],
       page : 1
     }
   },
   created() {
-    // this.getHotPost()
-    // this.getRanking()
+    this.getRanking()
   },
   methods: {
     infiniteHandler ($state) {
       console.log($state)
-      axios.get(`${BACK_URL}/blog/trend?no=${this.page}`)
+      axios.get(`${BACK_URL}/questions/trend?no=${this.page}`)
         .then (res => {
           if (res.data.list[0].list.length) {
             this.page += 1
             this.list.push(...res.data.list[0].list)
-            this.hotThumbnail.push(...res.data.list[2].list)
             $state.loaded()
           } else {
             $state.complete()
@@ -59,52 +68,32 @@ export default {
         })
         .catch(err => console.log(err))
     },
-    gotoDetail(post) {
-      this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.member_nickname, post_id : post.postId }})
+    gotoQuestionDetail(question) {
+      this.$router.push({ name : "DetailPost" , params: { post: question, nickname : question.member_nickname, post_id : question.qpost_id }})
     },
-    getHotPost() {
-      if (this.mode === "blog") {
-        axios.get(`${BACK_URL}/blog/trend`)
-          .then(res => {
-            this.hotThumbnail = res.data.list[2].list
-            this.postings = res.data.list[0].list
-          })
-          .catch(err => console.log(err))
-      } else {
-        axios.get(`${BACK_URL}/questions/trend`)
-          .then (res=> {
-            this.postings = res.data.list[0].list
-            console.log(this.postings)
-          })
-          .catch (err => console.log(err))
-      }
-    },
+    getRanking() {
+      axios.get(`${BACK_URL}/member/rank`)
+        .then(res => {
+          this.unsortedRank = res.data.list
+          // console.log(this.unsortedRank)
+        })
+        .catch(err => console.log(err))
+    }
   },
   computed: {
+    sortRanking () {
+      return _.orderBy(this.unsortedRank, 'score', 'desc')
+    }
   },
 }
 </script>
 
 <style>
-/* .wrapB {
-  display: flex;
-  margin-left: 20px;
-  margin-right: 20px;
-} */
-
 h2 {
   width:100%;
   margin-bottom: 30px;
 }
-/* .cards {
-  flex: 4;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-} */
 
-/* .tag-list-wrap {
-  flex:1;
-} */
 .tag-list-wrap h4 {
   margin-bottom: 30px
 }

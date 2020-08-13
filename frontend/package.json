@@ -20,6 +20,7 @@
     "vue": "^2.6.11",
     "vue-calendar-heatmap": "^0.8.4",
     "vue-cookies": "^1.7.3",
+    "vue-infinite-loading": "^2.4.5",
     "vue-js-modal": "^2.0.0-rc.6",
     "vue-router": "^3.2.0"
   },

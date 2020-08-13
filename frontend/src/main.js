@@ -20,6 +20,9 @@ import VueCookies from 'vue-cookies'
 // vue-calendar
 import VueCalendarHeatmap from 'vue-calendar-heatmap'
 
+// vue-infinite-loading
+import InfiniteLoading from 'vue-infinite-loading'
+
 VueMarkdownEditor.use(vuepressTheme);
 VueMarkdownEditor.lang.use('en-US', enUS);
 Vue.use(VueMarkdownEditor);
@@ -32,6 +35,8 @@ Vue.use(VueCookies)
 Vue.use(VModal, { dynamic: true })
 
 Vue.use(VueCalendarHeatmap)
+
+Vue.use(InfiniteLoading)
 
 Vue.config.productionTip = false
 

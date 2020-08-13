@@ -1,95 +1,66 @@
 <template>
   <div class="post">
     <div id="nav" class="mt-4">
-      <router-link v-if="mode==='blog'" :to="{ name : 'Home' }"><h4 class="d-inline ml-5">최신글</h4></router-link> 
-      <router-link v-if="mode==='blog'" :to="{ name: 'HotPost'}"><h4 class="d-inline ml-5"><b-icon class="mr-2" icon="graph-up" aria-hidden="true"></b-icon>트렌딩</h4></router-link> 
-      <router-link v-if="mode==='QnA'" :to="{ name : 'Home' }"><h4 class="d-inline ml-5">최신질문</h4></router-link> 
-      <router-link v-if="mode==='QnA'" :to="{ name: 'HotPost'}"><h4 class="d-inline ml-5">인기질문</h4></router-link>
+      <router-link v-if="this.$cookies.get('mode')==='Blog'" :to="{ name : 'RecentlyPost' }"><h4 class="d-inline ml-5">최신글</h4></router-link> 
+      <router-link v-if="this.$cookies.get('mode')==='Blog'" :to="{ name: 'HotPost'}"><h4 class="d-inline ml-5"><b-icon class="mr-2" icon="graph-up" aria-hidden="true"></b-icon>트렌딩</h4></router-link> 
+      <router-link v-if="this.$cookies.get('mode')==='QnA'" :to="{ name : 'RecentlyQuestion' }"><h4 class="d-inline ml-5">최신질문</h4></router-link> 
+      <router-link v-if="this.$cookies.get('mode')==='QnA'" :to="{ name: 'TrendQuestion'}"><h4 class="d-inline ml-5">인기질문</h4></router-link>
     </div>
     <hr>
-    <router-view :mode="mode" :posts="posts" :thumbnail="thumbnail"></router-view>
-    <div id="modeToggler">
-      <button @click="changeMode">{{ modeText }}보러 가기</button>   
+    <router-view  ></router-view>
+    <div class="Buttons">
+      <button id="modeToggler" @click="changeMode">{{ this.modeText }} 보러 가기</button>
+      <button id="upScroll" @click="upScroll"><i class="fas fa-arrow-up"></i></button>
     </div>
   </div>
 </template>
  
 <script>
-const BACK_URL = 'http://localhost:8080'
-import axios from 'axios'
+// const BACK_URL = 'http://localhost:8080'
+// import axios from 'axios'
 
 export default {
   name:"Home",
   components:{
   },
-  watch: {
-  },
   created() {
-    this.getAllPost()
+    // this.getAllPost()
+  },
+  watch : {
+    'this.$route.path' : {
+      handler : function () {
+        if (this.$cookies.get('mode') === "Blog") {
+          this.modeText = 'Blog'
+        } else {
+          this.modeText = 'QnA'
+        }
+      },
+      deep : true,
+      immediate : true
+    }
   },
   methods: {
     changeMode () {
-      if (this.mode == "blog") {
-        this.mode = "QnA"
-        this.modeText = 'blog'
+      if (this.$cookies.get('mode') == "Blog") {
+        this.$cookies.set('mode', 'QnA')
+        // this.modeText = 'Blog'
         // 에러 헨들링
-        this.$router.push({ name: 'Home' }).catch(()=>{})
-        this.getAllPost()
+        this.$router.push({ name: 'RecentlyQuestion' }).catch(()=>{})
+        // this.getAllPost()
       } else {
-        this.mode = "blog"
-        this.modeText = 'QnA'
-        this.$router.push({ name: 'Home' }).catch(()=>{})
-        this.getAllPost()
+        this.$cookies.set('mode',"Blog")
+        // this.modeText = 'QnA'
+        this.$router.push({ name: 'RecentlyPost' }).catch(()=>{})
+        // this.getAllPost()
       }
     },
-    getAllPost () {
-      if (this.$cookies.get('X-AUTH-TOKEN')) {
-        const config = {
-          headers: {
-            'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
-          }
-        }
-        if (this.mode == "blog"){
-          axios.get(`${BACK_URL}/blog/recent`, config)
-            .then (res => {
-              this.posts = res.data.list[0].list
-              if (res.data.list[2].list[0]) {
-                this.thumbnail = res.data.list[2].list
-              }
-              // console.log(this.thumbnail)
-            })
-            .catch (err => console.log(err))
-        } else {
-          axios.get(`${BACK_URL}/questions/recent`, config)
-            .then (res => {
-              this.posts = res.data.list[0].list
-            })
-        }
-      } else {
-        if (this.mode == "blog"){
-          axios.get(`${BACK_URL}/blog/recent`)
-            .then (res => {
-              this.posts = res.data.list[0].list
-              if (res.data.list[2].list[0]) {
-                this.thumbnail = res.data.list[2].list
-              } 
-            })
-            .catch (err => console.log(err))
-        } else {
-          axios.get(`${BACK_URL}/questions/recent`)
-            .then (res => {
-              this.posts = res.data.list
-            })
-        }
-      }
-    },
+    upScroll () {
+      window.scrollTo(0,0)
+    }
   },
   data: () => {
     return {
-      mode: "blog",
-      modeText : 'QnA',
-      posts: [],
-      thumbnail: []
+      modeText : 'Blog',
     }
   }
 }
@@ -110,13 +81,13 @@ export default {
   color: #42b983;
 }
 
-#modeToggler {
+.Buttons {
   display: flex;
   justify-content: flex-end;
   margin-right : 60px;
 }
 
-#modeToggler button {
+#modeToggler {
   border: none;
   background-color: #fff;
   color: #000;
@@ -132,14 +103,27 @@ export default {
   transition: all 0.3s ease 0s;
 }
 
-#modeToggler button:hover {
+#upScroll {
+  border: none;
+  background-color: #fff;
+  color: #000;
+  padding: 10px 18px 10px 18px;
+  border-radius: 100%;
+  box-shadow: 0px 8px 15px rgba(0, 0, 0, 0.1);
+  outline: none;
+  position: fixed;
+  bottom : 0;
+  right: 20px;
+  margin-right: 0;
+  margin-bottom: 30px;
+  transition: all 0.3s ease 0s;
+}
+
+#modeToggler:hover,#upScroll:hover {
   background-color: #2EE59D;
   box-shadow: 0px 15px 20px rgba(46, 229, 157, 0.4);
   color: #fff;
   transform: translateY(-7px);
 }
 
-.hidden {
-  display: none;
-}
 </style>
