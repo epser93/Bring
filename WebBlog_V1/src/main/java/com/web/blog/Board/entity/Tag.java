@@ -30,7 +30,7 @@ public class Tag extends CommonDateEntity implements Serializable {
     private int tagUsageCnt;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @OneToMany(mappedBy = "tag", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "tag", cascade = CascadeType.REMOVE)
     private List<PostTag> postTags = new ArrayList<>();
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})

@@ -160,17 +160,9 @@ public class BoardController {
                     PostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
                 cnt++;
             }
@@ -184,17 +176,9 @@ public class BoardController {
                     PostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
 
             }
@@ -223,7 +207,6 @@ public class BoardController {
         List<String> filePaths = new ArrayList<>();
         if (nickname.equals(member.getNickname())) {
             List<OnlyPostMapping> list = searchService.CategoryPostSearch(type, board_id, keyword, paging);
-            list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
             result.add(responseService.getListResult(list));
 
             int cnt = 0;
@@ -241,17 +224,9 @@ public class BoardController {
                         PostUploadsDto file = files.get(0);
                         filePaths.add(file.getImgFullPath());
                     } else {
-                        if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                            ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                            String filePath = "";
-                            if(profileImgDto != null) {
-                                filePath = profileImgDto.getImgFullPath();
-                            }
-                            filePaths.add(filePath);
-                        } else {
-                            String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                            filePaths.add(filePath);
-                        }
+                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                        String filePath = profileImgDto.getImgFullPath();
+                        filePaths.add(filePath);
                     }
                     cnt++;
                 }
@@ -265,17 +240,9 @@ public class BoardController {
                         PostUploadsDto file = files.get(0);
                         filePaths.add(file.getImgFullPath());
                     } else {
-                        if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                            ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                            String filePath = "";
-                            if(profileImgDto != null) {
-                                filePath = profileImgDto.getImgFullPath();
-                            }
-                            filePaths.add(filePath);
-                        } else {
-                            String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                            filePaths.add(filePath);
-                        }
+                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                        String filePath = profileImgDto.getImgFullPath();
+                        filePaths.add(filePath);
                     }
                 }
             }
@@ -300,8 +267,7 @@ public class BoardController {
         List<ListResult> result = new ArrayList<>();
         List<Boolean> amIInTheList = new ArrayList<>();
         List<String> filePaths = new ArrayList<>();
-        List<OnlyPostMapping> list = postRepository.findAllByMember_Nickname(nickname, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
-        list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
+        List<OnlyPostMapping> list = postRepository.findAllByMember_NicknameAndBoard_NameNotLike(nickname, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         result.add(responseService.getListResult(list));
         int cnt = 0;
         if (logined.isPresent()) {
@@ -318,17 +284,9 @@ public class BoardController {
                     PostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
                 cnt++;
             }
@@ -342,17 +300,9 @@ public class BoardController {
                     PostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
             }
         }
@@ -377,7 +327,6 @@ public class BoardController {
         List<Boolean> amIInTheList = new ArrayList<>();
         Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
         List<OnlyPostMapping> list = searchService.BlogPostSearch(type, nickname, keyword, paging);
-        list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
         result.add(responseService.getListResult(list));
         List<String> filePaths = new ArrayList<>();
         int cnt = 0;
@@ -395,17 +344,9 @@ public class BoardController {
                     PostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
                 cnt++;
             }
@@ -419,17 +360,9 @@ public class BoardController {
                     PostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else { //없으면~
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) { //프사가 있으면~
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else { //없으면~
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
             }
         }
@@ -454,8 +387,7 @@ public class BoardController {
 
         LocalDateTime date = LocalDateTime.now();
         date.minus(14, ChronoUnit.DAYS);
-        List<OnlyPostMapping> list = postRepository.findByCreatedAtLessThanEqualOrderByCreatedAtDesc(date, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
-        list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
+        List<OnlyPostMapping> list = postRepository.findByCreatedAtLessThanEqualAndBoard_NameNotLikeOrderByCreatedAtDesc(date, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         result.add(responseService.getListResult(list));
         List<String> filePaths = new ArrayList<>();
         int cnt = 0;
@@ -474,17 +406,9 @@ public class BoardController {
                     PostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
                 cnt++;
             }
@@ -499,17 +423,9 @@ public class BoardController {
                     PostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
             }
         }
@@ -533,8 +449,7 @@ public class BoardController {
         List<Boolean> amIInTheList = new ArrayList<>();
         LocalDateTime date = LocalDateTime.now();
         date.minus(14, ChronoUnit.DAYS);
-        List<OnlyPostMapping> list = postRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualOrLikesGreaterThanEqualAndCreatedAtLessThanEqualOrderByCreatedAtDesc(40, date, 20, date, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
-        list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
+        List<OnlyPostMapping> list = postRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualAndBoard_NameNotLikeOrLikesGreaterThanEqualAndCreatedAtLessThanEqualAndBoard_NameNotLikeOrderByCreatedAtDesc(40, date, "나의 Answers", 20, date, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         result.add(responseService.getListResult(list));
         List<String> filePaths = new ArrayList<>();
         int cnt = 0;
@@ -553,17 +468,9 @@ public class BoardController {
                     PostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
                 cnt++;
             }
@@ -578,17 +485,9 @@ public class BoardController {
                     PostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
             }
         }
@@ -613,7 +512,6 @@ public class BoardController {
         List<Boolean> amIInTheList = new ArrayList<>();
 
         List<OnlyPostMapping> list = searchService.SitePostSearch(type, keyword, paging);
-        list.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
         result.add(responseService.getListResult(list));
         List<String> filePaths = new ArrayList<>();
         int cnt = 0;
@@ -632,17 +530,9 @@ public class BoardController {
                     PostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
                 cnt++;
             }
@@ -657,17 +547,9 @@ public class BoardController {
                     PostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
             }
         }
@@ -851,15 +733,15 @@ public class BoardController {
     }
 
     @ApiOperation(value = "사용자 포스트 태그 리스트", notes = "사용자 포스트 태그 리스트")
-    @GetMapping(value = "/tags/blog/{msrl}")
-    public ListResult<ListResult> onesBlogTags(@PathVariable long msrl) {
-        return responseService.getListResult(tagService.getOnesBlogTags(msrl));
+    @GetMapping(value = "/tags/blog/{nickname}")
+    public ListResult<ListResult> onesBlogTags(@PathVariable String nickname) {
+        return responseService.getListResult(tagService.getOnesBlogTags(nickname));
     }
 
     @ApiOperation(value = "사용자 질문글 태그 리스트", notes = "사용자 질문글 태그 리스트")
-    @GetMapping(value = "/tags/qna/{msrl}")
-    public ListResult<ListResult> onesQnaTags(@PathVariable long msrl) {
-        return responseService.getListResult(tagService.getOnesQuestionTags(msrl));
+    @GetMapping(value = "/tags/qna/{nickname}")
+    public ListResult<ListResult> onesQnaTags(@PathVariable String nickname) {
+        return responseService.getListResult(tagService.getOnesQuestionTags(nickname));
     }
 
     @ApiOperation(value = "전체 포스트 태그 리스트", notes = "전체 포스트 태그 리스트")
@@ -955,5 +837,124 @@ public class BoardController {
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
         return responseService.getSingleResult(postService.saveFiles(postId, nickname, files));
+    }
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
+    @ApiOperation(value = "전체 포스트 태그 검색", notes = "전체 포스트 태그로 검색")
+    @PostMapping(value = "/blog/search/tags/{keyword}")
+    public ListResult<ListResult> searchAllPostsByTag(@PathVariable String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        Paging paging = new Paging(no);
+        List<ListResult> result = new ArrayList<>();
+        List<Boolean> amIInTheList = new ArrayList<>();
+        List<String> filePaths = new ArrayList<>();
+        List<OnlyPostMapping> list = searchService.AllBlogTagSearch(keyword, paging);
+        result.add(responseService.getListResult(list));
+        int cnt = 0;
+        if (logined.isPresent()) {
+            for (OnlyPostMapping pm : list) { //전체 포스트 리스트 for문
+                long postId = pm.getPostId();
+                Member member = memberRepository.findByNickname(pm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
+                amIInTheList.add(false);
+                if (postMemberRepository.findPostMemberByMember_MsrlAndPost_PostId(logined.get().getMsrl(), postId).isPresent()) {
+                    amIInTheList.remove(cnt);
+                    amIInTheList.add(true);
+                }
+                //파일 조회
+                if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<PostUploadsDto> files = postUploadsService.getList(postId);
+                    PostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                } else {
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
+                }
+                cnt++;
+            }
+        } else {
+            for (OnlyPostMapping pm : list) {
+                Member member = memberRepository.findByNickname(pm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
+                long postId = pm.getPostId();
+                amIInTheList.add(false);
+                //파일 조회
+                if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<PostUploadsDto> files = postUploadsService.getList(postId);
+                    PostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                } else {
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
+                }
+            }
+        }
+        result.add(responseService.getListResult(amIInTheList));
+        result.add(responseService.getListResult(filePaths));
+        return responseService.getListResult(result);
+    }
+
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
+    })
+    @ApiOperation(value = "특정 유저 포스트 태그 검색", notes = "특정 유저의 포스트 태그로 검색")
+    @PostMapping(value = "/blog/{nickname}/search/tags/{keyword}")
+    public ListResult<ListResult> searchOnesPostsByTag(@PathVariable String nickname, @PathVariable String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
+        Paging paging = new Paging(no);
+        List<ListResult> result = new ArrayList<>();
+        List<Boolean> amIInTheList = new ArrayList<>();
+        List<String> filePaths = new ArrayList<>();
+        List<OnlyPostMapping> list = searchService.OnesBlogTagSearch(nickname, keyword, paging);
+        result.add(responseService.getListResult(list));
+
+        int cnt = 0;
+        if (logined.isPresent()) {
+            for (OnlyPostMapping pm : list) {
+                long postId = pm.getPostId();
+                amIInTheList.add(false);
+                if (postMemberRepository.findPostMemberByMember_MsrlAndPost_PostId(logined.get().getMsrl(), postId).isPresent()) {
+                    amIInTheList.remove(cnt);
+                    amIInTheList.add(true);
+                }
+                //파일 조회
+                if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<PostUploadsDto> files = postUploadsService.getList(postId);
+                    PostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                } else {
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
+                }
+                cnt++;
+            }
+        } else {
+            for (OnlyPostMapping pm : list) {
+                long postId = pm.getPostId();
+                amIInTheList.add(false);
+                //파일 조회
+                if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<PostUploadsDto> files = postUploadsService.getList(postId);
+                    PostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                } else {
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
+                }
+            }
+        }
+
+        result.add(responseService.getListResult(amIInTheList));
+        result.add(responseService.getListResult(filePaths));
+        return responseService.getListResult(result);
     }
 }

@@ -114,9 +114,6 @@ public class SignController {
                 .build());
         Optional<Member> newUser = repository.findByNickname(nickname);
         boardService.createBoard(id, "나의 Answers");
-//        URL url = new URL("https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg");
-//        File file = new File("");
-//        FileUtils.copyURLToFile(url, file);
         URL url = new URL("https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg");
         BufferedImage img = ImageIO.read(url);
         File file = new File("default_img.jpg");

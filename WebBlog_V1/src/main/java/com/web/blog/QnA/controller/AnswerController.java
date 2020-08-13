@@ -187,8 +187,9 @@ public class AnswerController {
         Set<String> tagSet = new HashSet<>(qTagService.getTags(qpost.getQpostId()));
         List<String> tags = new ArrayList<>(tagSet);
         if (!tags.isEmpty()) {
+            tagService.deleteTags(answer);
             for (String tag : tags) {
-                tagService.updateTag(answer, tag);
+                tagService.insertTags(answer, tag);
             }
         }
         return responseService.getSingleResult(qnaService.updateAnswer(apostId, paramApost, qpostRepository.isSelectedAnswerExist(qpost.getQpostId())));
@@ -248,7 +249,7 @@ public class AnswerController {
     })
     @ApiOperation(value = "답변 추천", notes = "답변 추천")
     @PostMapping(value = "/like/{apostId}/{answerer}")
-    public SingleResult<Integer> like(@RequestBody Boolean likeit, @PathVariable long apostId, @PathVariable String answerer) throws Exception {
+    public SingleResult<Integer> like(@RequestBody Boolean likeit, @PathVariable long apostId, @PathVariable String answerer) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new); //로그인한 사용자
