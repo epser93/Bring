@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 
+import Index from '../views/Index.vue'
+
 // 포스트
 import Home from '../views/post/Home.vue'
 import RecentlyPost from '../views/post/RecentlyPost.vue'
@@ -38,22 +40,28 @@ import Search from '../components/common/Search.vue'
 
 Vue.use(VueRouter)
 
-const routes = [{
-        path: '/',
+const routes = [
+    {
+        path : '/',
+        name : 'Index',
+        component : Index
+    },
+    {
+        path: '/postqna',
         name: 'Home',
         component: Home,
         children: [{
-                path: '/recentlypost',
+                path: 'recentlypost',
                 name: 'RecentlyPost',
                 component: RecentlyPost
             },
             {
-                path: '/hotpost',
+                path: 'hotpost',
                 name: 'HotPost',
                 component: HotPost
             },
             {
-                path: '/recentlyquetion',
+                path: 'recentlyquetion',
                 name: 'RecentlyQuestion',
                 component : RecentlyQuestion
             },

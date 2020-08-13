@@ -54,8 +54,9 @@ export default {
           this.setCookie(res.data.data1)
           this.isLogin = true
           this.setNickname(res.data.data2.nickname, res.data.data2.msrl)
+          // 쿠키 모드
           this.$cookies.set('mode', 'Blog')
-          this.$router.replace({ name : 'Home' })
+          this.$router.replace({ name : 'RecentlyPost' })
           location.reload() // 새로고침이 답인가?
         })
         .catch(err => {

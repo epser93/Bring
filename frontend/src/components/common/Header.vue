@@ -60,24 +60,24 @@
             
         },
         watch: {
-          // '$cookies' : {
-          //   handler : function () {
-          //     if (this.$cookies.get('mode') === 'Blog') {
-          //       this.mode = 'Blog'
-          //     } else {
-          //       this.mode = 'QnA'
-          //     }
-          //   },
-          //   deep: true,
-          //   immediate : true
-          // }
+          '$route.name' : {
+            handler :function() {
+              if (this.$cookies.get('mode') === 'Blog') {
+                this.mode = 'Blog'
+              } else {
+                this.mode = 'QnA'
+              }
+            },
+            deep : true,
+            immediate : true
+          }
         },
         props: {
           isLogin : Boolean,
           nickname: String,
         },
         created() {
-          // console.log(this.isLogin)
+          this.mode = this.$cookies.get('mode')
         },
         methods : {
           logout() {
@@ -94,7 +94,7 @@
                 this.$cookies.remove('mode')
                 isLoggedIn = false
                 this.$emit("logout-state", isLoggedIn)
-                this.$router.push({name : 'Home'}).catch(() => {})
+                this.$router.push({name : 'RecentlyPost'}).catch(() => {})
               })
               .catch((err) => {
                 console.error(err)

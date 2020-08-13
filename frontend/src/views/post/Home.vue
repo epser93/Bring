@@ -1,10 +1,10 @@
 <template>
   <div class="post">
     <div id="nav" class="mt-4">
-      <router-link v-if="this.$cookies.get('mode')==='Blog'" :to="{ name : 'RecentlyPost' }"><h4 class="d-inline ml-5">최신글</h4></router-link> 
-      <router-link v-if="this.$cookies.get('mode')==='Blog'" :to="{ name: 'HotPost'}"><h4 class="d-inline ml-5"><b-icon class="mr-2" icon="graph-up" aria-hidden="true"></b-icon>트렌딩</h4></router-link> 
-      <router-link v-if="this.$cookies.get('mode')==='QnA'" :to="{ name : 'RecentlyQuestion' }"><h4 class="d-inline ml-5">최신질문</h4></router-link> 
-      <router-link v-if="this.$cookies.get('mode')==='QnA'" :to="{ name: 'TrendQuestion'}"><h4 class="d-inline ml-5">인기질문</h4></router-link>
+      <router-link v-if="this.mode==='Blog'" :to="{ name : 'RecentlyPost' }"><h4 class="d-inline ml-5">최신글</h4></router-link> 
+      <router-link v-if="this.mode==='Blog'" :to="{ name: 'HotPost'}"><h4 class="d-inline ml-5"><b-icon class="mr-2" icon="graph-up" aria-hidden="true"></b-icon>트렌딩</h4></router-link> 
+      <router-link v-if="this.mode==='QnA'" :to="{ name : 'RecentlyQuestion' }"><h4 class="d-inline ml-5">최신질문</h4></router-link> 
+      <router-link v-if="this.mode==='QnA'" :to="{ name: 'TrendQuestion'}"><h4 class="d-inline ml-5">인기질문</h4></router-link>
     </div>
     <hr>
     <router-view  ></router-view>
@@ -24,15 +24,17 @@ export default {
   components:{
   },
   created() {
-    // this.getAllPost()
+   
   },
-  watch : {
-    'this.$route.path' : {
-      handler : function () {
-        if (this.$cookies.get('mode') === "Blog") {
-          this.modeText = 'Blog'
-        } else {
+  watch: {
+    '$route.name' : {
+      handler :function() {
+        if (this.$cookies.get('mode') === 'Blog') {
+          this.mode = 'Blog'
           this.modeText = 'QnA'
+        } else {
+          this.mode = 'QnA'
+          this.modeText = 'Blog'
         }
       },
       deep : true,
@@ -43,13 +45,13 @@ export default {
     changeMode () {
       if (this.$cookies.get('mode') == "Blog") {
         this.$cookies.set('mode', 'QnA')
-        // this.modeText = 'Blog'
+        this.mode = 'Blog'
         // 에러 헨들링
         this.$router.push({ name: 'RecentlyQuestion' }).catch(()=>{})
         // this.getAllPost()
       } else {
         this.$cookies.set('mode',"Blog")
-        // this.modeText = 'QnA'
+        this.mode = 'QnA'
         this.$router.push({ name: 'RecentlyPost' }).catch(()=>{})
         // this.getAllPost()
       }
@@ -60,7 +62,8 @@ export default {
   },
   data: () => {
     return {
-      modeText : 'Blog',
+      mode : '',
+      modeText : 'QnA'
     }
   }
 }
