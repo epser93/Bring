@@ -94,21 +94,14 @@
             {{aArticle.answer}}
             <hr>
 
-
             <!--좋아요-->
             <span v-if="like[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="likeAnswer(aArticle, false)"><i class="fas fa-heart"></i></span>
             <span v-if="!like[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="likeAnswer(aArticle, true)"><i class="fas fa-heart"></i></span>        
             <small :ref="'like-count-' + aArticle.apostId">{{ aArticle.likes }}</small><small>개의 좋아요</small>
-            {{aArticle.likes}}
-            
-
-
         </div>
-
-        
-
     </b-container>
   </div>
+
 </template>
 
 <script>
@@ -239,12 +232,17 @@ export default {
         },
         // 답변 목록
         getAnswer(){
-            axios.get(`${BACK_URL}/answers/${this.qpost_id}/answers`)
+            const config={
+                headers:{
+                    'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN'),
+                    'Content-Type': 'application/json'
+                }
+            }
+            axios.get(`${BACK_URL}/answers/${this.qpost_id}/answers`,config)
             .then(res=>{
                 this.aPost=res.data.list[0].list
                 // 좋아요 불리언 값
                 this.like=res.data.list[1].list
-                
                 // 채택된 값이 하나라도 있으면 채택 못해주게끔
                 const array=res.data.list[0].list
                 for (const i in array){
@@ -279,7 +277,7 @@ export default {
             })
             }
         },
-        // 답변 추천(좋아요) 아직 안됨
+        // 답변 추천
         likeAnswer(aArticle,likeit){
             const config={
                 headers:{
@@ -287,27 +285,22 @@ export default {
                     'Content-Type': 'application/json'
                 }
             }
-            console.log(this.$refs[`like-count-${aArticle.apostId}`][0].innerText)
             if (likeit === false) {
                 axios.post(`${BACK_URL}/answers/like/${aArticle.apostId}/${aArticle.member_nickname}`,likeit,config)
                     .then(res=>{
-                        console.log(this.$refs)
-                        console.log(res.data.data)
                         this.$refs[`like-count-${aArticle.apostId}`][0].innerText = res.data.data
-                       
+                        console.log(res)
                         this.getAnswer()
                     })
                     .catch(err=>{
                         console.log(err)
                     })
-            }else{
-                
+            } else {
                 axios.post(`${BACK_URL}/answers/like/${aArticle.apostId}/${aArticle.member_nickname}`,likeit,config)
                     .then(res=>{
                         this.$refs[`like-count-${aArticle.apostId}`][0].innerText = res.data.data 
-                       
-                        this.getAnswer()
                         console.log(res)
+                        this.getAnswer()
                     })
                     .catch(err=>{
                         console.log(err)
