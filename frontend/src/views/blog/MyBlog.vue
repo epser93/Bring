@@ -1,13 +1,13 @@
 <template>
-  <transition name="fade">
+
     <div v-if="show" id="blog">
       <!-- 프로필 -->
       <div id="upsideTerritory" class="row ml-4 mr-4">
         <div class="ml-5 mt-3">
           <a class="d-inline" href=''>
-            <img class="rounded-circle mx-auto img-thumbnail mb-3" :src='cardUserImage' alt="Card image cap" style="width: 120px;">
+            <img @click="gotoProfile" class="rounded-circle mx-auto img-thumbnail mb-3" :src='cardUserImage' alt="Card image cap" style="width: 120px;">
           </a>
-            <h5 class="d-inline ml-3">{{ this.nickname }}</h5>
+            <h5 class="d-inline ml-3">{{ this.userInfo.nickname }}</h5>
         </div>
       </div>
 
@@ -25,7 +25,7 @@
         </div>
       </div>
     </div>
-  </transition>
+
 </template>
 
 <script>
@@ -66,13 +66,21 @@ export default {
       }
       axios.get(`${BACK_URL}/member/${nickname}/profile`, config)
         .then(res => {
-          this.userInfo = res.data
+          this.userInfo = res.data.list[0].list[0]
+          // 프로필 사진이 있을때만
+          if (res.data.list.length >= 6) {
+            this.cardUserImage = res.data.list[5].list[0]
+          }
+          
         })
         .catch(err => {
           alert('ID와 비밀번호를 다시 확인해주세요.')
           console.log(err)
         })
-    }, 
+    },
+    gotoProfile() {
+      this.$router.push({name : 'Profile', query: { nickname: this.nickname }})
+    } 
   },
   created() {
     this.getUserInfo(this.nickname)
@@ -115,17 +123,6 @@ export default {
 #upsideTerritory{
   background-color: rgb(231, 231, 231);
 }
-
-/* 트렌지션 */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 1s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-
 </style>
 
 

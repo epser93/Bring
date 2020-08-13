@@ -101,8 +101,10 @@
               })
           },
           gotoSearch() {
-            console.log(this.keyword)
-            this.$router.push({name : 'Search', query: { q: this.keyword, type: this.keywordType.keyid }})
+            if (this.keyword.length !== 0){
+              this.$router.push({name : 'Search', query: { q: this.keyword, type: this.keywordType.keyid }})
+            }
+            
           },
           // 검색 종류 설정
           dropdown(typeid, value) {
