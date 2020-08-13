@@ -292,7 +292,7 @@ export default {
                 axios.post(`${BACK_URL}/answers/like/${aArticle.apostId}/${aArticle.member_nickname}`,likeit,config)
                     .then(res=>{
                         console.log(this.$refs)
-                        console.log(res.data.data)
+                        console.log(res)
                         this.$refs[`like-count-${aArticle.apostId}`][0].innerText = res.data.data
                        
                         this.getAnswer()
