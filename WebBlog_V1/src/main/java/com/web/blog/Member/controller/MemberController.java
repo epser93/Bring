@@ -106,6 +106,7 @@ public class MemberController {
         List<String> img = new ArrayList<>();
         List<LocalDateTime> createdAt = new ArrayList<>();
         List<OnlyPostMapping> posts = postRepository.findAllByMember_Nickname(member.getNickname());
+        posts.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
         List<OnlyQpostMapping> qposts = qpostRepository.findByMember_Nickname(member.getNickname());
         List<OnlyApostMapping> aposts = apostRepository.findAllByMember_Nickname(member.getNickname());
         for(OnlyPostMapping opm : posts) {

@@ -15,7 +15,10 @@ import java.util.Optional;
 
 public interface QpostRepository extends JpaRepository<Qpost, Long> {
     List<OnlyQpostMapping> findByMember_Nickname(String writer, Pageable pageable);
+
     List<OnlyQpostMapping> findByMember_Nickname(String writer);
+
+    List<OnlyQpostMapping> findAllByOrderByQpostIdAsc();
 
     Optional<Qpost> findById(long qpost_id);
 

@@ -850,6 +850,30 @@ public class BoardController {
         return responseService.getListResult(tagService.getOnesTags(msrl));
     }
 
+    @ApiOperation(value = "사용자 포스트 태그 리스트", notes = "사용자 포스트 태그 리스트")
+    @GetMapping(value = "/tags/blog/{msrl}")
+    public ListResult<ListResult> onesBlogTags(@PathVariable long msrl) {
+        return responseService.getListResult(tagService.getOnesBlogTags(msrl));
+    }
+
+    @ApiOperation(value = "사용자 질문글 태그 리스트", notes = "사용자 질문글 태그 리스트")
+    @GetMapping(value = "/tags/qna/{msrl}")
+    public ListResult<ListResult> onesQnaTags(@PathVariable long msrl) {
+        return responseService.getListResult(tagService.getOnesQuestionTags(msrl));
+    }
+
+    @ApiOperation(value = "전체 포스트 태그 리스트", notes = "전체 포스트 태그 리스트")
+    @GetMapping(value = "/tags/blog")
+    public ListResult<ListResult> allBlogTags() {
+        return responseService.getListResult(tagService.getAllBlogTags());
+    }
+
+    @ApiOperation(value = "전체 질문글 태그 리스트", notes = "전체 질문글 태그 리스트")
+    @GetMapping(value = "/tags/qna")
+    public ListResult<ListResult> allQnaTags() {
+        return responseService.getListResult(tagService.getAllQuestionTags());
+    }
+
     //Post 공유기능
     @ApiImplicitParams({
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
