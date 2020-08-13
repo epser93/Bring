@@ -147,7 +147,7 @@ export default {
     getCategory() {
       axios.get(`${BACK_URL}/blog/${this.nickname}/categories`)
           .then(res => {
-              this.categoryList = res.data.list
+              this.categoryList = res.data.list[0].list
           })
 
           .catch(err => {
