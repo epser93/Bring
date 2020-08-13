@@ -89,8 +89,9 @@ export default {
       }
       axios.put(`${BACK_URL}/blog/${this.nickname}/${this.boardName}/${this.post_id}`, this.postData, config)
         .then(() => {
-          this.thumbnailPost()
+
           console.log('포스트데이터',this.postData)
+          this.thumbnailPost()
         })
         .catch(err => console.log(err))
     },

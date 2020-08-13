@@ -1,9 +1,9 @@
 <template>
   <div id="detail" class="row">
 
-    <!-- 글 부분(나중에 양 옆 채울것 필요) -->
+    <!-- 중심 부분 -->
     <div class="wrapper text-left col-12 col-lg-8">
-        <div class="info">
+        <div class="info mb-5">
             <h1 class="mb-3">{{subject}}</h1>
             <div class="text-right">
               <button class="btn btn-outline-warning btn-sm mx-1" v-if="(member_nickname === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="updatePost"><b-icon icon="trash"></b-icon> 수정</button>
@@ -11,13 +11,9 @@
           </div>
         </div>
         
-        <!-- 태그부분 -->
-        <div class="tag">
-            <span v-for="(tag,index) in this.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2">{{ tag }}</span>
-        </div>
-        <hr>
+        <!-- 썸네일과 글 -->
         <div class="text-center mb-5">
-          <img :src="thumbnail">
+          <img v-if="thumbnail" :src="thumbnail" style="height:500px;">
         </div>
         <p v-html="compiledMarkdown"></p>
 
@@ -71,6 +67,29 @@
           <button class="btn btn-outline-success btn-sm" v-if="$cookies.get('nickname') === comment.member_nickname" @click="openCommentUpdate(comment), setXY($event)">수정</button>
         </div>
     </div>
+
+    <!-- 오른쪽 바 -->
+    <div class="mt-5 col-12 col-lg-3">
+      <!-- 카테고리 글(6개 정도로 제한 필요) -->
+      <h4>같은 카테고리의 글</h4>
+      <div v-for="(item, index) in postListCategory" :key="item.postId" class="list-group">
+        <button @click="gotoDetail(item)" class="list-group-item list-group-item-action flex-column align-items-start p-0">
+          <div class="d-flex w-100">
+            <img class="mr-3" :src="thumbnail2[index]" alt="" style="height: 80px; width:80px;">
+            <div class="">
+              <p class="mb-1"><strong>{{ item.subject }}</strong></p>
+              <small>3 days ago</small>
+            </div>
+          </div>
+        </button>
+      </div>
+      
+      <!-- 태그 리스트 -->
+      <h4 class="mt-5">태그</h4>
+      <div class="tag">
+          <span v-for="(tag,index) in this.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2">{{ tag }}</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -106,7 +125,11 @@ export default {
             Y : 0,
             comment_id : 0,
             tags : '',
-            commentsLike: []
+            commentsLike: [],
+
+            // 같은 카테고리 다른 글들
+            postListCategory: [],
+            thumbnail2: [],
         }
      },
     methods: {
@@ -295,11 +318,33 @@ export default {
                   })
             }   
 
-        }
+        },
+        // 카테고리에 맞는 포스트만 가져오기
+        getSomePosts() {
+            const config = {
+                headers: {
+                    'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
+                }
+            }
+            axios.get(`${BACK_URL}/blog/${this.nickname}/${this.board_name}/post_list`, config)
+                .then(res => {
+                    this.postListCategory = res.data.list[0].list
+                    this.thumbnail2 = res.data.list[2].list
+                    console.log(this.postListCategory)
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        },
+        // 포스트 디테일
+        gotoDetail(post) {
+            this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.member_nickname, post_id : post.postId }})
+        },    
     },
     created(){
        this.fetchPost(),
-       this.getComment()
+       this.getComment(),
+       this.getSomePosts()
     },
     computed: {
       recentlyComments () {
@@ -308,6 +353,12 @@ export default {
       compiledMarkdown: function () {
         return marked(this.content, { sanitize: true })
       },
+    },
+    watch: {
+      '$route.params.post_id' () {
+        // 동일한 경로의 params 변경 사항에 반응하려면
+        location.reload()
+      }
     }
 }
 </script>
