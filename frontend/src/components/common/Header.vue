@@ -1,8 +1,11 @@
 <template>
     <div id="header">
         <nav class="navbar navbar-expand navbar-light bg-light">
-            <router-link :to="{ name: 'Home' }" class="navbar-brand">
-                GEESHIQUEEN
+            <router-link v-if="this.mode === 'Blog'" :to="{ name: 'RecentlyPost' }" class="navbar-brand">
+                GEESHIQUEEN블로그
+            </router-link>
+            <router-link v-if="this.mode === 'QnA'" :to="{ name: 'RecentlyQuestion' }" class="navbar-brand">
+                GEESHIQUEEN지식인
             </router-link>
 
             <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
@@ -56,6 +59,19 @@
         components: { 
             
         },
+        watch: {
+          // '$cookies' : {
+          //   handler : function () {
+          //     if (this.$cookies.get('mode') === 'Blog') {
+          //       this.mode = 'Blog'
+          //     } else {
+          //       this.mode = 'QnA'
+          //     }
+          //   },
+          //   deep: true,
+          //   immediate : true
+          // }
+        },
         props: {
           isLogin : Boolean,
           nickname: String,
@@ -75,6 +91,7 @@
               .then(() =>{
                 this.$cookies.remove('X-AUTH-TOKEN')
                 this.$cookies.remove('nickname')
+                this.$cookies.remove('mode')
                 isLoggedIn = false
                 this.$emit("logout-state", isLoggedIn)
                 this.$router.push({name : 'Home'}).catch(() => {})
@@ -107,6 +124,7 @@
                 3: '작성자검색',
                 4: '통합검색',
             },
+            mode : this.$cookies.get('mode')
           }
         },
 
