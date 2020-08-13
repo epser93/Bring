@@ -21,6 +21,12 @@
                 <button class="btn btn-outline-success my-2 my-sm-0" @click="searchFor">검색</button>
             </div>
 
+            <!-- 태그 리스트 -->
+            <h4 class="mt-5">태그</h4>
+            <div class="tag">
+                <span v-for="(tag,index) in this.tagList" :key="index" class="badge badge-pill badge-light mr-2 p-2">{{ tag }}</span>
+            </div>
+
             <!-- 카테고리 버튼 -->
             <div v-if="userNow === nickname">
                 <button type="button" @click="newCategory" class="btn btn-outline-dark mt-3" style="width:100px;">카테고리 관리</button>   
@@ -289,12 +295,23 @@ export default {
             }
         },
 
-
+        getTags() {
+            axios.get(`${BACK_URL}/tags/blog/${this.msrl}`)
+                .then(res => {
+                    this.tagList = res.data.list[0].list
+                    this.tagNum = res.data.list[1].list
+                    console.log(this.tagList)
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        },       
     },
     
     created() {
         this.getAllPosts(),
-        this.getCategory()
+        this.getCategory(),
+        this.getTags()
     },
     data() {
         return{
@@ -323,6 +340,11 @@ export default {
                 2: '내용검색',
                 3: '통합검색',
             },
+
+            // 태그 관련
+            tagList: [],
+            tagNum: [],
+
             // 좋아요 관련
             postLike1: [],
             postLike2: [],

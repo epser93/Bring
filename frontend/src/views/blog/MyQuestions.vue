@@ -110,8 +110,7 @@ export default {
         },
        
         getTags() {
-            this.msrl = this.$cookies.get('msrl')
-            axios.get(`${BACK_URL}/tags/list/${this.msrl}`)
+            axios.get(`${BACK_URL}/tags/qna/${this.msrl}`)
                 .then(res => {
                     this.tagList = res.data.list[0].list
                     this.tagNum = res.data.list[1].list
