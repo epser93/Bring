@@ -26,4 +26,6 @@ public class QpostTag {
     @ManyToOne
     @JoinColumn(name = "qpost_id")
     private Qpost qpost;
+
+    private int inWhere; //1 = post, 2 = qpost
 }

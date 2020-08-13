@@ -4,6 +4,7 @@ import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.model.ParamPost;
 import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Board.service.PostService;
+import com.web.blog.Board.service.SearchService;
 import com.web.blog.Board.service.TagService;
 import com.web.blog.Common.advice.exception.*;
 import com.web.blog.Common.model.Paging;
@@ -59,6 +60,7 @@ public class QuestionController {
     private final PostRepository postRepository;
     private final PostService postService;
     private final TagService tagService;
+    private final SearchService searchService;
     private final QpostUploadsRepository qpostUploadsRepository;
     private final QpostUploadsService qpostUploadsService;
     private final ProfileImgRepository profileImgRepository;
@@ -90,17 +92,9 @@ public class QuestionController {
                     QpostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
             }
         } else {
@@ -113,17 +107,9 @@ public class QuestionController {
                     QpostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
             }
         }
@@ -157,17 +143,9 @@ public class QuestionController {
                     QpostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
             }
         } else {
@@ -180,17 +158,9 @@ public class QuestionController {
                     QpostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
             }
         }
@@ -224,17 +194,9 @@ public class QuestionController {
                     QpostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
             }
         } else {
@@ -247,17 +209,9 @@ public class QuestionController {
                     QpostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
             }
         }
@@ -265,11 +219,11 @@ public class QuestionController {
         return responseService.getListResult(result);
     }
 
-    //사이트의 모든 블로그의 포스트 검색
+    //사이트의 모든 질문글 검색
     @ApiImplicitParams({
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
     })
-    @ApiOperation(value = "모든 블로그의 포스트 검색 ", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 작성자 검색, type 4: 통합검색, ")
+    @ApiOperation(value = "모든 질문글 검색 ", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 작성자 검색, type 4: 통합검색, ")
     @GetMapping(value = "/search/all_questions/{keyword}/{type}")
     public ListResult<ListResult> searchAlgorithm(@PathVariable int type, @PathVariable(required = false) String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -292,17 +246,9 @@ public class QuestionController {
                     QpostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
                 cnt++;
             }
@@ -316,17 +262,9 @@ public class QuestionController {
                     QpostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
                 } else {
-                    if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
-                        ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                        String filePath = "";
-                        if(profileImgDto != null) {
-                            filePath = profileImgDto.getImgFullPath();
-                        }
-                        filePaths.add(filePath);
-                    } else {
-                        String filePath = "https://dp02rmdt3p3bw.cloudfront.net/no_img.jpg";
-                        filePaths.add(filePath);
-                    }
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
                 }
             }
         }
@@ -390,8 +328,9 @@ public class QuestionController {
         if (qpost1.getAnswerCnt() > 0) throw new CAnsweredQuestionException();
         Qpost qpost = qnaService.updateQuestion(member, qpostId, paramQpost);
         if (!tags.isEmpty()) {
+            qTagService.deleteQtags(qpost);
             for (String tag : tags) {
-                qTagService.updateTag(qpost, tag);
+                qTagService.insertTags(qpost, tag);
             }
         }
 
@@ -466,5 +405,101 @@ public class QuestionController {
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
         return responseService.getSingleResult(qnaService.saveFiles(qpostId, logined.getNickname(), files));
+    }
+
+    @ApiOperation(value = "전체 질문글 태그 검색", notes = "전체 질문글 태그로 검색")
+    @PostMapping(value = "/search/tags/{keyword}")
+    public ListResult<ListResult> searchAllQuestionssByTag(@PathVariable String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        Paging paging = new Paging(no);
+        List<ListResult> result = new ArrayList<>();
+        List<String> filePaths = new ArrayList<>();
+        LocalDateTime date = LocalDateTime.now();
+        date.minus(30, ChronoUnit.DAYS);
+        List<OnlyQpostMapping> list = searchService.AllQnaTagSearch(keyword, paging);
+        result.add(responseService.getListResult(list));
+        if (logined.isPresent()) {
+            for (OnlyQpostMapping qm : list) {
+                Member member = memberRepository.findByNickname(qm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
+                long qpostId = qm.getQpostId();
+                //파일 조회
+                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
+                    QpostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                } else {
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
+                }
+            }
+        } else {
+            for (OnlyQpostMapping qm : list) {
+                Member member = memberRepository.findByNickname(qm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
+                long qpostId = qm.getQpostId();
+                //파일 조회
+                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
+                    QpostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                } else {
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
+                }
+            }
+        }
+        result.add(responseService.getListResult(filePaths));
+        return responseService.getListResult(result);
+    }
+
+    @ApiOperation(value = "특정 유저 질문글 태그 검색", notes = "특정 유저의 질문글 태그로 검색")
+    @PostMapping(value = "/{nickname}/search/tags/{keyword}")
+    public ListResult<ListResult> searchOnesQuestionsByTag(@PathVariable String nickname, @PathVariable String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        Paging paging = new Paging(no);
+        List<ListResult> result = new ArrayList<>();
+        List<String> filePaths = new ArrayList<>();
+        LocalDateTime date = LocalDateTime.now();
+        date.minus(30, ChronoUnit.DAYS);
+        List<OnlyQpostMapping> list = searchService.OnesQnaTagSearch(nickname, keyword, paging);
+        result.add(responseService.getListResult(list));
+        if (logined.isPresent()) {
+            for (OnlyQpostMapping qm : list) {
+                Member member = memberRepository.findByNickname(qm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
+                long qpostId = qm.getQpostId();
+                //파일 조회
+                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
+                    QpostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                } else {
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
+                }
+            }
+        } else {
+            for (OnlyQpostMapping qm : list) {
+                Member member = memberRepository.findByNickname(qm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
+                long qpostId = qm.getQpostId();
+                //파일 조회
+                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
+                    QpostUploadsDto file = files.get(0);
+                    filePaths.add(file.getImgFullPath());
+                } else {
+                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
+                    String filePath = profileImgDto.getImgFullPath();
+                    filePaths.add(filePath);
+                }
+            }
+        }
+        result.add(responseService.getListResult(filePaths));
+        return responseService.getListResult(result);
     }
 }

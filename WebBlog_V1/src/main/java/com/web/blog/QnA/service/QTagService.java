@@ -68,7 +68,7 @@ public class QTagService {
             else if (t.getTagUsageCnt() == 1) { //해당 태그가 한 번밖에 쓰지 않았으면 그냥 태그 통째로 삭제
                 tagRepository.delete(t);
             }
-            qpostTagRepository.deleteById(qt.getId()); //post_tag 에서 연결 해제
+            qpostTagRepository.deleteByIdEquals(qt.getId()); //post_tag 에서 연결 해제
         }
     }
 }

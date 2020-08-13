@@ -59,48 +59,50 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     //한 카테고리 내 모든 포스트 통합 검색
 //    @Query(value = "select distinct * from post where board_id = :board_id and (subject like concat('%',:keyword,'%') or content like concat('%',:keyword,'%'))", nativeQuery = true)
-    List<OnlyPostMapping> findDistinctByBoard_BoardIdAndSubjectContainingOrBoard_BoardIdAndContentContaining(long board_id1, String keyword1, long board_id2, String keyword2, Pageable pageable);
+    List<OnlyPostMapping> findDistinctByBoard_BoardIdAndSubjectContainingAndBoard_NameNotLikeOrBoard_BoardIdAndContentContainingAndBoard_NameNotLike(long board_id1, String keyword1, String notlike1, long board_id2, String keyword2, String notlike2, Pageable pageable);
 
     //한 카테고리 내 모든 포스트 제목 검색
-    List<OnlyPostMapping> findByBoard_BoardIdAndSubjectContaining(long bord_id, String keyword, Pageable pageable);
+    List<OnlyPostMapping> findByBoard_BoardIdAndSubjectContainingAndBoard_NameNotLike(long bord_id, String keyword, String notlike, Pageable pageable);
 
     //한 카테고리 내 모든 포스트 내용 검색
-    List<OnlyPostMapping> findByBoard_BoardIdAndContentContaining(long bord_id, String keyword, Pageable pageable);
+    List<OnlyPostMapping> findByBoard_BoardIdAndContentContainingAndBoard_NameNotLike(long bord_id, String keyword, String notlike, Pageable pageable);
 
 
     //한 블로그 내 모든 포스트 리스트
-    List<OnlyPostMapping> findAllByMember_Nickname(String writer, Pageable pageable);
+    List<OnlyPostMapping> findAllByMember_NicknameAndBoard_NameNotLike(String writer, String notlike, Pageable pageable);
+
+    List<OnlyPostMapping> findAllByMember_NicknameAndBoard_NameNotLike(String writer, String notlike);
 
     List<OnlyPostMapping> findAllByMember_Nickname(String writer);
 
     //한 블로그 내 모든 포스트 통합 검색(or 블로그 내 모든 포스트 리스트)
 //    @Query(value = "select distinct * from post where nickname = :nickname and (subject like concat('%',:keyword,'%') or content like concat('%',:keyword,'%'))", nativeQuery = true)
-    List<OnlyPostMapping> findDistinctByMember_NicknameAndSubjectContainingOrMember_NicknameAndContentContaining(String writer1, String keyword1, String writer2, String keyword2, Pageable pageable);
+    List<OnlyPostMapping> findDistinctByMember_NicknameAndSubjectContainingAndBoard_NameNotLikeOrMember_NicknameAndContentContainingAndBoard_NameNotLike(String writer1, String keyword1, String notlike1, String writer2, String keyword2, String notlike2, Pageable pageable);
 
     //한 블로그 내 모든 포스트 제목 검색
-    List<OnlyPostMapping> findByMember_NicknameAndSubjectContaining(String writer, String keyword, Pageable pageable);
+    List<OnlyPostMapping> findByMember_NicknameAndSubjectContainingAndBoard_NameNotLike(String writer, String keyword, String notlike, Pageable pageable);
 
     //한 블로그 내 모든 포스트 내용 검색
-    List<OnlyPostMapping> findByMember_NicknameAndContentContaining(String writer, String keyword, Pageable pageable);
+    List<OnlyPostMapping> findByMember_NicknameAndContentContainingAndBoard_NameNotLike(String writer, String keyword, String notlike, Pageable pageable);
 
 
     //사이트의 모든 포스트 리스트(최신글)
-    List<OnlyPostMapping> findByCreatedAtLessThanEqualOrderByCreatedAtDesc(LocalDateTime date, Pageable pageable);
+    List<OnlyPostMapping> findByCreatedAtLessThanEqualAndBoard_NameNotLikeOrderByCreatedAtDesc(LocalDateTime date, String notlike, Pageable pageable);
 
     //사이트의 모든 포스트 리스트(인기글)
-    List<OnlyPostMapping> findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualOrLikesGreaterThanEqualAndCreatedAtLessThanEqualOrderByCreatedAtDesc(int views, LocalDateTime dateV, int likes, LocalDateTime dateL, Pageable pageable);
+    List<OnlyPostMapping> findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualAndBoard_NameNotLikeOrLikesGreaterThanEqualAndCreatedAtLessThanEqualAndBoard_NameNotLikeOrderByCreatedAtDesc(int views, LocalDateTime dateV, String notlike1, int likes, LocalDateTime dateL, String notlike2, Pageable pageable);
 
 
     //사이트의 모든 포스트 통합 검색(or 사이트 내 모든 포스트 리스트)
 //    @Query(value = "select distinct * from post where (subject like concat('%',:keyword,'%') or content like concat('%',:keyword,'%') or writer like concat('%',:keyword,'%'))", nativeQuery = true)
-    List<OnlyPostMapping> findDistinctBySubjectContainingOrContentContainingOrMember_NicknameContaining(String keyword1, String keyword2, String keyword3, Pageable pageable);
+    List<OnlyPostMapping> findDistinctBySubjectContainingAndBoard_NameNotLikeOrContentContainingAndBoard_NameNotLikeOrMember_NicknameContainingAndBoard_NameNotLike(String keyword1, String notlike1, String keyword2, String notlike2, String keyword3, String notlike3, Pageable pageable);
 
     //사이트의 모든 포스트 제목 검색
-    List<OnlyPostMapping> findBySubjectContaining(String keyword, Pageable pageable);
+    List<OnlyPostMapping> findBySubjectContainingAndBoard_NameNotLike(String keyword, String notlike, Pageable pageable);
 
     //사이트의 모든 포스트 내용 검색
-    List<OnlyPostMapping> findByContentContaining(String keyword, Pageable pageable);
+    List<OnlyPostMapping> findByContentContainingAndBoard_NameNotLike(String keyword, String notlike, Pageable pageable);
 
     //사이트의 모든 포스트 작성자 검색
-    List<OnlyPostMapping> findByMember_NicknameContaining(String keyword, Pageable pageable);
+    List<OnlyPostMapping> findByMember_NicknameContainingAndBoard_NameNotLike(String keyword, String notlike, Pageable pageable);
 }

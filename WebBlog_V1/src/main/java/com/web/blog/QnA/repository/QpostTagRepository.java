@@ -1,7 +1,9 @@
 package com.web.blog.QnA.repository;
 
+import com.web.blog.Board.entity.Tag;
 import com.web.blog.QnA.entity.Qpost;
 import com.web.blog.QnA.entity.QpostTag;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -15,9 +17,13 @@ public interface QpostTagRepository extends JpaRepository<QpostTag, Long> {
 
     List<QpostTag> findByQpost_QpostId(long qpost_id);
 
+    List<QpostTag> findByTagAndInWhere(Tag tag, int in_where, Pageable pageable);
+
+    int deleteByIdEquals(long id);
+
     @Modifying
     @Transactional
-    @Query(value = "insert into qpost_tag (qpost_id, tag_id) values (:qpost_id, :tag_id)", nativeQuery = true)
+    @Query(value = "insert into qpost_tag (qpost_id, tag_id, in_where) values (:qpost_id, :tag_id, 2)", nativeQuery = true)
     int insertTag(@Param("qpost_id") long qpost_id, @Param("tag_id") long tag_id);
 
     @Modifying
