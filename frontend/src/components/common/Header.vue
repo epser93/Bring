@@ -91,7 +91,7 @@
               .then(() =>{
                 this.$cookies.remove('X-AUTH-TOKEN')
                 this.$cookies.remove('nickname')
-                this.$cookies.remove('mode')
+                this.$cookies.set('mode', 'Blog')
                 isLoggedIn = false
                 this.$emit("logout-state", isLoggedIn)
                 this.$router.push({name : 'RecentlyPost'}).catch(() => {})
