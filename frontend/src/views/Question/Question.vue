@@ -15,6 +15,11 @@
         
         </b-jumbotron>
         <hr>
+        <!-- 최신글 / 트랜드 -->
+        <div class= "mt-4 mb-4">
+            <b-button variant="outline-primary" class="mr-2" @click="getAllQna">최신글</b-button>
+            <b-button variant="outline-info" class="ml-2" @click="getHotQna">인기글</b-button>
+        </div>
 
         <!-- 썸네일 default 값 고민해볼것-->
         <div class="row">
@@ -88,11 +93,39 @@ export default {
             .then(res => {
                 this.thumbnail=res.data.list[1].list
                 this.qPost=res.data.list[0].list
+                // console.log(this.qPost)
             })
             .catch(err => {
                 console.log(err)
             })
         },
+        // 전체 질문 리스트 인기글
+        getHotQna(){
+            const config={
+                headers:{
+                    'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN')
+                }
+            }
+            axios.get(`${BACK_URL}/questions/trend`,config)
+            .then(res => {
+                console.log(res.data)
+                this.thumbnail=res.data.list[1].list
+                this.qHotPost=res.data.list[0].list
+
+                // console.log(res.data.list[0].list)
+                var qHotPost=this.qHOtPost
+                // console.log(qHotPost)
+                const sortHotQuestion = "views";
+                qHotPost.sort(function(a, b) { // 오름차순
+                    return b[sortHotQuestion] - a[sortHotQuestion];
+                    // 13, 21, 25, 44
+                });
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        },
+
         // 게시물 디테일 페이지로 이동
         getQnaDetail(qArticle){
             this.$router.push({ name: 'QuestionDetail', params: {nickname: qArticle.member_nickname, qpostId: qArticle.qpostId}})
@@ -100,6 +133,7 @@ export default {
     },
     created(){
         this.getAllQna()
+        this.getHotQna()
         }
 }
     
