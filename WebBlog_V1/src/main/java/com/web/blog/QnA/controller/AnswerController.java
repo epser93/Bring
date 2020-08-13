@@ -248,21 +248,29 @@ public class AnswerController {
     })
     @ApiOperation(value = "답변 추천", notes = "답변 추천")
     @PostMapping(value = "/like/{apostId}/{answerer}")
-    public void like(@RequestBody Boolean likeit, @PathVariable long apostId, @PathVariable String answerer) throws Exception {
+    public SingleResult<Integer> like(@RequestBody Boolean likeit, @PathVariable long apostId, @PathVariable String answerer) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new); //로그인한 사용자
         Optional<Apost> apost = apostRepository.findById(apostId);
         Optional<ApostMember> apostMember = apostMemberRepository.findByMemberAndApost(member, apost.get());
+        int like = 0;
         if (apostMember.isPresent() && likeit) {
             throw new CAlreadyLikedException();
         } else if (apostMember.isPresent() && !likeit) { //추천을 이미 한 사용자면서 추천을 취소하면
             qnaService.likeThisAnswer(member, apost.get(), likeit);
+            List<OnlyApostMapping> findApost = qnaService.getOneApost(apostId);
+            OnlyApostMapping onlyApostMapping = findApost.get(0);
+            like = onlyApostMapping.getLikes();
         } else {
             if (!member.getNickname().equals(answerer) && likeit) { //로그인 한 사용자가 답변 작성자가 아니고~
                 qnaService.likeThisAnswer(member, apost.get(), likeit);
+                List<OnlyApostMapping> findApost = qnaService.getOneApost(apostId);
+                OnlyApostMapping onlyApostMapping = findApost.get(0);
+                like = onlyApostMapping.getLikes();
             } else if (member.getNickname().equals(answerer)) throw new COwnerCannotLike();
         }
+        return responseService.getSingleResult(like);
     }
 
     @ApiOperation(value = "답변 추천 유저 목록", notes = "해당 답변을 추천한 유저들의 목록을 보여준다.")
