@@ -37,14 +37,14 @@ import Editor from '../views/blog/Editor.vue'
 
 // 검색
 import Search from '../components/common/Search.vue'
+import TagSearch from '../components/common/TagSearch.vue'
 
 Vue.use(VueRouter)
 
-const routes = [
-    {
-        path : '/',
-        name : 'Index',
-        component : Index
+const routes = [{
+        path: '/',
+        name: 'Index',
+        component: Index
     },
     {
         path: '/postqna',
@@ -63,12 +63,12 @@ const routes = [
             {
                 path: 'recentlyquetion',
                 name: 'RecentlyQuestion',
-                component : RecentlyQuestion
+                component: RecentlyQuestion
             },
             {
                 path: 'trendquestion',
-                name : 'TrendQuestion',
-                component : TrendQuestion
+                name: 'TrendQuestion',
+                component: TrendQuestion
             }
         ]
     },
@@ -90,6 +90,14 @@ const routes = [
         path: '/search',
         name: 'Search',
         component: Search,
+
+    },
+
+    // 태그검색
+    {
+        path: '/tag/:keyword',
+        name: 'TagSearch',
+        component: TagSearch,
 
     },
 
