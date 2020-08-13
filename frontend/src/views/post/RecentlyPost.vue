@@ -1,86 +1,80 @@
-!<template>
+<template>
   <div class="wrapB container-fluid">
     <section class="cards row">
-      <div v-for="(post,index) in list" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-        <div class="cardwrap" @click="gotoDetail(post)">
-          <div class="img-section" :style="{ 'background-image' : `url(${hotThumbnail[index]})`}">
-            <a href=""></a>
-          </div>
-          <div class="contents">
-            <h4>{{ post.subject }}</h4>
-            <p>{{ post.content }}</p>
-            <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.replyCnt }}개의 댓글</p>
+      <div v-for="(post, index) in list" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
+        <div class="cardwrap">
+          <div class="card-body p-0" @click="gotoDetail(post)">
+            <div class="img-section" :style="{ 'background-image' : `url(${thumbnails[index]})`}">
+              <a href=""></a>
+            </div>
+            <div class="contents">
+              <h4>{{ post.subject }}</h4>
+              <p>{{ post.content }}</p>
+              <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.replyCnt }}개의 댓글</p>
+            </div>
           </div>
           <div class="writer-info">
-            <p>{{ post.member_nickname }}</p>
-            <p>♥ {{ post.likes}}</p>
+            <button class="btn btn-sm" @click="gotoUserInfo(post.member_nickname)">{{ post.member_nickname }}</button>
+            <p>♥ {{ post.likes }}</p>
           </div>
         </div>
       </div>
+      <infinite-loading @infinite="infiniteHandler"></infinite-loading>
     </section>
-    <infinite-loading @infinite="infiniteHandler"></infinite-loading>
   </div>
-
 </template>
 
 <script>
 import axios from 'axios'
-// import _ from 'lodash'
 const BACK_URL = 'http://localhost:8080'
-export default {
-  name: 'HotPost',
-  props: {
 
-  },
+export default {
+  name: 'RecentlyPost',
   data() {
     return {
       list: [],
-      hotThumbnail: [],
-      page : 1
+      thumbnails: [],
+      page : 2,
     }
   },
-  created() {
-    // this.getHotPost()
-    // this.getRanking()
-  },
-  methods: {
+  methods : {
     infiniteHandler ($state) {
       console.log($state)
-      axios.get(`${BACK_URL}/blog/trend?no=${this.page}`)
-        .then (res => {
+      console.log('mode',this.mode)
+      axios.get(`${BACK_URL}/blog/recent?no=${this.page}`)
+        .then(res => {
           if (res.data.list[0].list.length) {
             this.page += 1
             this.list.push(...res.data.list[0].list)
-            this.hotThumbnail.push(...res.data.list[2].list)
+            this.thumbnails.push(...res.data.list[2].list)
+            // console.log(this.thumbnails)
             $state.loaded()
           } else {
             $state.complete()
           }
         })
-        .catch(err => console.log(err))
+        .catch (err => console.log(err))
     },
     gotoDetail(post) {
       this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.member_nickname, post_id : post.postId }})
     },
-    getHotPost() {
-      if (this.mode === "blog") {
-        axios.get(`${BACK_URL}/blog/trend`)
-          .then(res => {
-            this.hotThumbnail = res.data.list[2].list
-            this.postings = res.data.list[0].list
-          })
-          .catch(err => console.log(err))
-      } else {
-        axios.get(`${BACK_URL}/questions/trend`)
-          .then (res=> {
-            this.postings = res.data.list[0].list
-            console.log(this.postings)
-          })
-          .catch (err => console.log(err))
-      }
+    gotoUserInfo(userNickname) {
+      console.log(userNickname)
+      this.$router.push({ name : "Profile" , query: { nickname : userNickname }})
     },
+    Init() {
+      axios.get(`${BACK_URL}/blog/recent?no=1`)
+        .then (res => {
+          this.list = res.data.list[0].list
+          this.thumbnails = res.data.list[2].list
+          console.log('초기화 blog', res)
+          // console.log(this.thumbnail)
+        })
+        .catch (err => console.log(err))
+    }
   },
-  computed: {
+  created() {
+    this.Init()
   },
 }
 </script>
@@ -118,15 +112,12 @@ h2 {
   width: 380px;
   height: 450px;
   margin-bottom: 30px;
+  overflow: hidden;
   cursor: pointer;
-  overflow: visible;
 }
 
-.cardwrap:hover {
-  box-shadow: 1px 8px 20px grey;
-  transform: translateY(-10px);
-  transition: .3s ease-in;
-  overflow: visible;
+.cardwrap {
+  box-shadow: 10px 0px 60px -40px black
 }
 
 .img-section {

@@ -1,29 +1,8 @@
 <template>
   <div class="wrapB container-fluid">
-    <section v-if="mode==='blog'" class="cards row">
-      <div v-for="(post, index) in posts" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-        <div class="cardwrap">
-          <div class="card-body p-0" @click="gotoDetail(post)">
-            <div class="img-section" :style="{ 'background-image' : `url(${thumbnail[index]})`}">
-              <a href=""></a>
-            </div>
-            <div class="contents">
-              <h4>{{ post.subject }}</h4>
-              <p>{{ post.content }}</p>
-              <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.replyCnt }}개의 댓글</p>
-            </div>
-          </div>
-          <div class="writer-info">
-            <button class="btn btn-sm" @click="gotoUserInfo(post.member_nickname)">{{ post.member_nickname }}</button>
-            <p>♥ {{ post.likes }}</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section v-if="mode==='QnA'" class="cards row">
+    <section class="cards row">
       <div class="col-lg-10 row">
-        <div v-for="post in posts" :key="post.qpostId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
+        <div v-for="post in list" :key="post.qpostId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
           <div class=cardwrap>
             <div class="card-body p-0" @click="gotoQuestionDetail(post)">
               <div class="img-section">
@@ -43,15 +22,16 @@
         </div>
       </div>
 
-      <div v-if="mode==='QnA'" class="tag-list-wrap col-lg-2">
+      <div class="tag-list-wrap col-lg-2">
         <h4>명예의전당</h4>
         <ul class="tag-list">
           <li v-for="(ranker, index) in sortRanking.slice(0,5)" :key="index">
               {{ index + 1 }}등 : {{ranker.nickname}}({{ ranker.score}}점)
           </li> 
         </ul>
-      </div>   
+      </div>
     </section>
+    <infinite-loading @infinite="infiniteHandler"></infinite-loading>   
   </div>
 
 </template>
@@ -62,27 +42,32 @@ import _ from 'lodash'
 const BACK_URL = 'http://localhost:8080'
 
 export default {
-  name: 'PostList',
-  props: {
-    mode: String,
-    posts: Array,
-    thumbnail : Array
-  },
+  name: 'RecentlyQuestion',
   data() {
     return {
       unsortedRank : [],
+      list: [],
+      page : 1,
     }
   },
   methods : {
-    gotoDetail(post) {
-      this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.member_nickname, post_id : post.postId }})
+    infiniteHandler($state) {
+      console.log($state)
+      axios.get(`${BACK_URL}/questions/recent?no=${this.page}`)
+        .then (res => {
+          if (res.data.list[0].list.length) {
+            this.page += 1
+            this.list.push(...res.data.list[0].list)
+            $state.loaded()
+          } else {
+            $state.complete()
+          }
+        })
+        .catch(err => console.log(err))
     },
     gotoQuestionDetail(post) {
       this.$router.push({ name : "QuestionDetail" , params: { nickname : post.member_nickname, qpostId : post.qpostId }})
     },
-    // gotoUserInfo(userNickname) {
-    //   this.$router.push({ name : "MyBlog" , params: { nickname : userNickname }})
-    // },
     gotoUserInfo(userNickname) {
       console.log(userNickname)
       this.$router.push({ name : "Profile" , query: { nickname : userNickname }})
@@ -94,10 +79,12 @@ export default {
           // console.log(this.unsortedRank)
         })
         .catch(err => console.log(err))
-    }
+    },
   },
   created() {
     this.getRanking()
+  },
+  mounted() {
   },
   computed: {
     sortRanking () {
@@ -193,5 +180,9 @@ p {
 .comment-date {
   font-size: 12px;
   text-align: left;
+}
+
+.tag-list-wrap {
+  height: 100px;
 }
 </style>

@@ -45,12 +45,13 @@ public class Apost extends CommonDateEntity implements Serializable {
     @JoinColumn(name = "qpost_id")
     private Qpost qpost;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @ManyToOne
     @JoinColumn(name = "msrl")
     private Member member;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @OneToMany(mappedBy = "apost", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "apost", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<ApostMember> apostMembers = new ArrayList<>();
 
     public Apost setUpdate(String answer) {

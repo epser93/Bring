@@ -6,6 +6,7 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 @Builder
 @Entity
@@ -25,6 +26,10 @@ public class Board extends CommonDateEntity implements Serializable{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "msrl")
     private Member member;
+
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Post> posts;
 
     @Column(columnDefinition = "integer default 0")
     private int postCnt;

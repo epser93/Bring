@@ -156,7 +156,7 @@ public class ReplyController {
     })
     @ApiOperation(value = "댓글 추천", notes = "댓글 추천")
     @PostMapping(value = "/reply/like/{replyId}/{replyer}")
-    public void like(@RequestBody Boolean likeit, @PathVariable long replyId, @PathVariable String replyer) throws Exception {
+    public SingleResult<Integer> like(@RequestBody Boolean likeit, @PathVariable long replyId, @PathVariable String replyer) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new); //로그인한 사용자
@@ -178,6 +178,7 @@ public class ReplyController {
                 like = onlyReplyMapping.getLikes();
             } else if (member.getNickname().equals(replyer)) throw new COwnerCannotLike();
         }
+        return responseService.getSingleResult(like);
     }
 
     @ApiImplicitParams({

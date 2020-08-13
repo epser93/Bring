@@ -81,30 +81,39 @@ public class Member extends CommonDateEntity implements UserDetails, Serializabl
     @Builder.Default
     private List<String> roles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<PostMember> postMembers = new ArrayList<>();
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<ApostMember> apostMembers = new ArrayList<>();
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<ReplyMember> replyMembers = new ArrayList<>();
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(mappedBy = "from", cascade = CascadeType.REMOVE)
     private List<Follow> following = new ArrayList<>();
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(mappedBy = "to", cascade = CascadeType.REMOVE)
     private List<Follow> followers = new ArrayList<>();
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Post> posts = new ArrayList<>();
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Reply> replies = new ArrayList<>();
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Qpost> qposts = new ArrayList<>();
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Apost> aposts = new ArrayList<>();
 

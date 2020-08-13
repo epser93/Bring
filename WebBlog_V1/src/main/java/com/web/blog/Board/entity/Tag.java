@@ -1,6 +1,7 @@
 package com.web.blog.Board.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.web.blog.QnA.entity.QpostTag;
 import lombok.*;
@@ -28,9 +29,11 @@ public class Tag extends CommonDateEntity implements Serializable {
     @Column(columnDefinition = "integer default 0")
     private int tagUsageCnt;
 
-    @OneToMany(mappedBy = "tag", fetch = FetchType.EAGER)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @OneToMany(mappedBy = "tag", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
     private List<PostTag> postTags = new ArrayList<>();
 
-    @OneToMany(mappedBy = "tag")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @OneToMany(mappedBy = "tag", cascade = CascadeType.REMOVE)
     private List<QpostTag> qpostTags = new ArrayList<>();
 }

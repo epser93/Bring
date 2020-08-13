@@ -1,5 +1,6 @@
 <template>
-    <div id="blog">
+  <transition name="fade">
+    <div v-if="show" id="blog">
       <!-- 프로필 -->
       <div id="upsideTerritory" class="row ml-4 mr-4">
         <div class="ml-5 mt-3">
@@ -24,6 +25,7 @@
         </div>
       </div>
     </div>
+  </transition>
 </template>
 
 <script>
@@ -51,6 +53,7 @@ export default {
       // 닉네임 라우터 매개변수로 받아오기
       nickname: this.$route.params.nickname,
       userInfo: '',
+      show: false,
     }
   },
   methods: {
@@ -59,7 +62,6 @@ export default {
       const config = {
         headers: {
             'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
-
         }
       }
       axios.get(`${BACK_URL}/member/${nickname}/profile`, config)
@@ -70,13 +72,13 @@ export default {
           alert('ID와 비밀번호를 다시 확인해주세요.')
           console.log(err)
         })
-    },
-
-    
+    }, 
   },
   created() {
-    this.getUserInfo(this.nickname),
-    console.log(this.userInfo)
+    this.getUserInfo(this.nickname)
+  },
+  mounted() {
+    this.show = !this.show
   },
   watch: {
     '$route.params.nickname' () {
@@ -112,6 +114,16 @@ export default {
 
 #upsideTerritory{
   background-color: rgb(231, 231, 231);
+}
+
+/* 트렌지션 */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 1s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 
 </style>

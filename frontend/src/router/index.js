@@ -3,10 +3,12 @@ import VueRouter from 'vue-router'
 
 // 포스트
 import Home from '../views/post/Home.vue'
-import PostList from '../views/post/PostList.vue'
+import RecentlyPost from '../views/post/RecentlyPost.vue'
 import HotPost from '../views/post/HotPost.vue'
 import DetailPost from '../views/post/DetailPost.vue'
 import UpdateForm from '../views/post/UpdateForm.vue'
+import RecentlyQuestion from '../views/post/RecentlyQuestion.vue'
+import TrendQuestion from '../views/post/TrendQuestion.vue'
 
 // 유저
 import Login from '../views/user/Login.vue' // 곧 사라질 예정 모달로 처리함
@@ -31,6 +33,9 @@ import QuestionUpdate from '../views/Question/QuestionUpdate.vue'
 // 에디터(임시)
 import Editor from '../views/blog/Editor.vue'
 
+// 검색
+import Search from '../components/common/Search.vue'
+
 Vue.use(VueRouter)
 
 const routes = [{
@@ -38,14 +43,24 @@ const routes = [{
         name: 'Home',
         component: Home,
         children: [{
-                path: '',
-                name: 'Home',
-                component: PostList
+                path: '/recentlypost',
+                name: 'RecentlyPost',
+                component: RecentlyPost
             },
             {
                 path: '/hotpost',
                 name: 'HotPost',
                 component: HotPost
+            },
+            {
+                path: '/recentlyquetion',
+                name: 'RecentlyQuestion',
+                component : RecentlyQuestion
+            },
+            {
+                path: 'trendquestion',
+                name : 'TrendQuestion',
+                component : TrendQuestion
             }
         ]
     },
@@ -61,6 +76,15 @@ const routes = [{
         component: UpdateForm,
         props: true
     },
+
+    // 헤더검색
+    {
+        path: '/search',
+        name: 'Search',
+        component: Search,
+
+    },
+
     // 유저 관련
     {
         path: '/user/login', // 곧 사라질 예정 로그인 모달로 처리함

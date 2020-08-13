@@ -107,7 +107,7 @@ public class AnswerController {
     })
     @ApiOperation(value = "답변 작성", notes = "답변 작성")
     @PostMapping(value = "/{qpostId}")
-    public ListResult<ListResult> answerTheQuestion(@PathVariable long qpostId, @Valid @RequestBody ParamApost paramApost) throws IOException {
+    public SingleResult<Apost> answerTheQuestion(@PathVariable long qpostId, @Valid @RequestBody ParamApost paramApost) throws IOException {
         Optional<Qpost> qpost = qpostRepository.findById(qpostId);
         Member asker = qpost.get().getMember();
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -145,12 +145,8 @@ public class AnswerController {
             }
         }
         Apost apost = qnaService.writeAnswer(qpost.get(), logined.get(), paramApost, answer.getPostId());
-        List<Apost> list = new ArrayList<>();
-        list.add(apost);
-        result.add(responseService.getListResult(list));
-        result.add(responseService.getListResult(qTagService.getTags(qpostId)));
         if (qpostRepository.isSelectedAnswerExist(qpostId)) return null;
-        return responseService.getListResult(result);
+        return responseService.getSingleResult(apost);
     }
 
     //답변 수정

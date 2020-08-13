@@ -1,8 +1,11 @@
 <template>
     <div id="header">
         <nav class="navbar navbar-expand navbar-light bg-light">
-            <router-link :to="{ name: 'Home' }" class="navbar-brand">
-                GEESHIQUEEN
+            <router-link v-if="this.mode === 'Blog'" :to="{ name: 'RecentlyPost' }" class="navbar-brand">
+                GEESHIQUEEN블로그
+            </router-link>
+            <router-link v-if="this.mode === 'QnA'" :to="{ name: 'RecentlyQuestion' }" class="navbar-brand">
+                GEESHIQUEEN지식인
             </router-link>
 
             <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
@@ -29,10 +32,18 @@
                         <p v-if="isLogin" @click="logout" class="nav-link">로그아웃</p> 
                     </li>
                 </ul>
-                <form class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" v-model="keyword" type="text" placeholder="Search" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                </form>
+
+                <!-- 검색창 -->
+                <div class="form-inline my-2 my-lg-0">
+                    <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-success">{{ keywordType.name }}</button>
+                    <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu">
+                        <button type="button" tabindex="0" @click="dropdown(typeid, value)" class="dropdown-item" v-for="(value, typeid) in dropdownList" v-bind:key="typeid">
+                            {{ value }}
+                        </button>
+                    </div>
+                    <input class="form-control" type="search" v-model="keyword" placeholder="키워드 입력" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" @click="gotoSearch">검색</button>
+                </div>
             </div>
         </nav>
         
@@ -47,6 +58,19 @@
         name: 'Header',
         components: { 
             
+        },
+        watch: {
+          // '$cookies' : {
+          //   handler : function () {
+          //     if (this.$cookies.get('mode') === 'Blog') {
+          //       this.mode = 'Blog'
+          //     } else {
+          //       this.mode = 'QnA'
+          //     }
+          //   },
+          //   deep: true,
+          //   immediate : true
+          // }
         },
         props: {
           isLogin : Boolean,
@@ -67,6 +91,7 @@
               .then(() =>{
                 this.$cookies.remove('X-AUTH-TOKEN')
                 this.$cookies.remove('nickname')
+                this.$cookies.remove('mode')
                 isLoggedIn = false
                 this.$emit("logout-state", isLoggedIn)
                 this.$router.push({name : 'Home'}).catch(() => {})
@@ -75,10 +100,31 @@
                 console.error(err)
               })
           },
+          gotoSearch() {
+            console.log(this.keyword)
+            this.$router.push({name : 'Search', query: { q: this.keyword, type: this.keywordType.keyid }})
+          },
+          // 검색 종류 설정
+          dropdown(typeid, value) {
+              this.keywordType.keyid = typeid
+              this.keywordType.name = value
+          }
         },
         data() {
           return {
+            // 검색 관련
             keyword : "",
+            keywordType: {
+                name: '제목검색',
+                keyid: 1,
+            },
+            dropdownList: {
+                1: '제목검색',
+                2: '내용검색',
+                3: '작성자검색',
+                4: '통합검색',
+            },
+            mode : this.$cookies.get('mode')
           }
         },
 

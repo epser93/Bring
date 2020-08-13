@@ -34,7 +34,7 @@ public class QTagService {
         return tags;
     }
 
-    //포스트 태그 작성
+    //질문글 태그 작성
     public Tag insertTags(Qpost qpost, String paramTag) {
         Optional<Tag> check = tagRepository.findByTag(paramTag);
         Tag tag = null;
@@ -52,7 +52,7 @@ public class QTagService {
         return tag;
     }
 
-    //포스트 태그 수정
+    //질문글 태그 수정
     public Tag updateTag(Qpost qpost, String paramTag) {
         deleteQtags(qpost);
         return insertTags(qpost, paramTag); //다시 입력된 값으로 insert
