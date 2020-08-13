@@ -31,7 +31,7 @@
                 </div>
             </div>
             <div class="text-right" v-if="userNow === nickname">
-                <button type="button" @click="newArticle('default')" class="btn btn-outline-dark mb-5 mr-5" style="width:100px;">새 글 작성</button>
+                <button type="button" @click="newArticle" class="btn btn-outline-dark mb-5 mr-5" style="width:100px;">새 글 작성</button>
             </div>
         </div>
 
@@ -56,7 +56,7 @@
                 </div>
             </div>
             <div class="text-right" v-if="userNow === nickname">
-                <button type="button" @click="newArticle(currentCategory)" class="btn btn-outline-dark mb-5 mr-5" style="width:100px;">새 글 작성</button>
+                <button type="button" @click="newArticle" class="btn btn-outline-dark mb-5 mr-5" style="width:100px;">새 글 작성</button>
             </div>
         </div>
     </div>
@@ -85,6 +85,9 @@ export default {
     },
 
     methods: {
+        newArticle() {
+            this.$router.push({name : 'QuestionWrite'})
+        },
         getAllPosts() {
             const config = {
                 headers: {
@@ -99,7 +102,6 @@ export default {
                     this.postList = res.data.list[0].list
                     // 썸네일
                     this.thumbnail1 = res.data.list[1].list
-                    console.log(res.data)
                 })
  
                 .catch(err => {

@@ -33,9 +33,9 @@
                 <h3>현재 등록된 글이 없습니다</h3>
             </div>
             <div class="row">
-                <div v-for="(item, index) in postList" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
+                <div v-for="(item, index) in postList" :key="item.postId" class="p-0 mb-5 col-6 col-lg-4">
                     <div class="card" style="width: 75%;">
-                        <img class="card-img-top" :src="thumbnail1[index]" alt="Card image cap" style="height: 150px;">
+                        <img class="card-img-top" :src="thumbnail1[index]" alt="Card image cap" style="height: 180px;">
                         <div class="card-body pb-0">
                             <h5 class="card-title">{{ item.subject.slice(0, 10) + '...'  }}</h5>
                             <p class="card-text mb-3">{{ item.content.slice(0, 20) + '...' }}</p>
@@ -52,6 +52,18 @@
             </div>
             <div class="text-right" v-if="userNow === nickname">
                 <button type="button" @click="newArticle('default')" class="btn btn-outline-dark mb-5 mr-5" style="width:100px;">새 글 작성</button>
+            </div>
+
+            <!-- 페이지네이션 -->
+            <div class="offset-4">
+                <b-pagination v-model="currentPage" :total-rows="rows" :per-page="perPage" class="mt-4">
+                    <template v-slot:first-text><span class="text-success">First</span></template>
+                    <template v-slot:last-text><span class="text-info">Last</span></template>
+                    <template v-slot:page="{ page, active }">
+                        <b v-if="active">{{ page }}</b>
+                        <i v-else>{{ page }}</i>
+                    </template>
+                </b-pagination>
             </div>
         </div>
 
@@ -148,8 +160,9 @@ export default {
                 }
             }
             this.categoryOn = 1
-            axios.get(`${BACK_URL}/blog/${this.nickname}/post_list`, config)
+            axios.get(`${BACK_URL}/blog/${this.nickname}/post_list?no=${this.currentPage}`, config)
                 .then(res => {
+                    console.log(res)
                     // 썸네일
                     this.thumbnail1 = res.data.list[2].list
                     // 포스트 정보
@@ -272,8 +285,11 @@ export default {
         calPostsSum() {
             for (const item in this.categoryList) {
                 this.numOfPosts = this.numOfPosts + this.categoryList[item].postCnt
+                this.rows = this.numOfPosts
             }
-        }
+        },
+
+
     },
     
     created() {
@@ -311,8 +327,18 @@ export default {
             postLike1: [],
             postLike2: [],
             postLike3: [],
+
+            // 페이지네이션
+            rows: 100,
+            perPage: 6,
+            currentPage: 1
         }
     },
+    watch: {
+        'currentPage' () {
+            this.getAllPosts()
+        }
+    }
 }
 </script>
 

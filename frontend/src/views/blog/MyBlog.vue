@@ -39,10 +39,6 @@ export default {
 
     },
     props: {
-    cardUserImage: {
-      type: String,
-      default: require("@/assets/img/faces/marc.jpg")
-    },
     cardImage: {
       type: String,
       default: require("@/assets/img/card.jpg")
@@ -54,6 +50,7 @@ export default {
       nickname: this.$route.params.nickname,
       userInfo: '',
       show: false,
+      cardUserImage: '',
     }
   },
   methods: {
@@ -67,11 +64,7 @@ export default {
       axios.get(`${BACK_URL}/member/${nickname}/profile`, config)
         .then(res => {
           this.userInfo = res.data.list[0].list[0]
-          // 프로필 사진이 있을때만
-          if (res.data.list.length >= 6) {
-            this.cardUserImage = res.data.list[5].list[0]
-          }
-          
+          this.cardUserImage = res.data.list[5].list[0]
         })
         .catch(err => {
           alert('ID와 비밀번호를 다시 확인해주세요.')
