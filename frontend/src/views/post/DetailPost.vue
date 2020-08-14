@@ -11,10 +11,7 @@
           </div>
         </div>
         
-        <!-- 썸네일과 글 -->
-        <div class="text-center mb-5">
-          <img v-if="thumbnail" :src="thumbnail" style="height:500px;">
-        </div>
+        <!-- 글 -->
         <p v-html="compiledMarkdown"></p>
 
         <!-- 포스트 정보 박스 -->
@@ -71,9 +68,9 @@
     <!-- 오른쪽 바 -->
     <div class="mt-5 col-12 col-lg-3">
       <!-- 카테고리 글(카테고리 내부에서 또 글 번호 매겨져야?) -->
-      <h4>같은 카테고리의 글</h4>
+      <h4>{{ member_nickname }}의 다른 글</h4>
       <div v-for="(item, index) in postListCategory" :key="item.postId" class="list-group">
-        <button @click="gotoDetail(item)" class="list-group-item list-group-item-action flex-column align-items-start p-0">
+        <button v-if="item.postId != post_id" @click="gotoDetail(item)" class="list-group-item list-group-item-action flex-column align-items-start p-0">
           <div class="d-flex w-100">
             <img class="mr-3" :src="thumbnail2[index]" alt="" style="height: 80px; width:80px;">
             <div class="">
