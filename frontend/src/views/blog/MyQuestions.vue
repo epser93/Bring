@@ -110,7 +110,7 @@ export default {
         },
        
         getTags() {
-            axios.get(`${BACK_URL}/tags/qna/${this.msrl}`)
+            axios.get(`${BACK_URL}/tags/qna/${this.nickname}`)
                 .then(res => {
                     this.tagList = res.data.list[0].list
                     this.tagNum = res.data.list[1].list

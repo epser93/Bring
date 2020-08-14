@@ -23,7 +23,7 @@
 
             <!-- 태그 리스트 -->
             <h4 class="mt-5">태그</h4>
-            <div class="tag">
+            <div class="tag mb-5">
                 <span v-for="(tag,index) in this.tagList" :key="index" class="badge badge-pill badge-light mr-2 p-2">{{ tag }}</span>
             </div>
 
@@ -39,9 +39,9 @@
                 <h3>현재 등록된 글이 없습니다</h3>
             </div>
             <div class="row">
-                <div v-for="(item, index) in postList" :key="item.postId" class="p-0 mb-5 col-6 col-lg-4">
+                <div v-for="(item, index) in postList" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
                     <div class="card" style="width: 75%;">
-                        <img class="card-img-top" :src="thumbnail1[index]" alt="Card image cap" style="height: 180px;">
+                        <img class="card-img-top" :src="thumbnail1[index]" alt="Card image cap" style="height: 150px;">
                         <div class="card-body pb-0">
                             <h5 class="card-title">{{ item.subject.slice(0, 10) + '...'  }}</h5>
                             <p class="card-text mb-3">{{ item.content.slice(0, 20) + '...' }}</p>
@@ -170,11 +170,11 @@ export default {
                 .then(res => {
                     console.log(res)
                     // 썸네일
-                    this.thumbnail1 = res.data.list[2].list
+                    this.thumbnail1 = res.data.list[2].list.reverse()
                     // 포스트 정보
-                    this.postList = res.data.list[0].list
+                    this.postList = res.data.list[0].list.reverse()
                     // 포스트에 사용자가 좋아요를 눌렀는지에 대한 불린 값
-                    this.postLike1 = res.data.list[1].list
+                    this.postLike1 = res.data.list[1].list.reverse()
                 })
  
                 .catch(err => {
@@ -203,9 +203,9 @@ export default {
             this.categoryOn = 2
             axios.get(`${BACK_URL}/blog/${this.nickname}/${categoryName}/post_list`, config)
                 .then(res => {
-                    this.postListCategory = res.data.list[0].list
-                    this.postLike2 = res.data.list[1].list
-                    this.thumbnail2 = res.data.list[2].list
+                    this.postListCategory = res.data.list[0].list.reverse()
+                    this.postLike2 = res.data.list[1].list.reverse()
+                    this.thumbnail2 = res.data.list[2].list.reverse()
                     // 카테고리 바로 에디터로 가져가기 위한 용도
                     this.currentCategory = categoryName
                 })
@@ -228,9 +228,9 @@ export default {
             this.categoryOn = 3
             axios.get(`${BACK_URL}/blog/${this.nickname}/search/blogPosts/${this.keyword}/${this.keywordType.keyid}`, config)
                 .then(res => {
-                    this.postListKeyword = res.data.list[0].list 
-                    this.postLike3 = res.data.list[1].list
-                    this.thumbnail3 = res.data.list[2].list
+                    this.postListKeyword = res.data.list[0].list.reverse()
+                    this.postLike3 = res.data.list[1].list.reverse()
+                    this.thumbnail3 = res.data.list[2].list.reverse()
                 })
 
                 .catch(err => {
@@ -296,11 +296,12 @@ export default {
         },
 
         getTags() {
-            axios.get(`${BACK_URL}/tags/blog/${this.msrl}`)
+            axios.get(`${BACK_URL}/tags/blog/${this.nickname}`)
                 .then(res => {
+                    console.log('tag', res)
                     this.tagList = res.data.list[0].list
                     this.tagNum = res.data.list[1].list
-                    console.log(this.tagList)
+                    console.log('tag', this.tagList)
                 })
                 .catch(err => {
                     console.log(err)
@@ -308,7 +309,7 @@ export default {
         },       
     },
     
-    created() {
+    mounted() {
         this.getAllPosts(),
         this.getCategory(),
         this.getTags()
@@ -318,7 +319,7 @@ export default {
             userNow: this.$cookies.get('nickname'), 
             nickname: this.$route.params.nickname,
             // 글 관련
-            categoryOn: 1,
+            categoryOn: '',
             postList: [],
             postListCategory: [],
             postListKeyword: [],
@@ -351,8 +352,8 @@ export default {
             postLike3: [],
 
             // 페이지네이션
-            rows: 100,
-            perPage: 6,
+            rows: 0,
+            perPage: 8,
             currentPage: 1
         }
     },
