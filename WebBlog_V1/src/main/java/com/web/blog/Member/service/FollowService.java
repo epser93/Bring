@@ -1,6 +1,6 @@
 package com.web.blog.Member.service;
 
-import com.web.blog.Board.model.OnlyPostMapping;
+import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Common.advice.exception.CAlreadyFollowedException;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ import java.util.List;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class FollowService {
+public class FollowService implements Serializable {
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
     private final ProfileImgService profileImgService;
@@ -89,16 +90,16 @@ public class FollowService {
         return true;
     }
 
-    @Cacheable(value = "feedList", key = "#msrl")
-    public List<OnlyPostMapping> feedCaching(List<Long> followings, long msrl, long no) {
+    @Cacheable(value = "semiFinalList")
+    public List<Post> feedCaching(List<Long> followings, long no) {
         Paging paging = new Paging(no);
         LocalDateTime date = LocalDateTime.now();
         date.minus(3, ChronoUnit.DAYS);
-        List<OnlyPostMapping> semiFinalList = new ArrayList<>();
+        List<Post> semiFinalList = new ArrayList<>();
         for (long userNo : followings) {
             Member following = memberRepository.findById(userNo).get();
-            List<OnlyPostMapping> list = postRepository.findAllByMember_NicknameAndBoard_NameNotLikeAndCreatedAtGreaterThanEqualOrderByCreatedAtAsc(following.getNickname(), "나의 Answers", date, PageRequest.of(paging.getPageNo() - 1, 3));
-            for (OnlyPostMapping opm : list) {
+            List<Post> list = postRepository.findAllByMember_NicknameAndBoard_NameNotLikeAndCreatedAtLessThanEqualOrderByCreatedAtDesc(following.getNickname(), "나의 Answers", date, PageRequest.of(paging.getPageNo() - 1, 3));
+            for (Post opm : list) {
                 semiFinalList.add(opm);
             }
         }

@@ -38,6 +38,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-mail'
     implementation 'commons-io:commons-io:2.6'
     implementation 'commons-fileupload:commons-fileupload:1.2'
+    implementation 'io.pivotal.cfenv:java-cfenv-boot:2.1.1.RELEASE'
     testImplementation 'org.springframework.security:spring-security-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     compileOnly 'org.projectlombok:lombok'
@@ -45,6 +46,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-aws-context', version: '2.2.3.RELEASE'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
+    compile group: 'it.ozimov', name: 'embedded-redis', version: '0.7.2'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
