@@ -211,8 +211,14 @@ public class MemberController {
                 repository.updateTotalCnt(member.getMsrl());
             }
         }
+
+        List<Integer> visitorCnt = new ArrayList<>();
+        visitorCnt.add(member.getTodayCnt());
+        visitorCnt.add(member.getTotalCnt());
+        result.add(responseService.getListResult(visitorCnt));
         //유저가 좋아요 한 글 개수
         repository.updateLikeCnt(postMemberRepository.likedPostCnt(member.getMsrl()), member.getMsrl());
+
         return responseService.getListResult(result); //출력
     }
 
