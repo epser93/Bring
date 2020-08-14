@@ -1,26 +1,37 @@
 <template>
   <div class="wrapB container-fluid">
     <section class="cards row">
-      <div v-for="(post, index) in list" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-        <div class="cardwrap">
-          <div class="card-body p-0" @click="gotoDetail(post)">
-            <div class="img-section" :style="{ 'background-image' : `url(${thumbnails[index]})`}">
-              <a href=""></a>
+      <div class="col-lg-10 row">
+        <div v-for="(post, index) in list" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
+          <div class="cardwrap">
+            <div class="card-body p-0" @click="gotoDetail(post)">
+              <div class="img-section" :style="{ 'background-image' : `url(${thumbnails[index]})`}">
+                <a href=""></a>
+              </div>
+              <div class="contents">
+                <h4>{{ post.subject }}</h4>
+                <p>{{ post.content }}</p>
+                <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.replyCnt }}개의 댓글</p>
+              </div>
             </div>
-            <div class="contents">
-              <h4>{{ post.subject }}</h4>
-              <p>{{ post.content }}</p>
-              <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.replyCnt }}개의 댓글</p>
+            <div class="writer-info">
+              <button class="btn btn-sm" @click="gotoUserInfo(post.member_nickname)">{{ post.member_nickname }}</button>
+              <p>♥ {{ post.likes }}</p>
             </div>
-          </div>
-          <div class="writer-info">
-            <button class="btn btn-sm" @click="gotoUserInfo(post.member_nickname)">{{ post.member_nickname }}</button>
-            <p>♥ {{ post.likes }}</p>
           </div>
         </div>
       </div>
-      <infinite-loading @infinite="infiniteHandler"></infinite-loading>
+
+      <div class="tag-list-wrap col-lg-2">
+        <h4>인기 태그</h4>
+        <ul class="tag-list text-left">
+          <li @click="searchTags(tag)" v-for="(tag, index) in tags.slice(0,10)" :key="index" class="mb-3 pl-5 trendtags">
+              # {{ tag }}
+          </li> 
+        </ul>
+      </div>
     </section>
+    <infinite-loading @infinite="infiniteHandler"></infinite-loading>
   </div>
 </template>
 
@@ -34,20 +45,18 @@ export default {
     return {
       list: [],
       thumbnails: [],
-      page : 2,
+      page : 1,
+      tags : []
     }
   },
   methods : {
     infiniteHandler ($state) {
-      console.log($state)
-      console.log('mode',this.mode)
       axios.get(`${BACK_URL}/blog/recent?no=${this.page}`)
         .then(res => {
           if (res.data.list[0].list.length) {
             this.page += 1
             this.list.push(...res.data.list[0].list)
             this.thumbnails.push(...res.data.list[2].list)
-            // console.log(this.thumbnails)
             $state.loaded()
           } else {
             $state.complete()
@@ -59,7 +68,6 @@ export default {
       this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.member_nickname, post_id : post.postId }})
     },
     gotoUserInfo(userNickname) {
-      console.log(userNickname)
       this.$router.push({ name : "Profile" , query: { nickname : userNickname }})
     },
     Init() {
@@ -67,38 +75,34 @@ export default {
         .then (res => {
           this.list = res.data.list[0].list
           this.thumbnails = res.data.list[2].list
-          console.log('초기화 blog', res)
-          // console.log(this.thumbnail)
         })
         .catch (err => console.log(err))
+    },
+    getTags() {
+      axios.get(`${BACK_URL}/tags/blog`)
+        .then(res => {
+          this.tags = res.data.list[0].list
+        })
+        .catch(err => console.log(err))
+    },
+    searchTags(tag) {
+      console.log(tag)
+      this.$router.push({ name : 'TagSearch', params : { keyword : tag }})
     }
   },
   created() {
-    this.Init()
+    // this.Init()
+    this.getTags()
   },
 }
 </script>
 
 <style>
-/* .wrapB {
-  display: flex;
-  margin-left: 20px;
-  margin-right: 20px;
-} */
-
 h2 {
   width:100%;
   margin-bottom: 30px;
 }
-/* .cards {
-  flex: 4;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-} */
 
-/* .tag-list-wrap {
-  flex:1;
-} */
 .tag-list-wrap h4 {
   margin-bottom: 30px
 }
@@ -165,5 +169,8 @@ p {
 .comment-date {
   font-size: 12px;
   text-align: left;
+}
+.trendtags {
+  cursor: pointer;
 }
 </style>

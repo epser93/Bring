@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3>{{ this.keyword }}</h3>
+    <h3># {{ this.keyword }} 검색결과</h3>
     <!-- 글 리스트 -->
     <div class="col-10 container">
         <div class="text-left ml-5 mt-5" v-if="postList.length == 0">
@@ -25,6 +25,7 @@
             </div>
         </div>
     </div>
+    <infinite-loading @infinite="infiniteHandler"></infinite-loading>
   </div>
 </template>
 
@@ -40,28 +41,24 @@ export default {
             postList: [],
             postLike1: [],
             thumbnail1: [],
-            userNow: this.$cookies.get('nickname'), 
+            page : 1
         }
     },
     methods: {
-        // 태그 검색
-        searchFor() {
-            const config = {
-                headers: {
-                    'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
-                }
-            }
-            axios.get(`${BACK_URL}/search/all_blog_posts/${this.keyword}/${this.type}`, config)
+        infiniteHandler ($state) {
+            axios.post(`${BACK_URL}/blog/search/tags/${this.keyword}?no=${this.page}`)
                 .then(res => {
-                    console.log(res)
-                    this.postList = res.data.list[0].list
-                    this.postLike1 = res.data.list[1].list
-                    this.thumbnail1 = res.data.list[2].list
+                    if (res.data.list[0].list.length) {
+                        this.page += 1
+                        this.postList.push(...res.data.list[0].list)
+                        this.postLike1.push(...res.data.list[1].list)
+                        this.thumbnail1.push(...res.data.list[2].list)
+                        $state.loaded()
+                    } else {
+                        $state.complete()
+                    }
                 })
-
-                .catch(err => {
-                    console.log(err)
-                })
+                .catch (err => console.log(err))
         },
 
         // 좋아요
@@ -102,7 +99,6 @@ export default {
         },    
     },
     mounted() {
-        this.searchFor()
     },
 
 }
