@@ -69,7 +69,7 @@ public class SearchService {
     //전체 블로그의 태그 검색
     public List<OnlyPostMapping> AllBlogTagSearch(String keyword, Paging paging) {
         Optional<Tag> tag = tagRepository.findByTag(keyword);
-        if(tag.isPresent()) return null;
+        if(!tag.isPresent()) return null;
         List<PostTag> postTags = postTagRepository.findByTagAndInWhereAndAnswersNot(tag.get(), 1, true, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         List<OnlyPostMapping> posts = new ArrayList<>();
         for (PostTag pt : postTags) {
@@ -144,7 +144,7 @@ public class SearchService {
     public List<OnlyPostMapping> OnesBlogTagSearch(String nickname, String keyword, Paging paging) {
         Optional<Tag> tag = tagRepository.findByTag(keyword);
         if(!tag.isPresent()) return null;
-        List<PostTag> postTags = postTagRepository.findByTagAndInWhereAndAnswersNot(tag.get(), 1, true,PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<PostTag> postTags = postTagRepository.findByTagAndInWhereAndAnswersNot(tag.get(), 1, true, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         List<OnlyPostMapping> posts = new ArrayList<>();
         for (PostTag pt : postTags) {
             Post post = pt.getPost();

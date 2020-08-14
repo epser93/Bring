@@ -25,12 +25,16 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -84,7 +88,7 @@ public class BoardController {
         List<Board> boards = boardService.getBoards(member);
         results.add(responseService.getListResult(boards));
         List<Integer> postCnts = new ArrayList<>();
-        for(Board b : boards) {
+        for (Board b : boards) {
             int postCnt = b.getPostCnt();
             postCnts.add(postCnt);
         }
@@ -258,7 +262,7 @@ public class BoardController {
     })
     @ApiOperation(value = "블로그 포스트 리스트", notes = "한 블로그 내 모든 포스트 리스트")
     @GetMapping(value = "/blog/{nickname}/post_list")
-    public ListResult<ListResult> listPosts(@PathVariable String nickname, @RequestParam(required = false, defaultValue = "1") long no) {
+    public ListResult<ListResult> listPosts(@PathVariable String nickname, @RequestParam(required = false, defaultValue = "1") long no, HttpServletRequest request, HttpServletResponse response) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
@@ -305,6 +309,27 @@ public class BoardController {
                     filePaths.add(filePath);
                 }
             }
+        }
+
+        Cookie cookies[] = request.getCookies();
+        Map map = new HashMap();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                map.put(cookie.getName(), cookie.getValue());
+            }
+        }
+
+        String cookieCnt = (String) map.get("today_cnt");
+        String newCookieCnt = "null" + "|" + member.getNickname();;
+        if(logined.isPresent()){
+            newCookieCnt = logined.get().getNickname() + "|" + member.getNickname();
+        }
+        if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
+            Cookie cookie = new Cookie("today_cnt", newCookieCnt);
+            cookie.setMaxAge(60 * 60 * 24); //24시간
+            response.addCookie(cookie);
+            memberRepository.updateTodayCnt(member.getMsrl());
+            memberRepository.updateTotalCnt(member.getMsrl());
         }
 
         result.add(responseService.getListResult(amIInTheList));
@@ -593,10 +618,11 @@ public class BoardController {
     })
     @ApiOperation(value = "게시글 상세정보 조회", notes = "게시글 상세정보 비회원 조회")
     @GetMapping(value = "/blog/{nickname}/{boardName}/{postId}")
-    public ListResult<ListResult> post(@PathVariable String boardName, @PathVariable long postId, @PathVariable String nickname) {
+    public ListResult<ListResult> post(@PathVariable String boardName, @PathVariable long postId, @PathVariable String nickname, HttpServletRequest request, HttpServletResponse response) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = memberRepository.findByUid(uid);
+        Optional<Member> writer = memberRepository.findByNickname(nickname);
         List<ListResult> results = new ArrayList<>();
         List<String> likes;
         likes = postService.likedMemberList(postId);
@@ -618,7 +644,40 @@ public class BoardController {
                 filePaths.add(ud.getImgFullPath());
             }
         }
-        postRepository.updateViewCnt(postId);
+        Cookie[] cookies = null;
+        if(logined.isPresent() && logined.get().getMsrl() != writer.get().getMsrl()) {
+            cookies = request.getCookies();
+            Map map = new HashMap();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    map.put(cookie.getName(), cookie.getValue());
+                }
+            }
+            String key = logined.get().getMsrl() + "|" + "view_count";
+            String cookieCnt = (String) map.get(key);
+            String newCookieCnt = logined.get().getNickname() + "|" + postId;
+            if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
+                Cookie cookie = new Cookie(key, newCookieCnt);
+                cookie.setMaxAge(60 * 60); //1시간
+                response.addCookie(cookie);
+                postRepository.updateViewCnt(postId);
+            }
+
+            key = logined.get().getMsrl() + "|" + "today_cnt";
+            cookieCnt = (String) map.get(key);
+            newCookieCnt = logined.get().getNickname() + "|" + writer.get().getNickname();
+            if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
+                Cookie cookie = new Cookie(key, newCookieCnt);
+                cookie.setMaxAge(60 * 60 * 24); //1시간
+                response.addCookie(cookie);
+                memberRepository.updateTodayCnt(writer.get().getMsrl());
+                memberRepository.updateTotalCnt(writer.get().getMsrl());
+            }
+            results.add(responseService.getListResult(Arrays.asList(cookies)));
+        }
+        
+
+
         results.add(responseService.getListResult(postService.getPost(postId)));
         results.add(responseService.getListResult(tagService.getTags(postId)));
         results.add(responseService.getListResult(replyService.getRepliesofOnePost(postId)));
@@ -719,7 +778,7 @@ public class BoardController {
         List<OnlyTagMapping> list = tagService.getAllTags();
         results.add(responseService.getListResult(list));
         List<Integer> cnts = new ArrayList<>();
-        for(OnlyTagMapping otm : list) {
+        for (OnlyTagMapping otm : list) {
             cnts.add(otm.getTagUsageCnt());
         }
         results.add(responseService.getListResult(cnts));
@@ -843,7 +902,7 @@ public class BoardController {
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
     })
     @ApiOperation(value = "전체 포스트 태그 검색", notes = "전체 포스트 태그로 검색")
-    @GetMapping(value = "/blog/search/tags/{keyword}")
+    @PostMapping(value = "/blog/search/tags/{keyword}")
     public ListResult<ListResult> searchAllPostsByTag(@PathVariable String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
@@ -902,7 +961,7 @@ public class BoardController {
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
     })
     @ApiOperation(value = "특정 유저 포스트 태그 검색", notes = "특정 유저의 포스트 태그로 검색")
-    @GetMapping(value = "/blog/{nickname}/search/tags/{keyword}")
+    @PostMapping(value = "/blog/{nickname}/search/tags/{keyword}")
     public ListResult<ListResult> searchOnesPostsByTag(@PathVariable String nickname, @PathVariable String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();

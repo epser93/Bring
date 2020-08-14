@@ -43,6 +43,7 @@ dependencies {
     runtimeOnly 'mysql:mysql-connector-java'
     annotationProcessor 'org.projectlombok:lombok'
     compile group: 'org.springframework.cloud', name: 'spring-cloud-aws-context', version: '2.2.3.RELEASE'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.11'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }

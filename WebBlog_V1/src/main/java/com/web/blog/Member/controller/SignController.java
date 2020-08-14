@@ -69,7 +69,7 @@ public class SignController {
 
     @ApiOperation(value = "로그인", notes = "이메일을 이용한 로그인")
     @PostMapping("/in")
-    public String login(@Valid @RequestBody LoginParam user) throws JsonProcessingException {
+    public String login(@Valid @RequestBody LoginParam user, HttpServletRequest request) throws JsonProcessingException {
         String id = user.getId();
         String password = user.getPassword();
         Member member = repository.findByUid(id).orElseThrow(CEmailSigninFailedException::new);
@@ -79,6 +79,8 @@ public class SignController {
         ObjectMapper mapper = new ObjectMapper();
         String Json = "";
         Json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getMapResult(jwtTokenProvider.createToken(String.valueOf(member.getMsrl()), member.getRoles()), member));
+//        HttpSession session = request.getSession();
+//        session.setAttribute("member", member);
         return Json;
     }
 

@@ -33,6 +33,7 @@ import com.web.blog.QnA.repository.ApostRepository;
 import com.web.blog.QnA.repository.QpostRepository;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -41,14 +42,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Api(tags = {"2. Member"})
 @RequiredArgsConstructor
@@ -92,7 +93,7 @@ public class MemberController {
     })
     @ApiOperation(value = "회원 프로필 조회", notes = "닉네임으로 회원을 조회한다")
     @GetMapping(value = "/{nickname}/profile")
-    public ListResult<ListResult> findUserById(@PathVariable String nickname) throws JsonProcessingException {
+    public ListResult<ListResult> findUserById(@PathVariable String nickname, HttpServletResponse response, HttpServletRequest request) throws JsonProcessingException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = repository.findByUid(uid); //로그인 한 사용자
@@ -171,7 +172,22 @@ public class MemberController {
                 result.add(responseService.getListResult(img)); //프로필 사진
             }
         }
-
+        Cookie cookies[] = request.getCookies();
+        Map map = new HashMap();
+        if(cookies != null) {
+            for(Cookie cookie : cookies) {
+                map.put(cookie.getName(), cookie.getValue());
+            }
+        }
+        String cookieCnt = (String) map.get("today_cnt");
+        String newCookieCnt = "|" + member.getNickname();
+        if(StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
+            Cookie cookie = new Cookie("today_cnt", cookieCnt + newCookieCnt);
+            cookie.setMaxAge(60*60*24); //1시간
+            response.addCookie(cookie);
+            this.repository.updateTodayCnt(member.getMsrl());
+            this.repository.updateTotalCnt(member.getMsrl());
+        }
         //유저가 좋아요 한 글 개수
         repository.updateLikeCnt(postMemberRepository.likedPostCnt(member.getMsrl()), member.getMsrl());
         return responseService.getListResult(result); //출력
