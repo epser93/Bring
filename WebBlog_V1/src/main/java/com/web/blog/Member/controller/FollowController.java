@@ -1,13 +1,13 @@
 package com.web.blog.Member.controller;
 
-import com.web.blog.Board.model.OnlyPostMapping;
+import com.web.blog.Board.entity.Post;
+import com.web.blog.Board.model.OnlyPostMappingForFeed;
 import com.web.blog.Board.model.PostUploadsDto;
 import com.web.blog.Board.repository.PostMemberRepository;
 import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Board.repository.PostUploadsRepository;
 import com.web.blog.Board.service.PostUploadsService;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
-import com.web.blog.Common.model.Paging;
 import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.service.ResponseService;
@@ -26,6 +26,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -100,6 +101,8 @@ public class FollowController {
     }
 
     //팔로잉 피드
+    //각 데이터베이스에서 데이터를 가져와서 정리 및 출력하므로.. 페이징처리 어려움. 임시로 그냥 전체 데이터 redis 캐싱 처리 후 페이징!
+    @Transactional
     @ApiImplicitParams({
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
     })
@@ -112,28 +115,76 @@ public class FollowController {
         LocalDateTime date = LocalDateTime.now();
         date.minus(3, ChronoUnit.DAYS);
         List<ListResult> results = new ArrayList<>();
-        List<OnlyPostMapping> semiFinalList = new ArrayList<>();
-        List<OnlyPostMapping> finalList = new ArrayList<>();
+        List<Post> semiFinalList = new ArrayList<>();
+        List<OnlyPostMappingForFeed> finalList = new ArrayList<>();
         List<Boolean> amIInTheList = new ArrayList<>();
         List<String> filePaths = new ArrayList<>();
         List<Long> followings = followRepository.followingMember(logined.get().getMsrl());
-        semiFinalList = followService.feedCaching(followings, msrl, no);
-        Paging paging = new Paging((long) 1);
-//        for (long userNo : followings) {
-//            Member following = memberRepository.findById(userNo).get();
-//            List<OnlyPostMapping> list = postRepository.findAllByMember_NicknameAndBoard_NameNotLikeAndCreatedAtGreaterThanEqualOrderByCreatedAtAsc(following.getNickname(), "나의 Answers", date, PageRequest.of(paging.getPageNo() - 1, 3));
-//            for (OnlyPostMapping opm : list) {
-//                semiFinalList.add(opm);
-//            }
-//        }
-//        Collections.shuffle(semiFinalList);
+        semiFinalList = followService.feedCaching(followings, no);
         for (int i = 0; i < 8 && i + (no - 1) * 8 < semiFinalList.size(); i++) {
-            finalList.add(semiFinalList.get((int) (i + (no - 1) * 8)));
+            Post post = semiFinalList.get((i + ((int) no - 1) * 8));
+            OnlyPostMappingForFeed onlyPostMapping = new OnlyPostMappingForFeed() {
+                @Override
+                public Long getPostId() {
+                    return post.getPostId();
+                }
+
+                @Override
+                public LocalDateTime getCreatedAt() {
+                    return post.getCreatedAt();
+                }
+
+                @Override
+                public LocalDateTime getUpdatedAt() {
+                    return post.getUpdatedAt();
+                }
+
+                @Override
+                public String getMember_nickname() {
+                    return post.getMember().getNickname();
+                }
+
+                @Override
+                public String getSubject() {
+                    return post.getSubject();
+                }
+
+                @Override
+                public String getContent() {
+                    return post.getContent();
+                }
+
+                @Override
+                public int getViews() {
+                    return post.getViews();
+                }
+
+                @Override
+                public int getLikes() {
+                    return post.getLikes();
+                }
+
+                @Override
+                public int getReplyCnt() {
+                    return post.getReplyCnt();
+                }
+
+                @Override
+                public Long getOriginal() {
+                    return post.getOriginal();
+                }
+
+                @Override
+                public String getMember_uid() {
+                    return post.getMember().getUid();
+                }
+            };
+            finalList.add(onlyPostMapping);
         }
         results.add(responseService.getListResult(finalList));
 
         int cnt = 0;
-        for (OnlyPostMapping pm : finalList) { //전체 포스트 리스트 for문
+        for (OnlyPostMappingForFeed pm : finalList) { //전체 포스트 리스트 for문
             long postId = pm.getPostId();
             Member memberForImg = memberRepository.findByNickname(pm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
             amIInTheList.add(false);
