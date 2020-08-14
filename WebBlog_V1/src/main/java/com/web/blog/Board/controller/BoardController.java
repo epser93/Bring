@@ -691,7 +691,6 @@ public class BoardController {
                 memberRepository.updateTodayCnt(writer.get().getMsrl());
                 memberRepository.updateTotalCnt(writer.get().getMsrl());
             }
-            results.add(responseService.getListResult(Arrays.asList(cookies)));
         } else if(!logined.isPresent()) {
             cookies = request.getCookies();
             Map map = new HashMap();
@@ -720,7 +719,6 @@ public class BoardController {
                 memberRepository.updateTodayCnt(writer.get().getMsrl());
                 memberRepository.updateTotalCnt(writer.get().getMsrl());
             }
-            results.add(responseService.getListResult(Arrays.asList(cookies)));
         }
         
 
