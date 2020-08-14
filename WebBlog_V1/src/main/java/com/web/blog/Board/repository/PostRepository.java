@@ -71,6 +71,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     //한 블로그 내 모든 포스트 리스트
     List<OnlyPostMapping> findAllByMember_NicknameAndBoard_NameNotLike(String writer, String notlike, Pageable pageable);
 
+    List<OnlyPostMapping> findAllByMember_NicknameAndBoard_NameNotLikeAndCreatedAtGreaterThanEqualOrderByCreatedAtAsc(String writer, String notlike, LocalDateTime date, Pageable pageable);
+
     List<OnlyPostMapping> findAllByMember_NicknameAndBoard_NameNotLike(String writer, String notlike);
 
     List<OnlyPostMapping> findAllByMember_Nickname(String writer);

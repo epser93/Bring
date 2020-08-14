@@ -1,8 +1,9 @@
-package com.web.blog.Board.entity;
+package com.web.blog.Common.entity;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.web.blog.Board.entity.*;
 import com.web.blog.Member.entity.Member;
 import lombok.*;
 
@@ -19,10 +20,10 @@ import java.util.List;
 @AllArgsConstructor
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
 @org.hibernate.annotations.DynamicUpdate
-public class Post extends CommonDateEntity implements Serializable {
+public class Feed extends CommonDateEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long postId;
+    private Long feedId;
 
     @Column(nullable = false, columnDefinition = "LONGTEXT")
     private String subject;
@@ -69,9 +70,10 @@ public class Post extends CommonDateEntity implements Serializable {
         return board;
     }
 
-    public Post setUpdate(String subject, String content) {
+    public Feed setUpdate(String subject, String content) {
         this.subject = subject;
         this.content = content;
         return this;
     }
 }
+

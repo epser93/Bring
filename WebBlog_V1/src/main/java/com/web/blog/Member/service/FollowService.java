@@ -1,16 +1,24 @@
 package com.web.blog.Member.service;
 
+import com.web.blog.Board.model.OnlyPostMapping;
+import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Common.advice.exception.CAlreadyFollowedException;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
 import com.web.blog.Common.advice.exception.CYouHaveNotFollowedThisBlogerEver;
+import com.web.blog.Common.model.Paging;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.repository.FollowRepository;
 import com.web.blog.Member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -20,6 +28,7 @@ public class FollowService {
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
     private final ProfileImgService profileImgService;
+    private final PostRepository postRepository;
 
     //팔로우 기능
     public void followFunction(Member from, Member to) {
@@ -78,5 +87,22 @@ public class FollowService {
     public boolean isFollowed(Member from, Member to) {
         if (followRepository.countByFrom_MsrlAndTo_Msrl(from.getMsrl(), to.getMsrl()) == 0) return false;
         return true;
+    }
+
+    @Cacheable(value = "feedList", key = "#msrl")
+    public List<OnlyPostMapping> feedCaching(List<Long> followings, long msrl, long no) {
+        Paging paging = new Paging(no);
+        LocalDateTime date = LocalDateTime.now();
+        date.minus(3, ChronoUnit.DAYS);
+        List<OnlyPostMapping> semiFinalList = new ArrayList<>();
+        for (long userNo : followings) {
+            Member following = memberRepository.findById(userNo).get();
+            List<OnlyPostMapping> list = postRepository.findAllByMember_NicknameAndBoard_NameNotLikeAndCreatedAtGreaterThanEqualOrderByCreatedAtAsc(following.getNickname(), "나의 Answers", date, PageRequest.of(paging.getPageNo() - 1, 3));
+            for (OnlyPostMapping opm : list) {
+                semiFinalList.add(opm);
+            }
+        }
+        Collections.shuffle(semiFinalList);
+        return semiFinalList;
     }
 }
