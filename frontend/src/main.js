@@ -23,6 +23,10 @@ import VueCalendarHeatmap from 'vue-calendar-heatmap'
 // vue-infinite-loading
 import InfiniteLoading from 'vue-infinite-loading'
 
+// vue-swich button
+import ToggleButton from 'vue-js-toggle-button'
+ 
+
 VueMarkdownEditor.use(vuepressTheme);
 VueMarkdownEditor.lang.use('en-US', enUS);
 Vue.use(VueMarkdownEditor);
@@ -37,6 +41,8 @@ Vue.use(VModal, { dynamic: true })
 Vue.use(VueCalendarHeatmap)
 
 Vue.use(InfiniteLoading)
+
+Vue.use(ToggleButton)
 
 Vue.config.productionTip = false
 
