@@ -5,6 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
@@ -15,6 +16,7 @@ import java.util.TimeZone;
 @EnableJpaAuditing
 @SpringBootApplication
 @EnableCaching
+@EnableScheduling
 public class WebBlogV1Application {
 
     @PostConstruct
@@ -23,7 +25,7 @@ public class WebBlogV1Application {
     }
 
     public static void main(String[] args) {
-        System.setProperty("user.timezone", "UTC");
+        System.setProperty("user.timezone", "UTC+9");
         SpringApplication.run(WebBlogV1Application.class, args);
     }
 

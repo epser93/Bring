@@ -46,6 +46,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -70,6 +72,14 @@ public class SignController {
     @ApiOperation(value = "로그인", notes = "이메일을 이용한 로그인")
     @PostMapping("/in")
     public String login(@Valid @RequestBody LoginParam user, HttpServletRequest request) throws JsonProcessingException {
+//        LocalDateTime dateTime = LocalDateTime.now();
+//        System.out.println(dateTime.toString());
+        Calendar calendar = Calendar.getInstance();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        System.out.println("스케줄 실행 : " + dateFormat.format(calendar.getTime()));
+
         String id = user.getId();
         String password = user.getPassword();
         Member member = repository.findByUid(id).orElseThrow(CEmailSigninFailedException::new);
