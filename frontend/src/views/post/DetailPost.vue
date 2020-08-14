@@ -70,7 +70,7 @@
 
     <!-- 오른쪽 바 -->
     <div class="mt-5 col-12 col-lg-3">
-      <!-- 카테고리 글(6개 정도로 제한 필요) -->
+      <!-- 카테고리 글(카테고리 내부에서 또 글 번호 매겨져야?) -->
       <h4>같은 카테고리의 글</h4>
       <div v-for="(item, index) in postListCategory" :key="item.postId" class="list-group">
         <button @click="gotoDetail(item)" class="list-group-item list-group-item-action flex-column align-items-start p-0">
@@ -328,9 +328,8 @@ export default {
             }
             axios.get(`${BACK_URL}/blog/${this.nickname}/${this.board_name}/post_list`, config)
                 .then(res => {
-                    this.postListCategory = res.data.list[0].list
-                    this.thumbnail2 = res.data.list[2].list
-                    console.log(this.postListCategory)
+                    this.postListCategory = res.data.list[0].list.reverse().slice(0,6)
+                    this.thumbnail2 = res.data.list[2].list.reverse().slice(0,6)
                 })
                 .catch(err => {
                     console.log(err)
