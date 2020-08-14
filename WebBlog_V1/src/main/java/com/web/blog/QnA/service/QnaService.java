@@ -173,7 +173,6 @@ public class QnaService {
     //답변 삭제
     public boolean deleteAnswer(long apost_id, Member member, boolean isSelected) {
         Apost apost = apostRepository.findById(apost_id).orElseThrow(CResourceNotExistException::new);
-        Qpost qpost = apost.getQpost();
         if (!isSelected && apost.getMember().getNickname().equals(member.getNickname())) {
             apostRepository.delete(apost);
             return true;

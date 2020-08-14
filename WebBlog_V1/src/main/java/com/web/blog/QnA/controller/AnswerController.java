@@ -250,14 +250,50 @@ public class AnswerController {
     })
     @ApiOperation(value = "답변 삭제", notes = "답변 삭제")
     @DeleteMapping(value = "/{apostId}")
-    public CommonResult deleteAnswer(@PathVariable long apostId) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Member member = (Member) principal;
-        Optional<Apost> apost = apostRepository.findById(apostId);
-        Qpost qpost = apost.get().getQpost();
-        Boolean isOk = qnaService.deleteAnswer(apostId, member, qpostRepository.isSelectedAnswerExist(qpost.getQpostId()));
-        qpostRepository.updateAnswerCntMinus(qpost.getQpostId());
-        postService.deletePost(apost.get().getPostId(), member);
+    public CommonResult deleteAnswer(@PathVariable long apostId) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid)); //로그인 한 사용자
+        Optional<Apost> apost = apostRepository.findById(apostId); //삭제할 답변
+        Qpost qpost = apost.get().getQpost(); //질문
+        Member asker = qpost.getMember(); //질문자
+        ParamPost paramPost = new ParamPost();
+
+        Boolean isOk = false;
+        long postId = 0;
+        if (asker.getMsrl() != logined.get().getMsrl()) { //질문자와 답변자(로그인 한 사용자)가 다르면(나의 Answers 존재)~
+            Optional<List<Apost>> list = apostRepository.findByMember_MsrlAndQpost_QpostIdOrderByApostIdAsc(logined.get().getMsrl(), qpost.getQpostId());
+            isOk = qnaService.deleteAnswer(apostId, logined.get(), qpostRepository.isSelectedAnswerExist(qpost.getQpostId()));
+            qpostRepository.updateAnswerCntMinus(qpost.getQpostId());
+            //블로그 Q&A 게시판
+            if(list.isPresent()) {
+                if (list.get().size() > 1) { //답변을 두개 이상 달았으면~
+                    Apost apost1 = list.get().get(list.get().size() - 1); //해당 리스트의 마지막 답변
+                    postId = apost1.getPostId();
+                    StringBuilder sb = new StringBuilder();
+                    sb.append("Q. " + qpost.getSubject() + "(Q writer: " + qpost.getMember().getNickname() + ", Q number: " + qpost.getQpostId() + ")" + System.getProperty("line.separator"));
+                    sb.append("\t" + qpost.getContent() + System.getProperty("line.separator"));
+                    paramPost.setSubject(sb.toString());
+                    sb = new StringBuilder();
+                    System.out.println(list.get().size());
+                    System.out.println(list.get().get(1));
+                    for (Apost ap : list.get()) {
+                        if(ap.getApostId() == apostId) continue;
+                        sb.append("A." + System.getProperty("line.separator"));
+                        sb.append("\t" + ap.getAnswer() + System.getProperty("line.separator") + System.getProperty("line.separator"));
+                    }
+                    paramPost.setContent(sb.toString());
+                    paramPost.setOriginal((long) -1);
+                    postService.updatePost("나의 Answers", postId, logined.get().getMsrl(), paramPost);
+                } else { //답변 하나밖에 한 적이 없으면~
+                    postService.deletePost(apost.get().getPostId(), logined.get());
+                }
+            }
+        } else {
+            isOk = qnaService.deleteAnswer(apostId, logined.get(), qpostRepository.isSelectedAnswerExist(qpost.getQpostId()));
+            qpostRepository.updateAnswerCntMinus(qpost.getQpostId());
+        }
+
         if (isOk) {
             return responseService.getSuccessResult();
         }
