@@ -34,12 +34,16 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -278,9 +282,23 @@ public class QuestionController {
     })
     @ApiOperation(value = "질문 조회", notes = "질문 조회")
     @GetMapping(value = "/{qpostId}")
-    public ListResult<ListResult> questionDetail(@PathVariable long qpostId) {
+    public ListResult<ListResult> questionDetail(@PathVariable long qpostId, HttpServletRequest request, HttpServletResponse response) {
         List<ListResult> results = new ArrayList<>();
-        qpostRepository.updateViewCnt(qpostId);
+        Cookie cookies[] = request.getCookies();
+        Map map = new HashMap();
+        if(cookies != null) {
+            for(Cookie cookie : cookies) {
+                map.put(cookie.getName(), cookie.getValue());
+            }
+        }
+        String cookieCnt = (String) map.get("view_count");
+        String newCookieCnt = "|" + qpostId;
+        if(StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
+            Cookie cookie = new Cookie("view_count", cookieCnt + newCookieCnt);
+            cookie.setMaxAge(60*60); //1시간
+            response.addCookie(cookie);
+            this.qpostRepository.updateViewCnt(qpostId);
+        }
         results.add(responseService.getListResult(qnaService.getOneQpost(qpostId)));
         results.add(responseService.getListResult(qTagService.getTags(qpostId)));
         results.add(responseService.getListResult(qnaService.getApostsofOneQpost(qpostId)));
@@ -408,7 +426,7 @@ public class QuestionController {
     }
 
     @ApiOperation(value = "전체 질문글 태그 검색", notes = "전체 질문글 태그로 검색")
-    @GetMapping(value = "/search/tags/{keyword}")
+    @PostMapping(value = "/search/tags/{keyword}")
     public ListResult<ListResult> searchAllQuestionssByTag(@PathVariable String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
@@ -456,7 +474,7 @@ public class QuestionController {
     }
 
     @ApiOperation(value = "특정 유저 질문글 태그 검색", notes = "특정 유저의 질문글 태그로 검색")
-    @GetMapping(value = "/{nickname}/search/tags/{keyword}")
+    @PostMapping(value = "/{nickname}/search/tags/{keyword}")
     public ListResult<ListResult> searchOnesQuestionsByTag(@PathVariable String nickname, @PathVariable String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();

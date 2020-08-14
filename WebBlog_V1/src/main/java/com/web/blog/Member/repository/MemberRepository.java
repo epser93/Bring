@@ -25,18 +25,18 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "update userinfo set ip_addr = :ip_addr where uid = :uid", nativeQuery = true)
-    void updateIpAddr(@Param("ip_addr") String ip_addr);
+    @Query(value = "update userinfo set today_cnt = 0 where msrl = :msrl", nativeQuery = true)
+    int initializeTodayCnt(@Param("msrl") long msrl);
 
     @Modifying
     @Transactional
-    @Query(value = "update userinfo set todayCnt = todayCnt + 1 where uid = :uid", nativeQuery = true)
-    void updateTodayCnt(@Param("uid") String uid);
+    @Query(value = "update userinfo set today_cnt = today_cnt + 1 where msrl = :msrl", nativeQuery = true)
+    int updateTodayCnt(@Param("msrl") long msrl);
 
     @Modifying
     @Transactional
-    @Query(value = "update userinfo set totalCnt = totalCnt + todayCnt where uid = :uid", nativeQuery = true)
-    void updateTotalCnt(@Param("uid") String uid);
+    @Query(value = "update userinfo set total_cnt = total_cnt + 1 where msrl = :msrl", nativeQuery = true)
+    void updateTotalCnt(@Param("msrl") long msrl);
 
     @Query(value = "select nickname, score from userinfo order by score desc", nativeQuery = true)
     List<Map<String, Integer>> rank();
