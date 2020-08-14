@@ -25,6 +25,7 @@ import MyQuestions from '../views/blog/MyQuestions.vue'
 import MyAnswers from '../views/blog/MyAnswers.vue'
 import BlogCategory from '../views/blog/BlogCategory.vue'
 import QuestionPosts from '../views/blog/QuestionPosts.vue'
+import BlogPosts from '../views/blog/BlogPosts.vue'
 
 
 // 스택오버플로우
@@ -132,7 +133,13 @@ const routes = [{
         children: [{
                 path: '',
                 name: 'MyBlog',
-                component: MyList
+                component: MyList,
+                props: true,
+                children: [{
+                    path: '',
+                    name: 'MyBlog',
+                    component: BlogPosts
+                }]
             },
             {
                 path: 'myquestions',

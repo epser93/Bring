@@ -9,7 +9,6 @@
             <div v-for="(tag, index) in tagList" :key="tag.boardId">
                 <router-link :to="{ name: 'MyQuestions' , query : { q: tag }}"><p class="">{{ tag }}({{ tagNum[index] }})</p></router-link> 
             </div>
-            
         </div>
         <!-- 컴포넌트 불러오기 -->
         <div class="container-fluid col-10">
