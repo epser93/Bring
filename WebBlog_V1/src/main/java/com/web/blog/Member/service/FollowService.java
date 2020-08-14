@@ -19,6 +19,7 @@ import java.util.List;
 public class FollowService {
     private final MemberRepository memberRepository;
     private final FollowRepository followRepository;
+    private final ProfileImgService profileImgService;
 
     //팔로우 기능
     public void followFunction(Member from, Member to) {
@@ -40,27 +41,37 @@ public class FollowService {
     }
 
     //팔로잉 리스트
-    public List<String> followingList(Member member) { //내가 팔로잉 하는~
+    public List<List> followingList(Member member) { //내가 팔로잉 하는~
         long from = member.getMsrl();
         List<Long> list = followRepository.followingMember(from);
         List<String> followings = new ArrayList<>();
+        List<String> followingsImg = new ArrayList<>();
+        List<List> result = new ArrayList<>();
         for (Long msrl : list) {
             Member following = memberRepository.findById(msrl).orElseThrow(CUserNotFoundException::new);
             followings.add(following.getNickname());
+            followingsImg.add(profileImgService.getOneImg(following.getMsrl()).getImgFullPath());
         }
-        return followings;
+        result.add(followings);
+        result.add(followingsImg);
+        return result;
     }
 
     //팔로워 리스트
-    public List<String> followersList(Member member) { //나를 팔로우 하는~
+    public List<List> followersList(Member member) { //나를 팔로우 하는~
         long to = member.getMsrl();
         List<Long> list = followRepository.followerMember(to);
         List<String> followers = new ArrayList<>();
+        List<String> followersImg = new ArrayList<>();
+        List<List> result = new ArrayList<>();
         for (Long msrl : list) {
             Member follower = memberRepository.findById(msrl).orElseThrow(CUserNotFoundException::new);
             followers.add(follower.getNickname());
+            followersImg.add(profileImgService.getOneImg(follower.getMsrl()).getImgFullPath());
         }
-        return followers;
+        result.add(followers);
+        result.add(followersImg);
+        return result;
     }
 
     //기팔로우 체크

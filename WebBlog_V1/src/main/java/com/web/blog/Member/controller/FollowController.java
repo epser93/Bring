@@ -16,6 +16,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Api(tags = {"3. Subscribe"})
@@ -66,7 +67,7 @@ public class FollowController {
     //팔로잉 리스트
     @ApiOperation(value = "팔로잉 목록", notes = "팔로잉 목록")
     @GetMapping(value = "/follow/ings/{msrl}")
-    public ListResult<String> getFollowingList(@PathVariable long msrl) {
+    public ListResult<List> getFollowingList(@PathVariable long msrl) {
         Member member = memberRepository.findById(msrl).orElseThrow(CUserNotFoundException::new);
         return responseService.getListResult(followService.followingList(member));
     }
@@ -74,7 +75,7 @@ public class FollowController {
     //팔로워 리스트
     @ApiOperation(value = "팔로워 목록", notes = "팔로워 목록")
     @GetMapping(value = "/follow/ers/{msrl}")
-    public ListResult<String> getFollowersList(@PathVariable long msrl) {
+    public ListResult<List> getFollowersList(@PathVariable long msrl) {
         Member member = memberRepository.findById(msrl).orElseThrow(CUserNotFoundException::new);
         return responseService.getListResult(followService.followersList(member));
     }

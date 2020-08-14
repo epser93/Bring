@@ -119,29 +119,26 @@ public class AnswerController {
         if(qpost.get().getSelectOver() == true) {
             throw new CSelectedAnswerException();
         }
-
-        if (asker.getMsrl() == logined.get().getMsrl()) {
-            throw new CAskedQuestionException();
-        }
-
-        //블로그 Q&A 게시판
-        StringBuilder sb = new StringBuilder();
-        sb.append("Q. " + qpost.get().getSubject() + "(Q writer: " + qpost.get().getMember().getNickname() + ", Q number: " + qpostId + ")" + System.getProperty("line.separator"));
-        sb.append("\t" + qpost.get().getContent() + System.getProperty("line.separator"));
-        paramPost.setSubject(sb.toString());
-        sb = new StringBuilder();
-        sb.append("A." + System.getProperty("line.separator"));
-        sb.append("\t" + paramApost.getAnswer() + System.getProperty("line.separator"));
-        paramPost.setContent(sb.toString());
-        paramPost.setOriginal((long) -1);
         Post answer = new Post();
-        answer = postService.writePost("나의 Answers", paramPost, logined.get(), "");
+        if (asker.getMsrl() != logined.get().getMsrl()) {
+            //블로그 Q&A 게시판
+            StringBuilder sb = new StringBuilder();
+            sb.append("Q. " + qpost.get().getSubject() + "(Q writer: " + qpost.get().getMember().getNickname() + ", Q number: " + qpostId + ")" + System.getProperty("line.separator"));
+            sb.append("\t" + qpost.get().getContent() + System.getProperty("line.separator"));
+            paramPost.setSubject(sb.toString());
+            sb = new StringBuilder();
+            sb.append("A." + System.getProperty("line.separator"));
+            sb.append("\t" + paramApost.getAnswer() + System.getProperty("line.separator"));
+            paramPost.setContent(sb.toString());
+            paramPost.setOriginal((long) -1);
+            answer = postService.writePost("나의 Answers", paramPost, logined.get(), "");
 
-        Set<String> tagSet = new HashSet<>(qTagService.getTags(qpostId));
-        List<String> tags = new ArrayList<>(tagSet);
-        if (!tags.isEmpty()) {
-            for (String tag : tags) {
-                tagService.insertTags(answer, tag);
+            Set<String> tagSet = new HashSet<>(qTagService.getTags(qpostId));
+            List<String> tags = new ArrayList<>(tagSet);
+            if (!tags.isEmpty()) {
+                for (String tag : tags) {
+                    tagService.insertTags(answer, tag);
+                }
             }
         }
         Apost apost = qnaService.writeAnswer(qpost.get(), logined.get(), paramApost, answer.getPostId());
@@ -156,40 +153,44 @@ public class AnswerController {
     @ApiOperation(value = "답변 수정", notes = "답변 수정")
     @PutMapping(value = "/{apostId}")
     public SingleResult<Apost> updateAnswer(@Valid @RequestBody ParamApost paramApost, @PathVariable long apostId) throws IOException {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Member logined = (Member) principal;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
         Optional<Apost> apost = apostRepository.findById(apostId);
         long qpostId = apost.get().getQpost().getQpostId();
         Qpost qpost = qpostRepository.findById(qpostId).orElseThrow(CResourceNotExistException::new);
+        Member asker = qpost.getMember();
         ParamPost paramPost = new ParamPost();
 
         if(qpost.getSelectOver() == true) {
             throw new CSelectedAnswerException();
         }
 
-        if (!logined.getNickname().equals(apost.get().getMember().getNickname())) {
+        if (!logined.get().getNickname().equals(apost.get().getMember().getNickname())) {
             throw new CNotOwnerException();
         }
 
-        //블로그 Q&A 게시판
-        StringBuilder sb = new StringBuilder();
-        sb.append("Q. " + qpost.getSubject() + "(Q writer: " + qpost.getMember().getNickname() + ", Q number: " + qpostId + ")" + System.getProperty("line.separator"));
-        sb.append("\t" + qpost.getContent() + System.getProperty("line.separator"));
-        paramPost.setSubject(sb.toString());
-        sb = new StringBuilder();
-        sb.append("A." + System.getProperty("line.separator"));
-        sb.append("\t" + paramApost.getAnswer() + System.getProperty("line.separator"));
-        paramPost.setContent(sb.toString());
-        paramPost.setOriginal((long) -1);
-        postService.updatePost("나의 Answers", apost.get().getPostId(), logined.getMsrl(), paramPost);
-        Post answer = postRepository.findById(apost.get().getPostId()).orElseThrow(CResourceNotExistException::new);
+        if (asker.getMsrl() != logined.get().getMsrl()) {
+            //블로그 Q&A 게시판
+            StringBuilder sb = new StringBuilder();
+            sb.append("Q. " + qpost.getSubject() + "(Q writer: " + qpost.getMember().getNickname() + ", Q number: " + qpostId + ")" + System.getProperty("line.separator"));
+            sb.append("\t" + qpost.getContent() + System.getProperty("line.separator"));
+            paramPost.setSubject(sb.toString());
+            sb = new StringBuilder();
+            sb.append("A." + System.getProperty("line.separator"));
+            sb.append("\t" + paramApost.getAnswer() + System.getProperty("line.separator"));
+            paramPost.setContent(sb.toString());
+            paramPost.setOriginal((long) -1);
+            postService.updatePost("나의 Answers", apost.get().getPostId(), logined.get().getMsrl(), paramPost);
+            Post answer = postRepository.findById(apost.get().getPostId()).orElseThrow(CResourceNotExistException::new);
 
-        Set<String> tagSet = new HashSet<>(qTagService.getTags(qpost.getQpostId()));
-        List<String> tags = new ArrayList<>(tagSet);
-        if (!tags.isEmpty()) {
-            tagService.deleteTags(answer);
-            for (String tag : tags) {
-                tagService.insertTags(answer, tag);
+            Set<String> tagSet = new HashSet<>(qTagService.getTags(qpost.getQpostId()));
+            List<String> tags = new ArrayList<>(tagSet);
+            if (!tags.isEmpty()) {
+                tagService.deleteTags(answer);
+                for (String tag : tags) {
+                    tagService.insertTags(answer, tag);
+                }
             }
         }
         return responseService.getSingleResult(qnaService.updateAnswer(apostId, paramApost, qpostRepository.isSelectedAnswerExist(qpost.getQpostId())));
