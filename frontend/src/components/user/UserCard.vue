@@ -63,6 +63,7 @@
                                         <div v-if="selectFollow == true">
                                             <div v-if="followerUserImg == null">
                                                 <h5>팔로우가 없습니다.</h5>
+                                                sadflkasdjflksdjfklsdjkljfdkl
                                             </div>
                                             <div v-else class="row row-cols-2">
                                                 <li v-for="user in followerUserImg" v-bind:key="user" class="listFollow col">
@@ -75,11 +76,11 @@
                                         </div>
 
                                         <div v-else>
-                                            <div v-if="followerUserImg == null">
+                                            <div v-if="followingUserImg == null">
                                                 <h5>팔로잉이 없습니다.</h5>
                                             </div>
-                                            <div v-else>
-                                                    <li v-for="user in followingUserImg" v-bind:key="user" class="listFollow col">
+                                            <div v-else class="row row-cols-2">
+                                                <li v-for="user in followingUserImg" v-bind:key="user" class="listFollow col">
                                                     <div class="d-flex" id="modalFollow">
                                                         <img class="rounded-circle" :src=user.img alt="Card image cap" style="width:50px; height:50px; border-style: outset;">
                                                         <router-link :to="{ name: 'Profile', query: { nickname: user.nickname }}">{{ user.nickname }}</router-link>
@@ -445,7 +446,6 @@ export default {
             let tmpFerUser = []
             let tmpFingUser = []
             // 팔로워 닉네임 : 팔로워 사진
-            
             if(this.userFerList.length>0){
                 const lenFer = (this.userFerList[0].length + this.userFerList[1].length) / 2
                 for(var j=0; j<lenFer; j++){
@@ -454,8 +454,8 @@ export default {
                     // console.log(getFerUser)
                 }
 
-            this.followerUserImg = getFerUser
-            console.log(this.followerUserImg)
+                this.followerUserImg = getFerUser
+                console.log(this.followerUserImg)
             }
 
             // 팔로잉 닉네임 : 팔로잉 사진
@@ -467,8 +467,8 @@ export default {
                     // console.log(getFingUser)
                 }
 
-            this.followingUserImg = getFingUser
-            console.log(this.followingUserImg)
+                this.followingUserImg = getFingUser
+                console.log(this.followingUserImg)
             }
 
         })
