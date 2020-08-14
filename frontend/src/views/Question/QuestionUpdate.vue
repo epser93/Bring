@@ -95,7 +95,10 @@ export default {
         },
         // 태그
         postTag() {
-          if (!this.questionData.tags.includes(this.tag)) {
+          if (this.tag === null || this.tag.replace(/^\s*|\s*$/g, '').length === 0) {
+            alert('빈칸은 태그로 입력 불가능합니다.')
+            this.tag = ""
+          } else if (!this.questionData.tags.includes(this.tag)) {
             this.questionData.tags.push(this.tag)
             this.tag = ""
           } else {
