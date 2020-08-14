@@ -55,10 +55,11 @@
                         v-model="answerData.answer"
                     ></b-form-textarea>
                 </div>
-                <button class="btn btn-success btn-sm mx-1" @click='writeAnswer' >답변 달기</button>
+                <button class="btn btn-success btn-sm mx-1" v-if="!updateAnswer" @click='writeAnswer'>답변 작성</button>
+                <button class="btn btn-success btn-sm mx-1" v-if="updateAnswer" @click='modifyAnswer'>답변 수정</button>
                 <button class="btn btn-success btn-sm mx-1" @click='commentClose'>답변창 닫기</button>
             </span>
-            <span v-else-if="this.nickname!=qPost.member_nickname">
+            <span v-else>
                 <button class="btn btn-success btn-sm mx-1" @click='commentOpen' >답변창 열기</button>
             </span>
         </div>
@@ -66,27 +67,13 @@
         <!-- 답변 리스트-->
         <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded" v-for="(aArticle,index) in aPost" :key="aArticle.aPostId">
             <p>글쓴이: {{aArticle.member_nickname}}
-                
+                {{aArticle.apostId}}
                 <!-- 만약 채택 된 답변이라면 -->
                 <span v-if="aArticle.selected===true"><b-icon icon="patch-check-fll" variant="info"></b-icon>채택된 답변</span>
                 <span v-else>
                     <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="(nickname===aArticle.member_nickname && selectedAnswer===false)">삭제</b-button>
-                    <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false)">채택</b-button>
-                    <!-- 답변 수정-->
-                    <b-button variant="warning"  v-if="nickname===aArticle.member_nickname">수정</b-button>
-                    <!-- 답변 수정창 열기-->
-                    <!-- <span v-if="modifyComment">
-                        <div>
-                            <b-form-textarea
-                                id="textarea-rows"
-                                placeholder="Tall textarea"
-                                rows="8"
-                                v-model="answerData"
-                            ></b-form-textarea>
-                        </div>
-                        <button class="btn btn-success btn-sm mx-1" @click='writeAnswer(aArticle.apostId)' >답변 수정하기</button>
-                        <button class="btn btn-success btn-sm mx-1" @click='modifyClose(aArticle.apostId)'>답변창 닫기</button>
-                    </span> -->
+                    <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false )">채택</b-button>
+                    <b-button variant="warning" @click='modifyAnswerOpen(aArticle)' v-if="nickname===aArticle.member_nickname">수정</b-button>
                 </span>
             </p> 
 
@@ -128,8 +115,11 @@ export default {
             apost_id: this.$route.params.apostId,
             answerUpdate:false,
             // 답변 수정
-            // modifyComment: false,
-            // id:0,
+            updateAnswer: false,
+            id:0,
+            newAnswerData:{
+                answer:"",
+            },
            
             // 답변 추천(좋아요)
             answerer: this.$cookies.get('nickname'),   
@@ -138,8 +128,6 @@ export default {
 
             // 답변 채택
             selectedAnswer:false,
-           
-
             // 태그
             tags: ''
         }
@@ -153,24 +141,6 @@ export default {
         commentClose() {
             this.writeComment = false
         },
-        // 답변 수정창 열기
-        // modifyOpen(apostId){
-        //     // console.log(arr)
-        //     this.id=apostId
-        //     console.log(apostId)
-        //     console.log(this.id)
-            
-        //     if (apostId===this.aPost[this.id-1].apostId){
-        //         this.modifyComment=true
-        //         break;
-        //     } 
-        // },
-        // // 답변 수정창 닫기
-        // modifyClose(apostId){
-        //     console.log(apostId)
-        //     this.modifyComment=false
-        // },
-
         // 게시물 호출
         getQna() {
             axios.get(`${BACK_URL}/questions/${this.qpost_id}`)
@@ -293,6 +263,7 @@ export default {
                         this.getAnswer()
                     })
                     .catch(err=>{
+                        alert('본인의 답변에는 좋아요를 할 수 없습니다')
                         console.log(err)
                     })
             } else {
@@ -303,6 +274,7 @@ export default {
                         this.getAnswer()
                     })
                     .catch(err=>{
+                        alert('본인의 답변에는 좋아요를 할 수 없습니다')
                         console.log(err)
                     })
             }
@@ -328,20 +300,30 @@ export default {
             })
             }
         },
-        // 답변 수정 (더 고민)
-        modifyAnswer(aPostId){
+        // 답변 수정
+        modifyAnswer(){
             const config={
                 headers:{
                     'X-AUTH-TOKEN':this.$cookies.get('X-AUTH-TOKEN')
                 }
             }
-            axios.put(`${BACK_URL}/answers/${aPostId}`,config)
+            axios.put(`${BACK_URL}/answers/${this.answerData_id}`,this.answerData,config)
             .then(res=>{
+                this.getAnswer()
+                this.updateAnswer=false
+                this.writeComment=false
                 console.log(res)
             })
             .catch(err=>{
                 console.log(err)
             })
+        },
+        // 답변 수정창 열기
+        modifyAnswerOpen(aArticle){
+            this.writeComment=true
+            this.updateAnswer=true
+            this.answerData.answer=aArticle.answer
+            this.answerData_id=aArticle.apostId
         },
     },
     created(){
