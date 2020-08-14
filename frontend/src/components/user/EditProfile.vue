@@ -191,7 +191,7 @@ export default {
       backProfile(){
         // this.$router.go(-1) // 뭘로할까?? 뒤로가기?? 아니면 메인화면으로 가기??
         //this.$router.push('/')
-        this.$router.push({ name : "Profile" }) 
+        this.$router.push({ name : "Profile", query: {nickname: this.changeData.nickname}})
       },
 
       changeInfo(){

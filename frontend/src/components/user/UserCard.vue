@@ -14,10 +14,8 @@
                             <button class="btn btn-success btn-sm" id="homeBt" @click="gotoBlog"><i class="fas fa-home"></i></button>
                         </div>
                         <div class="location text-sm-center"><i class="far fa-envelope"></i>  {{ userInfo.uid }}</div>
-                        <span><a data-toggle="modal" data-target="#staticBackdrop" style="color:gray" @click="seeFollower"><i class="fas fa-user-friends"></i> {{userInfo.followersCnt}} follower</a></span> 
+                        <span><a href="/" data-toggle="modal" data-target="#staticBackdrop" style="color:gray" @click="seeFollower"><i class="fas fa-user-friends"></i> {{userInfo.followersCnt}} follower · {{userInfo.followingCnt}} following</a></span> 
                         <!-- 여기 위에 수정함 data-toggle & href 처리방법 연구필요 -->
-                        <span> · </span>
-                        <span><a href="" style="color:gray" @click="seeFollowing"> {{userInfo.followingCnt}} following</a></span>
                         <div v-if="loginNickname == userNickname"> 
                             <button class="btn btn-outline-info btn-sm mx-1 mt-2" @click="gotoEdit">
                                 <i class="fas fa-user-tie"></i> Edit profile
@@ -38,28 +36,49 @@
                     </div>
 
 <!-- <toggle-button @change="onChangeEventHandler"/>
- 
 <toggle-button v-model="myDataVariable"/> -->
 
-<!-- <input type="checkbox" data-toggle="switchbutton" checked data-onstyle="primary"> -->
-
-                    
-                    <!-- 밑에 부분은 modal -->
-
                     <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-scrollable">
+                        <div class="modal-dialog modal-dialog-scrollable modal-sm">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
-                                    <input type="checkbox" data-toggle="switchbutton" checked data-onstyle="primary">
+                                    <h5 v-if="selectFollow == true" class="modal-title" id="staticBackdropLabel">{{ userInfo.nickname }}'s</h5>
+
+                                    <h5 v-else class="modal-title" id="staticBackdropLabel">{{ userInfo.nickname }}'s</h5>
+                                   
+                                    <toggle-button v-model="selectFollow"
+                                        :value="true"
+                                        :color="{checked: '#82C7EB', unchecked: '#A6D608'}"
+                                        :width="110"
+                                        :height="30"
+                                        :font-size="15"
+                                        :labels="{checked: 'Follower', unchecked: 'Following'}"/>
+                                        <!-- {{selectFollow}} -->
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <p>
-                                        간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라간다ㅏ라라라
-                                    </p>
+                                    <ul class="listGroup row row-cols-2">
+                                        <div v-if="selectFollow == true">
+                                            <li v-for="(follower, img) in followerUserImg" v-bind:key="follower" class="listFollow col">
+                                                <div class="row d-flex" id="modalFollow">
+                                                    <img class="rounded-circle" :src=img alt="Card image cap" style="width:30px; height:30px;">
+                                                    <router-link :to="{ name: 'Profile', query: { nickname: follower }}">{{ follower }}</router-link>
+                                                </div>
+                                            </li>
+                                        </div>
+
+                                        <div v-else>
+                                            <li v-for="following in userFingList" v-bind:key="following" class="listFollow col">
+                                                <div class="row d-flex" id="modalFollow">
+                                                    <img class="rounded-circle" :src=userThumbnail alt="Card image cap" style="width:30px; height:30px;">
+                                                    <router-link :to="{ name: 'Profile', query: { nickname: following }}">{{ following }}</router-link>
+                                                </div>
+                                            </li>
+                                        </div>
+                                    </ul>
+                                    
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
@@ -160,8 +179,8 @@ export default {
         userNickname: null,
         userInfo: null, // 0번
         userFCheck: null, // 1번
-        userFerList: null, // 2번
-        userFingList: null, // 3번
+        userFerList: null, // 2번 나를 팔로우한사람들의 리스트
+        userFingList: null, // 3번 내가 팔로우한사람들의 리스트
         userPostList:[], // 4번
         userThumbnail: null, // 5번
         userScore: '',
@@ -172,7 +191,9 @@ export default {
         valPostList: [],
         showFollower: false,
         showFollowing: false,
-        
+        selectFollow: true,
+        followerUserImg: null, // 팔로우 list목록의 프로필마다 사진
+        followingUserImg: null,
     };
   },
 
@@ -188,7 +209,7 @@ export default {
   },
   
   created() {
-      this.Init()
+    //   this.Init()
   },
 
   watch: {
@@ -201,6 +222,10 @@ export default {
       },
   },
   computed: {
+    // onChangeEventHandler(){
+    //     console.log(value)
+
+    // },
     computedScore(){
           const bronze = 0;
           const silver = 30;
@@ -293,7 +318,7 @@ export default {
         const myNick = this.userInfo.nickname
         const lenUserList = this.allUsers
         let ranks = this.userRank
-        console.log(ranks)
+        //console.log(ranks)
         let rank = 0
         ranks.sort(compareSecondColumn);
 
@@ -338,10 +363,10 @@ export default {
                 'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
                 }
         }
-        console.log(this.userInfo.msrl)
+        //console.log(this.userInfo.msrl)
         axios.post(`${BACK_URL}/follow/${this.userInfo.msrl}`, {msrl:this.userInfo.msrl}, config)
             .then(() => {
-                console.log("팔로우완료")
+                //console.log("팔로우완료")
                 this.Init()
             })
             .catch((err) => {
@@ -356,7 +381,7 @@ export default {
             }
         axios.delete(`${BACK_URL}/follow/${this.userInfo.msrl}`, config)
             .then(() => {
-                console.log("팔로우취소")
+                //console.log("팔로우취소")
                 this.Init()
             })
             .catch((err) => {
@@ -375,7 +400,7 @@ export default {
         }
     
         this.userNickname = this.$route.query.nickname
-        console.log(this.loginNickname)
+        //console.log(this.loginNickname)
         this.loginNickname = this.$cookies.get('nickname')
 
         axios.get(`${BACK_URL}/member/${this.userNickname}/profile`,config)
@@ -383,11 +408,11 @@ export default {
             console.log(res)
             this.userInfo = res.data.list[0].list[0]
             this.userFCheck = res.data.list[1].list[0]
-            this.userFerList = res.data.list[2]
-            this.userFingList = res.data.list[3]
+            this.userFingList = res.data.list[2].list
+            this.userFerList = res.data.list[3].list
             this.userPostList = res.data.list[4].list
             this.userThumbnail = res.data.list[5].list[0]
-        
+            console.log(this.userFerList)
             for(var i=0; i<this.userPostList.length; i++){
                 this.userPostList[i] = moment(this.userPostList[i], "YYYY-MM-DD").format().slice(0,10)
                 if(this.userPostList[i] in this.cntPostList){
@@ -401,8 +426,7 @@ export default {
                 var tmp = {date:key, count:this.cntPostList[key]}
                 this.valPostList.push(tmp)
             }         
-            this.userScore = this.userInfo.score
-            
+            this.userScore = this.userInfo.score  
         })
         .catch((err) => {
             console.error(err)
@@ -418,14 +442,40 @@ export default {
             console.error(err)
         })
 
-        // 팔로우 목록 가져오기
-        // axios.get(`${BACK_URL}/follow/ings/${this.userInfo.msrl}`)
-        // .then(res => {
-        //     console.log(res)
-        // })
-        // .catch((err) => {
-        //     console.error(err)
-        // })
+        ////////////////////////////////////////////////////////////////////////
+//             console.log("dd./////////////////////////////////dd")
+//         console.log(this.userFerList)
+// console.log("dd./////////////////////////////////dd")
+//         let ferUserImg = []
+//         let fingUserImg = []
+
+//         for(var i=0; i<this.userFerList.length; i++){
+//             axios.get(`${BACK_URL}/member/${this.userFerList[i]}/profile`,config)
+//             .then(res => {
+//                 ferUserImg.push(this.userFerList[i], res.data.list[5].list[0])
+//                 console.log(this.userFerList[i])
+//             })
+//             .catch((err) => {
+//             console.error(err)
+//             })
+//         }
+//         this.followerUserImg = ferUserImg
+
+//         // console.log("ddddddddddddddddddddddddddddddddddddddddd")
+//         // console.log(this.followerUserImg)
+//         // console.log("ddddddddddddddddddddddddddddddddddddddddd")
+
+
+//         for(var j=0; j<this.userFingList.length; i++){
+//             axios.get(`${BACK_URL}/member/${this.userFingList[j]}/profile`,config)
+//             .then(res => {
+//                 fingUserImg.push(this.userFingList[j], res.data.list[5].list[0])
+//             })
+//             .catch((err) => {
+//             console.error(err)
+//             })
+//         }
+//         this.followingUserImg = fingUserImg
     }   
   },
   mounted () {
@@ -460,6 +510,21 @@ export default {
 }
 #homeBt {
     height: fit-content;
+}
+.listFollow{
+    list-style: none;
+    padding: 5px 0px 5px 5px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid #efefef;
+    font-size: 18px;
+}
+.listGroup{
+    margin: 0;
+    padding: 0;
+}
+#modalFollow{
+    align-items: center;
+    justify-content: space-evenly;
 }
 </style>
 
