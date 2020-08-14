@@ -47,7 +47,7 @@ export default {
                     'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
                 }
             }
-            this.categoryOn = 1
+
             axios.get(`${BACK_URL}/blog/${this.nickname}/나의 Answers/post_list`, config)
                 .then(res => {
                     this.answersList = res.data.list[0].list
@@ -59,10 +59,9 @@ export default {
                 })
         },
     },
-    created() {
-        this.getAllAnswers()
+    mounted() {
+        this.getAllAnswers()   
     }
-
 }
 </script>
 

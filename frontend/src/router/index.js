@@ -24,6 +24,7 @@ import MyList from '../views/blog/MyList.vue'
 import MyQuestions from '../views/blog/MyQuestions.vue'
 import MyAnswers from '../views/blog/MyAnswers.vue'
 import BlogCategory from '../views/blog/BlogCategory.vue'
+import QuestionPosts from '../views/blog/QuestionPosts.vue'
 
 
 // 스택오버플로우
@@ -136,12 +137,19 @@ const routes = [{
             {
                 path: 'myquestions',
                 name: 'MyQuestions',
-                component: MyQuestions
+                component: MyQuestions,
+                props: true,
+                children: [{
+                    path: '',
+                    name: 'MyQuestions',
+                    component: QuestionPosts
+                }]
             },
             {
                 path: 'myanswers',
                 name: 'MyAnswers',
-                component: MyAnswers
+                component: MyAnswers,
+
             }
 
         ]
