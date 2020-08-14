@@ -113,22 +113,44 @@ public class AnswerController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        if (!logined.isPresent() || !qpost.isPresent()) {
+            return null;
+        }
+
+        if (qpost.get().getSelectOver() == true) {
+            throw new CSelectedAnswerException();
+        }
+
         ParamPost paramPost = new ParamPost();
         List<ListResult> result = new ArrayList<>();
 
-        if(qpost.get().getSelectOver() == true) {
-            throw new CSelectedAnswerException();
-        }
         Post answer = new Post();
-        if (asker.getMsrl() != logined.get().getMsrl()) {
+        Apost apost = new Apost();
+        Optional<List<Apost>> list = apostRepository.findByMember_MsrlAndQpost_QpostIdOrderByApostIdAsc(logined.get().getMsrl(), qpostId);
+        String apAnswer = null;
+        long postId = 0;
+        if (asker.getMsrl() != logined.get().getMsrl()) { //질문자 외 다른사람이 답변을 달면~
+            if (list.isPresent()) {
+                Apost ap = list.get().get(list.get().size() - 1); //해당 리스트의 마지막 답변
+                postId = ap.getPostId();
+                List<OnlyPostMapping> postMapping = postRepository.findByPostId(postId);
+                apAnswer = postMapping.get(0).getContent();
+            }
             //블로그 Q&A 게시판
             StringBuilder sb = new StringBuilder();
             sb.append("Q. " + qpost.get().getSubject() + "(Q writer: " + qpost.get().getMember().getNickname() + ", Q number: " + qpostId + ")" + System.getProperty("line.separator"));
             sb.append("\t" + qpost.get().getContent() + System.getProperty("line.separator"));
             paramPost.setSubject(sb.toString());
             sb = new StringBuilder();
-            sb.append("A." + System.getProperty("line.separator"));
-            sb.append("\t" + paramApost.getAnswer() + System.getProperty("line.separator"));
+            if (apAnswer == null) { //해당 질문글에 내가 쓴 이전 답변이 없을 경우
+                sb.append("A." + System.getProperty("line.separator"));
+                sb.append("\t" + paramApost.getAnswer() + System.getProperty("line.separator") + System.getProperty("line.separator"));
+            } else {
+                sb.append(apAnswer);
+                sb.append("A." + System.getProperty("line.separator"));
+                sb.append("\t" + paramApost.getAnswer() + System.getProperty("line.separator") + System.getProperty("line.separator"));
+                postService.deletePost(postId, logined.get());
+            }
             paramPost.setContent(sb.toString());
             paramPost.setOriginal((long) -1);
             answer = postService.writePost("나의 Answers", paramPost, logined.get(), "");
@@ -140,8 +162,10 @@ public class AnswerController {
                     tagService.insertTags(answer, tag);
                 }
             }
+            apost = qnaService.writeAnswer(qpost.get(), logined.get(), paramApost, answer.getPostId());
+        } else {
+            apost = qnaService.writeAnswer(qpost.get(), logined.get(), paramApost, -1); //
         }
-        Apost apost = qnaService.writeAnswer(qpost.get(), logined.get(), paramApost, answer.getPostId());
         if (qpostRepository.isSelectedAnswerExist(qpostId)) return null;
         return responseService.getSingleResult(apost);
     }
@@ -157,32 +181,56 @@ public class AnswerController {
         String uid = authentication.getName();
         Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
         Optional<Apost> apost = apostRepository.findById(apostId);
-        long qpostId = apost.get().getQpost().getQpostId();
-        Qpost qpost = qpostRepository.findById(qpostId).orElseThrow(CResourceNotExistException::new);
-        Member asker = qpost.getMember();
-        ParamPost paramPost = new ParamPost();
-
-        if(qpost.getSelectOver() == true) {
-            throw new CSelectedAnswerException();
+        if (!logined.isPresent() || !apost.isPresent()) {
+            return null;
         }
 
         if (!logined.get().getNickname().equals(apost.get().getMember().getNickname())) {
             throw new CNotOwnerException();
         }
 
+        long qpostId = apost.get().getQpost().getQpostId();
+        Qpost qpost = qpostRepository.findById(qpostId).orElseThrow(CResourceNotExistException::new);
+        if (qpost.getSelectOver() == true) {
+            throw new CSelectedAnswerException();
+        }
+        Member asker = qpost.getMember();
+        ParamPost paramPost = new ParamPost();
+
+        Optional<List<Apost>> list = apostRepository.findByMember_MsrlAndQpost_QpostIdOrderByApostIdAsc(logined.get().getMsrl(), qpostId);
+        String apAnswer = null;
+        long postId = 0;
         if (asker.getMsrl() != logined.get().getMsrl()) {
+            if (list.isPresent()) {
+                Apost ap = list.get().get(list.get().size() - 1); //해당 리스트의 마지막 답변
+                postId = ap.getPostId();
+                List<OnlyPostMapping> postMapping = postRepository.findByPostId(postId);
+                apAnswer = postMapping.get(0).getContent();
+            }
             //블로그 Q&A 게시판
             StringBuilder sb = new StringBuilder();
             sb.append("Q. " + qpost.getSubject() + "(Q writer: " + qpost.getMember().getNickname() + ", Q number: " + qpostId + ")" + System.getProperty("line.separator"));
             sb.append("\t" + qpost.getContent() + System.getProperty("line.separator"));
             paramPost.setSubject(sb.toString());
             sb = new StringBuilder();
-            sb.append("A." + System.getProperty("line.separator"));
-            sb.append("\t" + paramApost.getAnswer() + System.getProperty("line.separator"));
+            if (apAnswer.equals(null)) {
+                sb.append("A." + System.getProperty("line.separator"));
+                sb.append("\t" + paramApost.getAnswer() + System.getProperty("line.separator") + System.getProperty("line.separator"));
+            } else {
+                for (Apost ap : list.get()) {
+                    if (ap.getApostId() == apostId) {
+                        sb.append("A." + System.getProperty("line.separator"));
+                        sb.append("\t" + paramApost.getAnswer() + System.getProperty("line.separator") + System.getProperty("line.separator"));
+                    } else {
+                        sb.append("A." + System.getProperty("line.separator"));
+                        sb.append("\t" + ap.getAnswer() + System.getProperty("line.separator") + System.getProperty("line.separator"));
+                    }
+                }
+            }
             paramPost.setContent(sb.toString());
             paramPost.setOriginal((long) -1);
-            postService.updatePost("나의 Answers", apost.get().getPostId(), logined.get().getMsrl(), paramPost);
-            Post answer = postRepository.findById(apost.get().getPostId()).orElseThrow(CResourceNotExistException::new);
+            postService.updatePost("나의 Answers", postId, logined.get().getMsrl(), paramPost);
+            Post answer = postRepository.findById(postId).get();
 
             Set<String> tagSet = new HashSet<>(qTagService.getTags(qpost.getQpostId()));
             List<String> tags = new ArrayList<>(tagSet);

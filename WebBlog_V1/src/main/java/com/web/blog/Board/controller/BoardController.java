@@ -843,7 +843,7 @@ public class BoardController {
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
     })
     @ApiOperation(value = "전체 포스트 태그 검색", notes = "전체 포스트 태그로 검색")
-    @PostMapping(value = "/blog/search/tags/{keyword}")
+    @GetMapping(value = "/blog/search/tags/{keyword}")
     public ListResult<ListResult> searchAllPostsByTag(@PathVariable String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
@@ -902,7 +902,7 @@ public class BoardController {
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
     })
     @ApiOperation(value = "특정 유저 포스트 태그 검색", notes = "특정 유저의 포스트 태그로 검색")
-    @PostMapping(value = "/blog/{nickname}/search/tags/{keyword}")
+    @GetMapping(value = "/blog/{nickname}/search/tags/{keyword}")
     public ListResult<ListResult> searchOnesPostsByTag(@PathVariable String nickname, @PathVariable String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
