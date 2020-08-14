@@ -172,21 +172,44 @@ public class MemberController {
                 result.add(responseService.getListResult(img)); //프로필 사진
             }
         }
-        Cookie cookies[] = request.getCookies();
-        Map map = new HashMap();
-        if(cookies != null) {
-            for(Cookie cookie : cookies) {
-                map.put(cookie.getName(), cookie.getValue());
+
+        Cookie[] cookies = null;
+        if(logined.isPresent() && logined.get().getMsrl() != member.getMsrl()) {
+            cookies = request.getCookies();
+            Map map = new HashMap();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    map.put(cookie.getName(), cookie.getValue());
+                }
             }
-        }
-        String cookieCnt = (String) map.get("today_cnt");
-        String newCookieCnt = "|" + member.getNickname();
-        if(StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
-            Cookie cookie = new Cookie("today_cnt", cookieCnt + newCookieCnt);
-            cookie.setMaxAge(60*60*24); //1시간
-            response.addCookie(cookie);
-            this.repository.updateTodayCnt(member.getMsrl());
-            this.repository.updateTotalCnt(member.getMsrl());
+            String key = logined.get().getMsrl() + "|" + "today_cnt";
+            String cookieCnt = (String) map.get(key);
+            String newCookieCnt = logined.get().getNickname() + "|" + member.getNickname();
+            if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
+                Cookie cookie = new Cookie(key, newCookieCnt);
+                cookie.setMaxAge(60 * 60 * 24); //24시간
+                response.addCookie(cookie);
+                repository.updateTodayCnt(member.getMsrl());
+                repository.updateTotalCnt(member.getMsrl());
+            }
+        } else if (!logined.isPresent()) {
+            cookies = request.getCookies();
+            Map map = new HashMap();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    map.put(cookie.getName(), cookie.getValue());
+                }
+            }
+            String key = "temp" + "|" + "today_cnt";
+            String cookieCnt = (String) map.get(key);
+            String newCookieCnt = "temp" + "|" + member.getNickname();
+            if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
+                Cookie cookie = new Cookie(key, newCookieCnt);
+                cookie.setMaxAge(60 * 60 * 24); //24시간
+                response.addCookie(cookie);
+                repository.updateTodayCnt(member.getMsrl());
+                repository.updateTotalCnt(member.getMsrl());
+            }
         }
         //유저가 좋아요 한 글 개수
         repository.updateLikeCnt(postMemberRepository.likedPostCnt(member.getMsrl()), member.getMsrl());
