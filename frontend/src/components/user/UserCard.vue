@@ -186,25 +186,25 @@ export default {
     
   data() {
     return {
-        loginNickname: null,
-        userNickname: null,
-        userInfo: null, // 0번
-        userFCheck: null, // 1번
-        userFerList: null, // 2번 나를 팔로우한사람들의 리스트
-        userFingList: null, // 3번 내가 팔로우한사람들의 리스트
-        userPostList:[], // 4번
-        userThumbnail: null, // 5번
-        userScore: '',
-        userRank: [],
+        loginNickname: null,  // 로그인한 사용자 닉네임
+        userNickname: null,  // mypage의 사용자 닉네임
+        userInfo: null, // mypage-user : 0번
+        userFCheck: null, // mypage-user : 1번
+        userFerList: null, // mypage-user : 2번 나를 팔로우한사람들의 리스트
+        userFingList: null, // mypage-user : 3번 내가 팔로우한사람들의 리스트
+        userPostList:[], // mypage-user : 4번
+        userThumbnail: null, // mypage-user : 5번
+        userTodays: null, // mypage-user : 6번 [오늘 방문자, 토탈 방문자]
+        userScore: '', // mypage-user : 스코어
+        userRank: [], // 모든 회원들의 랭킹
         allUsers: '', // 회원가입한 전체 User 수
-        todays: null,
-        cntPostList: {},
-        valPostList: [],
-        showFollower: false,
-        showFollowing: false,
-        selectFollow: true,
+        todays: null, // sys의 오늘날짜를 계산하기 위한 변수
+        cntPostList: {}, // 게시글 및 지식인 질문 및 답변 갯수
+        valPostList: [], // TIL에 표시하기 위해서 {date : yyyy-mm-dd, count: num}
+        showFollower: false, // 팔로워 & 팔로잉 버튼 활성화 비활성화
+        selectFollow: true, // 팔로우 modal 내의 check button 활성화 비활성화(toggle)
         followerUserImg:null, // 팔로우 list목록의 프로필마다 사진
-        followingUserImg:null,
+        followingUserImg:null, // 팔로워 list 목록의 프로필마다 사진
     };
   },
 
@@ -233,10 +233,6 @@ export default {
       },
   },
   computed: {
-    // onChangeEventHandler(){
-    //     console.log(value)
-
-    // },
     computedScore(){
           const bronze = 0;
           const silver = 30;
@@ -358,9 +354,6 @@ export default {
         this.showFollower = true
         // this.$router.push({})
     },
-    seeFollowing() {
-        this.showFollowing = true
-    },
     callFunction() {  
         var currentDateWithFormat = new Date().toJSON().slice(0,10);
         this.todays = currentDateWithFormat
@@ -423,6 +416,7 @@ export default {
             this.userFerList = res.data.list[3].list
             this.userPostList = res.data.list[4].list
             this.userThumbnail = res.data.list[5].list[0]
+            this.userTodays = res.data.list[6].list
 
             // TIL 찍기
             for(var i=0; i<this.userPostList.length; i++){
