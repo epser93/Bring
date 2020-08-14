@@ -117,6 +117,7 @@ public class FollowController {
         List<ListResult> results = new ArrayList<>();
         List<Post> semiFinalList = new ArrayList<>();
         List<OnlyPostMappingForFeed> finalList = new ArrayList<>();
+        List<String> boards = new ArrayList<>();
         List<Boolean> amIInTheList = new ArrayList<>();
         List<String> filePaths = new ArrayList<>();
         List<Long> followings = followRepository.followingMember(logined.get().getMsrl());
@@ -182,7 +183,13 @@ public class FollowController {
             finalList.add(onlyPostMapping);
         }
         results.add(responseService.getListResult(finalList));
-
+        for(OnlyPostMappingForFeed opmf : finalList) {
+            long postId = opmf.getPostId();
+            Optional<Post> post = postRepository.findById(postId);
+            String boardName = post.get().getBoard().getName();
+            boards.add(boardName);
+        }
+        results.add(responseService.getListResult(boards));
         int cnt = 0;
         for (OnlyPostMappingForFeed pm : finalList) { //전체 포스트 리스트 for문
             long postId = pm.getPostId();

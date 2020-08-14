@@ -1,4 +1,4 @@
-package com.web.blog.Common.util;
+package com.web.blog.Common.util.redis;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.serializer.support.DeserializingConverter;
