@@ -1,21 +1,32 @@
 !<template>
   <div class="wrapB container-fluid">
     <section class="cards row">
-      <div v-for="(post,index) in list" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-        <div class="cardwrap" @click="gotoDetail(post)">
-          <div class="img-section" :style="{ 'background-image' : `url(${hotThumbnail[index]})`}">
-            <a href=""></a>
-          </div>
-          <div class="contents">
-            <h4>{{ post.subject }}</h4>
-            <p>{{ post.content }}</p>
-            <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.replyCnt }}개의 댓글</p>
-          </div>
-          <div class="writer-info">
-            <p>{{ post.member_nickname }}</p>
-            <p>♥ {{ post.likes}}</p>
+      <div class="col-lg-10 row">
+        <div v-for="(post,index) in list" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
+          <div class="cardwrap" @click="gotoDetail(post)">
+            <div class="img-section" :style="{ 'background-image' : `url(${hotThumbnail[index]})`}">
+              <a href=""></a>
+            </div>
+            <div class="contents">
+              <h4>{{ post.subject }}</h4>
+              <p>{{ post.content }}</p>
+              <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.replyCnt }}개의 댓글</p>
+            </div>
+            <div class="writer-info">
+              <p>{{ post.member_nickname }}</p>
+              <p>♥ {{ post.likes}}</p>
+            </div>
           </div>
         </div>
+      </div>
+
+      <div class="tag-list-wrap col-lg-2">
+        <h4>인기 태그</h4>
+        <ul class="tag-list text-left">
+          <li @click="searchTags(tag)" v-for="(tag, index) in tags.slice(0,10)" :key="index" class="mb-3 pl-5 trendtags">
+              # {{ tag }}
+          </li> 
+        </ul>
       </div>
     </section>
     <infinite-loading @infinite="infiniteHandler"></infinite-loading>
@@ -36,12 +47,14 @@ export default {
     return {
       list: [],
       hotThumbnail: [],
-      page : 1
+      page : 1,
+      tags: []
     }
   },
   created() {
     // this.getHotPost()
     // this.getRanking()
+    this.getTags()
   },
   methods: {
     infiniteHandler ($state) {
@@ -79,6 +92,17 @@ export default {
           .catch (err => console.log(err))
       }
     },
+    getTags() {
+      axios.get(`${BACK_URL}/tags/blog`)
+        .then(res => {
+          this.tags = res.data.list[0].list
+        })
+        .catch(err => console.log(err))
+    },
+    searchTags(tag) {
+      console.log(tag)
+      this.$router.push({ name : 'TagSearch', params : { keyword : tag }})
+    }
   },
   computed: {
   },
@@ -86,25 +110,11 @@ export default {
 </script>
 
 <style>
-/* .wrapB {
-  display: flex;
-  margin-left: 20px;
-  margin-right: 20px;
-} */
-
 h2 {
   width:100%;
   margin-bottom: 30px;
 }
-/* .cards {
-  flex: 4;
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-} */
 
-/* .tag-list-wrap {
-  flex:1;
-} */
 .tag-list-wrap h4 {
   margin-bottom: 30px
 }

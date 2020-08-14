@@ -23,7 +23,7 @@
       <div class="tag-list-wrap col-lg-2">
         <h4>명예의전당</h4>
         <ul class="tag-list">
-          <li v-for="(ranker, index) in sortRanking.slice(0,5)" :key="index">
+          <li v-for="(ranker, index) in sortRanking.slice(0,10)" :key="index">
               {{ index + 1 }}등 : {{ranker.nickname}}({{ ranker.score}}점)
           </li> 
         </ul>
