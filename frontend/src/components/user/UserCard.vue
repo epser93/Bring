@@ -59,26 +59,36 @@
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    <ul class="listGroup row row-cols-2">
+                                    <ul class="listGroup container">
                                         <div v-if="selectFollow == true">
-                                            <li v-for="(follower, img) in followerUserImg" v-bind:key="follower" class="listFollow col">
-                                                <div class="row d-flex" id="modalFollow">
-                                                    <img class="rounded-circle" :src=img alt="Card image cap" style="width:30px; height:30px;">
-                                                    <router-link :to="{ name: 'Profile', query: { nickname: follower }}">{{ follower }}</router-link>
-                                                </div>
-                                            </li>
+                                            <div v-if="followerUserImg == null">
+                                                <h5>팔로우가 없습니다.</h5>
+                                            </div>
+                                            <div v-else class="row row-cols-2">
+                                                <li v-for="user in followerUserImg" v-bind:key="user" class="listFollow col">
+                                                    <div class="d-flex" id="modalFollow">
+                                                        <img class="rounded-circle" :src=user.img alt="Card image cap" style="width:50px; height:50px; border-style: outset;">
+                                                        <router-link :to="{ name: 'Profile', query: { nickname: user.nickname }}">{{ user.nickname }}</router-link>
+                                                    </div>
+                                                </li>
+                                            </div>
                                         </div>
 
                                         <div v-else>
-                                            <li v-for="following in userFingList" v-bind:key="following" class="listFollow col">
-                                                <div class="row d-flex" id="modalFollow">
-                                                    <img class="rounded-circle" :src=userThumbnail alt="Card image cap" style="width:30px; height:30px;">
-                                                    <router-link :to="{ name: 'Profile', query: { nickname: following }}">{{ following }}</router-link>
-                                                </div>
-                                            </li>
+                                            <div v-if="followerUserImg == null">
+                                                <h5>팔로잉이 없습니다.</h5>
+                                            </div>
+                                            <div v-else>
+                                                    <li v-for="user in followingUserImg" v-bind:key="user" class="listFollow col">
+                                                    <div class="d-flex" id="modalFollow">
+                                                        <img class="rounded-circle" :src=user.img alt="Card image cap" style="width:50px; height:50px; border-style: outset;">
+                                                        <router-link :to="{ name: 'Profile', query: { nickname: user.nickname }}">{{ user.nickname }}</router-link>
+                                                    </div>
+                                                </li>
+                                            </div>
                                         </div>
+
                                     </ul>
-                                    
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
@@ -192,8 +202,8 @@ export default {
         showFollower: false,
         showFollowing: false,
         selectFollow: true,
-        followerUserImg: null, // 팔로우 list목록의 프로필마다 사진
-        followingUserImg: null,
+        followerUserImg:null, // 팔로우 list목록의 프로필마다 사진
+        followingUserImg:null,
     };
   },
 
@@ -412,7 +422,8 @@ export default {
             this.userFerList = res.data.list[3].list
             this.userPostList = res.data.list[4].list
             this.userThumbnail = res.data.list[5].list[0]
-            console.log(this.userFerList)
+
+            // TIL 찍기
             for(var i=0; i<this.userPostList.length; i++){
                 this.userPostList[i] = moment(this.userPostList[i], "YYYY-MM-DD").format().slice(0,10)
                 if(this.userPostList[i] in this.cntPostList){
@@ -426,7 +437,40 @@ export default {
                 var tmp = {date:key, count:this.cntPostList[key]}
                 this.valPostList.push(tmp)
             }         
-            this.userScore = this.userInfo.score  
+            this.userScore = this.userInfo.score
+            
+            // 팔로우 부분
+            let getFerUser = []
+            let getFingUser = []
+            let tmpFerUser = []
+            let tmpFingUser = []
+            // 팔로워 닉네임 : 팔로워 사진
+            
+            if(this.userFerList.length>0){
+                const lenFer = (this.userFerList[0].length + this.userFerList[1].length) / 2
+                for(var j=0; j<lenFer; j++){
+                    tmpFerUser = {nickname:this.userFerList[0][j], img:this.userFerList[1][j]}
+                    getFerUser.push(tmpFerUser)
+                    // console.log(getFerUser)
+                }
+
+            this.followerUserImg = getFerUser
+            console.log(this.followerUserImg)
+            }
+
+            // 팔로잉 닉네임 : 팔로잉 사진
+            if(this.userFingList.length>0){
+                const lenFing = (this.userFingList[0].length + this.userFingList[1].length) / 2
+                for(var p=0; p<lenFing; p++){
+                    tmpFingUser = {nickname:this.userFingList[0][p], img:this.userFingList[1][p]}
+                    getFingUser.push(tmpFingUser)
+                    // console.log(getFingUser)
+                }
+
+            this.followingUserImg = getFingUser
+            console.log(this.followingUserImg)
+            }
+
         })
         .catch((err) => {
             console.error(err)
@@ -441,41 +485,6 @@ export default {
         .catch((err) => {
             console.error(err)
         })
-
-        ////////////////////////////////////////////////////////////////////////
-//             console.log("dd./////////////////////////////////dd")
-//         console.log(this.userFerList)
-// console.log("dd./////////////////////////////////dd")
-//         let ferUserImg = []
-//         let fingUserImg = []
-
-//         for(var i=0; i<this.userFerList.length; i++){
-//             axios.get(`${BACK_URL}/member/${this.userFerList[i]}/profile`,config)
-//             .then(res => {
-//                 ferUserImg.push(this.userFerList[i], res.data.list[5].list[0])
-//                 console.log(this.userFerList[i])
-//             })
-//             .catch((err) => {
-//             console.error(err)
-//             })
-//         }
-//         this.followerUserImg = ferUserImg
-
-//         // console.log("ddddddddddddddddddddddddddddddddddddddddd")
-//         // console.log(this.followerUserImg)
-//         // console.log("ddddddddddddddddddddddddddddddddddddddddd")
-
-
-//         for(var j=0; j<this.userFingList.length; i++){
-//             axios.get(`${BACK_URL}/member/${this.userFingList[j]}/profile`,config)
-//             .then(res => {
-//                 fingUserImg.push(this.userFingList[j], res.data.list[5].list[0])
-//             })
-//             .catch((err) => {
-//             console.error(err)
-//             })
-//         }
-//         this.followingUserImg = fingUserImg
     }   
   },
   mounted () {
