@@ -4,6 +4,12 @@
       <h2>글수정</h2>
       
       <hr>
+      <!-- 썸네일 ( 이 부분 추가하면 에러남)-->
+      <!-- <div class="row ml-1 mt-5 mb-5">
+        <label for="thumbnailInput">썸네일 : </label>
+        <input @change="thumbnailSelect" type="file" ref="thumbnailImage" id="thumbnailInput">
+      </div> -->
+
     <b-row class="my-1">
       <b-col sm="3">
         <label>제목</label>
@@ -48,10 +54,11 @@ export default {
                 content:"",
                 subject:"",       
                 tags:[],
-
-                // 태그
-                tag:""
             },
+            // 태그
+            tag:"",
+            thumbnail:"",
+            
         }
     },
     methods:{
@@ -65,7 +72,7 @@ export default {
             axios.put(`${BACK_URL}/questions/${this.qpost_id}`,this.questionData,config)
             .then(res=>{
                 console.log(res)
-               
+                this.thumbnailPost()
                 this.$router.push({name:'QuestionDetail'})
             })
             .catch(err=>{
@@ -74,6 +81,7 @@ export default {
         },
         // 기존 질문 내용 호출
         getQna() {
+          console.log(this.qpost_id)
             axios.get(`${BACK_URL}/questions/${this.qpost_id}`)
             .then(res => {
                 this.questionData.subject=res.data.list[0].list[0].subject
@@ -98,7 +106,32 @@ export default {
         deleteTag(index) {
           this.questionData.tags.splice(index,1)
         },
-    },
+      },
+        // 썸네일
+        thumbnailSelect() {
+          this.thumbnail = this.$refs.thumbnailImage.files[0]
+      },
+        thumbnailPost() {
+          const formData = new FormData()
+          formData.append('files', this.thumbnail)
+
+          const config = {
+              headers: {
+                'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
+                'Content-Type' : 'multipart/form-data'
+              }
+            }
+            axios.post(
+              `${BACK_URL}/questions/ask/${this.qpost_id}/uploads`, formData, config)
+              .then(() =>{
+                this.$router.go(-1)
+              })
+              .catch((err) => {
+                alert('에러')
+                console.error(err)
+              })      
+      },
+
      created(){
         this.getQna()
         
