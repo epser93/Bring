@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Optional;
 
 public interface ApostRepository extends JpaRepository<Apost, Long> {
     List<Apost> findByMember_Nickname(String writer);
@@ -19,6 +20,8 @@ public interface ApostRepository extends JpaRepository<Apost, Long> {
     List<OnlyApostMapping> findByApostId(long apost_id);
 
     List<OnlyApostMapping> findAllByMember_Nickname(String writer);
+
+    Optional<List<Apost>> findByMember_MsrlAndQpost_QpostIdOrderByApostIdAsc(long msrl, long qpost_id);
 
     @Modifying
     @Transactional

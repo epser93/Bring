@@ -408,7 +408,7 @@ public class QuestionController {
     }
 
     @ApiOperation(value = "전체 질문글 태그 검색", notes = "전체 질문글 태그로 검색")
-    @PostMapping(value = "/search/tags/{keyword}")
+    @GetMapping(value = "/search/tags/{keyword}")
     public ListResult<ListResult> searchAllQuestionssByTag(@PathVariable String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
@@ -456,7 +456,7 @@ public class QuestionController {
     }
 
     @ApiOperation(value = "특정 유저 질문글 태그 검색", notes = "특정 유저의 질문글 태그로 검색")
-    @PostMapping(value = "/{nickname}/search/tags/{keyword}")
+    @GetMapping(value = "/{nickname}/search/tags/{keyword}")
     public ListResult<ListResult> searchOnesQuestionsByTag(@PathVariable String nickname, @PathVariable String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
