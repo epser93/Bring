@@ -21,7 +21,6 @@
             <b-button variant="outline-info" class="ml-2" @click="getHotQna">인기글</b-button>
         </div> -->
 
-        <!-- 썸네일 default 값 고민해볼것-->
         <div class="row">
             <div v-for="(qArticle,index) in qPost" :key="qArticle.qpostId" class="p-0 mb-5 col-12 col-lg-3">
                 <div class="card" style="width: 18rem;">

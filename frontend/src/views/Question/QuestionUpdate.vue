@@ -72,7 +72,7 @@ export default {
             axios.put(`${BACK_URL}/questions/${this.qpost_id}`,this.questionData,config)
             .then(res=>{
                 console.log(res)
-                this.thumbnailPost()
+                // this.thumbnailPost()
                 this.$router.push({name:'QuestionDetail'})
             })
             .catch(err=>{
@@ -114,26 +114,26 @@ export default {
         thumbnailSelect() {
           this.thumbnail = this.$refs.thumbnailImage.files[0]
       },
-        thumbnailPost() {
-          const formData = new FormData()
-          formData.append('files', this.thumbnail)
+      //   thumbnailPost() {
+      //     const formData = new FormData()
+      //     formData.append('files', this.thumbnail)
 
-          const config = {
-              headers: {
-                'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
-                'Content-Type' : 'multipart/form-data'
-              }
-            }
-            axios.post(
-              `${BACK_URL}/questions/ask/${this.qpost_id}/uploads`, formData, config)
-              .then(() =>{
-                this.$router.go(-1)
-              })
-              .catch((err) => {
-                alert('에러')
-                console.error(err)
-              })      
-      },
+      //     const config = {
+      //         headers: {
+      //           'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
+      //           'Content-Type' : 'multipart/form-data'
+      //         }
+      //       }
+      //       axios.post(
+      //         `${BACK_URL}/questions/ask/${this.qpost_id}/uploads`, formData, config)
+      //         .then(() =>{
+      //           this.$router.go(-1)
+      //         })
+      //         .catch((err) => {
+      //           alert('에러')
+      //           console.error(err)
+      //         })      
+      // },
 
      created(){
         this.getQna()

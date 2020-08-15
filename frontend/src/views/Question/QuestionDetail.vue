@@ -3,7 +3,11 @@
      <b-container>
          <div class="card rounded-lg shadow p-3 mb-5 bg-white rounded">
          <div>
-             <h1>{{qPost.subject}}</h1>
+            <h1>{{qPost.subject}}</h1>
+            <!-- 질문에 채택된 답변이 있으면 표시-->
+            <div v-if="selectedAnswer">
+                 <b-badge variant="success">채택</b-badge>
+            </div>
          </div>
          <b-container>
             <b-row>
@@ -71,16 +75,25 @@
                 <!-- 만약 채택 된 답변이라면 -->
                 <span v-if="aArticle.selected===true"><b-icon icon="patch-check-fll" variant="info"></b-icon>채택된 답변</span>
                 <span v-else>
-                    <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="(nickname===aArticle.member_nickname && selectedAnswer===false)">삭제</b-button>
-                    <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false )">채택</b-button>
-                    <b-button variant="warning" @click='modifyAnswerOpen(aArticle)' v-if="nickname===aArticle.member_nickname">수정</b-button>
+                    <div v-if="aArticle.member_nickname===qPost.member_nickname">
+                        <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)">삭제</b-button>
+                        <b-button variant="warning" @click='modifyAnswerOpen(aArticle)'>수정</b-button>
+                    </div>
+                    <div v-else-if="(nickname===aArticle.member_nickname && selectedAnswer===false )">
+                        <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)">삭제</b-button>
+                        <b-button variant="warning" @click='modifyAnswerOpen(aArticle)'>수정</b-button>
+                    </div>
+                    <div v-else>
+                        <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="(nickname===aArticle.member_nickname && selectedAnswer===false)">삭제</b-button>
+                        <b-button variant="warning" @click='modifyAnswerOpen(aArticle)' v-if="nickname===aArticle.member_nickname">수정</b-button>
+                        <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false )">채택</b-button>
+                    </div>
                 </span>
             </p> 
-
             <hr>
+            <!--내용-->
             {{aArticle.answer}}
             <hr>
-
             <!--좋아요-->
             <span v-if="like[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="likeAnswer(aArticle, false)"><i class="fas fa-heart"></i></span>
             <span v-if="!like[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="likeAnswer(aArticle, true)"><i class="fas fa-heart"></i></span>        
@@ -148,7 +161,8 @@ export default {
                 this.qPost = res.data.list[0].list[0]
                 // 태그
                 this.tags = res.data.list[1].list
-                
+
+                console.log(this.aPost.length)
             })
             .catch(err => {
                 console.log(err)
