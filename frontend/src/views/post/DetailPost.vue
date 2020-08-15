@@ -84,7 +84,7 @@
       <!-- 태그 리스트 -->
       <h4 class="mt-5">태그</h4>
       <div class="tag">
-          <span v-for="(tag,index) in this.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2">{{ tag }}</span>
+          <span v-for="(tag,index) in this.tags" :key="index" @click="searchTag(tag)" class="badge badge-pill badge-light mr-2 p-2">{{ tag }}</span>
       </div>
     </div>
   </div>
@@ -335,7 +335,11 @@ export default {
         // 포스트 디테일
         gotoDetail(post) {
             this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.member_nickname, post_id : post.postId }})
-        },    
+        },   
+        // 태그 검색
+        searchTag(tag) {
+          this.$router.push({ name : 'TagSearch', params: { keyword : tag }})
+        } 
     },
     created(){
        this.fetchPost(),
