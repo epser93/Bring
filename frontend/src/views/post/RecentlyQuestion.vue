@@ -29,6 +29,13 @@
               {{ index + 1 }}등 : {{ranker.nickname}}({{ ranker.score}}점)
           </li> 
         </ul>
+
+        <h4 class="mt-5">인기 태그</h4>
+        <ul class="tag-list text-left">
+          <li @click="searchTags(tag)" v-for="(tag, index) in tags.slice(0,10)" :key="index" class="mb-3 pl-5 trendtags">
+              # {{ tag }}
+          </li> 
+        </ul>
       </div>
     </section>
     <infinite-loading @infinite="infiniteHandler"></infinite-loading>   
@@ -48,6 +55,7 @@ export default {
       unsortedRank : [],
       list: [],
       page : 1,
+      tags : [],
     }
   },
   methods : {
@@ -79,9 +87,21 @@ export default {
         })
         .catch(err => console.log(err))
     },
+    getTags() {
+      axios.get(`${BACK_URL}/tags/qna`)
+        .then(res => {
+          this.tags = res.data.list[0].list
+        })
+        .catch(err => console.log(err))
+    },
+    searchTags(tag) {
+      console.log(tag)
+      this.$router.push({ name : 'TagSearchQuestions', params : { keyword : tag }})
+    }
   },
   created() {
-    this.getRanking()
+    this.getRanking(),
+    this.getTags()
   },
   mounted() {
   },
