@@ -35,9 +35,6 @@
                         </div>
                     </div>
 
-<!-- <toggle-button @change="onChangeEventHandler"/>
-<toggle-button v-model="myDataVariable"/> -->
-
                     <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                         <div class="modal-dialog modal-dialog-scrollable modal-sm">
                             <div class="modal-content">
@@ -69,7 +66,7 @@
                                                 <li v-for="user in followerUserImg" v-bind:key="user" class="listFollow col">
                                                     <div class="d-flex" id="modalFollow">
                                                         <img class="rounded-circle" :src=user.img alt="Card image cap" style="width:50px; height:50px; border-style: outset;">
-                                                        <router-link :to="{ name: 'Profile', query: { nickname: user.nickname }}">{{ user.nickname }}</router-link>
+                                                        <router-link :to="{ name: 'Profile', query: { nickname: user.nickname }}" data-dismiss="modal">{{ user.nickname }}</router-link>
                                                     </div>
                                                 </li>
                                             </div>
@@ -83,7 +80,7 @@
                                                 <li v-for="user in followingUserImg" v-bind:key="user" class="listFollow col">
                                                     <div class="d-flex" id="modalFollow">
                                                         <img class="rounded-circle" :src=user.img alt="Card image cap" style="width:50px; height:50px; border-style: outset;">
-                                                        <router-link :to="{ name: 'Profile', query: { nickname: user.nickname }}">{{ user.nickname }}</router-link>
+                                                        <router-link :to="{ name: 'Profile', query: { nickname: user.nickname }}" data-dismiss="modal">{{ user.nickname }}</router-link>
                                                     </div>
                                                 </li>
                                             </div>
@@ -101,7 +98,7 @@
 
 
 
-                    <!-- 육성게임 -->
+                    <!-- 육성게임  -->
                     <div class="col-6 mx-3 mt-3"> 
                         <h3 class="card-title"><b>My Level</b> </h3>
                         <div v-if="computedGrade === 'bronze'" class="mb-3">
@@ -139,29 +136,38 @@
                     </div>
                 </div>
                 <hr>
-        <!--  TIL   -->
-            <h4><b>Today I Post</b></h4>
-            
-            <calendar-heatmap
-            :values="valPostList"
-            :end-date= "todays"
-            tooltip-unit="posts"
-            :max="10"
-            :range-color="['ebedf0', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']" />
-            <!-- :range-color="['ebedf0', 'dae2ef', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']" -->
-            <hr>
 
-        <!-- 여기다가는 chart 할거임 이것도 -->
-            ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>                                
-            <br>
-            <br>
-            <br>
-            ㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡㅡ
+                <!--  TIL   -->
+                <h4><b>Today I Post</b></h4>
+                
+                <calendar-heatmap
+                :values="valPostList"
+                :end-date= "todays"
+                tooltip-unit="posts"
+                :max="10"
+                :range-color="['ebedf0', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']" />
+                <!-- :range-color="['ebedf0', 'dae2ef', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']" -->
+                <hr>
+
+
+
+                <!-- Tag chart & Today visited chart -->
+                <!-- 
+                <div>
+                    <apexchart width="500" type="bar" :options="lineOptions" :series="lineSeries"></apexchart>
+                </div> -->
+
+                <div id="chart">
+                    <h4><b>Tag List</b></h4>
+                    <div v-if="checkTag == true">
+                        <apexchart type="donut" :options="donutOptions" :series="donutSeries"></apexchart>
+                    </div>
+                    <div v-else>
+                        <br><br>
+                        <h5>게시물을 등록해보세요!</h5>
+                    </div>
+                </div>
+
         </div>
     </div>
 
@@ -171,10 +177,9 @@
 import axios from 'axios'
 import moment from 'moment'
 import { CalendarHeatmap } from 'vue-calendar-heatmap'
+import VueApexCharts from 'vue-apexcharts'
 
 const BACK_URL = 'http://127.0.0.1:8080'
-
-
 
 
 
@@ -182,8 +187,9 @@ export default {
   name: "UserCard",
   components:{
       CalendarHeatmap,
+      apexchart:VueApexCharts,
   },
-    
+ 
   data() {
     return {
         loginNickname: null,  // 로그인한 사용자 닉네임
@@ -205,6 +211,56 @@ export default {
         selectFollow: true, // 팔로우 modal 내의 check button 활성화 비활성화(toggle)
         followerUserImg:null, // 팔로우 list목록의 프로필마다 사진
         followingUserImg:null, // 팔로워 list 목록의 프로필마다 사진
+        userTagList:[], // mypage-user가 작성한 post의 tag list // 데이터 받아오는 용도
+        userTagCnt:[], // mypage-user가 작성한 post의 tag cnt 
+        checkTag:true,
+        // Tag 차트
+        donutSeries: [],
+        donutOptions: {
+            chart: {
+                type: 'donut',
+                },           
+            labels: [],
+            plotOptions: {
+                pie: {
+                    customScale: 0.9,
+                    donut: {
+                        size: '50%'
+                    }
+                }
+            },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: {
+                        width: 200
+                    },
+                  
+                    legend: {
+                        position: 'bottom'
+                        }
+                    }
+                }]
+            },
+
+        ////////////////////////////////////////////////////////////////
+        // cntToday:null,
+        // options: null,
+        // 일일 방문자 차트
+        // lineOptions: {
+        //     chart: {
+        //         id: 'vuechart-example'
+        //     },
+        //     xaxis: {
+        //         categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998]
+        //     }
+        // },
+        // lineSeries: [{
+        //     name: 'series-1',
+        //     data: [30, 40, 35, 50, 49, 60, 70, 91]
+        //     }],
+
+
     };
   },
 
@@ -417,8 +473,12 @@ export default {
             this.userPostList = res.data.list[4].list
             this.userThumbnail = res.data.list[5].list[0]
             this.userTodays = res.data.list[6].list
+            this.userScore = this.userInfo.score
 
             // TIL 찍기
+            this.valPostList = [] // 초기화
+            this.cntPostList = {} // 초기화
+
             for(var i=0; i<this.userPostList.length; i++){
                 this.userPostList[i] = moment(this.userPostList[i], "YYYY-MM-DD").format().slice(0,10)
                 if(this.userPostList[i] in this.cntPostList){
@@ -432,7 +492,6 @@ export default {
                 var tmp = {date:key, count:this.cntPostList[key]}
                 this.valPostList.push(tmp)
             }         
-            this.userScore = this.userInfo.score
             
             // 팔로우 부분
             let getFerUser = []
@@ -449,7 +508,7 @@ export default {
                 }
 
                 this.followerUserImg = getFerUser
-                console.log(this.followerUserImg)
+                //console.log(this.followerUserImg)
             }
 
             // 팔로잉 닉네임 : 팔로잉 사진
@@ -462,7 +521,7 @@ export default {
                 }
 
                 this.followingUserImg = getFingUser
-                console.log(this.followingUserImg)
+                //console.log(this.followingUserImg)
             }
 
         })
@@ -475,6 +534,53 @@ export default {
         .then(res => {
             this.userRank = res.data.list
             this.allUsers = this.userRank.length
+        })
+        .catch((err) => {
+            console.error(err)
+        })
+
+        // 유저 tag 가져오기
+        axios.get(`${BACK_URL}/tags/blog/${this.userNickname}`)
+        .then(res => {
+            
+            this.donutOptions.labels = []
+            this.donutSeries = []
+            this.userTagList = res.data.list[0].list  // 데이터 받아오는 용도
+            this.userTagCnt = res.data.list[1].list
+            var tmpTagList = []
+            var tmpTagCnt = []
+            var sumETC = 0
+            for(var i=0; i<this.userTagList.length; i++){
+                if(i >= 4){
+                    sumETC += this.userTagCnt[i]
+                }
+                else{
+                    tmpTagList.push(this.userTagList[i])
+                    tmpTagCnt.push(this.userTagCnt[i])
+                }
+            }
+            if(this.userTagList.length > 3){
+                tmpTagList.push('ETC') //donutSeries
+                tmpTagCnt.push(sumETC)
+            }           
+            this.donutOptions.labels = tmpTagList
+            this.donutSeries = tmpTagCnt
+
+            if(this.userTagList.length > 0){
+                this.checkTag = true
+            }
+            else{
+                this.checkTag = false
+            }
+
+            console.log("새로운사람")
+            console.log(tmpTagList)
+            console.log(tmpTagCnt)
+            console.log(this.userNickname)
+            console.log(this.donutSeries)
+            console.log(this.donutOptions.labels)
+        
+
         })
         .catch((err) => {
             console.error(err)
@@ -528,6 +634,11 @@ export default {
 #modalFollow{
     align-items: center;
     justify-content: space-evenly;
+}
+#chart{
+    width:300px;
+    height: 200px;
+    margin:auto;
 }
 </style>
 

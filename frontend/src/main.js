@@ -26,6 +26,8 @@ import InfiniteLoading from 'vue-infinite-loading'
 // vue-swich button
 import ToggleButton from 'vue-js-toggle-button'
  
+// vue-chart
+import VueApexCharts from 'vue-apexcharts'
 
 VueMarkdownEditor.use(vuepressTheme);
 VueMarkdownEditor.lang.use('en-US', enUS);
@@ -44,8 +46,11 @@ Vue.use(InfiniteLoading)
 
 Vue.use(ToggleButton)
 
+Vue.use(VueApexCharts)
+
 Vue.config.productionTip = false
 
+Vue.component('apexchart', VueApexCharts)
 new Vue({
   router,
   render: h => h(App)

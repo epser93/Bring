@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@kangc/v-md-editor": "^1.4.9",
+    "apexcharts": "^3.20.0",
     "axios": "^0.19.2",
     "bootstrap-vue": "^2.15.0",
     "calendar-graph": "^1.0.0",
@@ -18,6 +19,7 @@
     "moment": "^2.27.0",
     "url-search-params-polyfill": "^8.1.0",
     "vue": "^2.6.11",
+    "vue-apexcharts": "^1.6.0",
     "vue-calendar-heatmap": "^0.8.4",
     "vue-cookies": "^1.7.3",
     "vue-infinite-loading": "^2.4.5",
