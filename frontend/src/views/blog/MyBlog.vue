@@ -14,10 +14,11 @@
       <div class="row mt-3">
         <!-- 네비게이션 -->
         <div id="nav" class="col-12 ml-5">
-            <router-link :to="{ name: 'MyBlog' , params: { nickname: this.nickname }}"><h3 class="d-inline ml-5 mr-5">글</h3></router-link> 
-            <router-link :to="{ name: 'MyQuestions' , params: { nickname: this.nickname }}"><h3 class="d-inline mr-5">질문</h3></router-link> 
-            <router-link :to="{ name: 'MyAnswers' , params: { nickname: this.nickname }}"><h3 class="d-inline mr-5">답변</h3></router-link>
-            
+            <router-link :to="{ name: 'MyBlog' , params: { nickname: this.nickname }}"><h3 class="d-inline ml-5 mr-5">블로그</h3></router-link> 
+            <router-link :to="{ name: 'MyQuestions' , params: { nickname: this.nickname }}"><h3 class="d-inline mr-5">지식</h3></router-link> 
+            <span v-if="userNow === nickname">
+              <router-link :to="{ name: 'Myfeeds' , params: { nickname: this.nickname }}"><h3 class="d-inline mr-5">피드?</h3></router-link>
+            </span>
             <!-- 컴포넌트 불러오기 -->
             <div class="container-fluid mt-5">
               <router-view></router-view>
@@ -46,8 +47,8 @@ export default {
   },
   data() {
     return {
-      // 닉네임 라우터 매개변수로 받아오기
       nickname: this.$route.params.nickname,
+      userNow: this.$cookies.get('nickname'), 
       userInfo: '',
       show: false,
       cardUserImage: '',

@@ -53,7 +53,6 @@ export default {
             }
             axios.get(`${BACK_URL}/search/all_blog_posts/${this.keyword}/${this.type}`, config)
                 .then(res => {
-                    console.log(res)
                     this.postList = res.data.list[0].list
                     this.postLike1 = res.data.list[1].list
                     this.thumbnail1 = res.data.list[2].list
@@ -104,6 +103,19 @@ export default {
     mounted() {
         this.searchFor()
     },
+    watch: {
+        '$route.query.q'() {
+            this.keyword = this.$route.query.q
+            this.type = this.$route.query.type
+            this.searchFor()
+        },
+
+        '$route.query.type'() {
+            this.keyword = this.$route.query.q
+            this.type = this.$route.query.type
+            this.searchFor()
+        }
+    }
 
 }
 </script>

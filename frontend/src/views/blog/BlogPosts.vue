@@ -129,19 +129,12 @@ import axios from 'axios'
 const BACK_URL = 'http://localhost:8080'
 
 export default {
-    name: 'MyList',
+    name: 'BlogPosts',
     components: {
    
     }, 
     props: {
-        cardUserImage: {
-            type: String,
-            default: require("@/assets/img/faces/marc.jpg")
-        },
-        cardImage: {
-            type: String,
-            default: require("@/assets/img/card.jpg")
-        },
+
     },
 
     methods: {
