@@ -135,7 +135,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 #category-menu button{
     text-decoration: none;
     color: black;

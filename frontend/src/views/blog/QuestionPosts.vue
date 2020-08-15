@@ -78,9 +78,9 @@ export default {
             axios.get(`${BACK_URL}/questions/${this.nickname}/qlist`, config)
                 .then(res => {
                     // 포스트 정보
-                    this.postList = res.data.list[0].list
+                    this.postList = res.data.list[0].list.reverse()
                     // 썸네일
-                    this.thumbnail1 = res.data.list[1].list
+                    this.thumbnail1 = res.data.list[1].list.reverse()
                 })
  
                 .catch(err => {
@@ -95,9 +95,9 @@ export default {
             axios.post(`${BACK_URL}/questions/${this.nickname}/search/tags/${tag}`)
                 .then(res => {
                     // 포스트 정보
-                    this.postListTag = res.data.list[0].list
+                    this.postListTag = res.data.list[0].list.reverse()
                     // 썸네일
-                    this.thumbnail2 = res.data.list[1].list
+                    this.thumbnail2 = res.data.list[1].list.reverse()
                 })
  
                 .catch(err => {

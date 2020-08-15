@@ -22,11 +22,10 @@ import Edit from '../components/user/EditProfile.vue'
 import MyBlog from '../views/blog/MyBlog.vue'
 import MyList from '../views/blog/MyList.vue'
 import MyQuestions from '../views/blog/MyQuestions.vue'
-import MyAnswers from '../views/blog/MyAnswers.vue'
 import BlogCategory from '../views/blog/BlogCategory.vue'
 import QuestionPosts from '../views/blog/QuestionPosts.vue'
 import BlogPosts from '../views/blog/BlogPosts.vue'
-
+import MyFeeds from '../views/blog/MyFeeds.vue'
 
 // 스택오버플로우
 import Question from '../views/Question/Question.vue'
@@ -39,6 +38,7 @@ import Editor from '../views/blog/Editor.vue'
 
 // 검색
 import Search from '../components/common/Search.vue'
+import SearchQuestions from '../components/common/SearchQuestions.vue'
 import TagSearch from '../components/common/TagSearch.vue'
 
 Vue.use(VueRouter)
@@ -87,11 +87,18 @@ const routes = [{
         props: true
     },
 
-    // 헤더검색
+    // 블로그 글 헤더검색
     {
         path: '/search',
         name: 'Search',
         component: Search,
+
+    },
+    // 질문글 헤더검색
+    {
+        path: '/search-questions',
+        name: 'SearchQuestions',
+        component: SearchQuestions,
 
     },
 
@@ -126,7 +133,7 @@ const routes = [{
     },
     // 블로그 관련
     {
-        path: '/blog/:nickname',
+        path: '/:nickname/blog',
         name: 'MyBlog',
         component: MyBlog,
         props: true,
@@ -153,9 +160,9 @@ const routes = [{
                 }]
             },
             {
-                path: 'myanswers',
-                name: 'MyAnswers',
-                component: MyAnswers,
+                path: 'myfeeds',
+                name: 'Myfeeds',
+                component: MyFeeds,
 
             }
 

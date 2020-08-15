@@ -34,7 +34,7 @@
                 </ul>
 
                 <!-- 검색창 -->
-                <div class="form-inline my-2 my-lg-0">
+                <div v-if="this.mode === 'Blog'" class="form-inline my-2 my-lg-0">
                     <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-success">{{ keywordType.name }}</button>
                     <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu">
                         <button type="button" tabindex="0" @click="dropdown(typeid, value)" class="dropdown-item" v-for="(value, typeid) in dropdownList" v-bind:key="typeid">
@@ -44,6 +44,18 @@
                     <input class="form-control" type="search" v-model="keyword" placeholder="키워드 입력" aria-label="Search">
                     <button class="btn btn-outline-success my-2 my-sm-0" @click="gotoSearch">검색</button>
                 </div>
+
+                <!-- 질문 검색창 -->
+                <div v-if="this.mode === 'QnA'" class="form-inline my-2 my-lg-0">
+                    <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-success">{{ keywordType.name }}</button>
+                    <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu">
+                        <button type="button" tabindex="0" @click="dropdown(typeid, value)" class="dropdown-item" v-for="(value, typeid) in dropdownList" v-bind:key="typeid">
+                            {{ value }}
+                        </button>
+                    </div>
+                    <input class="form-control" type="search" v-model="keyword" placeholder="키워드 입력" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" @click="gotoSearchQuestions">검색</button>
+                </div>                
             </div>
         </nav>
         
@@ -100,12 +112,21 @@
                 console.error(err)
               })
           },
+
+          // 블로그 글 검색
           gotoSearch() {
             if (this.keyword.length !== 0){
               this.$router.push({name : 'Search', query: { q: this.keyword, type: this.keywordType.keyid }})
-            }
-            
+            } 
           },
+
+          // 질문 글 검색
+          gotoSearchQuestions() {
+            if (this.keyword.length !== 0){
+              this.$router.push({name : 'SearchQuestions', query: { q: this.keyword, type: this.keywordType.keyid }})
+            } 
+          },
+
           // 검색 종류 설정
           dropdown(typeid, value) {
               this.keywordType.keyid = typeid
