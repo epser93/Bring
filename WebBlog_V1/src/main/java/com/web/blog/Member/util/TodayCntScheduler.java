@@ -28,6 +28,7 @@ public class TodayCntScheduler {
             todayDateRepository.save(TodayDate.builder()
                     .date(date)
                     .cnt(member.getTodayCnt())
+                    .member(member)
                     .build());
             memberRepository.initializeTodayCnt(member.getMsrl());
         }

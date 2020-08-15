@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -219,8 +220,15 @@ public class MemberController {
         visitorCnt.add(member.getTodayCnt());
         visitorCnt.add(member.getTotalCnt());
         List<TodayDate> todayDates = todayDateRepository.findByMember_Msrl(member.getMsrl());
+        List<LocalDate> localDates = new ArrayList<>();
+        List<Integer> counts = new ArrayList<>();
+        for(TodayDate td : todayDates) {
+            localDates.add(td.getDate());
+            counts.add(td.getCnt());
+        }
         result.add(responseService.getListResult(visitorCnt));
-        result.add(responseService.getListResult(todayDates));
+        result.add(responseService.getListResult(localDates)); //투데이 반영 (00시00분에 업로드, 즉 전날까지의 데이터만!)
+        result.add(responseService.getListResult(counts)); //투데이 카운트 (00시00분에 업로드, 즉 전날까지의 데이터만!)
         //유저가 좋아요 한 글 개수
         repository.updateLikeCnt(postMemberRepository.likedPostCnt(member.getMsrl()), member.getMsrl());
 
