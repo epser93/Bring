@@ -1,25 +1,18 @@
 package com.web.blog.Member.service;
 
-import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Common.advice.exception.CAlreadyFollowedException;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
 import com.web.blog.Common.advice.exception.CYouHaveNotFollowedThisBlogerEver;
-import com.web.blog.Common.model.Paging;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.repository.FollowRepository;
 import com.web.blog.Member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -90,20 +83,20 @@ public class FollowService implements Serializable {
         return true;
     }
 
-    @Cacheable(value = "semiFinalList")
-    public List<Post> feedCaching(List<Long> followings, long no) {
-        Paging paging = new Paging(no);
-        LocalDateTime date = LocalDateTime.now();
-        date.minus(3, ChronoUnit.DAYS);
-        List<Post> semiFinalList = new ArrayList<>();
-        for (long userNo : followings) {
-            Member following = memberRepository.findById(userNo).get();
-            List<Post> list = postRepository.findAllByMember_NicknameAndBoard_NameNotLikeAndCreatedAtLessThanEqualOrderByCreatedAtDesc(following.getNickname(), "나의 Answers", date, PageRequest.of(paging.getPageNo() - 1, 3));
-            for (Post opm : list) {
-                semiFinalList.add(opm);
-            }
-        }
-        Collections.shuffle(semiFinalList);
-        return semiFinalList;
-    }
+//    @Cacheable(value = "semiFinalList")
+//    public List<Post> feedCaching(List<Long> followings, long no) {
+//        Paging paging = new Paging(no);
+//        LocalDateTime date = LocalDateTime.now();
+//        date.minus(3, ChronoUnit.DAYS);
+//        List<Post> semiFinalList = new ArrayList<>();
+//        for (long userNo : followings) {
+//            Member following = memberRepository.findById(userNo).get();
+//            List<Post> list = postRepository.findAllByMember_NicknameAndBoard_NameNotLikeAndCreatedAtLessThanEqualOrderByCreatedAtDesc(following.getNickname(), "나의 Answers", date, PageRequest.of(paging.getPageNo() - 1, 3));
+//            for (Post opm : list) {
+//                semiFinalList.add(opm);
+//            }
+//        }
+//        Collections.shuffle(semiFinalList);
+//        return semiFinalList;
+//    }
 }

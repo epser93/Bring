@@ -20,11 +20,13 @@ import com.web.blog.Common.service.ResponseService;
 import com.web.blog.Common.service.S3Service;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.entity.ProfileImg;
+import com.web.blog.Member.entity.TodayDate;
 import com.web.blog.Member.model.OnlyMemberMapping;
 import com.web.blog.Member.model.ParamPassword;
 import com.web.blog.Member.model.ProfileImgDto;
 import com.web.blog.Member.repository.MemberRepository;
 import com.web.blog.Member.repository.ProfileImgRepository;
+import com.web.blog.Member.repository.TodayDateRepository;
 import com.web.blog.Member.service.FollowService;
 import com.web.blog.Member.service.ProfileImgService;
 import com.web.blog.QnA.model.OnlyApostMapping;
@@ -70,6 +72,7 @@ public class MemberController {
     private final QpostRepository qpostRepository;
     private final ApostRepository apostRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final TodayDateRepository todayDateRepository;
     private static final Logger logger = LoggerFactory.getLogger(MemberController.class);
 
     @ApiImplicitParams({
@@ -215,7 +218,9 @@ public class MemberController {
         List<Integer> visitorCnt = new ArrayList<>();
         visitorCnt.add(member.getTodayCnt());
         visitorCnt.add(member.getTotalCnt());
+        List<TodayDate> todayDates = todayDateRepository.findByMember_Msrl(member.getMsrl());
         result.add(responseService.getListResult(visitorCnt));
+        result.add(responseService.getListResult(todayDates));
         //유저가 좋아요 한 글 개수
         repository.updateLikeCnt(postMemberRepository.likedPostCnt(member.getMsrl()), member.getMsrl());
 
