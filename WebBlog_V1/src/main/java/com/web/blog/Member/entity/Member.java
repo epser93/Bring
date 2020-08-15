@@ -73,7 +73,12 @@ public class Member extends CommonDateEntity implements UserDetails, Serializabl
 
     private int totalCnt;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"}) //No serializer found for class org.hibernate.proxy.pojo.bytebuddy.ByteBuddyInterceptor and no properties discovered to create BeanSerializer //아마 LAZY 로딩으로 인한 오류같음. hibernateLazyInitializer로 수정.
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @OneToMany(mappedBy = "member", cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
+    private List<TodayDate> todayDates = new ArrayList<>();
+
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    //No serializer found for class org.hibernate.proxy.pojo.bytebuddy.ByteBuddyInterceptor and no properties discovered to create BeanSerializer //아마 LAZY 로딩으로 인한 오류같음. hibernateLazyInitializer로 수정.
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Board> boards = new ArrayList<>();
 

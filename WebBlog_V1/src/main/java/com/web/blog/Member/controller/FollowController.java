@@ -30,6 +30,7 @@ import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -107,13 +108,13 @@ public class FollowController {
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
     })
     @ApiOperation(value = "팔로잉 피드", notes = "사용자가 팔로우 하는 사람들의 최신글")
-    @GetMapping(value = "/follow/{msrl}/feed")
-    public ListResult<ListResult> getFollowingFeed(@PathVariable long msrl, @RequestParam(required = false, defaultValue = "1") long no) {
+    @GetMapping(value = "/follow/feed")
+    public ListResult<ListResult> getFollowingFeed() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = memberRepository.findByUid(uid);
         LocalDateTime date = LocalDateTime.now();
-        date.minus(3, ChronoUnit.DAYS);
+        date.minus(2, ChronoUnit.DAYS);
         List<ListResult> results = new ArrayList<>();
         List<Post> semiFinalList = new ArrayList<>();
         List<OnlyPostMappingForFeed> finalList = new ArrayList<>();
@@ -121,9 +122,16 @@ public class FollowController {
         List<Boolean> amIInTheList = new ArrayList<>();
         List<String> filePaths = new ArrayList<>();
         List<Long> followings = followRepository.followingMember(logined.get().getMsrl());
-        semiFinalList = followService.feedCaching(followings, no);
-        for (int i = 0; i < 8 && i + (no - 1) * 8 < semiFinalList.size(); i++) {
-            Post post = semiFinalList.get((i + ((int) no - 1) * 8));
+        date.minus(3, ChronoUnit.DAYS);
+        for (long userNo : followings) {
+            Member following = memberRepository.findById(userNo).get();
+            List<Post> list = postRepository.findAllByMember_NicknameAndBoard_NameNotLikeAndCreatedAtLessThanEqualOrderByCreatedAtDesc(following.getNickname(), "나의 Answers", date);
+            for (Post opm : list) {
+                semiFinalList.add(opm);
+            }
+        }
+        for (int i = 0; i < semiFinalList.size(); i++) {
+            Post post = semiFinalList.get(i);
             OnlyPostMappingForFeed onlyPostMapping = new OnlyPostMappingForFeed() {
                 @Override
                 public Long getPostId() {
@@ -182,6 +190,7 @@ public class FollowController {
             };
             finalList.add(onlyPostMapping);
         }
+        Collections.shuffle(finalList);
         results.add(responseService.getListResult(finalList));
         for(OnlyPostMappingForFeed opmf : finalList) {
             long postId = opmf.getPostId();
