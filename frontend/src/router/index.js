@@ -40,6 +40,7 @@ import Editor from '../views/blog/Editor.vue'
 import Search from '../components/common/Search.vue'
 import SearchQuestions from '../components/common/SearchQuestions.vue'
 import TagSearch from '../components/common/TagSearch.vue'
+import TagSearchQuestions from '../components/common/TagSearchQuestions.vue'
 
 Vue.use(VueRouter)
 
@@ -63,7 +64,7 @@ const routes = [{
                 component: HotPost
             },
             {
-                path: 'recentlyquetion',
+                path: 'recentlyquestion',
                 name: 'RecentlyQuestion',
                 component: RecentlyQuestion
             },
@@ -107,6 +108,14 @@ const routes = [{
         path: '/tag/:keyword',
         name: 'TagSearch',
         component: TagSearch,
+
+    },
+
+    // 질문 태그검색
+    {
+        path: '/question-tag/:keyword',
+        name: 'TagSearchQuestions',
+        component: TagSearchQuestions,
 
     },
 

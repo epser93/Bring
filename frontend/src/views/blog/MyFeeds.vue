@@ -13,12 +13,12 @@
                         <h5 class="card-title">{{ item.subject.slice(0, 10) + '...'  }}</h5>
                         <p class="card-text mb-3">{{ item.content.slice(0, 20) + '...' }}</p>
                         <!-- 좋아요 부분 -->
-                        <b-icon icon="heart-fill" v-if="postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="postLike(item, false, 1)"></b-icon>
-                        <b-icon icon="heart" v-if="!postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="postLike(item, true, 1)"></b-icon>
+                        <b-icon icon="heart-fill" v-if="postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="postLike(item, false)"></b-icon>
+                        <b-icon icon="heart" v-if="!postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="postLike(item, true)"></b-icon>
                         <small :ref="'like-count-' + item.postId">{{ item.likes }}</small><small>개의 좋아요</small>
                     </div>
                     <div class="card-footer bg-transparent">
-                        <button class="btn btn-sm" @click="gotoDetail(item)">글 보기</button>
+                        <button class="btn btn-sm" @click="gotoDetail(item, index)">글 보기</button>
                     </div>
                 </div>
             </div>
@@ -43,10 +43,11 @@ export default {
       return {
         postList: [],
         postLike1: [],
-        thumbnail: [],
+        thumbnail1: [],
+        boardName: [],
       }
     },
-    mounted() {
+    created() {
       this.getPosts()
     },
 
@@ -63,11 +64,13 @@ export default {
                 .then(res => {
                   console.log(res.data)
                     // 썸네일
-                    this.thumbnail = res.data.list[2].list.reverse()
+                    this.thumbnail1 = res.data.list[3].list.reverse()
                     // 포스트 정보
                     this.postList = res.data.list[0].list.reverse()
                     // 포스트에 사용자가 좋아요를 눌렀는지에 대한 불린 값
-                    this.postLike1 = res.data.list[1].list.reverse()
+                    this.postLike1 = res.data.list[2].list.reverse()
+                    // 보드네임
+                    this.boardName = res.data.list[1].list.reverse()
                 })
  
                 .catch(err => {
@@ -76,12 +79,12 @@ export default {
         },
  
         // 포스트 디테일
-        gotoDetail(post) {
-            this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.member_nickname, post_id : post.postId }})
+        gotoDetail(post, index) {
+            this.$router.push({ name : "DetailPost" , params: { boardName: this.boardName[index], nickname : post.member_nickname, post_id : post.postId }})
         },    
 
         // 좋아요
-        postLike(post, likeit, num) {
+        postLike(post, likeit) {
             const config = {
                 headers: {
                     'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
@@ -94,15 +97,9 @@ export default {
                 axios.post(`${BACK_URL}/blog/${post.member_nickname}/like/${post.postId}`, likeit, config)
                     .then(res => {
                         // 좋아요 수 바꾸기(화면에서)
+                        console.log(res.data)
                         this.$refs[`like-count-${post.postId}`][0].innerText = res.data.data    
-                        if (num === 1) {
-                            this.getAllPosts()  
-                        } else if (num === 2) {
-                            this.getSomePosts(this.c) 
-                        } else if (num === 3) {
-                            this.searchFor(this.k, this.type)
-                        }
-                                    
+                        this.getPosts()            
                     })
                     .catch(err => {
                         console.log(err)
@@ -111,14 +108,9 @@ export default {
                 axios.post(`${BACK_URL}/blog/${post.member_nickname}/like/${post.postId}`, likeit, config)
                     .then(res => {
                         // 좋아요 수 바꾸기(화면에서)
+                        console.log(res.data)
                         this.$refs[`like-count-${post.postId}`][0].innerText = res.data.data   
-                        if (num === 1) {
-                            this.getAllPosts()  
-                        } else if (num === 2) {
-                            this.getSomePosts(this.currentCategory) 
-                        } else if (num === 3)  {
-                            this.searchFor(this.k, this.type)
-                        }                   
+                        this.getPosts()
                     })
                     .catch(err => {
                         console.log(err)
