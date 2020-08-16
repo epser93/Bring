@@ -1,6 +1,6 @@
 <template>
 
-    <div v-if="show" id="blog">
+    <div id="blog">
       <!-- 프로필 -->
       <div id="upsideTerritory" class="row ml-4 mr-4">
         <div class="ml-5 mt-3">
@@ -14,8 +14,8 @@
       <div class="row mt-3">
         <!-- 네비게이션 -->
         <div id="nav" class="col-12 ml-5">
-            <router-link :to="{ name: 'MyBlog' , params: { nickname: this.nickname }}"><h3 class="d-inline ml-5 mr-5">블로그</h3></router-link> 
-            <router-link :to="{ name: 'MyQuestions' , params: { nickname: this.nickname }}"><h3 class="d-inline mr-5">지식</h3></router-link> 
+            <router-link :to="{ name: 'MyBlog' , params: { nickname: this.nickname }}"><h3 :ref="'blog-word'" class="d-inline ml-5 mr-5">블로그</h3></router-link> 
+            <router-link :to="{ name: 'MyQuestions' , params: { nickname: this.nickname }}"><h3 :ref="'gisik-word'" class="d-inline mr-5">지식</h3></router-link> 
             <span v-if="userNow === nickname">
               <router-link :to="{ name: 'Myfeeds' , params: { nickname: this.nickname }}"><h3 class="d-inline mr-5">피드?</h3></router-link>
             </span>
@@ -50,7 +50,6 @@ export default {
       nickname: this.$route.params.nickname,
       userNow: this.$cookies.get('nickname'), 
       userInfo: '',
-      show: false,
       cardUserImage: '',
     }
   },
@@ -80,12 +79,33 @@ export default {
     this.getUserInfo(this.nickname)
   },
   mounted() {
-    this.show = !this.show
+    if (this.$route.path.match('/blog/') && !this.$route.path.match('/blog/my')) {
+      this.$refs['blog-word'].style.color = "#42b983"
+      this.$refs['gisik-word'].style.color = "#2c3e50"
+    } else if (this.$route.path.match('/blog/myquestions/')) {
+      this.$refs['gisik-word'].style.color = "#42b983"
+      this.$refs['blog-word'].style.color = "#2c3e50"
+    } else if (this.$route.path.match('/blog/myfeeds')) {
+      this.$refs['blog-word'].style.color = "#2c3e50"
+      this.$refs['gisik-word'].style.color = "#2c3e50"
+    }
   },
   watch: {
     '$route.params.nickname' () {
-      // 동일한 경로의 params 변경 사항에 반응하려면
       location.reload()
+    },
+
+    '$route.path' () {
+      if (this.$route.path.match('/blog/') && !this.$route.path.match('/blog/my')) {
+        this.$refs['blog-word'].style.color = "#42b983"
+        this.$refs['gisik-word'].style.color = "#2c3e50"
+      } else if (this.$route.path.match('/blog/myquestions/')) {
+        this.$refs['gisik-word'].style.color = "#42b983"
+        this.$refs['blog-word'].style.color = "#2c3e50"
+      } else if (this.$route.path.match('/blog/myfeeds')) {
+        this.$refs['blog-word'].style.color = "#2c3e50"
+        this.$refs['gisik-word'].style.color = "#2c3e50"
+      }
     }
   }
 }

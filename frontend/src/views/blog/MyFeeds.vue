@@ -13,9 +13,9 @@
                         <h5 class="card-title">{{ item.subject.slice(0, 10) + '...'  }}</h5>
                         <p class="card-text mb-3">{{ item.content.slice(0, 20) + '...' }}</p>
                         <!-- 좋아요 부분 -->
-                        <b-icon icon="heart-fill" v-if="postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="postLike(item, false)"></b-icon>
-                        <b-icon icon="heart" v-if="!postLike1[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="postLike(item, true)"></b-icon>
-                        <small :ref="'like-count-' + item.postId">{{ item.likes }}</small><small>개의 좋아요</small>
+                        <b-icon icon="heart-fill" v-if="postLike1[index]" class="d-inline mr-1" style="color: crimson;" @click="postLike(item, false)"></b-icon>
+                        <b-icon icon="heart" v-if="!postLike1[index]" class="d-inline mr-1" style="color: black;" @click="postLike(item, true)"></b-icon>
+                        <small>{{ item.likes }}</small><small>개의 좋아요</small>
                     </div>
                     <div class="card-footer bg-transparent">
                         <button class="btn btn-sm" @click="gotoDetail(item, index)">글 보기</button>
@@ -58,11 +58,9 @@ export default {
                     'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
                 }
             }
-            const msrl = this.$cookies.get('msrl')
 
-            axios.get(`${BACK_URL}/follow/${msrl}/feed`, config)
+            axios.get(`${BACK_URL}/follow/feed`, config)
                 .then(res => {
-                  console.log(res.data)
                     // 썸네일
                     this.thumbnail1 = res.data.list[3].list.reverse()
                     // 포스트 정보
@@ -83,40 +81,6 @@ export default {
             this.$router.push({ name : "DetailPost" , params: { boardName: this.boardName[index], nickname : post.member_nickname, post_id : post.postId }})
         },    
 
-        // 좋아요
-        postLike(post, likeit) {
-            const config = {
-                headers: {
-                    'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
-                    'Content-Type': 'application/json'
-                }
-            }
-            // 좋아요 현 상태로 구분
-            
-            if (likeit === false) {
-                axios.post(`${BACK_URL}/blog/${post.member_nickname}/like/${post.postId}`, likeit, config)
-                    .then(res => {
-                        // 좋아요 수 바꾸기(화면에서)
-                        console.log(res.data)
-                        this.$refs[`like-count-${post.postId}`][0].innerText = res.data.data    
-                        this.getPosts()            
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })   
-            } else {
-                axios.post(`${BACK_URL}/blog/${post.member_nickname}/like/${post.postId}`, likeit, config)
-                    .then(res => {
-                        // 좋아요 수 바꾸기(화면에서)
-                        console.log(res.data)
-                        this.$refs[`like-count-${post.postId}`][0].innerText = res.data.data   
-                        this.getPosts()
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })   
-            }        
-        },
     },
 }
 </script>
