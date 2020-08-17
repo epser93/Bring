@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="blog-posts">
       <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
         <!-- 글 리스트 -->
         <div v-if="this.categoryOn === 1" class="col-12 p-0 m-0 container">
@@ -9,19 +9,24 @@
             <div class="row">
                 <div v-for="(item, index) in postList" :key="item.postId" class="p-0 mb-5 col-12">
                     <div class="card-list">
-                        <div class="card-header text-center bg-transparent p-5">
-                            <h4 class="card-title mb-4">{{ item.subject }}</h4>
-                            <span>{{ item.createdAt.slice(0,10) }}</span> 
+                        <div class="card-header text-left bg-transparent p-5 d-flex justify-content-between">
+                            <h4 class="card-title m-0"><strong>{{ item.subject }}</strong></h4>
                             <span class="vertical-line mx-3"></span>
-                            <span>{{ item.member_nickname }}</span>
+                            <div>
+                                <p>{{ item.createdAt.slice(0,10) }}</p> 
+                                
+                                <p>{{ item.member_nickname }}</p>
+                            </div>
                         </div>
 
                         <div class="card-list-body p-5">
-                            <img :src="thumbnail1[index]" alt="Card image cap" style="height: 300px; width: 100%">
+                            <div class="card-image">
+                                <img :src="thumbnail1[index]" alt="Card image cap">
+                            </div>
                             <p class="card-list-text my-5">{{ item.content.slice(0, 200) }}</p>
 
                             <div class="d-flex justify-content-between">
-                                <span style="cursor: pointer; border: 1px solid #e7e7e7;" class="py-3 px-5" @click="gotoDetail(item)">글 더보기</span>
+                                <a class="py-3 px-5" @click="gotoDetail(item)">글 더보기</a>
                                 <div class="py-3 px-5">
                                     <!-- 좋아요 부분 -->
                                     <i class="far fa-eye"></i>{{ item.views }}
@@ -129,6 +134,7 @@
 
 <script>
 import axios from 'axios'
+import { EventBus } from '../../event-bus.js'
 
 const BACK_URL = 'http://localhost:8080'
 
@@ -154,7 +160,7 @@ export default {
                 }
             }
             this.categoryOn = 1
-            axios.get(`${BACK_URL}/blog/${this.nickname}/post_list?no=${this.currentPage}`, config)
+            axios.get(`${BACK_URL}/blog/${this.nickname}/post_list?no=${this.numOfPage}`, config)
                 .then(res => {
                     // 썸네일
                     this.thumbnail1 = res.data.list[2].list.reverse()
@@ -177,7 +183,7 @@ export default {
                 }
             }
             this.categoryOn = 2
-            axios.get(`${BACK_URL}/blog/${this.nickname}/${categoryName}/post_list`, config)
+            axios.get(`${BACK_URL}/blog/${this.nickname}/${categoryName}/post_list?no=${this.numOfPage}`, config)
                 .then(res => {
                     this.postListCategory = res.data.list[0].list.reverse()
                     this.postLike2 = res.data.list[1].list.reverse()
@@ -218,7 +224,7 @@ export default {
                 }
             }
             this.categoryOn = 4
-            axios.post(`${BACK_URL}/blog/${this.nickname}/search/tags/${tag}`, config)
+            axios.post(`${BACK_URL}/blog/${this.nickname}/search/tags/${tag}?no=${this.numOfPage}`, config)
                 .then(res => {
                     this.postListTag = res.data.list[0].list.reverse()
                     this.postLike4 = res.data.list[1].list.reverse()
@@ -298,6 +304,10 @@ export default {
         } else {
             this.getAllPosts()
         }
+
+        EventBus.$on("paging", currentPage => {
+            this.numOfPage = currentPage
+        })
     },
     watch: {
       // 카테고리가 있는 경우
@@ -334,6 +344,25 @@ export default {
         } else {
           this.getAllPosts() 
         }               
+      },
+
+      // 페이지네이션
+      'numOfPage' () {
+        this.c = this.$route.query.c
+        this.k = this.$route.query.k
+        this.type = this.$route.query.type
+        this.t = this.$route.query.t
+        // 카테고리가 있는 경우
+        if (this.c) {
+            this.getSomePosts(this.c)
+        // 검색 키워드 있으면
+        } else if (this.k) {
+            this.searchFor(this.k, this.type)
+        } else if (this.t) {
+            this.getTagPosts(this.t)
+        } else {
+            this.getAllPosts()
+        }
       }
     },
 
@@ -365,6 +394,9 @@ export default {
             postLike2: [],
             postLike3: [],
             postLike4: [],
+
+            // 페이지네이션
+            numOfPage: 1,
         }
     },
 
@@ -372,13 +404,16 @@ export default {
 </script>
 
 <style>
+#blog-posts {
+    min-height: 1000px;
+}
+
 .card-list {
     background-color: #ffffff;
     border: 1px solid #e7e7e7;
 }
 
 .vertical-line {
-
     background-color: #e7e7e7;
     border: 1px solid #e7e7e7 ;
 }
@@ -390,4 +425,27 @@ export default {
     color: #6b6b6b
 }
 
+.card-list a {
+    cursor: pointer;
+    text-decoration: none;
+    transition-duration: 0.3s;
+    border: 1px solid #e7e7e7;
+}
+.card-list a:hover {
+    color: #56dbc9 !important;
+    border: 1px solid #99c9c2 !important;
+}
+
+.card-image{
+    overflow: hidden;
+}
+
+.card-image img{
+    height: 300px;
+    width: 90%;
+}
+
+.card-title {
+    width: 70%;
+}
 </style>
