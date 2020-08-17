@@ -1,11 +1,11 @@
 <template>
     <div id="blog" class= "row">
       <!-- 프로필 -->
-      <div class="info col-12 col-lg-4 px-5 py-4">
-        <a class="">
-          <img @click="gotoProfile" class="rounded-circle mx-auto img-thumbnail mb-3" :src='cardUserImage' alt="Card image cap" style="width: 70px;">
+      <div class="info col-12 col-lg-4 px-5 py-4 mt-3">
+        <a class="" style="cursor:pointer;">
+          <img @click="gotoProfile" class="rounded-circle mx-auto img-thumbnail mb-3" :src='cardUserImage' alt="Card image cap" style="width: 90px; height:90px;">
         </a>
-          <h3 class="">{{ this.userInfo.nickname }}</h3>
+          <h3 class=""><strong>{{ this.userInfo.nickname }}</strong></h3>
           <h4 class="mb-3">'s Blog</h4>
           <p class="card-list-text">{{ this.userInfo.nickname }}의 개인 블로그에 오신것을</p>
           <p class="card-list-text mb-5">환영합니다!</p>
@@ -126,7 +126,7 @@ export default {
 
     #nav {
       padding: 30px;
-      margin: 30px 0 0 0;
+      margin: 50px 0 0 0;
     }
 
     .info {
@@ -149,6 +149,7 @@ export default {
   color: #2c3e50;
   text-decoration: none;
 }
+
 
 #nav a.router-link-exact-active {
   color: #56dbc9;

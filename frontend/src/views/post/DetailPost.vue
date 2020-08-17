@@ -2,31 +2,30 @@
   <div id="detail" class="row">
 
     <!-- 중심 부분 -->
-    <div class="wrapper text-left col-12 col-lg-8">
-        <div class="info mb-5">
+    <div class="wrapper text-left col-12 col-lg-8 mt-5 px-5">
+        <!-- 글쓴이 정보 -->
+        <div class="info text-center my-5">
             <h1 class="mb-3">{{subject}}</h1>
+            <span class="text-muted">{{ createdAt.slice(0, 10) }}</span>
+            <span class="vertical-line mx-3"></span>
+            <span class="mr-2"><strong>{{ member_nickname }}</strong></span>
             <div class="text-right">
               <button class="btn btn-outline-warning btn-sm mx-1" v-if="(member_nickname === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="updatePost"><b-icon icon="trash"></b-icon> 수정</button>
               <button class="btn btn-outline-danger btn-sm mx-1" v-if="(member_nickname === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="deletePost"><b-icon icon="trash"></b-icon> 삭제</button>
           </div>
         </div>
+        <hr>
         
         <!-- 글 -->
-        <p v-html="compiledMarkdown"></p>
+        <p class="mt-4" v-html="compiledMarkdown"></p>
 
-        <!-- 포스트 정보 박스 -->
-        <div class="bg-light" style="margin: 100px 0 50px;">
-            <span class="mr-2"><strong>{{ member_nickname }}</strong></span>
-            <span class="text-muted">{{ createdAt }}</span>
-            <p>조회수: {{ views }}</p>
-            
-        </div>
-
-        <!-- 좋아요 -->
-        <div class="mb-5">
-          <b-icon icon="heart-fill" v-if="likeItOrNot" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="postLike(false)"></b-icon>
-          <b-icon icon="heart" v-if="!likeItOrNot" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="postLike(true)"></b-icon>          
-          <span :ref="'like-count-' + post_id">{{ likes }}</span>
+        <!-- 기타 정보 -->
+        <div class="" style="margin: 100px 0 50px;">     
+            <b-icon icon="heart-fill" v-if="likeItOrNot" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="postLike(false)"></b-icon>
+            <b-icon icon="heart" v-if="!likeItOrNot" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="postLike(true)"></b-icon>          
+            <span :ref="'like-count-' + post_id">{{ likes }}</span>
+            <span class="vertical-line mx-3"></span>
+            <i class="far fa-eye"></i>{{ views }}
         </div>
 
         <!-- 댓글 입력 부분 -->
@@ -45,46 +44,48 @@
               <button class="btn btn-success btn-sm mx-1" @click='commentClose'>답변창 닫기</button>
           </span>
           <span v-else>
-              <button class="btn btn-success btn-sm mx-1" @click='commentOpen'>답변창 열기</button>
+              <a class="p-2" @click='commentOpen'>답변창 열기</a>
           </span>
         </div>
 
         <!-- 댓글 목록부분 -->
-        <h3 class="mt-5">{{ recentlyComments.length }} Comments</h3>
+        <h3 class="mt-5 mb-4">{{ recentlyComments.length }} Comments</h3>
         <div class="ml-3" v-for="(comment,index) in recentlyComments" :key="comment.replyId">
-          <p>{{ comment.member_nickname }}</p>
-          <p>{{ comment.reply }}</p>
-          <p>{{ comment.replyId }}</p>
+          <strong>{{ comment.member_nickname }}</strong>
+          <p class="my-3">{{ comment.reply }}</p>
           <!-- 좋아요 -->
           <b-icon icon="heart-fill" v-if="commentsLike[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="commentLike(comment.replyId, comment.member_nickname, false)"></b-icon>
           <b-icon icon="heart" v-if="!commentsLike[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="commentLike(comment.replyId, comment.member_nickname, true)"></b-icon>          
           <span :ref="'like-comment-' + comment.replyId">{{ comment.likes }}</span>
-          <p>{{ comment.createdAt }}</p>
-          <button class="btn btn-outline-success btn-sm mx-1" v-if="$cookies.get('nickname') === comment.member_nickname" @click="commentDelete(comment)">삭제</button>
-          <button class="btn btn-outline-success btn-sm" v-if="$cookies.get('nickname') === comment.member_nickname" @click="openCommentUpdate(comment), setXY($event)">수정</button>
+          <span class="vertical-line mx-3"></span>
+          <span>{{ comment.createdAt.slice(0,10) }}</span>
+          <a class="btn btn-outline-success btn-sm ml-4" v-if="$cookies.get('nickname') === comment.member_nickname" @click="commentDelete(comment)">삭제</a>
+          <a class="btn btn-outline-success btn-sm" v-if="$cookies.get('nickname') === comment.member_nickname" @click="openCommentUpdate(comment), setXY($event)">수정</a>
+          <hr>
         </div>
     </div>
-
+          
     <!-- 오른쪽 바 -->
-    <div class="mt-5 col-12 col-lg-3">
-      <!-- 카테고리 글(카테고리 내부에서 또 글 번호 매겨져야?) -->
-      <h4>{{ member_nickname }}의 다른 글</h4>
-      <div v-for="(item, index) in postListCategory" :key="item.postId" class="list-group">
-        <button v-if="item.postId != post_id" @click="gotoDetail(item)" class="list-group-item list-group-item-action flex-column align-items-start p-0">
-          <div class="d-flex w-100">
-            <img class="mr-3" :src="thumbnail2[index]" alt="" style="height: 80px; width:80px;">
-            <div class="">
-              <p class="mb-1"><strong>{{ item.subject }}</strong></p>
-              <small>3 days ago</small>
-            </div>
-          </div>
-        </button>
-      </div>
-      
+    <div class="mt-5 col-6 col-lg-3 text-left pl-5">
       <!-- 태그 리스트 -->
-      <h4 class="mt-5">태그</h4>
-      <div class="tag">
-          <span v-for="(tag,index) in this.tags" :key="index" @click="searchTag(tag)" class="badge badge-pill badge-light mr-2 p-2">{{ tag }}</span>
+      <h4 class="">태그</h4>
+      <div class="tagcloud mb-5">
+          <a v-for="(tag,index) in this.tags" :key="index" @click="searchTag(tag)" class="tag-cloud-link">{{ tag }}</a>
+      </div>
+
+      <!-- 카테고리 글(카테고리 내부에서 또 글 번호 매겨져야?) -->
+      <h4 class="mb-3">{{ member_nickname }}의 다른 글</h4>
+      <hr>
+      <div v-for="(item, index) in postListCategory" :key="item.postId" class="list-group">
+        <div v-if="item.postId != post_id" class="category-posts mb-4 p-0">
+          <div class="card-wrapper">
+            <div class="category-post-img" @click="gotoDetail(item)"><img class="mr-3" :src="thumbnail2[index]" style="height: 180px; width:100%;"></div>
+          </div>
+          <div class="text-left ml-2 p-3">
+            <p @click="gotoDetail(item)"><strong>{{ item.subject }}</strong></p>
+            <small class="text-muted ml-1">{{ item.createdAt.slice(0, 10) }}</small>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -367,9 +368,82 @@ export default {
 #detail {
   display: flex;
   justify-content: center;
+  font-family: 'Noto Serif KR', serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f4f4f4;
 }
 
-.badge {
-  cursor: pointer;
+.wrapper {
+  background-color: white;
+  border: 1px solid #e7e7e7;
+  min-height: 700px;
 }
+
+
+#commentTextArea a {
+    cursor: pointer;
+    text-decoration: none;
+    transition-duration: 0.3s;
+    border: 1px solid #e7e7e7;
+}
+
+#commentTextArea a:hover {
+    color: #56dbc9 !important;
+    border: 1px solid #99c9c2 !important;
+}
+
+.tagcloud {
+  padding: 0; }
+  .tagcloud a {
+    text-transform: uppercase;
+    display: inline-block;
+    padding: 4px 10px;
+    margin-bottom: 7px;
+    margin-right: 4px;
+    border-radius: 4px;
+    color: #000000;
+    border: 1px solid #ccc;
+    font-size: 11px; }
+    .tagcloud a:hover {
+      transition-duration: 0.5s;
+      border: 1px solid #000; }
+
+.category-posts {
+  background-color: white;
+  border: 1px solid #e7e7e7;  
+}
+
+.category-posts p {
+    cursor: pointer;
+    text-decoration: none;
+    transition-duration: 0.3s;
+}
+.category-posts p:hover {
+    color: #56dbc9 !important;
+}
+
+.category-post-img {
+  transform: scale(1);
+  -webkit-transform: scale(1);
+  -moz-transform: scale(1);
+  -ms-transform: scale(1);
+  -o-transform: scale(1);
+  transition: all 0.3s ease-in-out;
+}
+
+.category-post-img:hover {
+  transform: scale(1.1);
+  -webkit-transform: scale(1.1);
+  -moz-transform: scale(1.1);
+  -ms-transform: scale(1.1);
+  -o-transform: scale(1.1);
+}
+
+.card-wrapper {
+  height: 180px; 
+  width:100%;
+  overflow:hidden;
+  cursor: pointer;
+  } 
 </style>
