@@ -1,58 +1,66 @@
 <template>
-    <div id="mylist" class="row">
-        <!-- 사이드 바 -->
-        <div id="nav" class="col-2 flex-column text-left p-0">
-            <h5>카테고리</h5>
-            <hr class="ml-0" style="width:70%;">
-            <router-link :to="{ name: 'MyBlog' , params: { nickname: this.nickname }}"><p>전체보기 ({{ numOfPosts }})</p></router-link> 
-            <div v-for="category in categoryList" :key="category.name">
-                <router-link :to="{ name: 'MyBlog' , query : { c: category.name }}"><p>{{ category.name }}({{ category.postCnt }})</p></router-link> 
-            </div>
+    <div id="mylist" class="">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
+        <!-- 컴포넌트 불러오기 -->
+        <div class="container-fluid col-12">
+            <router-view></router-view>
+        </div>
 
+        <!-- 페이지네이션 -->
+        <BlogPagination />
+
+        <!-- 사이드 바 -->
+        <div id="nav-mylist" class="flex-column text-left p-0">
             <!-- 검색창 -->
-            <div class="mt-5">
-                <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-success">{{ keywordType.name }}</button>
+            <div class="my-5 text-center">
+                <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-secondary">{{ keywordType.name }}</button>
                 <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu">
                     <button type="button" tabindex="0" @click="dropdown(typeid, value)" class="dropdown-item" v-for="(value, typeid) in dropdownList" v-bind:key="typeid">
                         {{ value }}
                     </button>
                 </div>
-                <input class="form-control mr-sm-2 w-75" type="search" v-model="keyword" placeholder="키워드 입력" aria-label="Search">
-                <button class="btn btn-outline-success my-2 my-sm-0">
-                    <router-link :to="{ name: 'MyBlog' , query : { k: keyword, type: this.keywordType.keyid }}"><p>검색</p></router-link>
+                <input v-model="keyword" placeholder="키워드 입력" aria-label="Search">
+                <button class="btn btn-link my-2 my-sm-0">
+                    <router-link :to="{ name: 'MyBlog' , query : { k: keyword, type: this.keywordType.keyid }}"><i class="fas fa-search"></i></router-link>
                 </button>
             </div>
 
+            <!-- 카테고리 목록 -->
+            <h5>카테고리</h5>
+            <hr class="mb-4">
+            <div class="px-5">
+                <router-link :to="{ name: 'MyBlog' , params: { nickname: this.nickname }}">전체보기 <span class="float-right">({{ numOfPosts }})</span><hr></router-link> 
+                <div class="m-0 p-0" v-for="category in categoryList" :key="category.name">
+                    <router-link :to="{ name: 'MyBlog' , query : { c: category.name }}">{{ category.name }}<span class="float-right">({{ category.postCnt }})</span><hr></router-link> 
+                </div>
+            </div>
+            
             <!-- 태그 리스트 -->
             <h5 class="mt-5">태그</h5>
-            <div class="tag mb-5">
-                <div v-for="(tag,index) in this.tagList" :key="index">
-                    <router-link :to="{ name: 'MyBlog' , query : { t: tag }}" class="badge badge-pill badge-light mr-2 p-2">{{ tag }}</router-link>
+            <div class="tagcloud" style="width: 330px;">
+                <div v-for="(tag,index) in this.tagList" :key="index" class="d-inline">
+                    <router-link :to="{ name: 'MyBlog' , query : { t: tag }}" class="tag-cloud-link ">{{ tag }}</router-link>
                 </div>
             </div>
 
             <!-- 카테고리 버튼 -->
             <div v-if="userNow === nickname">
-                <button type="button" @click="newCategory" class="btn btn-outline-dark mt-3" style="width:100px;">카테고리 관리</button>   
+                <button type="button" @click="newCategory" class="btn btn-outline-dark mt-5" style="width:150px;">카테고리 관리</button>   
             </div>
-        </div>
-
-        <!-- 컴포넌트 불러오기 -->
-        <div class="container-fluid col-10">
-            <router-view></router-view>
         </div>
     </div>
 </template>
 
 <script>
 import axios from 'axios'
+import BlogPagination from '../blog/BlogPagination.vue'
 
 const BACK_URL = 'http://localhost:8080'
 
 export default {
     name: 'MyList',
     components: {
-   
+        BlogPagination,
     }, 
     props: {
 
@@ -85,7 +93,6 @@ export default {
         calPostsSum() {
             for (const item in this.categoryList) {
                 this.numOfPosts = this.numOfPosts + this.categoryList[item].postCnt
-                this.rows = this.numOfPosts
             }
         },
 
@@ -111,7 +118,6 @@ export default {
             nickname: this.$route.params.nickname,
             
             // 카테고리 관련
-            categoryOn: '',
             categoryList: [],
             numOfPosts: 0,
             
@@ -130,34 +136,65 @@ export default {
             // 태그 관련
             tagList: [],
             tagNum: [],
+
+            // 페이지네이션 관련
+            totalNum : this.numOfPosts,
+
         }
     },
 }
 </script>
 
 <style scoped>
-#category-menu button{
-    text-decoration: none;
-    color: black;
+@media only screen and (min-width: 768px) {
+    #mylist {
+        position: relative;
+    }
+
+    #nav-mylist{
+        position: absolute;
+        top: 200px;
+        left: -420px;
+    }
 }
 
-#category-menu button:focus{
-    font-weight: bold;
-    color: #42b983;
+input {
+    height: auto; /* 높이값 초기화 */ 
+    line-height : normal; /* line-height 초기화 */ 
+    padding: .8em .5em; /* 원하는 여백 설정, 상하단 여백으로 높이를 조절 */ 
+    font-family: inherit; /* 폰트 상속 */ 
+    border: 1px solid #999; 
+    border-radius: 0; /* iSO 둥근모서리 제거 */ 
+    outline-style: none; /* 포커스시 발생하는 효과 제거를 원한다면 */ 
+    -webkit-appearance: none; /* 브라우저별 기본 스타일링 제거 */ 
+    -moz-appearance: none; appearance: none;
+
 }
 
-#category-all button{
-    text-decoration: none;
-    color: black;
+button {
+    height: auto; /* 높이값 초기화 */ 
+    line-height : normal; /* line-height 초기화 */ 
+    padding: .7em .5em; /* 원하는 여백 설정, 상하단 여백으로 높이를 조절 */ 
+    font-family: inherit; /* 폰트 상속 */ 
+    border-radius: 0; /* iSO 둥근모서리 제거 */ 
+
 }
 
-#category-all button:focus{
-    font-weight: bold;
-    color: #42b983;
-}
+.tagcloud {
+  padding: 0; }
+  .tagcloud a {
+    text-transform: uppercase;
+    display: inline-block;
+    padding: 4px 10px;
+    margin-bottom: 7px;
+    margin-right: 4px;
+    border-radius: 4px;
+    color: #000000;
+    border: 1px solid #ccc;
+    font-size: 11px; }
+    .tagcloud a:hover {
+      transition-duration: 0.5s;
+      border: 1px solid #000; }
 
-.card {
-    box-shadow: 10px 0px 60px -40px black;
-}
 
 </style>
