@@ -88,9 +88,6 @@ export default {
     color: #42b983;
 }
 
-.card {
-    box-shadow: 10px 0px 60px -40px black;
-}
 /* 트렌지션 */
 .fade-enter-active,
 .fade-leave-active {

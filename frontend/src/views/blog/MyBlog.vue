@@ -1,30 +1,30 @@
 <template>
-
-    <div id="blog">
+    <div id="blog" class= "row">
       <!-- 프로필 -->
-      <div id="upsideTerritory" class="row ml-4 mr-4">
-        <div class="ml-5 mt-3">
-          <a class="d-inline" href=''>
-            <img @click="gotoProfile" class="rounded-circle mx-auto img-thumbnail mb-3" :src='cardUserImage' alt="Card image cap" style="width: 120px;">
-          </a>
-            <h5 class="d-inline ml-3">{{ this.userInfo.nickname }}</h5>
-        </div>
+      <div class="info col-12 col-lg-4 px-5 py-4">
+        <a class="">
+          <img @click="gotoProfile" class="rounded-circle mx-auto img-thumbnail mb-3" :src='cardUserImage' alt="Card image cap" style="width: 70px;">
+        </a>
+          <h3 class="">{{ this.userInfo.nickname }}</h3>
+          <h4 class="mb-3">'s Blog</h4>
+          <p class="card-list-text">{{ this.userInfo.nickname }}의 개인 블로그에 오신것을</p>
+          <p class="card-list-text mb-5">환영합니다!</p>
+          <hr>
+      </div>
+    
+      <!-- 네비게이션 -->
+      <div id="nav" class="col-12 col-lg-8 p-0">
+          <router-link :to="{ name: 'MyBlog' , params: { nickname: this.nickname }}"><h3 :ref="'blog-word'" class="d-inline mr-5">블로그</h3></router-link> 
+          <router-link :to="{ name: 'MyQuestions' , params: { nickname: this.nickname }}"><h3 :ref="'gisik-word'" class="d-inline mr-5">지식</h3></router-link> 
+          <span v-if="userNow === nickname">
+            <router-link :to="{ name: 'Myfeeds' , params: { nickname: this.nickname }}"><h3 class="d-inline">피드</h3></router-link>
+          </span>
+          <!-- 컴포넌트 불러오기 -->
+          <div class="container-fluid mt-5">
+            <router-view></router-view>
+          </div>
       </div>
 
-      <div class="row mt-3">
-        <!-- 네비게이션 -->
-        <div id="nav" class="col-12 ml-5">
-            <router-link :to="{ name: 'MyBlog' , params: { nickname: this.nickname }}"><h3 :ref="'blog-word'" class="d-inline ml-5 mr-5">블로그</h3></router-link> 
-            <router-link :to="{ name: 'MyQuestions' , params: { nickname: this.nickname }}"><h3 :ref="'gisik-word'" class="d-inline mr-5">지식</h3></router-link> 
-            <span v-if="userNow === nickname">
-              <router-link :to="{ name: 'Myfeeds' , params: { nickname: this.nickname }}"><h3 class="d-inline mr-5">피드?</h3></router-link>
-            </span>
-            <!-- 컴포넌트 불러오기 -->
-            <div class="container-fluid mt-5">
-              <router-view></router-view>
-            </div>
-        </div>
-      </div>
     </div>
 
 </template>
@@ -80,10 +80,10 @@ export default {
   },
   mounted() {
     if (this.$route.path.match('/blog/') && !this.$route.path.match('/blog/my')) {
-      this.$refs['blog-word'].style.color = "#42b983"
+      this.$refs['blog-word'].style.color = "#56dbc9"
       this.$refs['gisik-word'].style.color = "#2c3e50"
     } else if (this.$route.path.match('/blog/myquestions/')) {
-      this.$refs['gisik-word'].style.color = "#42b983"
+      this.$refs['gisik-word'].style.color = "#56dbc9"
       this.$refs['blog-word'].style.color = "#2c3e50"
     } else if (this.$route.path.match('/blog/myfeeds')) {
       this.$refs['blog-word'].style.color = "#2c3e50"
@@ -97,10 +97,10 @@ export default {
 
     '$route.path' () {
       if (this.$route.path.match('/blog/') && !this.$route.path.match('/blog/my')) {
-        this.$refs['blog-word'].style.color = "#42b983"
+        this.$refs['blog-word'].style.color = "#56dbc9"
         this.$refs['gisik-word'].style.color = "#2c3e50"
       } else if (this.$route.path.match('/blog/myquestions/')) {
-        this.$refs['gisik-word'].style.color = "#42b983"
+        this.$refs['gisik-word'].style.color = "#56dbc9"
         this.$refs['blog-word'].style.color = "#2c3e50"
       } else if (this.$route.path.match('/blog/myfeeds')) {
         this.$refs['blog-word'].style.color = "#2c3e50"
@@ -112,12 +112,33 @@ export default {
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+@import url('https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Serif+KR:wght@200;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@700&display=swap');
+
+@media only screen and (min-width: 768px) {
+    #blog {
+        padding: 0 100px;
+        font-family: 'Noto Serif KR', serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #f4f4f4;
+    }
+
+    #nav {
+      padding: 30px;
+      margin: 30px 0 0 0;
+    }
+
+    .info {
+      text-align: left;
+    }
+}
+
+#blog {
+  font-family: 'Noto Serif KR', serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+  background-color: #f4f4f4;
 }
 
 #nav {
@@ -125,18 +146,19 @@ export default {
 }
 
 #nav a {
-  font-weight: bold;
   color: #2c3e50;
   text-decoration: none;
 }
 
 #nav a.router-link-exact-active {
-  color: #42b983;
+  color: #56dbc9;
 }
 
 #upsideTerritory{
   background-color: rgb(231, 231, 231);
 }
+
+
 </style>
 
 
