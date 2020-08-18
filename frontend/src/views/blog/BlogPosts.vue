@@ -187,9 +187,9 @@ export default {
             this.categoryOn = 2
             axios.get(`${BACK_URL}/blog/${this.nickname}/${categoryName}/post_list?no=${this.numOfPage}`, config)
                 .then(res => {
-                    this.postListCategory = res.data.list[0].list.reverse()
-                    this.postLike2 = res.data.list[1].list.reverse()
-                    this.thumbnail2 = res.data.list[2].list.reverse()
+                    this.postListCategory = res.data.list[0].list
+                    this.postLike2 = res.data.list[1].list
+                    this.thumbnail2 = res.data.list[2].list
                     // 카테고리 바로 에디터로 가져가기 위한 용도
                     this.currentCategory = categoryName
                 })
@@ -208,9 +208,9 @@ export default {
             this.categoryOn = 3
             axios.get(`${BACK_URL}/blog/${this.nickname}/search/blogPosts/${keyword}/${type}?no=1`, config)
                 .then(res => {
-                    this.postListKeyword = res.data.list[0].list.reverse()
-                    this.postLike3 = res.data.list[1].list.reverse()
-                    this.thumbnail3 = res.data.list[2].list.reverse()
+                    this.postListKeyword = res.data.list[0].list
+                    this.postLike3 = res.data.list[1].list
+                    this.thumbnail3 = res.data.list[2].list
                 })
 
                 .catch(err => {
@@ -230,9 +230,9 @@ export default {
                 .then(res => {
                 if (res.data.list[0].list.length) {
                     this.page += 1
-                    this.postListKeyword.push(...res.data.list[0].list.reverse())
-                    this.postLike3.push(...res.data.list[1].list.reverse())
-                    this.thumbnail3.push(...res.data.list[2].list.reverse())
+                    this.postListKeyword.push(...res.data.list[0].list)
+                    this.postLike3.push(...res.data.list[1].list)
+                    this.thumbnail3.push(...res.data.list[2].list)
                     $state.loaded()
                 } else {
                     $state.complete()
@@ -251,9 +251,9 @@ export default {
             this.categoryOn = 4
             axios.post(`${BACK_URL}/blog/${this.nickname}/search/tags/${tag}?no=${this.numOfPage}`, config)
                 .then(res => {
-                    this.postListTag = res.data.list[0].list.reverse()
-                    this.postLike4 = res.data.list[1].list.reverse()
-                    this.thumbnail4 = res.data.list[2].list.reverse()
+                    this.postListTag = res.data.list[0].list
+                    this.postLike4 = res.data.list[1].list
+                    this.thumbnail4 = res.data.list[2].list
                 })
 
                 .catch(err => {
@@ -422,7 +422,7 @@ export default {
 
             // 페이지네이션
             numOfPage: 1,
-            page : 1,
+            page : 2,
         }
     },
 

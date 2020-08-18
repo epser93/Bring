@@ -20,11 +20,11 @@
                     </li>
 
                     <li class="nav-item ml-3">
-                        <router-link v-if="isLogin" :to="{ name: 'Profile', query: { nickname: this.nickname }}" class="nav-link">프로필</router-link> 
+                        <router-link v-if="isLogin" :to="{ name: 'Profile', query: { nickname: this.nickname }}" class="nav-link">PROFILE</router-link> 
                     </li>
 
                     <li class="nav-item ml-3">
-                        <router-link v-if="isLogin" :to="{ name: 'MyBlog', params: { nickname: this.nickname }}" class="nav-link">블로그</router-link> 
+                        <router-link v-if="isLogin" :to="{ name: 'MyBlog', params: { nickname: this.nickname }}" class="nav-link">BRING</router-link> 
                     </li>
 
                     <li class="nav-item ml-3">
@@ -32,7 +32,7 @@
                     </li>     
 
                     <li class="nav-item ml-3" id="logout">
-                        <p v-if="isLogin" @click="logout" class="nav-link">로그아웃</p> 
+                        <p v-if="isLogin" @click="logout" class="nav-link">LOGOUT</p> 
                     </li>
                 </ul>
 

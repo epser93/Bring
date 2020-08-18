@@ -7,7 +7,7 @@
         </a>
           <h3 class=""><strong>{{ this.userInfo.nickname }}</strong></h3>
           <h4 class="mb-3">'s Blog</h4>
-          <p class="card-list-text">{{ this.userInfo.nickname }}의 개인 블로그에 오신것을</p>
+          <p class="card-list-text">{{ this.userInfo.nickname }}의 브링에 오신것을</p>
           <p class="card-list-text mb-5">환영합니다!</p>
 
           <!-- 조회수 -->
@@ -19,8 +19,8 @@
     
       <!-- 네비게이션 -->
       <div id="nav" class="col-12 col-lg-8 p-0">
-          <router-link :to="{ name: 'MyBlog' , params: { nickname: this.nickname }}"><h3 :ref="'blog-word'" class="d-inline mr-5">블로그</h3></router-link> 
-          <router-link :to="{ name: 'MyQuestions' , params: { nickname: this.nickname }}"><h3 :ref="'gisik-word'" class="d-inline mr-5">지식</h3></router-link> 
+          <router-link :to="{ name: 'MyBlog' , params: { nickname: this.nickname }}"><h3 :ref="'blog-word'" class="d-inline mr-5">포스트</h3></router-link> 
+          <router-link :to="{ name: 'MyQuestions' , params: { nickname: this.nickname }}"><h3 :ref="'gisik-word'" class="d-inline mr-5">질문</h3></router-link> 
           <span v-if="userNow === nickname">
             <router-link :to="{ name: 'Myfeeds' , params: { nickname: this.nickname }}"><h3 class="d-inline">피드</h3></router-link>
           </span>
