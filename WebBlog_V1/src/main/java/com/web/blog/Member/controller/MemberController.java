@@ -179,8 +179,8 @@ public class MemberController {
         }
 
         String ip = followService.getIpAddr(request);
-        Optional<IpAddrForTodayCnt> ipAddr = ipAddrForTodayCntRepository.findByIpAndNickname(ip,  member.getNickname());
-        if(!ipAddr.isPresent()) {
+        Optional<IpAddrForTodayCnt> ipAddr = ipAddrForTodayCntRepository.findByIpAndNickname(ip, member.getNickname());
+        if (!ipAddr.isPresent()) {
             IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
                     .ip(ip)
                     .nickname(member.getNickname())
