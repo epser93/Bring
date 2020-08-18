@@ -309,7 +309,7 @@ public class QuestionController {
                 Cookie cookie = new Cookie(key, newCookieCnt);
                 cookie.setMaxAge(60 * 60); //1시간
                 response.addCookie(cookie);
-                postRepository.updateViewCnt(qpostId);
+                qpostRepository.updateViewCnt(qpostId);
             }
 
             key = logined.get().getMsrl() + "|" + "today_cnt";
@@ -337,7 +337,7 @@ public class QuestionController {
                 Cookie cookie = new Cookie(key, newCookieCnt);
                 cookie.setMaxAge(60 * 60); //1시간
                 response.addCookie(cookie);
-                postRepository.updateViewCnt(qpostId);
+                qpostRepository.updateViewCnt(qpostId);
             }
 
             key = "temp" + "|" + "today_cnt";
