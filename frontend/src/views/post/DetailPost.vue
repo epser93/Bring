@@ -6,7 +6,7 @@
         <!-- 글쓴이 정보 -->
         <div class="info text-center my-5">
             <h1 class="mb-3">{{subject}}</h1>
-            <span class="text-muted">{{ createdAt.slice(0, 10) }}</span>
+            <span class="text-muted">{{createdAt.slice(0, 10)}}</span>
             <span class="vertical-line mx-3"></span>
             <span class="mr-2"><strong>{{ member_nickname }}</strong></span>
             <div class="text-right">
@@ -17,7 +17,7 @@
         <hr>
         
         <!-- 글 -->
-        <p class="mt-4" v-html="compiledMarkdown"></p>
+        <v-md-preview :text="this.content"></v-md-preview>
 
         <!-- 기타 정보 -->
         <div class="" style="margin: 100px 0 50px;">     
@@ -93,8 +93,6 @@
 
 <script>
 import axios from 'axios'
-// 마크다운
-import marked from 'marked'
 import _ from 'lodash'
 const BACK_URL = 'http://localhost:8080'
 
@@ -350,9 +348,6 @@ export default {
     computed: {
       recentlyComments () {
         return _.orderBy(this.comments, ['createdAt'], ['desc'])
-      },
-      compiledMarkdown: function () {
-        return marked(this.content, { sanitize: true })
       },
     },
     watch: {

@@ -11,6 +11,7 @@
               <div class="contents">
                 <h4>{{ post.subject }}</h4>
                 <p>{{ post.content }}</p>
+                <!-- <v-md-preview :text="post.content"></v-md-preview> -->
                 <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.replyCnt }}개의 댓글</p>
               </div>
             </div>
@@ -46,7 +47,8 @@ export default {
       list: [],
       thumbnails: [],
       page : 1,
-      tags : []
+      tags : [],
+      text : '# 안녕하세요'
     }
   },
   methods : {

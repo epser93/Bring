@@ -2,16 +2,16 @@
   <div class="wrapB container-fluid">
     <section class="cards row">
       <div class="col-lg-10 row">
-        <div v-for="post in list" :key="post.qpostId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
+        <div v-for="(post, index) in list" :key="index" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
           <div class=cardwrap>
             <div class="card-body p-0" @click="gotoQuestionDetail(post)">
-              <div class="img-section">
+              <div class="img-section" :style="{ 'background-image' : `url(${thumbnails[index]})`}">
                 <a href=""></a>
               </div>
               <div class="contents">
                 <h4>{{ post.subject }}</h4>
                 <p>{{ post.content }}</p>
-                <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.answerCnt }}개의 답변</p>
+                <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.answerCnt }}개의 댓글</p>
               </div>
             </div>
             <div class="writer-info">
@@ -53,6 +53,7 @@ export default {
   data() {
     return {
       unsortedRank : [],
+      thumbnails : [],
       list: [],
       page : 1,
       tags : [],
@@ -60,12 +61,12 @@ export default {
   },
   methods : {
     infiniteHandler($state) {
-      console.log($state)
       axios.get(`${BACK_URL}/questions/recent?no=${this.page}`)
         .then (res => {
           if (res.data.list[0].list.length) {
             this.page += 1
             this.list.push(...res.data.list[0].list)
+            this.thumbnails.push(...res.data.list[1].list)
             $state.loaded()
           } else {
             $state.complete()
@@ -77,7 +78,6 @@ export default {
       this.$router.push({ name : "QuestionDetail" , params: { nickname : post.member_nickname, qpostId : post.qpostId }})
     },
     gotoUserInfo(userNickname) {
-      console.log(userNickname)
       this.$router.push({ name : "Profile" , query: { nickname : userNickname }})
     },
     getRanking() {
@@ -95,7 +95,6 @@ export default {
         .catch(err => console.log(err))
     },
     searchTags(tag) {
-      console.log(tag)
       this.$router.push({ name : 'TagSearchQuestions', params : { keyword : tag }})
     }
   },
