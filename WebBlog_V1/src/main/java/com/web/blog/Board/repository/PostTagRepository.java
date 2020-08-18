@@ -24,5 +24,5 @@ public interface PostTagRepository extends JpaRepository<PostTag, Long> {
     @Query(value = "insert into post_tag (post_id, tag_id, in_where, answers) values (:post_id, :tag_id, 1, :answers)", nativeQuery = true)
     int insertTag(@Param("post_id") long post_id, @Param("tag_id") long tag_id, @Param("answers") boolean answers);
 
-    List<PostTag> findByTagAndInWhereAndAnswersNot(Tag tag, int in_where, boolean answers, Pageable pageable);
+    List<PostTag> findByTagAndInWhereAndAnswersNotOrderByIdDesc(Tag tag, int in_where, boolean answers, Pageable pageable);
 }

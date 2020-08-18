@@ -18,12 +18,14 @@ import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.response.SingleResult;
 import com.web.blog.Common.service.ResponseService;
 import com.web.blog.Common.service.S3Service;
+import com.web.blog.Member.entity.IpAddrForTodayCnt;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.entity.ProfileImg;
 import com.web.blog.Member.entity.TodayDate;
 import com.web.blog.Member.model.OnlyMemberMapping;
 import com.web.blog.Member.model.ParamPassword;
 import com.web.blog.Member.model.ProfileImgDto;
+import com.web.blog.Member.repository.IpAddrForTodayCntRepository;
 import com.web.blog.Member.repository.MemberRepository;
 import com.web.blog.Member.repository.ProfileImgRepository;
 import com.web.blog.Member.repository.TodayDateRepository;
@@ -35,15 +37,12 @@ import com.web.blog.QnA.repository.ApostRepository;
 import com.web.blog.QnA.repository.QpostRepository;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -51,7 +50,10 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Api(tags = {"2. Member"})
 @RequiredArgsConstructor
@@ -73,7 +75,7 @@ public class MemberController {
     private final ApostRepository apostRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final TodayDateRepository todayDateRepository;
-    private static final Logger logger = LoggerFactory.getLogger(MemberController.class);
+    private final IpAddrForTodayCntRepository ipAddrForTodayCntRepository;
 
     @ApiImplicitParams({
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
@@ -176,43 +178,16 @@ public class MemberController {
             }
         }
 
-        Cookie[] cookies = null;
-        if (logined.isPresent() && logined.get().getMsrl() != member.getMsrl()) {
-            cookies = request.getCookies();
-            Map map = new HashMap();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    map.put(cookie.getName(), cookie.getValue());
-                }
-            }
-            String key = logined.get().getMsrl() + "|" + member.getMsrl() + "|" + "today_cnt";
-            String cookieCnt = logined.get().getMsrl() + "|" + member.getMsrl();
-            if (!map.containsKey(key)) {
-                Cookie cookie = new Cookie(key, cookieCnt);
-                cookie.setMaxAge(60 * 60 * 24); //24시간
-                cookie.setPath("/");
-                response.addCookie(cookie);
-                repository.updateTodayCnt(member.getMsrl());
-                repository.updateTotalCnt(member.getMsrl());
-            }
-        } else if (!logined.isPresent()) {
-            cookies = request.getCookies();
-            Map map = new HashMap();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    map.put(cookie.getName(), cookie.getValue());
-                }
-            }
-            String key = "temp" + "|" + member.getMsrl() + "|" + "today_cnt";
-            String cookieCnt = "temp" + "|" + member.getMsrl();
-            if (!map.containsKey(key)) {
-                Cookie cookie = new Cookie(key, cookieCnt);
-                cookie.setMaxAge(60 * 60 * 24); //24시간
-                cookie.setPath("/");
-                response.addCookie(cookie);
-                repository.updateTodayCnt(member.getMsrl());
-                repository.updateTotalCnt(member.getMsrl());
-            }
+        String ip = followService.getIpAddr(request);
+        Optional<IpAddrForTodayCnt> ipAddr = ipAddrForTodayCntRepository.findByIpAndNickname(ip,  member.getNickname());
+        if(!ipAddr.isPresent()) {
+            IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
+                    .ip(ip)
+                    .nickname(member.getNickname())
+                    .build();
+            ipAddrForTodayCntRepository.save(checkCnt);
+            repository.updateTodayCnt(member.getMsrl());
+            repository.updateTotalCnt(member.getMsrl());
         }
 
         List<Integer> visitorCnt = new ArrayList<>();

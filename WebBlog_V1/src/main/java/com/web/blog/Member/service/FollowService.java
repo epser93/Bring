@@ -10,6 +10,7 @@ import com.web.blog.Member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -83,20 +84,25 @@ public class FollowService implements Serializable {
         return true;
     }
 
-//    @Cacheable(value = "semiFinalList")
-//    public List<Post> feedCaching(List<Long> followings, long no) {
-//        Paging paging = new Paging(no);
-//        LocalDateTime date = LocalDateTime.now();
-//        date.minus(3, ChronoUnit.DAYS);
-//        List<Post> semiFinalList = new ArrayList<>();
-//        for (long userNo : followings) {
-//            Member following = memberRepository.findById(userNo).get();
-//            List<Post> list = postRepository.findAllByMember_NicknameAndBoard_NameNotLikeAndCreatedAtLessThanEqualOrderByCreatedAtDesc(following.getNickname(), "나의 Answers", date, PageRequest.of(paging.getPageNo() - 1, 3));
-//            for (Post opm : list) {
-//                semiFinalList.add(opm);
-//            }
-//        }
-//        Collections.shuffle(semiFinalList);
-//        return semiFinalList;
-//    }
+    public String getIpAddr(HttpServletRequest request) {
+
+        String ip = request.getHeader("X-Forwarded-For");
+
+        if (ip == null) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null) {
+            ip = request.getHeader("WL-Proxy-Client-IP"); // 웹로직
+        }
+        if (ip == null) {
+            ip = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ip == null) {
+            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        }
+        if (ip == null) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
+    }
 }

@@ -25,7 +25,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     Optional<OnlyPostMapping> findAllByPostId(long post_id);
 
-    Optional<List<Post>> findByBoard_BoardIdAndMember_Nickname(long boardId, String writer);
+    Optional<List<Post>> findByBoard_BoardId(long boardId);
 
     @Modifying
     @Transactional

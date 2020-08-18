@@ -17,7 +17,7 @@ public interface QpostTagRepository extends JpaRepository<QpostTag, Long> {
 
     List<QpostTag> findByQpost_QpostId(long qpost_id);
 
-    List<QpostTag> findByTagAndInWhere(Tag tag, int in_where, Pageable pageable);
+    List<QpostTag> findByTagAndInWhereOrderByIdDesc(Tag tag, int in_where, Pageable pageable);
 
     int deleteByIdEquals(long id);
 
