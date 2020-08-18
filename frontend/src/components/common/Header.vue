@@ -39,7 +39,7 @@
                 <!-- 검색창 -->
                 <div v-if="this.mode === 'Blog'" class="form-inline mx-3">
                     <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-secondary">{{ keywordType.name }}</button>
-                    <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu">
+                    <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu" style="left:auto">
                         <button type="button" tabindex="0" @click="dropdown(typeid, value)" class="dropdown-item" v-for="(value, typeid) in dropdownList" v-bind:key="typeid">
                             {{ value }}
                         </button>

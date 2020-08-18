@@ -58,8 +58,8 @@
                                 <div class="modal-body">
                                     <ul class="listGroup container">
                                         <div v-if="selectFollow == true">
-                                            <div v-if="followerUserImg == null">
-                                                <h5>팔로우가 없습니다.</h5>
+                                            <div v-if="followerUserImg.length == 0">
+                                                <h5><i class="far fa-frown"></i> 팔로우가 없습니다.</h5>
                                             </div>
                                             <div v-else class="row row-cols-2">
                                                 <li v-for="user in followerUserImg" v-bind:key="user.nickname" class="listFollow col">
@@ -73,8 +73,8 @@
                                         </div>
 
                                         <div v-else>
-                                            <div v-if="followingUserImg == null">
-                                                <h5>팔로잉이 없습니다.</h5>
+                                            <div v-if="followingUserImg.length == 0">
+                                                <h5><i class="far fa-frown"></i> 팔로잉이 없습니다.</h5>
                                             </div>
                                             <div v-else class="row row-cols-2">
                                                 <li v-for="user in followingUserImg" v-bind:key="user.nickname" class="listFollow col">
@@ -100,7 +100,7 @@
 
 
                     <!-- 육성게임  -->
-                    <div class="col-6 mx-3 mt-3"> 
+                    <div class="col-6 mx-3" id="gameContent"> 
                         <h3 class="card-title"><b>My Level</b> </h3>
                         <div v-if="computedGrade === 'bronze'" class="mb-3">
                             <img class="grade-img" src="../../assets/img/브론즈.png" alt="">
@@ -506,7 +506,6 @@ export default {
                 }
 
                 this.followerUserImg = getFerUser
-                //console.log(this.followerUserImg)
             }
 
             // 팔로잉 닉네임 : 팔로잉 사진
@@ -640,13 +639,17 @@ export default {
     margin:auto;
 }
 .card-title{
-    margin: auto;
+    margin-top:10px;
+    margin-bottom:15px;
 }
 .tag-list{
     text-transform: uppercase;
 }
 .grade-img{
     height: 70px;
+}
+#gameContent{
+    text-align: -webkit-center;
 }
 </style>
 
