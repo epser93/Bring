@@ -5,7 +5,7 @@
             <h5>{{ nickname }}의 답변 목록</h5>
             <hr class="ml-0" style="width:70%;">
             <div v-for="(item, index) in answersList" :key="item.answerId" class="p-0 mb-5">
-                <a @click="gotoDetail(item)" style="cursor: pointer;">
+                <a style="cursor: pointer;">
                     <div class="card border-secondary mb-3" style="width: 70%;">
                         <div class="card-header bg-transparent border-secondary"><strong>{{ answersQList[index] }}</strong><br><small>작성자: {{ answersWList[index] }}</small></div>
                         <div class="card-body text-secondary">
@@ -67,11 +67,6 @@ export default {
                     console.log(err)
                 })
         },
-
-        // 포스트 디테일
-        gotoDetail(post) {
-            this.$router.push({ name : "QuestionDetail" , params: { nickname : post.member_nickname, qpostId : post.postId }})
-        },    
     },
     mounted() {
         this.getAllAnswers()   

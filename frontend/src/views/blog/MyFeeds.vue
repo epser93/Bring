@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="myfeeds">
     <!-- 글 리스트 -->
     <div class="col-12">
         <div class="text-left ml-5 mt-5" v-if="postList.length == 0">
@@ -86,5 +86,7 @@ export default {
 </script>
 
 <style>
-
+#myfeeds {
+    min-height: 1000px;
+}
 </style>

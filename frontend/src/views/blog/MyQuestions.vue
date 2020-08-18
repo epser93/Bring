@@ -68,6 +68,10 @@ export default {
 </script>
 
 <style>
+#myquestions {
+    min-height: 1000px;
+}
+
 #category-menu button{
     text-decoration: none;
     color: black;
