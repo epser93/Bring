@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <Header :isLogin="isLogin" :nickname="userNickname" @logout-state="updateLogout"/>
-    <demo-login-modal @submit-login-data="login" @submit-signup-data="signup"/>
+    <demo-login-modal @submit-login-data="login" @submit-signup-data="validateSignupData"/>
     <div class="container-fluid p-0">
     <router-view />
     </div>
@@ -65,8 +65,36 @@ export default {
           console.log(err)
         })
     },
+    validateSignupData(signupData) {
+      console.log('hihi')
+      const passwordchk = /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/;
+      const emailchk = /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i;
+      const namechk = /^[가-힣a-zA-Z]{2,5}$/;
+      const nicknamechk = /^[가-힣a-zA-Z0-9]{2,15}$/;
+      // 회원가입 이메일 형식 체크
+      if (!emailchk.test(signupData.uid)) {
+        alert('아이디가 이메일 형식이 아닙니다.')
+      }
+      // 이름 검증
+      else if (!namechk.test(signupData.name)) {
+        alert('이름은 2~5글자 이내 / 문자 이외는 입력할 수 없습니다.')
+      }
+      // 닉네임 검증
+      else if (!nicknamechk.test(signupData.nickname)) {
+        alert('닉네임은 2~15자 이내여야 합니다.')
+      }
+      // 비밀번호가 문자+숫자 8~20자리 체크
+      else if (!passwordchk.test(signupData.password1)) {
+        alert("비밀번호는 문자+숫자+특수문자 8~20 자리입니다.")
+      }
+      else if (signupData.password1 != signupData.password2) {
+        alert('비밀번호와 확인란이 서로 다릅니다.')
+      }
+      else (this.signup(signupData))
+    },
 
     signup(signupData) {
+      console.log(signupData)
       axios.post(`${BACK_URL}/sign/up`, signupData)
         .then(() => {
           this.forLogin.id = signupData.uid
@@ -74,7 +102,6 @@ export default {
           this.login(this.forLogin)
         })
         .catch(err =>{
-          alert('회원가입 실패')
           console.log(err)
         })
     },
@@ -102,7 +129,7 @@ export default {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Noto Serif KR', serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; 
   text-align: center;

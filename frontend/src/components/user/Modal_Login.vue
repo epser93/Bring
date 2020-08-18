@@ -8,7 +8,7 @@
         <button type="button" class="toggle-btn" @click="registerToggle">Register</button>
       </div>
       <div class="social-icons">
-        <i class="fab fa-twitter fa-3x"></i>
+        <i class="fab fa-github fa-3x"></i>
         <i class="fab fa-facebook-square fa-3x"></i>
         <i class="fab fa-google fa-3x"></i>
       </div>
@@ -32,8 +32,8 @@
 export default {
 
   name: 'LoginModal',
-  data() {
-    return {
+    data() {
+      return {
       loginData: {
         id: '',
         password: '',
@@ -48,6 +48,9 @@ export default {
     }
   },
   created() {
+  },
+  computed: {
+
   },
   methods: {
     loginToggle() {
