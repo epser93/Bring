@@ -7,7 +7,10 @@
                 <h3>현재 등록된 글이 없습니다</h3>
             </div>
             <div class="row">
-                <div v-for="(item, index) in postList" :key="item.postId" class="p-0 mb-5 col-12">
+                <div class="new-article col-12" v-if="userNow === nickname">
+                    <a type="button" @click="newArticle('default')" class="mb-5 float-right" style="width:100px;">새 글 작성</a>
+                </div>
+                <div v-for="(item, index) in postList" :key="index" class="p-0 mb-5 col-12">
                     <div class="card-list">
                         <div class="card-header text-left bg-transparent p-5 d-flex justify-content-between">
                             <h4 class="card-title m-0"><strong>{{ item.subject }}</strong></h4>
@@ -42,9 +45,6 @@
                     </div>
                 </div>
             </div>
-            <div class="text-right" v-if="userNow === nickname">
-                <button type="button" @click="newArticle('default')" class="btn btn-outline-dark mb-5 mr-5" style="width:100px;">새 글 작성</button>
-            </div>
         </div>
 
         <!-- 글 리스트 카테고리 있는 경우 -->
@@ -53,7 +53,7 @@
                 <h3>현재 등록된 글이 없습니다</h3>
             </div>
             <div class="row">
-                <div v-for="(item, index) in postListCategory" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
+                <div v-for="(item, index) in postListCategory" :key="index" class="p-0 mb-5 col-12 col-lg-3">
                     <div class="card" style="width: 75%;">
                         <img class="card-img-top" :src="thumbnail2[index]" alt="Card image cap" style="height: 150px;">
                         <div class="card-body pb-0">
@@ -81,7 +81,7 @@
                 <h3>현재 등록된 글이 없습니다</h3>
             </div>
             <div class="row">
-                <div v-for="(item, index) in postListKeyword" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
+                <div v-for="(item, index) in postListKeyword" :key="index" class="p-0 mb-5 col-12 col-lg-3">
                     <div class="card" style="width: 75%;">
                         <img class="card-img-top" :src="thumbnail3[index]" alt="Card image cap" style="height: 150px;">
                         <div class="card-body pb-0">
@@ -98,6 +98,8 @@
                     </div>
                 </div>
             </div>
+            <!-- 무한스크롤 -->
+            <infinite-loading @infinite="infiniteHandler"></infinite-loading>
         </div>
 
         <!-- 태그로 검색한 경우 -->
@@ -106,7 +108,7 @@
                 <h3>현재 등록된 글이 없습니다</h3>
             </div>
             <div class="row">
-                <div v-for="(item, index) in postListTag" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
+                <div v-for="(item, index) in postListTag" :key="index" class="p-0 mb-5 col-12 col-lg-3">
                     <div class="card" style="width: 75%;">
                         <img class="card-img-top" :src="thumbnail4[index]" alt="Card image cap" style="height: 150px;">
                         <div class="card-body pb-0">
@@ -204,7 +206,7 @@ export default {
                 }
             }
             this.categoryOn = 3
-            axios.get(`${BACK_URL}/blog/${this.nickname}/search/blogPosts/${keyword}/${type}`, config)
+            axios.get(`${BACK_URL}/blog/${this.nickname}/search/blogPosts/${keyword}/${type}?no=1`, config)
                 .then(res => {
                     this.postListKeyword = res.data.list[0].list.reverse()
                     this.postLike3 = res.data.list[1].list.reverse()
@@ -214,6 +216,29 @@ export default {
                 .catch(err => {
                     console.log(err)
                 })
+        },
+
+        //무한스크롤
+        infiniteHandler ($state) {
+            const config = {
+                headers: {
+                    'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
+                }
+            }
+            this.categoryOn = 3
+            axios.get(`${BACK_URL}/blog/${this.nickname}/search/blogPosts/${this.k}/${this.type}?no=${this.page}`, config)
+                .then(res => {
+                if (res.data.list[0].list.length) {
+                    this.page += 1
+                    this.postListKeyword.push(...res.data.list[0].list.reverse())
+                    this.postLike3.push(...res.data.list[1].list.reverse())
+                    this.thumbnail3.push(...res.data.list[2].list.reverse())
+                    $state.loaded()
+                } else {
+                    $state.complete()
+                }
+                })
+                .catch (err => console.log(err))
         },
 
         // 태그 검색
@@ -397,6 +422,7 @@ export default {
 
             // 페이지네이션
             numOfPage: 1,
+            page : 1,
         }
     },
 
@@ -435,6 +461,21 @@ export default {
     color: #56dbc9 !important;
     border: 1px solid #99c9c2 !important;
 }
+
+.new-article a {
+    padding: 10px 30px;
+    cursor: pointer;
+    text-decoration: none;
+    transition-duration: 0.3s;
+    border: 1px solid #929292;
+}
+
+.new-article a:hover {
+    padding: 10px 30px;
+    color: #56dbc9 !important;
+    border: 1px solid #99c9c2 !important;
+}
+
 
 .card-image{
     overflow: hidden;

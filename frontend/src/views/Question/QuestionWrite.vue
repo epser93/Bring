@@ -70,7 +70,7 @@ export default {
           console.log(res)
           this.thumbnailPost()
           this.$router.push({name : 'Question'})
-          this.$router.go(0) // 이 부분 안해주면 question으로 돌아갈 때 썸네일이 안보임
+          this.$router.go(-2) // 이 부분 안해주면 question으로 돌아갈 때 썸네일이 안보임
         })
         .catch(err=>{
           console.log(err)
