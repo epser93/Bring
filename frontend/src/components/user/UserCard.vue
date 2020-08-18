@@ -62,10 +62,11 @@
                                                 <h5>팔로우가 없습니다.</h5>
                                             </div>
                                             <div v-else class="row row-cols-2">
-                                                <li v-for="user in followerUserImg" v-bind:key="user" class="listFollow col">
+                                                <li v-for="user in followerUserImg" v-bind:key="user.nickname" class="listFollow col">
                                                     <div class="d-flex" id="modalFollow">
                                                         <img class="rounded-circle" :src=user.img alt="Card image cap" style="width:50px; height:50px; border-style: outset;">
-                                                        <router-link :to="{ name: 'Profile', query: { nickname: user.nickname }}" data-dismiss="modal">{{ user.nickname }}</router-link>
+                                                        <a :href="$router.resolve({name: 'Profile', query: { nickname: user.nickname }}).href">{{ user.nickname }}</a>                                                        
+                                                        <!-- <router-link :to="{ name: 'Profile', query: { nickname: user.nickname }}" data-dismiss="modal">{{ user.nickname }}</router-link> -->
                                                     </div>
                                                 </li>
                                             </div>
@@ -76,10 +77,11 @@
                                                 <h5>팔로잉이 없습니다.</h5>
                                             </div>
                                             <div v-else class="row row-cols-2">
-                                                <li v-for="user in followingUserImg" v-bind:key="user" class="listFollow col">
+                                                <li v-for="user in followingUserImg" v-bind:key="user.nickname" class="listFollow col">
                                                     <div class="d-flex" id="modalFollow">
                                                         <img class="rounded-circle" :src=user.img alt="Card image cap" style="width:50px; height:50px; border-style: outset;">
-                                                        <router-link :to="{ name: 'Profile', query: { nickname: user.nickname }}" data-dismiss="modal">{{ user.nickname }}</router-link>
+                                                        <a :href="$router.resolve({name: 'Profile', query: { nickname: user.nickname }}).href">{{ user.nickname }}</a>
+                                                        <!-- <router-link :to="{ name: 'Profile', query: { nickname: user.nickname }}" data-dismiss="modal">{{ user.nickname }}</router-link> -->
                                                     </div>
                                                 </li>
                                             </div>
@@ -101,7 +103,7 @@
                     <div class="col-6 mx-3 mt-3"> 
                         <h3 class="card-title"><b>My Level</b> </h3>
                         <div v-if="computedGrade === 'bronze'" class="mb-3">
-                            <img class="grade-img" src="../../assets/img/마스터.png" alt="">
+                            <img class="grade-img" src="../../assets/img/브론즈.png" alt="">
                             <p>Bronze</p>
                         </div>
                         <div v-else-if="computedGrade === 'silver'" class="mb-3">
@@ -159,7 +161,7 @@
                 <div id="chart">
                     <h4><b>Tag List</b></h4>
                     <div v-if="checkTag == true">
-                        <apexchart type="donut" :options="donutOptions" :series="donutSeries" class="tag-list"></apexchart>
+                        <apexchart type="donut" :options="donutOptions" :series="donutSeries" class="tag-list"></apexchart>                    
                     </div>
                     <div v-else>
                         <br><br>
@@ -268,20 +270,16 @@ export default {
       type: String,
       default: require("@/assets/img/faces/no_img.jpg")
     },
-    changeNickname: {
-        type: String,
-        default: null
-    },
   },
   
   created() {
-    //   this.Init()
   },
 
   watch: {
       '$route.params.query' : {
           handler : function () {
             this.Init()
+            this.tagFun()
           },
         deep: true,
         immediate : true
@@ -452,6 +450,7 @@ export default {
       },
 
     Init() {
+        console.log('init')
         const config = {
             headers: {
             'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
@@ -503,7 +502,7 @@ export default {
                 for(var j=0; j<lenFer; j++){
                     tmpFerUser = {nickname:this.userFerList[0][j], img:this.userFerList[1][j]}
                     getFerUser.push(tmpFerUser)
-                    // console.log(getFerUser)
+                    console.log(getFerUser)
                 }
 
                 this.followerUserImg = getFerUser
@@ -537,11 +536,15 @@ export default {
         .catch((err) => {
             console.error(err)
         })
-
+        
         // 유저 tag 가져오기
-        axios.get(`${BACK_URL}/tags/blog/${this.userNickname}`)
-        .then(res => {
-            
+    },
+
+    tagFun(){
+         axios.get(`${BACK_URL}/tags/blog/${this.userNickname}`)
+        .then(res => {            
+            console.log(this.userNickname)
+            console.log("ddffffffffffffffffffffffffffffff")
             this.donutOptions.labels = []
             this.donutSeries = []
             this.userTagList = res.data.list[0].list  // 데이터 받아오는 용도
@@ -549,6 +552,8 @@ export default {
             var tmpTagList = []
             var tmpTagCnt = []
             var sumETC = 0
+            console.log(tmpTagList)
+            console.log(tmpTagCnt)
             for(var i=0; i<this.userTagList.length; i++){
                 if(i >= 4){
                     sumETC += this.userTagCnt[i]
@@ -564,21 +569,16 @@ export default {
             }           
             this.donutOptions.labels = tmpTagList
             this.donutSeries = tmpTagCnt
-
             if(this.userTagList.length > 0){
                 this.checkTag = true
             }
             else{
                 this.checkTag = false
             }
-
-            console.log("새로운사람")
-            console.log(tmpTagList)
-            console.log(tmpTagCnt)
-            console.log(this.userNickname)
-            console.log(this.donutSeries)
+            // console.log("새로운사람")
+            // console.log(this.userNickname)
+            // console.log(this.donutSeries)
             console.log(this.donutOptions.labels)
-        
 
         })
         .catch((err) => {
