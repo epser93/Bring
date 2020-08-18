@@ -69,19 +69,19 @@ public class QnaService {
 
     //한 유저의 모든 답변글 리스트
     public List<Apost> getOnesAllAnswer(Member member) {
-        return apostRepository.findByMember_Nickname(member.getNickname());
+        return apostRepository.findByMember_NicknameOrderByApostIdDesc(member.getNickname());
     }
 
     //모든 질문글 검색
     public List<OnlyQpostMapping> QuestionSearch(int which, String keyword, Paging paging) { //검색: which = 1~4
         if (which == 1) { //제목 검색
-            return qpostRepository.findBySubjectContaining(keyword, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return qpostRepository.findBySubjectContainingOrderByQpostIdDesc(keyword, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         } else if (which == 2) { //내용 검색
-            return qpostRepository.findByContentContaining(keyword, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return qpostRepository.findByContentContainingOrderByQpostIdDesc(keyword, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         } else if (which == 3) { //작성자 검색
-            return qpostRepository.findByMember_NicknameContaining(keyword, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return qpostRepository.findByMember_NicknameContainingOrderByQpostIdDesc(keyword, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         } else { //통합검색
-            return qpostRepository.findDistinctBySubjectContainingOrContentContainingOrMember_NicknameContaining(keyword, keyword, keyword, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return qpostRepository.findDistinctBySubjectContainingOrContentContainingOrMember_NicknameContainingOrderByQpostIdDesc(keyword, keyword, keyword, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         }
     }
 
@@ -144,7 +144,7 @@ public class QnaService {
     //한 포스트의 답변 리스트 조회
     public List<OnlyApostMapping> getApostsofOneQpost(long qpost_id) {
         Qpost qpost = qpostRepository.findById(qpost_id).orElseThrow(CResourceNotExistException::new);
-        return apostRepository.findByQpost(qpost);
+        return apostRepository.findByQpostOrderByApostIdDesc(qpost);
     }
 
     //답변 작성

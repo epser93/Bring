@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ApostRepository extends JpaRepository<Apost, Long> {
-    List<Apost> findByMember_Nickname(String writer);
+    List<Apost> findByMember_NicknameOrderByApostIdDesc(String writer);
+
+    List<OnlyApostMapping> findByQpostOrderByApostIdDesc(Qpost qpost);
 
     List<OnlyApostMapping> findByQpost(Qpost qpost);
 

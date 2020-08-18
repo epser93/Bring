@@ -103,7 +103,7 @@ public class BoardService {
     //게시판 내 포스트  list 조회
     @Transactional
     public List<OnlyPostMapping> CategoryPostList(long board_id, Paging paging) {
-        return postRepository.findAllByBoard_BoardId(board_id, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        return postRepository.findAllByBoard_BoardIdOrderByPostIdDesc(board_id, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
     }
 
     //한 게시판 내의 게시글 전체 삭제
