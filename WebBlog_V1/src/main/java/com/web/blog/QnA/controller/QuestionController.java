@@ -284,24 +284,74 @@ public class QuestionController {
     @GetMapping(value = "/{qpostId}")
     public ListResult<ListResult> questionDetail(@PathVariable long qpostId, HttpServletRequest request, HttpServletResponse response) {
         List<ListResult> results = new ArrayList<>();
-        Cookie cookies[] = request.getCookies();
-        Map map = new HashMap();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                map.put(cookie.getName(), cookie.getValue());
-            }
-        }
-        String cookieCnt = (String) map.get("view_count");
-        String newCookieCnt = "|" + qpostId;
-        if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
-            Cookie cookie = new Cookie("view_count", cookieCnt + newCookieCnt);
-            cookie.setMaxAge(60 * 60); //1시간
-            response.addCookie(cookie);
-            this.qpostRepository.updateViewCnt(qpostId);
-        }
         results.add(responseService.getListResult(qnaService.getOneQpost(qpostId)));
         results.add(responseService.getListResult(qTagService.getTags(qpostId)));
         results.add(responseService.getListResult(qnaService.getApostsofOneQpost(qpostId)));
+
+        Optional<Qpost> qpost = qpostRepository.findById(qpostId);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = memberRepository.findByUid(uid);
+        Optional<Member> writer = memberRepository.findByNickname(qpost.get().getMember().getNickname());
+        Cookie[] cookies = null;
+        if (logined.isPresent() && logined.get().getMsrl() != writer.get().getMsrl()) {
+            cookies = request.getCookies();
+            Map map = new HashMap();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    map.put(cookie.getName(), cookie.getValue());
+                }
+            }
+            String key = logined.get().getMsrl() + "|" + "q_view_count";
+            String cookieCnt = (String) map.get(key);
+            String newCookieCnt = logined.get().getNickname() + "|" + qpostId;
+            if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
+                Cookie cookie = new Cookie(key, newCookieCnt);
+                cookie.setMaxAge(60 * 60); //1시간
+                response.addCookie(cookie);
+                postRepository.updateViewCnt(qpostId);
+            }
+
+            key = logined.get().getMsrl() + "|" + "today_cnt";
+            cookieCnt = (String) map.get(key);
+            newCookieCnt = logined.get().getNickname() + "|" + writer.get().getNickname();
+            if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
+                Cookie cookie = new Cookie(key, newCookieCnt);
+                cookie.setMaxAge(60 * 60 * 24); //1시간
+                response.addCookie(cookie);
+                memberRepository.updateTodayCnt(writer.get().getMsrl());
+                memberRepository.updateTotalCnt(writer.get().getMsrl());
+            }
+        } else if (!logined.isPresent()) {
+            cookies = request.getCookies();
+            Map map = new HashMap();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    map.put(cookie.getName(), cookie.getValue());
+                }
+            }
+            String key = "temp" + "|" + "q_view_count";
+            String cookieCnt = (String) map.get(key);
+            String newCookieCnt = "temp" + "|" + qpostId;
+            if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
+                Cookie cookie = new Cookie(key, newCookieCnt);
+                cookie.setMaxAge(60 * 60); //1시간
+                response.addCookie(cookie);
+                postRepository.updateViewCnt(qpostId);
+            }
+
+            key = "temp" + "|" + "today_cnt";
+            cookieCnt = (String) map.get(key);
+            newCookieCnt = "temp" + "|" + writer.get().getNickname();
+            if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
+                Cookie cookie = new Cookie(key, newCookieCnt);
+                cookie.setMaxAge(60 * 60 * 24); //1시간
+                response.addCookie(cookie);
+                memberRepository.updateTodayCnt(writer.get().getMsrl());
+                memberRepository.updateTotalCnt(writer.get().getMsrl());
+            }
+        }
+
         return responseService.getListResult(results);
     }
 

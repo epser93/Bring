@@ -20,8 +20,6 @@ public interface QpostRepository extends JpaRepository<Qpost, Long> {
 
     List<OnlyQpostMapping> findAllByOrderByQpostIdAsc();
 
-    Optional<Qpost> findById(long qpost_id);
-
     List<OnlyQpostMapping> findByQpostId(long qpost_id);
 
     Optional<List<Qpost>> findAllByMember_Nickname(String writer);
