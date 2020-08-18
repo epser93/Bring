@@ -68,36 +68,49 @@
             </span>
         </div>
         
-        <!-- 답변 리스트-->
-        <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded" v-for="(aArticle,index) in aPost" :key="aArticle.aPostId">
+        <!-- 채택된 답변-->
+            <div  v-for="(aArticle,index) in aPost"  :key="`A-${index}`"> <!--key 이렇게 안해주면 에러남 -->
+            <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded" v-if="aArticle.selected===true">
             <p>글쓴이: {{aArticle.member_nickname}}
-                {{aArticle.apostId}}
-                <!-- 만약 채택 된 답변이라면 -->
-                <span v-if="aArticle.selected===true"><b-icon icon="patch-check-fll" variant="info"></b-icon>채택된 답변</span>
-                <span v-else>
-                    <div v-if="aArticle.member_nickname===qPost.member_nickname">
-                        <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)">삭제</b-button>
-                        <b-button variant="warning" @click='modifyAnswerOpen(aArticle)'>수정</b-button>
-                    </div>
-                    <div v-else-if="(nickname===aArticle.member_nickname && selectedAnswer===false )">
-                        <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)">삭제</b-button>
-                        <b-button variant="warning" @click='modifyAnswerOpen(aArticle)'>수정</b-button>
+                <span><b-icon icon="patch-check-fll" variant="info"></b-icon>채택된 답변</span>
+            </p> 
+                <hr>
+                <!--내용-->
+                {{aArticle.answer}}
+                <hr>
+                <!--좋아요-->
+                <span v-if="like[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="likeAnswer(aArticle, false)"><i class="fas fa-heart"></i></span>
+                <span v-if="!like[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="likeAnswer(aArticle, true)"><i class="fas fa-heart"></i></span>        
+                <small :ref="'like-count-' + aArticle.apostId">{{ aArticle.likes }}</small><small>개의 좋아요</small>
+            </div>
+        </div>
+        
+
+        <!-- 채택 되지 않은 답변 리스트-->
+        <div v-for="(aArticle,index) in aPost" :key="aArticle.apostId">
+            <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded" v-if="aArticle.selected===false">
+            <p>글쓴이: {{aArticle.member_nickname}}
+                <span v-if="aArticle.selected===false">
+                    <div v-if="(nickname===aArticle.member_nickname)">
+                        <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="selectedAnswer===false">삭제</b-button>
+                        <b-button variant="warning" @click='modifyAnswerOpen(aArticle)' v-if="selectedAnswer===false">수정</b-button>
                     </div>
                     <div v-else>
-                        <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="(nickname===aArticle.member_nickname && selectedAnswer===false)">삭제</b-button>
-                        <b-button variant="warning" @click='modifyAnswerOpen(aArticle)' v-if="nickname===aArticle.member_nickname">수정</b-button>
-                        <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false )">채택</b-button>
+                        <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="(nickname===aArticle.member_nickname)">삭제</b-button>
+                        <b-button variant="warning" @click='modifyAnswerOpen(aArticle)' v-if="nickname===aArticle.member_nickname ">수정</b-button>
+                        <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false)">채택</b-button>
                     </div>
                 </span>
             </p> 
-            <hr>
-            <!--내용-->
-            {{aArticle.answer}}
-            <hr>
-            <!--좋아요-->
-            <span v-if="like[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="likeAnswer(aArticle, false)"><i class="fas fa-heart"></i></span>
-            <span v-if="!like[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="likeAnswer(aArticle, true)"><i class="fas fa-heart"></i></span>        
-            <small :ref="'like-count-' + aArticle.apostId">{{ aArticle.likes }}</small><small>개의 좋아요</small>
+                <hr>
+                <!--내용-->
+                {{aArticle.answer}}
+                <hr>
+                <!--좋아요-->
+                <span v-if="like[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="likeAnswer(aArticle, false)"><i class="fas fa-heart"></i></span>
+                <span v-if="!like[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="likeAnswer(aArticle, true)"><i class="fas fa-heart"></i></span>        
+                <small :ref="'like-count-' + aArticle.apostId">{{ aArticle.likes }}</small><small>개의 좋아요</small>
+            </div>
         </div>
     </b-container>
   </div>
@@ -162,7 +175,7 @@ export default {
                 // 태그
                 this.tags = res.data.list[1].list
 
-                console.log(this.aPost.length)
+                
             })
             .catch(err => {
                 console.log(err)
@@ -210,6 +223,7 @@ export default {
                 console.log(res)
             })
             .catch(err=>{
+                alert("더 이상 답변을 작성 할 수 없습니다")
                 console.log(err)
             })
             
@@ -273,7 +287,6 @@ export default {
                 axios.post(`${BACK_URL}/answers/like/${aArticle.apostId}/${aArticle.member_nickname}`,likeit,config)
                     .then(res=>{
                         this.$refs[`like-count-${aArticle.apostId}`][0].innerText = res.data.data
-                        console.log(res)
                         this.getAnswer()
                     })
                     .catch(err=>{
@@ -284,7 +297,6 @@ export default {
                 axios.post(`${BACK_URL}/answers/like/${aArticle.apostId}/${aArticle.member_nickname}`,likeit,config)
                     .then(res=>{
                         this.$refs[`like-count-${aArticle.apostId}`][0].innerText = res.data.data 
-                        console.log(res)
                         this.getAnswer()
                     })
                     .catch(err=>{
@@ -308,9 +320,8 @@ export default {
                 this.getAnswer()
                 console.log(res)
             })
-            .catch(err=>{
-                console.log(err)
-                alert("더 이상 답변을 채택할 수 없습니다")
+            .catch(()=>{
+                this.getAnswer()
             })
             }
         },
