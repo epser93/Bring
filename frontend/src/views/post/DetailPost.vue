@@ -29,7 +29,7 @@
         </div>
 
         <!-- 댓글 입력 부분 -->
-        <div id="commentTextArea" class="">
+        <div id="commentTextArea">
             <span v-if="writeComment">
               <div>
                   <b-form-textarea
@@ -446,4 +446,8 @@ export default {
   overflow:hidden;
   cursor: pointer;
   } 
+
+.tag-cloud-link {
+  cursor: pointer;
+}
 </style>
