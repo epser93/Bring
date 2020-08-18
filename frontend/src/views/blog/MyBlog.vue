@@ -9,6 +9,11 @@
           <h4 class="mb-3">'s Blog</h4>
           <p class="card-list-text">{{ this.userInfo.nickname }}의 개인 블로그에 오신것을</p>
           <p class="card-list-text mb-5">환영합니다!</p>
+
+          <!-- 조회수 -->
+          <small>TODAY: {{ todayViewers }}</small>
+          <span class="vertical-line mx-3"></span>
+          <small>TOTAL: {{ totalViewers }}</small>
           <hr>
       </div>
     
@@ -51,6 +56,8 @@ export default {
       userNow: this.$cookies.get('nickname'), 
       userInfo: '',
       cardUserImage: '',
+      todayViewers: 0,
+      totalViewers: 0,
     }
   },
   methods: {
@@ -63,6 +70,8 @@ export default {
       }
       axios.get(`${BACK_URL}/member/${nickname}/profile`, config)
         .then(res => {
+          this.todayViewers = res.data.list[6].list[0]
+          this.totalViewers = res.data.list[6].list[1]
           this.userInfo = res.data.list[0].list[0]
           this.cardUserImage = res.data.list[5].list[0]
         })

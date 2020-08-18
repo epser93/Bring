@@ -165,11 +165,11 @@ export default {
             axios.get(`${BACK_URL}/blog/${this.nickname}/post_list?no=${this.numOfPage}`, config)
                 .then(res => {
                     // 썸네일
-                    this.thumbnail1 = res.data.list[2].list.reverse()
+                    this.thumbnail1 = res.data.list[2].list
                     // 포스트 정보
-                    this.postList = res.data.list[0].list.reverse()
+                    this.postList = res.data.list[0].list
                     // 포스트에 사용자가 좋아요를 눌렀는지에 대한 불린 값
-                    this.postLike1 = res.data.list[1].list.reverse()
+                    this.postLike1 = res.data.list[1].list
                 })
  
                 .catch(err => {
