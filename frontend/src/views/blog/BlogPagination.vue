@@ -30,13 +30,17 @@ export default {
     methods: {
         sendCurrentPage() {
             this.$emit('pageNum', this.currentPage)
+        },
+        upScroll () {
+            window.scrollTo(0,0)
         }
     },
     watch: {
         'currentPage' () {
             this.sendCurrentPage()
+            this.upScroll()
         },
-        'totalNum' () {
+        '$route.query' () {
             // 다른곳으로 이동 시 커렌트 페이지 1로 만들어야 함
             this.currentPage = 1
         }
