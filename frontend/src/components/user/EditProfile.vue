@@ -47,7 +47,7 @@
           </div>
 
         </div>
-
+        <h3 class="font-weight-light overflow-hidden mb-0">A smarter way to tell about<span class="typed-text font-weight-bold ml-1" data-typed-text='["new features.","product updates.","a new idea.","an announcment."]'></span></h3>
         <!-- 닉네임 -->
         <div class="section">
           <h5 class="title"><b>닉네임</b></h5>
@@ -66,21 +66,7 @@
         <div class="section">
           <h5 class="title"><b>새 비밀번호 확인</b></h5>
            <input v-model="changeData.password2" id="pw3" :type="password2Type" placeholder="새 비밀번호를 한번 더 입력해주세요" class="inputRange"/>
-        </div>       
-
-      <!-- 프로필 사진 변경 -->
-        <!-- <div class="section" style="margin-bottom:0">
-          <h5 class="title"><b>프로필 사진 변경</b></h5>
-
-          <div class="filebox" style="margin-top:0">
-            <label for="ex_file"><i class="far fa-images"></i> 사진 변경 </label>
-            <input type="file" id="ex_file" v-on:change="upload">
-          </div>
-          <div class="previewBg">
-            <img class="previewImg" :src="uploadFile"> 
-          </div>
-        </div> -->
-
+        </div>
 
         <div class="section" style="margin-bottom:0">
           <h5 class="title"><b>프로필 사진 변경</b></h5>
@@ -223,37 +209,6 @@ export default {
 
       },
 
-      // upload(e){
-      //   const config = {
-      //     headers: {
-      //     'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
-      //      }
-      //    }
-
-      //   let file = e.target.files;
-      //   let reader = new FileReader();
-        
-      //   reader.readAsDataURL(file[0]);
-      //   reader.onload = e => {
-      //   // console.log(e.target.result);
-      //   this.uploadFile = e.target.result;
-      //   // console.log(this.userInfo.msrl)
-      //   console.log(this.uploadFile)
-      //   }
-
-      //   axios.post(`${BACK_URL}/member/profile/image/${this.userInfo.msrl}`,this.uploadFile, config)
-      //     .then(() => {
-      //           console.log("수정완료")
-      //           this.$router.push({ name : "Profile" })                
-      //     })
-      //     .catch((err) => {
-      //       console.log('에러보기')
-      //       console.error(err)
-      //       alert('사진부분에러남.')
-      //     })
-      // }
-
-
       uploadImage(){
         const config = {
           headers: {
@@ -273,8 +228,8 @@ export default {
 
         axios.post(`${BACK_URL}/member/profile/image/${this.userInfo.msrl}`, formData, config)
           .then(() => {
-                console.log("사진완료")
-                this.$router.push({ name: 'Profile', query: { nickname: this.loginNickname }})           
+            console.log("사진완료")
+            this.$router.push({ name: 'Profile', query: { nickname: this.loginNickname }})           
           })
           .catch((err) => {
             console.error(err)
