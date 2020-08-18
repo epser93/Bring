@@ -73,6 +73,7 @@ public class PostService {
                 postUploadsDto.setNum(num);
                 postUploadsService.savePost(postUploadsDto);
                 fileUrls.add(postUploadsDto.getImgFullPath());
+                System.out.println(postUploadsDto.getImgFullPath());
                 num++;
             }
         }
@@ -248,4 +249,8 @@ public class PostService {
         return true;
     }
 
+//    @CachePut(value = "post-count", key = "#ip + '|' + #postId")
+//    public String getIpForCnt(String ip, long postId) {
+//
+//    }
 }

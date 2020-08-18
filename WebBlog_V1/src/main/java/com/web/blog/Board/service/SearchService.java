@@ -70,7 +70,7 @@ public class SearchService {
     public List<OnlyPostMapping> AllBlogTagSearch(String keyword, Paging paging) {
         Optional<Tag> tag = tagRepository.findByTag(keyword);
         if (!tag.isPresent()) return null;
-        List<PostTag> postTags = postTagRepository.findByTagAndInWhereAndAnswersNot(tag.get(), 1, true, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<PostTag> postTags = postTagRepository.findByTagAndInWhereAndAnswersNotOrderByIdDesc(tag.get(), 1, true, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         List<OnlyPostMapping> posts = new ArrayList<>();
         for (PostTag pt : postTags) {
             Post post = pt.getPost();
@@ -144,7 +144,7 @@ public class SearchService {
     public List<OnlyPostMapping> OnesBlogTagSearch(String nickname, String keyword, Paging paging) {
         Optional<Tag> tag = tagRepository.findByTag(keyword);
         if (!tag.isPresent()) return null;
-        List<PostTag> postTags = postTagRepository.findByTagAndInWhereAndAnswersNot(tag.get(), 1, true, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<PostTag> postTags = postTagRepository.findByTagAndInWhereAndAnswersNotOrderByIdDesc(tag.get(), 1, true, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         List<OnlyPostMapping> posts = new ArrayList<>();
         for (PostTag pt : postTags) {
             Post post = pt.getPost();
@@ -221,7 +221,7 @@ public class SearchService {
     public List<OnlyQpostMapping> AllQnaTagSearch(String keyword, Paging paging) {
         Optional<Tag> tag = tagRepository.findByTag(keyword);
         if (!tag.isPresent()) return null;
-        List<QpostTag> qpostTags = qpostTagRepository.findByTagAndInWhere(tag.get(), 2, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<QpostTag> qpostTags = qpostTagRepository.findByTagAndInWhereOrderByIdDesc(tag.get(), 2, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         List<OnlyQpostMapping> qposts = new ArrayList<>();
         for (QpostTag qt : qpostTags) {
             Qpost qpost = qt.getQpost();
@@ -280,7 +280,7 @@ public class SearchService {
     public List<OnlyQpostMapping> OnesQnaTagSearch(String nickname, String keyword, Paging paging) {
         Optional<Tag> tag = tagRepository.findByTag(keyword);
         if (!tag.isPresent()) return null;
-        List<QpostTag> qpostTags = qpostTagRepository.findByTagAndInWhere(tag.get(), 2, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<QpostTag> qpostTags = qpostTagRepository.findByTagAndInWhereOrderByIdDesc(tag.get(), 2, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         List<OnlyQpostMapping> qposts = new ArrayList<>();
         for (QpostTag qt : qpostTags) {
             Qpost qpost = qt.getQpost();

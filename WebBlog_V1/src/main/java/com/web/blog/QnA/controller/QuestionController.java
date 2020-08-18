@@ -12,11 +12,16 @@ import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.response.SingleResult;
 import com.web.blog.Common.service.ResponseService;
+import com.web.blog.Member.entity.IpAddrForTodayCnt;
+import com.web.blog.Member.entity.IpAddrForViewCnt;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.model.OnlyMemberMapping;
 import com.web.blog.Member.model.ProfileImgDto;
+import com.web.blog.Member.repository.IpAddrForTodayCntRepository;
+import com.web.blog.Member.repository.IpAddrForViewCntRepository;
 import com.web.blog.Member.repository.MemberRepository;
 import com.web.blog.Member.repository.ProfileImgRepository;
+import com.web.blog.Member.service.FollowService;
 import com.web.blog.Member.service.ProfileImgService;
 import com.web.blog.QnA.entity.Qpost;
 import com.web.blog.QnA.model.OnlyApostMapping;
@@ -40,7 +45,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -54,6 +58,7 @@ import java.util.*;
 @RestController
 @RequestMapping(value = "/questions")
 public class QuestionController {
+    private final FollowService followService;
     private final ResponseService responseService;
     private final MemberRepository memberRepository;
     private final QTagService qTagService;
@@ -68,6 +73,8 @@ public class QuestionController {
     private final QpostUploadsService qpostUploadsService;
     private final ProfileImgRepository profileImgRepository;
     private final ProfileImgService profileImgService;
+    private final IpAddrForTodayCntRepository ipAddrForTodayCntRepository;
+    private final IpAddrForViewCntRepository ipAddrForViewCntRepository;
 
     @ApiImplicitParams({
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
@@ -286,66 +293,31 @@ public class QuestionController {
         results.add(responseService.getListResult(qnaService.getOneQpost(qpostId)));
         results.add(responseService.getListResult(qTagService.getTags(qpostId)));
         results.add(responseService.getListResult(qnaService.getApostsofOneQpost(qpostId)));
-
         Optional<Qpost> qpost = qpostRepository.findById(qpostId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = memberRepository.findByUid(uid);
         Optional<Member> writer = memberRepository.findByNickname(qpost.get().getMember().getNickname());
-        Cookie[] cookies = null;
-        if (logined.isPresent() && logined.get().getMsrl() != writer.get().getMsrl()) {
-            cookies = request.getCookies();
-            Map map = new HashMap();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    map.put(cookie.getName(), cookie.getValue());
-                }
-            }
-            String key = logined.get().getMsrl() + "|" + qpostId + "|" + "q_view_count";
-            String cookieCnt = logined.get().getMsrl() + "|" + qpostId;
-            if (!map.containsKey(key)) {
-                Cookie cookie = new Cookie(key, cookieCnt);
-                cookie.setMaxAge(60 * 60); //1시간
-                cookie.setPath("/");
-                response.addCookie(cookie);
+
+        if (logined.get().getMsrl() != writer.get().getMsrl()) {
+            String ip = followService.getIpAddr(request);
+            Optional<IpAddrForViewCnt> ipAddrQ = ipAddrForViewCntRepository.findByIpAndQpostId(ip, qpostId);
+            if(!ipAddrQ.isPresent()) {
+                IpAddrForViewCnt checkCnt = IpAddrForViewCnt.builder()
+                        .ip(ip)
+                        .postId((long)-1)
+                        .qpostId(qpostId)
+                        .build();
+                ipAddrForViewCntRepository.save(checkCnt);
                 qpostRepository.updateViewCnt(qpostId);
             }
-
-            key = logined.get().getMsrl() + "|" + writer.get().getMsrl() + "|" + "today_cnt";
-            cookieCnt = logined.get().getMsrl() + "|" + writer.get().getMsrl();
-            if (!map.containsKey(key)) {
-                Cookie cookie = new Cookie(key, cookieCnt);
-                cookie.setMaxAge(60 * 60 * 24); //24시간
-                cookie.setPath("/");
-                response.addCookie(cookie);
-                memberRepository.updateTodayCnt(writer.get().getMsrl());
-                memberRepository.updateTotalCnt(writer.get().getMsrl());
-            }
-        } else if (!logined.isPresent()) {
-            cookies = request.getCookies();
-            Map map = new HashMap();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    map.put(cookie.getName(), cookie.getValue());
-                }
-            }
-            String key = "temp" + "|" + qpostId + "|" + "q_view_count";
-            String cookieCnt = "temp" + "|" + qpostId;
-            if (!map.containsKey(key)) {
-                Cookie cookie = new Cookie(key, cookieCnt);
-                cookie.setMaxAge(60 * 60); //1시간
-                cookie.setPath("/");
-                response.addCookie(cookie);
-                qpostRepository.updateViewCnt(qpostId);
-            }
-
-            key = "temp" + "|" + writer.get().getMsrl() + "|" + "today_cnt";
-            cookieCnt = "temp" + "|" + writer.get().getMsrl();
-            if (!map.containsKey(key)) {
-                Cookie cookie = new Cookie(key, cookieCnt);
-                cookie.setMaxAge(60 * 60 * 24); //24시간
-                cookie.setPath("/");
-                response.addCookie(cookie);
+            Optional<IpAddrForTodayCnt> ipAddr = ipAddrForTodayCntRepository.findByIpAndNickname(ip, writer.get().getNickname());
+            if(!ipAddr.isPresent()) {
+                IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
+                        .ip(ip)
+                        .nickname(writer.get().getNickname())
+                        .build();
+                ipAddrForTodayCntRepository.save(checkCnt);
                 memberRepository.updateTodayCnt(writer.get().getMsrl());
                 memberRepository.updateTotalCnt(writer.get().getMsrl());
             }

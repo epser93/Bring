@@ -15,10 +15,15 @@ import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.response.SingleResult;
 import com.web.blog.Common.service.ResponseService;
+import com.web.blog.Member.entity.IpAddrForTodayCnt;
+import com.web.blog.Member.entity.IpAddrForViewCnt;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.model.ProfileImgDto;
+import com.web.blog.Member.repository.IpAddrForTodayCntRepository;
+import com.web.blog.Member.repository.IpAddrForViewCntRepository;
 import com.web.blog.Member.repository.MemberRepository;
 import com.web.blog.Member.repository.ProfileImgRepository;
+import com.web.blog.Member.service.FollowService;
 import com.web.blog.Member.service.ProfileImgService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -31,7 +36,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -60,6 +64,9 @@ public class BoardController {
     private final ProfileImgRepository profileImgRepository;
     private final PostUploadsService postUploadsService;
     private final PostUploadsRepository postUploadsRepository;
+    private final FollowService followService;
+    private final IpAddrForTodayCntRepository ipAddrForTodayCntRepository;
+    private final IpAddrForViewCntRepository ipAddrForViewCntRepository;
 
     @Transactional
     @ApiImplicitParams({
@@ -310,43 +317,16 @@ public class BoardController {
             }
         }
 
-        Cookie[] cookies = null;
-        if (logined.isPresent() && logined.get().getMsrl() != member.getMsrl()) {
-            cookies = request.getCookies();
-            Map map = new HashMap();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    map.put(cookie.getName(), cookie.getValue());
-                }
-            }
-            String key = logined.get().getMsrl() + "|" + member.getMsrl() + "|" + "today_cnt";
-            String cookieCnt = logined.get().getMsrl() + "|" + member.getMsrl();
-            if (!map.containsKey(key)) {
-                Cookie cookie = new Cookie(key, cookieCnt);
-                cookie.setMaxAge(60 * 60 * 24); //24시간
-                cookie.setPath("/");
-                response.addCookie(cookie);
-                memberRepository.updateTodayCnt(member.getMsrl());
-                memberRepository.updateTotalCnt(member.getMsrl());
-            }
-        } else if (!logined.isPresent()) {
-            cookies = request.getCookies();
-            Map map = new HashMap();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    map.put(cookie.getName(), cookie.getValue());
-                }
-            }
-            String key = "temp" + "|" + member.getMsrl() + "|" + "today_cnt";
-            String cookieCnt = "temp" + "|" + member.getMsrl();
-            if (!map.containsKey(key)) {
-                Cookie cookie = new Cookie(key, cookieCnt);
-                cookie.setMaxAge(60 * 60 * 24); //24시간
-                cookie.setPath("/");
-                response.addCookie(cookie);
-                memberRepository.updateTodayCnt(member.getMsrl());
-                memberRepository.updateTotalCnt(member.getMsrl());
-            }
+        String ip = followService.getIpAddr(request);
+        Optional<IpAddrForTodayCnt> ipAddr = ipAddrForTodayCntRepository.findByIpAndNickname(ip,  member.getNickname());
+        if(!ipAddr.isPresent()) {
+            IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
+                    .ip(ip)
+                    .nickname(member.getNickname())
+                    .build();
+            ipAddrForTodayCntRepository.save(checkCnt);
+            memberRepository.updateTodayCnt(member.getMsrl());
+            memberRepository.updateTotalCnt(member.getMsrl());
         }
 
         result.add(responseService.getListResult(amIInTheList));
@@ -661,66 +641,29 @@ public class BoardController {
                 filePaths.add(ud.getImgFullPath());
             }
         }
-        Cookie[] cookies = null;
-        if (logined.isPresent() && logined.get().getMsrl() != writer.get().getMsrl()) {
-            cookies = request.getCookies();
-            Map map = new HashMap();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    map.put(cookie.getName(), cookie.getValue());
-                }
-            }
-            String key = logined.get().getMsrl() + "|" + postId + "|" + "p_view_count";
-            String cookieCnt = logined.get().getMsrl() + "|" + postId;
-            if (!map.containsKey(key)) {
-                Cookie cookie = new Cookie(key, cookieCnt);
-                cookie.setMaxAge(60 * 60); //1시간
-                cookie.setPath("/");
-                response.addCookie(cookie);
+        if (logined.get().getMsrl() != writer.get().getMsrl()) {
+            String ip = followService.getIpAddr(request);
+            Optional<IpAddrForViewCnt> ipAddrQ = ipAddrForViewCntRepository.findByIpAndPostId(ip, postId);
+            if(!ipAddrQ.isPresent()) {
+                IpAddrForViewCnt checkCnt = IpAddrForViewCnt.builder()
+                        .ip(ip)
+                        .postId(postId)
+                        .qpostId((long)-1)
+                        .build();
+                ipAddrForViewCntRepository.save(checkCnt);
                 postRepository.updateViewCnt(postId);
             }
-
-            key = logined.get().getMsrl() + "|" + writer.get().getMsrl() + "|" + "today_cnt";
-            cookieCnt = logined.get().getMsrl() + "|" + writer.get().getMsrl();
-            if (!map.containsKey(key)) {
-                Cookie cookie = new Cookie(key, cookieCnt);
-                cookie.setMaxAge(60 * 60 * 24); //24시간
-                cookie.setPath("/");
-                response.addCookie(cookie);
-                memberRepository.updateTodayCnt(writer.get().getMsrl());
-                memberRepository.updateTotalCnt(writer.get().getMsrl());
-            }
-        } else if (!logined.isPresent()) {
-            cookies = request.getCookies();
-            Map map = new HashMap();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    map.put(cookie.getName(), cookie.getValue());
-                }
-            }
-            String key = "temp" + "|" + postId + "|" + "p_view_count";
-            String cookieCnt = "temp" + "|" + postId;
-            if (!map.containsKey(key)) {
-                Cookie cookie = new Cookie(key, cookieCnt);
-                cookie.setMaxAge(60 * 60); //1시간
-                cookie.setPath("/");
-                response.addCookie(cookie);
-                postRepository.updateViewCnt(postId);
-            }
-
-            key = "temp" + "|" + writer.get().getMsrl() + "|" + "today_cnt";
-            cookieCnt = "temp" + "|" + writer.get().getMsrl();
-            if (!map.containsKey(key)) {
-                Cookie cookie = new Cookie(key, cookieCnt);
-                cookie.setMaxAge(60 * 60 * 24); //24시간
-                cookie.setPath("/");
-                response.addCookie(cookie);
+            Optional<IpAddrForTodayCnt> ipAddr = ipAddrForTodayCntRepository.findByIpAndNickname(ip, writer.get().getNickname());
+            if(!ipAddr.isPresent()) {
+                IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
+                        .ip(ip)
+                        .nickname(writer.get().getNickname())
+                        .build();
+                ipAddrForTodayCntRepository.save(checkCnt);
                 memberRepository.updateTodayCnt(writer.get().getMsrl());
                 memberRepository.updateTotalCnt(writer.get().getMsrl());
             }
         }
-        
-
 
         results.add(responseService.getListResult(postService.getPost(postId)));
         results.add(responseService.getListResult(tagService.getTags(postId)));
@@ -921,8 +864,7 @@ public class BoardController {
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
         Board board = boardRepository.findByNameAndMember(boardName, logined);
-        Optional<List<Post>> list = postRepository.findByBoard_BoardIdAndMember_Nickname(board.getBoardId(), nickname);
-
+        Optional<List<Post>> list = postRepository.findByBoard_BoardId(board.getBoardId());
         if (list.isPresent()) {
             Post post = list.get().get(list.get().size() - 1);
             long postId = post.getPostId();
