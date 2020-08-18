@@ -15,7 +15,7 @@ public class ProfileImgService {
     private final S3Service s3Service;
 
     public ProfileImg savePost(ProfileImgDto profileImgDto) {
-        if(profileImgRepository.findByMsrl(profileImgDto.getMsrl()).isPresent()) {
+        if (profileImgRepository.findByMsrl(profileImgDto.getMsrl()).isPresent()) {
             profileImgRepository.deleteByMsrl(profileImgDto.getMsrl());
         }
         return profileImgRepository.save(profileImgDto.toEntity());

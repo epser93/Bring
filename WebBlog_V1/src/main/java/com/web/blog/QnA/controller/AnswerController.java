@@ -266,7 +266,7 @@ public class AnswerController {
             isOk = qnaService.deleteAnswer(apostId, logined.get(), qpostRepository.isSelectedAnswerExist(qpost.getQpostId()));
             qpostRepository.updateAnswerCntMinus(qpost.getQpostId());
             //블로그 Q&A 게시판
-            if(list.isPresent()) {
+            if (list.isPresent()) {
                 if (list.get().size() > 1) { //답변을 두개 이상 달았으면~
                     Apost apost1 = list.get().get(list.get().size() - 1); //해당 리스트의 마지막 답변
                     postId = apost1.getPostId();
@@ -278,7 +278,7 @@ public class AnswerController {
                     System.out.println(list.get().size());
                     System.out.println(list.get().get(1));
                     for (Apost ap : list.get()) {
-                        if(ap.getApostId() == apostId) continue;
+                        if (ap.getApostId() == apostId) continue;
                         sb.append("A." + System.getProperty("line.separator"));
                         sb.append("\t" + ap.getAnswer() + System.getProperty("line.separator") + System.getProperty("line.separator"));
                     }

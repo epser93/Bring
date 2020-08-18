@@ -192,7 +192,7 @@ public class FollowController {
         }
         Collections.shuffle(finalList);
         results.add(responseService.getListResult(finalList));
-        for(OnlyPostMappingForFeed opmf : finalList) {
+        for (OnlyPostMappingForFeed opmf : finalList) {
             long postId = opmf.getPostId();
             Optional<Post> post = postRepository.findById(postId);
             String boardName = post.get().getBoard().getName();

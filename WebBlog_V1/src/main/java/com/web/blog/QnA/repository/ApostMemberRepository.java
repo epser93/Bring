@@ -14,7 +14,9 @@ import java.util.Optional;
 
 public interface ApostMemberRepository extends JpaRepository<ApostMember, Long> {
     Optional<ApostMember> findByMemberAndApost(Member member, Apost apost);
+
     Optional<ApostMember> findApostMemberByMember_MsrlAndApost_ApostId(long msrl, long apot_id);
+
     @Modifying
     @Transactional
     @Query(value = "insert into apost_member (msrl, apost_id) values (:msrl, :apost_id)", nativeQuery = true)

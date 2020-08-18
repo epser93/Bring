@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Entity
 public class PostUploads {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(columnDefinition = "TEXT")

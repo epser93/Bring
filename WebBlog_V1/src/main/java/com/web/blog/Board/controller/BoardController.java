@@ -271,7 +271,7 @@ public class BoardController {
         List<ListResult> result = new ArrayList<>();
         List<Boolean> amIInTheList = new ArrayList<>();
         List<String> filePaths = new ArrayList<>();
-        List<OnlyPostMapping> list = postRepository.findAllByMember_NicknameAndBoard_NameNotLike(nickname, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<OnlyPostMapping> list = postRepository.findAllByMember_NicknameAndBoard_NameNotLikeOrderByPostIdDesc(nickname, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         result.add(responseService.getListResult(list));
         int cnt = 0;
         if (logined.isPresent()) {

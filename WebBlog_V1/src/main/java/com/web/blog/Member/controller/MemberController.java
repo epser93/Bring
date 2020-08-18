@@ -114,18 +114,18 @@ public class MemberController {
         posts.removeIf(opm -> opm.getBoard_name().equals("나의 Answers"));
         List<OnlyQpostMapping> qposts = qpostRepository.findByMember_Nickname(member.getNickname());
         List<OnlyApostMapping> aposts = apostRepository.findAllByMember_Nickname(member.getNickname());
-        for(OnlyPostMapping opm : posts) {
+        for (OnlyPostMapping opm : posts) {
             createdAt.add(opm.getCreatedAt());
         }
-        for(OnlyQpostMapping oqm : qposts) {
+        for (OnlyQpostMapping oqm : qposts) {
             createdAt.add(oqm.getCreatedAt());
         }
-        for(OnlyApostMapping oam : aposts) {
+        for (OnlyApostMapping oam : aposts) {
             createdAt.add(oam.getCreatedAt());
         }
 
-        if(logined.isPresent()) {
-            if(logined.get().getMsrl() != member.getMsrl()) { //프로필 주인이 아니면~
+        if (logined.isPresent()) {
+            if (logined.get().getMsrl() != member.getMsrl()) { //프로필 주인이 아니면~
                 amIIn = followService.isFollowed(logined.get(), member); //로그인 사용자가 조회하려는 유저를 팔로우했으면 true, 아니면 false
                 amIInTheList.add(amIIn);
                 result.add(responseService.getListResult(profile)); //조회하려는 멤버와 불린값 맵 설정
@@ -133,10 +133,10 @@ public class MemberController {
                 result.add(responseService.getListResult(followService.followingList(member))); //팔로잉 리스트(조회하려는 멤버가 구독중인 멤버 리스트)
                 result.add(responseService.getListResult(followService.followersList(member))); //팔로워 리스트(조회하려는 멤버를 구독중인 멤버 리스트)
                 result.add(responseService.getListResult(createdAt)); //모든 포스트의 각 게시 시간
-                if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
+                if (profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
                     ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
                     String filePath = "";
-                    if(profileImgDto != null) {
+                    if (profileImgDto != null) {
                         filePath = profileImgDto.getImgFullPath();
                     }
                     img.add(filePath);
@@ -149,10 +149,10 @@ public class MemberController {
                 result.add(responseService.getListResult(followService.followingList(member))); //팔로잉 리스트(조회하려는 멤버가 구독중인 멤버 리스트)
                 result.add(responseService.getListResult(followService.followersList(member))); //팔로워 리스트(조회하려는 멤버를 구독중인 멤버 리스트)
                 result.add(responseService.getListResult(createdAt)); //모든 포스트의 각 게시 시간
-                if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
+                if (profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
                     ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
                     String filePath = "";
-                    if(profileImgDto != null) {
+                    if (profileImgDto != null) {
                         filePath = profileImgDto.getImgFullPath();
                     }
                     img.add(filePath);
@@ -166,10 +166,10 @@ public class MemberController {
             result.add(responseService.getListResult(followService.followingList(member))); //팔로잉 리스트(조회하려는 멤버가 구독중인 멤버 리스트)
             result.add(responseService.getListResult(followService.followersList(member))); //팔로워 리스트(조회하려는 멤버를 구독중인 멤버 리스트)
             result.add(responseService.getListResult(createdAt)); //모든 포스트의 각 게시 시간
-            if(profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
+            if (profileImgRepository.findByMsrl(member.getMsrl()).isPresent()) {
                 ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
                 String filePath = "";
-                if(profileImgDto != null) {
+                if (profileImgDto != null) {
                     filePath = profileImgDto.getImgFullPath();
                 }
                 img.add(filePath);
@@ -178,7 +178,7 @@ public class MemberController {
         }
 
         Cookie[] cookies = null;
-        if(logined.isPresent() && logined.get().getMsrl() != member.getMsrl()) {
+        if (logined.isPresent() && logined.get().getMsrl() != member.getMsrl()) {
             cookies = request.getCookies();
             Map map = new HashMap();
             if (cookies != null) {
@@ -222,7 +222,7 @@ public class MemberController {
         List<TodayDate> todayDates = todayDateRepository.findByMember_Msrl(member.getMsrl());
         List<LocalDate> localDates = new ArrayList<>();
         List<Integer> counts = new ArrayList<>();
-        for(TodayDate td : todayDates) {
+        for (TodayDate td : todayDates) {
             localDates.add(td.getDate());
             counts.add(td.getCnt());
         }
@@ -258,15 +258,15 @@ public class MemberController {
         String id = authentication.getName();
         Member member = repository.findByUid(id).orElseThrow(CUserNotFoundException::new);
 
-        if(!passwordEncoder.matches(oldPassword, member.getPassword())){ //기존 비밀번호 입력값이 DB의 값과 다르면~
+        if (!passwordEncoder.matches(oldPassword, member.getPassword())) { //기존 비밀번호 입력값이 DB의 값과 다르면~
             throw new CPasswordDoesntMatch(); //에러메세지
         } else { //기존 비밀번호 입력값이 DB의 값과 같으면~
             //비밀번호 변경
-            if(newPassword.isPresent()) { //새 비밀번호 입력값이 비어있지 않으면~
-                if(!newPasswordChk.isPresent() || newPassword.get().length() < 7 || newPassword.get().length() > 20 || newPasswordChk.get().length() < 7 || newPasswordChk.get().length() > 20) { //길이가 맞지 않으면~
+            if (newPassword.isPresent()) { //새 비밀번호 입력값이 비어있지 않으면~
+                if (!newPasswordChk.isPresent() || newPassword.get().length() < 7 || newPassword.get().length() > 20 || newPasswordChk.get().length() < 7 || newPasswordChk.get().length() > 20) { //길이가 맞지 않으면~
                     throw new CPasswordLengthException();
                 }
-                if(!newPassword.get().equals(newPasswordChk.get())) { //비밀번호 확인 값과 다르면~
+                if (!newPassword.get().equals(newPasswordChk.get())) { //비밀번호 확인 값과 다르면~
                     throw new CPasswordDoesntMatch();
                 } else { //비밀번호 확인 값과 같으면~
                     member.setPassword(passwordEncoder.encode(newPassword.get()));
@@ -274,8 +274,8 @@ public class MemberController {
             }
 
             //닉네임 변경(값 존재하면!)
-            if(nickname.isPresent()) {
-                if(!repository.findByNickname(nickname.get()).isPresent()) member.setNickname(nickname.get());
+            if (nickname.isPresent()) {
+                if (!repository.findByNickname(nickname.get()).isPresent()) member.setNickname(nickname.get());
                 else throw new CNicknameExistException();
             }
         }
@@ -295,8 +295,8 @@ public class MemberController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String id = authentication.getName();
         Member logined = repository.findByUid(id).orElseThrow(CUserNotFoundException::new);
-        if(msrl != logined.getMsrl()) return null;
-        if(profileImgRepository.findByMsrl(msrl).isPresent()) { // 기존 프로필 이미지 존재시 삭제 먼저하기
+        if (msrl != logined.getMsrl()) return null;
+        if (profileImgRepository.findByMsrl(msrl).isPresent()) { // 기존 프로필 이미지 존재시 삭제 먼저하기
             s3Service.delete(profileImgRepository.findByMsrl(msrl).get().getFilePath());
             profileImgRepository.deleteByMsrl(logined.getMsrl());
         }
@@ -314,7 +314,7 @@ public class MemberController {
     @ApiOperation(value = "회원 삭제", notes = "회원번호로 회원정보를 삭제한다")
     @DeleteMapping(value = "/delete/{msrl}")
     public CommonResult delete(@ApiParam(value = "회원번호", required = true) @PathVariable long msrl) {
-        if(profileImgRepository.findByMsrl(msrl).isPresent()) { // 기존 프로필 이미지 존재시 삭제 먼저하기
+        if (profileImgRepository.findByMsrl(msrl).isPresent()) { // 기존 프로필 이미지 존재시 삭제 먼저하기
             s3Service.delete(profileImgRepository.findByMsrl(msrl).get().getFilePath());
             profileImgRepository.deleteByMsrl(msrl);
         }
