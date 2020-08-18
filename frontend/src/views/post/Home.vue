@@ -87,7 +87,7 @@ export default {
 .Buttons {
   display: flex;
   justify-content: flex-end;
-  margin-right : 60px;
+  margin-right : 80px;
 }
 
 #modeToggler {

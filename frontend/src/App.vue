@@ -1,9 +1,9 @@
 <template>
   <div id="app">
     <Header :isLogin="isLogin" :nickname="userNickname" @logout-state="updateLogout"/>
-    <demo-login-modal @submit-login-data="login"/>
+    <demo-login-modal @submit-login-data="login" @submit-signup-data="signup"/>
     <div class="container-fluid p-0">
-      <router-view @submit-login-data="login" @submit-signup-data="signup" />
+    <router-view />
     </div>
   </div>
 </template>
@@ -56,8 +56,9 @@ export default {
           this.setNickname(res.data.data2.nickname, res.data.data2.msrl)
           // 쿠키 모드
           this.$cookies.set('mode', 'Blog')
-          this.$router.replace({ name : 'RecentlyPost' })
-          location.reload() // 새로고침이 답인가?
+          this.$modal.hide('demo-login')
+          this.$router.push({ name : 'RecentlyPost' }).catch(() => {})
+          location.reload() // 새로고침이 답인가??
         })
         .catch(err => {
           alert('ID와 비밀번호를 다시 확인해주세요.')
@@ -66,14 +67,11 @@ export default {
     },
 
     signup(signupData) {
-      console.log(signupData)
       axios.post(`${BACK_URL}/sign/up`, signupData)
-        .then(res => {
-          console.log(res)
+        .then(() => {
           this.forLogin.id = signupData.uid
           this.forLogin.password = signupData.password1
           this.login(this.forLogin)
-          this.$router.push('/')
         })
         .catch(err =>{
           alert('회원가입 실패')

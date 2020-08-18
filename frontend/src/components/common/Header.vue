@@ -10,14 +10,8 @@
 
             <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
                 <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                    <!-- <li class="nav-item">
-                        <router-link v-if="!isLogin" :to="{ name: 'Login' }" class="nav-link">로그인</router-link>
-                    </li> -->
                     <li class="nav-item">
                         <a href='#' v-if="!isLogin" @click="$modal.show('demo-login')" class="nav-link">LOGIN</a>
-                    </li>
-                    <li class="nav-item">
-                        <router-link v-if="!isLogin" :to="{ name: 'Signup' }" class="nav-link">회원가입</router-link>
                     </li>
                     <li class="nav-item">
                         <router-link v-if="isLogin" :to="{ name: 'Profile', query: { nickname: this.nickname }}" class="nav-link">프로필</router-link> 
