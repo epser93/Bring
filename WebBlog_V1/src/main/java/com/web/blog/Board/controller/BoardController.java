@@ -641,29 +641,28 @@ public class BoardController {
                 filePaths.add(ud.getImgFullPath());
             }
         }
-        if (logined.get().getMsrl() != writer.get().getMsrl()) {
-            String ip = followService.getIpAddr(request);
-            Optional<IpAddrForViewCnt> ipAddrQ = ipAddrForViewCntRepository.findByIpAndPostId(ip, postId);
-            if(!ipAddrQ.isPresent()) {
-                IpAddrForViewCnt checkCnt = IpAddrForViewCnt.builder()
-                        .ip(ip)
-                        .postId(postId)
-                        .qpostId((long)-1)
-                        .build();
-                ipAddrForViewCntRepository.save(checkCnt);
-                postRepository.updateViewCnt(postId);
-            }
-            Optional<IpAddrForTodayCnt> ipAddr = ipAddrForTodayCntRepository.findByIpAndNickname(ip, writer.get().getNickname());
-            if(!ipAddr.isPresent()) {
-                IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
-                        .ip(ip)
-                        .nickname(writer.get().getNickname())
-                        .build();
-                ipAddrForTodayCntRepository.save(checkCnt);
-                memberRepository.updateTodayCnt(writer.get().getMsrl());
-                memberRepository.updateTotalCnt(writer.get().getMsrl());
-            }
+        String ip = followService.getIpAddr(request);
+        Optional<IpAddrForViewCnt> ipAddrQ = ipAddrForViewCntRepository.findByIpAndPostId(ip, postId);
+        if (!ipAddrQ.isPresent()) {
+            IpAddrForViewCnt checkCnt = IpAddrForViewCnt.builder()
+                    .ip(ip)
+                    .postId(postId)
+                    .qpostId((long) -1)
+                    .build();
+            ipAddrForViewCntRepository.save(checkCnt);
+            postRepository.updateViewCnt(postId);
         }
+        Optional<IpAddrForTodayCnt> ipAddr = ipAddrForTodayCntRepository.findByIpAndNickname(ip, writer.get().getNickname());
+        if (!ipAddr.isPresent()) {
+            IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
+                    .ip(ip)
+                    .nickname(writer.get().getNickname())
+                    .build();
+            ipAddrForTodayCntRepository.save(checkCnt);
+            memberRepository.updateTodayCnt(writer.get().getMsrl());
+            memberRepository.updateTotalCnt(writer.get().getMsrl());
+        }
+
 
         results.add(responseService.getListResult(postService.getPost(postId)));
         results.add(responseService.getListResult(tagService.getTags(postId)));

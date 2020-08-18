@@ -41,13 +41,13 @@ public class QnaService {
     public List<String> saveFiles(long qpostId, String nickname, MultipartFile[] files) throws IOException {
         List<String> fileUrls = new ArrayList<>();
         if (files != null) {
-            if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //질문에 사진이 한장이라도 존재하면~
-                List<QpostUploads> beforeUpdate = qpostUploadsRepository.findAllByQpostId(qpostId);
-                qpostUploadsService.deleteImgs(qpostId); //해당하는 질문의 모든 사진 정보 db에서 삭제
-                for (QpostUploads upload : beforeUpdate) { //해당하는 질문의 모든 사진 s3에서 삭제
-                    s3Service.delete(upload.getFilePath());
-                }
-            }
+//            if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //질문에 사진이 한장이라도 존재하면~
+//                List<QpostUploads> beforeUpdate = qpostUploadsRepository.findAllByQpostId(qpostId);
+//                qpostUploadsService.deleteImgs(qpostId); //해당하는 질문의 모든 사진 정보 db에서 삭제
+//                for (QpostUploads upload : beforeUpdate) { //해당하는 질문의 모든 사진 s3에서 삭제
+//                    s3Service.delete(upload.getFilePath());
+//                }
+//            }
 
             int num = 0;
             for (MultipartFile file : files) { //s3에 업로드하고 db에 파일 정보 저장
@@ -56,6 +56,7 @@ public class QnaService {
                 qpostUploadsDto.setFilePath(imgPath);
                 qpostUploadsDto.setQpostId(qpostId);
                 qpostUploadsDto.setNum(num);
+                qpostUploadsDto.setImgFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + imgPath);
                 qpostUploadsService.savePost(qpostUploadsDto);
                 fileUrls.add(qpostUploadsDto.getImgFullPath());
                 num++;

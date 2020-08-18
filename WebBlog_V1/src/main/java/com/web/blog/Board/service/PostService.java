@@ -56,14 +56,13 @@ public class PostService {
     public List<String> saveFiles(long postId, String nickname, MultipartFile[] files) throws IOException {
         List<String> fileUrls = new ArrayList<>();
         if (files != null) {
-            if (postUploadsRepository.findByPostId(postId).isPresent()) { //포스트에 사진이 한장이라도 존재하면~
-                List<PostUploads> beforeUpdate = postUploadsRepository.findAllByPostId(postId);
-                postUploadsService.deleteImgs(postId); //해당하는 포스트의 모든 사진 정보 db에서 삭제
-                for (PostUploads upload : beforeUpdate) { //해당하는 포스트의 모든 사진 s3에서 삭제
-                    s3Service.delete(upload.getFilePath());
-                }
-            }
-
+//            if (postUploadsRepository.findByPostId(postId).isPresent()) { //포스트에 사진이 한장이라도 존재하면~
+//                List<PostUploads> beforeUpdate = postUploadsRepository.findAllByPostId(postId);
+//                postUploadsService.deleteImgs(postId); //해당하는 포스트의 모든 사진 정보 db에서 삭제
+//                for (PostUploads upload : beforeUpdate) { //해당하는 포스트의 모든 사진 s3에서 삭제
+//                    s3Service.delete(upload.getFilePath());
+//                }
+//            }
             int num = 0;
             for (MultipartFile file : files) { //s3에 업로드하고 db에 파일 정보 저장
                 String imgPath = s3Service.upload(file, postId, num, nickname); //s3에 저장
@@ -71,9 +70,9 @@ public class PostService {
                 postUploadsDto.setFilePath(imgPath);
                 postUploadsDto.setPostId(postId);
                 postUploadsDto.setNum(num);
+                postUploadsDto.setImgFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + imgPath);
                 postUploadsService.savePost(postUploadsDto);
                 fileUrls.add(postUploadsDto.getImgFullPath());
-                System.out.println(postUploadsDto.getImgFullPath());
                 num++;
             }
         }
