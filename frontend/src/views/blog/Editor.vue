@@ -38,7 +38,7 @@
     </form>
 
     <!-- 글 에디터 부분 -->
-    <v-md-editor class="text-left" v-model="aboutText.post.content" height="600px"></v-md-editor>
+    <v-md-editor class="text-left" v-model="aboutText.post.content" :disabled-menus="[]" @upload-image="handleUploadImage" height="600px"></v-md-editor>
     <br>
 
     <!-- 태그 -->
@@ -77,9 +77,43 @@ export default {
       thumbnail: '',
       tag: null,
       modal: false,
+      // 이미지 업로드 반환 url
+      imageServerUrl : ''
     }
   },
   methods: {
+    // 이미지 업로드
+    handleUploadImage(event, insertImage, files) {
+      if (this.aboutText.boardName === "default" || this.aboutText.boardName === null) {
+        alert('카테고리 먼저 정해주세요')
+      } else {
+        console.log(this.aboutText.boardName)
+        console.log(files[0])
+        this.uploadImageDirect(files[0])
+        insertImage({
+          // url : 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1269952892,3525182336&fm=26&gp=0.jpg',
+          url : this.imageServerUrl,
+          desc : '사진설명'
+        })
+      }
+    },
+    // 바로 이미지를 서버에 업로드 업로드 된 장소의 url 받아오기
+    uploadImageDirect(file) {
+      const formData = new FormData()
+      formData.append('files', file)
+      const config = {
+        headers: {
+          'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
+          'Content-Type' : 'multipart/form-data'
+        }
+      }
+      axios.post(`${BACK_URL}/blog/${this.aboutText.nickname}/${this.aboutText.boardName}/uploads`, formData, config)
+        .then(res => {
+          console.log('업로드',res)
+          this.imageServerUrl = res.data.list[0]
+        })
+        .catch(err => console.log(err))
+    },
     postText() {
       const config = {
           headers: {

@@ -2,19 +2,19 @@
   <div class="wrapB container-fluid">
     <section class="cards row">
       <div class="col-lg-10 row">
-        <div v-for="question in list" :key="question.qpostId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
+        <div v-for="(question, index) in list" :key="question.qpostId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
           <div class="cardwrap" @click="gotoQuestionDetail(question)">
-            <div class="img-section">
+            <div class="img-section" :style="{ 'background-image' : `url(${thumbnails[index]})`}">
               <a href=""></a>
             </div>
             <div class="contents">
               <h4>{{ question.subject }}</h4>
               <p>{{ question.content }}</p>
-              <p class="comment-date">{{ question.createdAt.substring(0,10) }} · {{ question.answerCnt }}개의 댓글</p>
+              <p class="comment-date">{{ question.createdAt.substring(0,10) }} · {{ question.answerCnt }}개의 답변</p>
             </div>
             <div class="writer-info">
               <p>{{ question.member_nickname }}</p>
-              <p>♥ {{ question.views }}</p>
+              <p><i class="far fa-eye"></i> {{ question.views }}</p>
             </div>
           </div>
         </div>
@@ -54,6 +54,7 @@ export default {
     return {
       list: [],
       unsortedRank: [],
+      thumbnails: [],
       page : 1,
       tags : [],
     }
@@ -64,12 +65,12 @@ export default {
   },
   methods: {
     infiniteHandler ($state) {
-      console.log($state)
       axios.get(`${BACK_URL}/questions/trend?no=${this.page}`)
         .then (res => {
           if (res.data.list[0].list.length) {
             this.page += 1
             this.list.push(...res.data.list[0].list)
+            this.thumbnails.push(...res.data.list[1].list)
             $state.loaded()
           } else {
             $state.complete()
@@ -84,7 +85,6 @@ export default {
       axios.get(`${BACK_URL}/member/rank`)
         .then(res => {
           this.unsortedRank = res.data.list
-          // console.log(this.unsortedRank)
         })
         .catch(err => console.log(err))
     },
@@ -96,7 +96,6 @@ export default {
         .catch(err => console.log(err))
     },
     searchTags(tag) {
-      console.log(tag)
       this.$router.push({ name : 'TagSearchQuestions', params : { keyword : tag }})
     }
   },
