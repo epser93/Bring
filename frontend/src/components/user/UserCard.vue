@@ -60,7 +60,6 @@
                                         <div v-if="selectFollow == true">
                                             <div v-if="followerUserImg == null">
                                                 <h5>팔로우가 없습니다.</h5>
-                                                sadflkasdjflksdjfklsdjkljfdkl
                                             </div>
                                             <div v-else class="row row-cols-2">
                                                 <li v-for="user in followerUserImg" v-bind:key="user" class="listFollow col">
@@ -102,27 +101,27 @@
                     <div class="col-6 mx-3 mt-3"> 
                         <h3 class="card-title"><b>My Level</b> </h3>
                         <div v-if="computedGrade === 'bronze'" class="mb-3">
-                            <h3 class="r_bronze"><i class="fas fa-medal"></i></h3>
+                            <img class="grade-img" src="../../assets/img/마스터.png" alt="">
                             <p>Bronze</p>
                         </div>
                         <div v-else-if="computedGrade === 'silver'" class="mb-3">
-                            <h3 class="r_silver"><i class="fas fa-medal"></i></h3>
+                            <img class="grade-img" src="../../assets/img/실버.png" alt="">
                             <p>Silver</p>
                         </div>
                         <div v-else-if="computedGrade === 'gold'" class="mb-3">
-                            <h3 class="r_gold"><i class="fas fa-medal"></i></h3>
+                            <img class="grade-img" src="../../assets/img/골드.png" alt="">
                             <p>Gold</p>
                         </div>
                         <div v-else-if="computedGrade === 'platinum'" class="mb-3">
-                            <h3 class="r_platinum"><i class="fas fa-trophy"></i></h3>
+                            <img class="grade-img" src="../../assets/img/플래티넘.png" alt="">
                             <p>Platinum</p>
                         </div>
                         <div v-else-if="computedGrade === 'diamond'" class="mb-3">
-                            <h3 class="r_diamond"><i class="fas fa-trophy"></i></h3>
+                            <img class="grade-img" src="../../assets/img/다이아.png" alt="">
                             <p>Diamond</p>
                         </div>
                         <div v-else class="mb-3">
-                            <h3 class="r_master"><i class="fas fa-trophy"></i></h3>
+                            <img class="grade-img" src="../../assets/img/마스터.png" alt="">
                             <p>Master</p>
                         </div>
 
@@ -138,7 +137,7 @@
                 <hr>
 
                 <!--  TIL   -->
-                <h4><b>Today I Post</b></h4>
+                <h4><b>Today's Post</b></h4>
                 
                 <calendar-heatmap
                 :values="valPostList"
@@ -160,7 +159,7 @@
                 <div id="chart">
                     <h4><b>Tag List</b></h4>
                     <div v-if="checkTag == true">
-                        <apexchart type="donut" :options="donutOptions" :series="donutSeries"></apexchart>
+                        <apexchart type="donut" :options="donutOptions" :series="donutSeries" class="tag-list"></apexchart>
                     </div>
                     <div v-else>
                         <br><br>
@@ -559,7 +558,7 @@ export default {
                     tmpTagCnt.push(this.userTagCnt[i])
                 }
             }
-            if(this.userTagList.length > 3){
+            if(this.userTagList.length > 4){
                 tmpTagList.push('ETC') //donutSeries
                 tmpTagCnt.push(sumETC)
             }           
@@ -637,8 +636,17 @@ export default {
 }
 #chart{
     width:300px;
-    height: 200px;
+    height: 250px;
     margin:auto;
+}
+.card-title{
+    margin: auto;
+}
+.tag-list{
+    text-transform: uppercase;
+}
+.grade-img{
+    height: 70px;
 }
 </style>
 
