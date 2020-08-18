@@ -1,40 +1,43 @@
 <template>
     <div id="header">
         <nav class="navbar navbar-expand-lg p-0 m-0">
-            <router-link v-if="this.mode === 'Blog'" :to="{ name: 'RecentlyPost' }" class="navbar-brand p-3">
-                GEESHIQUEEN블로그
+            <router-link v-if="this.mode === 'Blog'" :to="{ name: 'RecentlyPost' }" class="navbar-brand p-3 ml-3">
+                BD BLOG
             </router-link>
-            <router-link v-if="this.mode === 'QnA'" :to="{ name: 'RecentlyQuestion' }" class="navbar-brand p-3">
-                GEESHIQUEEN지식인
+            <router-link v-if="this.mode === 'QnA'" :to="{ name: 'RecentlyQuestion' }" class="navbar-brand p-3 ml-3">
+                BD GISIK
             </router-link>
+            
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"><i class="fas fa-sliders-h"></i></span>
+              <span class="navbar-toggler-icon"><i class="fas fa-sliders-h" style="color: gray;"></i></span>
             </button>
             <div class="collapse navbar-collapse m-0" id="navbarSupportedContent">
+                
                 <ul class="navbar-nav mr-auto text-left">
-                    <li class="nav-item">
+                  <span class="vertical-line mx-3"></span>
+                    <li class="nav-item ml-3">
                         <a href='#' v-if="!isLogin" @click="$modal.show('demo-login')" class="nav-link">LOGIN</a>
                     </li>
-                    <span class="vertical-line mx-3"></span>
-                    <li class="nav-item">
+
+                    <li class="nav-item ml-3">
                         <router-link v-if="isLogin" :to="{ name: 'Profile', query: { nickname: this.nickname }}" class="nav-link">프로필</router-link> 
                     </li>
-                    <span class="vertical-line mx-3 my-2"></span>
-                    <li class="nav-item">
+
+                    <li class="nav-item ml-3">
                         <router-link v-if="isLogin" :to="{ name: 'MyBlog', params: { nickname: this.nickname }}" class="nav-link">블로그</router-link> 
                     </li>
-                    <span class="vertical-line mx-3 my-2"></span>
-                    <li class="nav-item">
+
+                    <li class="nav-item ml-3">
                         <router-link v-if="isLogin" :to="{ name: 'Question' }" class="nav-link">지식인</router-link> 
                     </li>     
-                    <span class="vertical-line mx-3 my-2"></span>               
-                    <li class="nav-item" id="logout">
+
+                    <li class="nav-item ml-3" id="logout">
                         <p v-if="isLogin" @click="logout" class="nav-link">로그아웃</p> 
                     </li>
                 </ul>
 
                 <!-- 검색창 -->
-                <div v-if="this.mode === 'Blog'" class="form-inline my-2 my-lg-0">
+                <div v-if="this.mode === 'Blog'" class="form-inline mx-3">
                     <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-secondary">{{ keywordType.name }}</button>
                     <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu">
                         <button type="button" tabindex="0" @click="dropdown(typeid, value)" class="dropdown-item" v-for="(value, typeid) in dropdownList" v-bind:key="typeid">
@@ -46,7 +49,7 @@
                 </div>
 
                 <!-- 질문 검색창 -->
-                <div v-if="this.mode === 'QnA'" class="form-inline">
+                <div v-if="this.mode === 'QnA'" class="form-inline mx-3">
                     <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-secondary">{{ keywordType.name }}</button>
                     <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu">
                         <button type="button" tabindex="0" @click="dropdown(typeid, value)" class="dropdown-item" v-for="(value, typeid) in dropdownList" v-bind:key="typeid">
@@ -170,6 +173,11 @@
 
 .navbar p {
   color: #494949;
+}
+
+.navbar p:hover {
+  color: #56dbc9;
+  transition-duration: 0.3s;
 }
 
 input {
