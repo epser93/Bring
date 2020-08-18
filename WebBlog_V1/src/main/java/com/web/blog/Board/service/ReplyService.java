@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -45,7 +46,8 @@ public class ReplyService {
         return replyRepository.findByPost(post);
     }
 
-    public boolean saveFiles(long replyId, String nickname, MultipartFile[] files) throws IOException {
+    public List<String> saveFiles(long replyId, String nickname, MultipartFile[] files) throws IOException {
+        List<String> fileUrls = new ArrayList<>();
         if (files != null) {
             if (replyUploadsRepository.findByReplyId(replyId).isPresent()) { //댓글에 사진이 한장이라도 존재하면~
                 List<ReplyUploads> beforeUpdate = replyUploadsRepository.findAllByReplyId(replyId);
@@ -63,10 +65,11 @@ public class ReplyService {
                 replyUploadsDto.setReplyId(replyId);
                 replyUploadsDto.setNum(num);
                 replyUploadsService.savePost(replyUploadsDto);
+                fileUrls.add(replyUploadsDto.getImgFullPath());
                 num++;
             }
         }
-        return true;
+        return fileUrls;
     }
 
     //댓글 작성

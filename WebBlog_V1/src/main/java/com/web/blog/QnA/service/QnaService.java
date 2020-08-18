@@ -38,7 +38,8 @@ public class QnaService {
     private final S3Service s3Service;
     private final PostRepository postRepository;
 
-    public boolean saveFiles(long qpostId, String nickname, MultipartFile[] files) throws IOException {
+    public List<String> saveFiles(long qpostId, String nickname, MultipartFile[] files) throws IOException {
+        List<String> fileUrls = new ArrayList<>();
         if (files != null) {
             if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //질문에 사진이 한장이라도 존재하면~
                 List<QpostUploads> beforeUpdate = qpostUploadsRepository.findAllByQpostId(qpostId);
@@ -56,10 +57,11 @@ public class QnaService {
                 qpostUploadsDto.setQpostId(qpostId);
                 qpostUploadsDto.setNum(num);
                 qpostUploadsService.savePost(qpostUploadsDto);
+                fileUrls.add(qpostUploadsDto.getImgFullPath());
                 num++;
             }
         }
-        return true;
+        return fileUrls;
     }
 
     //모든 질문글 리스트

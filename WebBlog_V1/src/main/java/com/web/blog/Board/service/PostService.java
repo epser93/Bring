@@ -53,7 +53,8 @@ public class PostService {
         return postRepository.findById(postId).get();
     }
 
-    public boolean saveFiles(long postId, String nickname, MultipartFile[] files) throws IOException {
+    public List<String> saveFiles(long postId, String nickname, MultipartFile[] files) throws IOException {
+        List<String> fileUrls = new ArrayList<>();
         if (files != null) {
             if (postUploadsRepository.findByPostId(postId).isPresent()) { //포스트에 사진이 한장이라도 존재하면~
                 List<PostUploads> beforeUpdate = postUploadsRepository.findAllByPostId(postId);
@@ -71,10 +72,11 @@ public class PostService {
                 postUploadsDto.setPostId(postId);
                 postUploadsDto.setNum(num);
                 postUploadsService.savePost(postUploadsDto);
+                fileUrls.add(postUploadsDto.getImgFullPath());
                 num++;
             }
         }
-        return true;
+        return fileUrls;
     }
 
     //게시글 작성
@@ -245,4 +247,5 @@ public class PostService {
         }
         return true;
     }
+
 }
