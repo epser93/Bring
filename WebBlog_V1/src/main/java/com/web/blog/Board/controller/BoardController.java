@@ -916,7 +916,7 @@ public class BoardController {
     })
     @ApiOperation(value = "파일 등록", notes = "새로운 포스트 작성 시, 또는 공유 할 시 파일 등록")
     @PostMapping(value = "/blog/{nickname}/{boardName}/uploads")
-    public SingleResult<Boolean> upload(@PathVariable String nickname, @PathVariable String boardName, @RequestPart MultipartFile[] files) throws IOException {
+    public ListResult<String> upload(@PathVariable String nickname, @PathVariable String boardName, @RequestPart MultipartFile[] files) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
@@ -926,7 +926,7 @@ public class BoardController {
         if (list.isPresent()) {
             Post post = list.get().get(list.get().size() - 1);
             long postId = post.getPostId();
-            return responseService.getSingleResult(postService.saveFiles(postId, nickname, files));
+            return responseService.getListResult(postService.saveFiles(postId, nickname, files));
         } else return null;
     }
 
@@ -935,11 +935,11 @@ public class BoardController {
     })
     @ApiOperation(value = "파일 수정 등록", notes = "기존 포스트 수정 할 때, 필요시 파일 수정")
     @PostMapping(value = "/blog/{nickname}/{boardName}/{postId}/uploads")
-    public SingleResult<Boolean> uploadUpdate(@PathVariable String nickname, @PathVariable String boardName, @PathVariable long postId, @RequestPart MultipartFile[] files) throws IOException {
+    public ListResult<String> uploadUpdate(@PathVariable String nickname, @PathVariable String boardName, @PathVariable long postId, @RequestPart MultipartFile[] files) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
-        return responseService.getSingleResult(postService.saveFiles(postId, nickname, files));
+        return responseService.getListResult(postService.saveFiles(postId, nickname, files));
     }
 
     @ApiImplicitParams({
