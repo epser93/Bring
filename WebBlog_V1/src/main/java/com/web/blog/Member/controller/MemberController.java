@@ -35,7 +35,6 @@ import com.web.blog.QnA.repository.ApostRepository;
 import com.web.blog.QnA.repository.QpostRepository;
 import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -186,12 +185,12 @@ public class MemberController {
                     map.put(cookie.getName(), cookie.getValue());
                 }
             }
-            String key = logined.get().getMsrl() + "|" + "today_cnt";
-            String cookieCnt = (String) map.get(key);
-            String newCookieCnt = logined.get().getNickname() + "|" + member.getNickname();
-            if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
-                Cookie cookie = new Cookie(key, newCookieCnt);
+            String key = logined.get().getMsrl() + "|" + member.getMsrl() + "|" + "today_cnt";
+            String cookieCnt = logined.get().getMsrl() + "|" + member.getMsrl();
+            if (!map.containsKey(key)) {
+                Cookie cookie = new Cookie(key, cookieCnt);
                 cookie.setMaxAge(60 * 60 * 24); //24시간
+                cookie.setPath("/");
                 response.addCookie(cookie);
                 repository.updateTodayCnt(member.getMsrl());
                 repository.updateTotalCnt(member.getMsrl());
@@ -204,12 +203,12 @@ public class MemberController {
                     map.put(cookie.getName(), cookie.getValue());
                 }
             }
-            String key = "temp" + "|" + "today_cnt";
-            String cookieCnt = (String) map.get(key);
-            String newCookieCnt = "temp" + "|" + member.getNickname();
-            if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
-                Cookie cookie = new Cookie(key, newCookieCnt);
+            String key = "temp" + "|" + member.getMsrl() + "|" + "today_cnt";
+            String cookieCnt = "temp" + "|" + member.getMsrl();
+            if (!map.containsKey(key)) {
+                Cookie cookie = new Cookie(key, cookieCnt);
                 cookie.setMaxAge(60 * 60 * 24); //24시간
+                cookie.setPath("/");
                 response.addCookie(cookie);
                 repository.updateTodayCnt(member.getMsrl());
                 repository.updateTotalCnt(member.getMsrl());

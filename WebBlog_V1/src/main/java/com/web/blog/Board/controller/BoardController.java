@@ -25,7 +25,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -311,8 +310,8 @@ public class BoardController {
             }
         }
 
-        Cookie[] cookies;
-        if(logined.isPresent() && logined.get().getMsrl() != member.getMsrl()) {
+        Cookie[] cookies = null;
+        if (logined.isPresent() && logined.get().getMsrl() != member.getMsrl()) {
             cookies = request.getCookies();
             Map map = new HashMap();
             if (cookies != null) {
@@ -320,12 +319,12 @@ public class BoardController {
                     map.put(cookie.getName(), cookie.getValue());
                 }
             }
-            String key = logined.get().getMsrl() + "|" + "today_cnt";
-            String cookieCnt = (String) map.get(key);
-            String newCookieCnt = logined.get().getNickname() + "|" + member.getNickname();
-            if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
-                Cookie cookie = new Cookie(key, newCookieCnt);
+            String key = logined.get().getMsrl() + "|" + member.getMsrl() + "|" + "today_cnt";
+            String cookieCnt = logined.get().getMsrl() + "|" + member.getMsrl();
+            if (!map.containsKey(key)) {
+                Cookie cookie = new Cookie(key, cookieCnt);
                 cookie.setMaxAge(60 * 60 * 24); //24시간
+                cookie.setPath("/");
                 response.addCookie(cookie);
                 memberRepository.updateTodayCnt(member.getMsrl());
                 memberRepository.updateTotalCnt(member.getMsrl());
@@ -338,12 +337,12 @@ public class BoardController {
                     map.put(cookie.getName(), cookie.getValue());
                 }
             }
-            String key = "temp" + "|" + "today_cnt";
-            String cookieCnt = (String) map.get(key);
-            String newCookieCnt = "temp" + "|" + member.getNickname();
-            if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
-                Cookie cookie = new Cookie(key, newCookieCnt);
+            String key = "temp" + "|" + member.getMsrl() + "|" + "today_cnt";
+            String cookieCnt = "temp" + "|" + member.getMsrl();
+            if (!map.containsKey(key)) {
+                Cookie cookie = new Cookie(key, cookieCnt);
                 cookie.setMaxAge(60 * 60 * 24); //24시간
+                cookie.setPath("/");
                 response.addCookie(cookie);
                 memberRepository.updateTodayCnt(member.getMsrl());
                 memberRepository.updateTotalCnt(member.getMsrl());
@@ -663,7 +662,7 @@ public class BoardController {
             }
         }
         Cookie[] cookies = null;
-        if(logined.isPresent() && logined.get().getMsrl() != writer.get().getMsrl()) {
+        if (logined.isPresent() && logined.get().getMsrl() != writer.get().getMsrl()) {
             cookies = request.getCookies();
             Map map = new HashMap();
             if (cookies != null) {
@@ -671,27 +670,27 @@ public class BoardController {
                     map.put(cookie.getName(), cookie.getValue());
                 }
             }
-            String key = logined.get().getMsrl() + "|" + "view_count";
-            String cookieCnt = (String) map.get(key);
-            String newCookieCnt = logined.get().getNickname() + "|" + postId;
-            if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
-                Cookie cookie = new Cookie(key, newCookieCnt);
+            String key = logined.get().getMsrl() + "|" + postId + "|" + "p_view_count";
+            String cookieCnt = logined.get().getMsrl() + "|" + postId;
+            if (!map.containsKey(key)) {
+                Cookie cookie = new Cookie(key, cookieCnt);
                 cookie.setMaxAge(60 * 60); //1시간
+                cookie.setPath("/");
                 response.addCookie(cookie);
                 postRepository.updateViewCnt(postId);
             }
 
-            key = logined.get().getMsrl() + "|" + "today_cnt";
-            cookieCnt = (String) map.get(key);
-            newCookieCnt = logined.get().getNickname() + "|" + writer.get().getNickname();
-            if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
-                Cookie cookie = new Cookie(key, newCookieCnt);
-                cookie.setMaxAge(60 * 60 * 24); //1시간
+            key = logined.get().getMsrl() + "|" + writer.get().getMsrl() + "|" + "today_cnt";
+            cookieCnt = logined.get().getMsrl() + "|" + writer.get().getMsrl();
+            if (!map.containsKey(key)) {
+                Cookie cookie = new Cookie(key, cookieCnt);
+                cookie.setMaxAge(60 * 60 * 24); //24시간
+                cookie.setPath("/");
                 response.addCookie(cookie);
                 memberRepository.updateTodayCnt(writer.get().getMsrl());
                 memberRepository.updateTotalCnt(writer.get().getMsrl());
             }
-        } else if(!logined.isPresent()) {
+        } else if (!logined.isPresent()) {
             cookies = request.getCookies();
             Map map = new HashMap();
             if (cookies != null) {
@@ -699,22 +698,22 @@ public class BoardController {
                     map.put(cookie.getName(), cookie.getValue());
                 }
             }
-            String key = "temp" + "|" + "view_count";
-            String cookieCnt = (String) map.get(key);
-            String newCookieCnt = "temp" + "|" + postId;
-            if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
-                Cookie cookie = new Cookie(key, newCookieCnt);
+            String key = "temp" + "|" + postId + "|" + "p_view_count";
+            String cookieCnt = "temp" + "|" + postId;
+            if (!map.containsKey(key)) {
+                Cookie cookie = new Cookie(key, cookieCnt);
                 cookie.setMaxAge(60 * 60); //1시간
+                cookie.setPath("/");
                 response.addCookie(cookie);
                 postRepository.updateViewCnt(postId);
             }
 
-            key = "temp" + "|" + "today_cnt";
-            cookieCnt = (String) map.get(key);
-            newCookieCnt = "temp" + "|" + writer.get().getNickname();
-            if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
-                Cookie cookie = new Cookie(key, newCookieCnt);
-                cookie.setMaxAge(60 * 60 * 24); //1시간
+            key = "temp" + "|" + writer.get().getMsrl() + "|" + "today_cnt";
+            cookieCnt = "temp" + "|" + writer.get().getMsrl();
+            if (!map.containsKey(key)) {
+                Cookie cookie = new Cookie(key, cookieCnt);
+                cookie.setMaxAge(60 * 60 * 24); //24시간
+                cookie.setPath("/");
                 response.addCookie(cookie);
                 memberRepository.updateTodayCnt(writer.get().getMsrl());
                 memberRepository.updateTotalCnt(writer.get().getMsrl());
