@@ -60,10 +60,10 @@ public class QTagService {
 
     public void deleteQtags(Qpost qpost) {
         List<QpostTag> originalQpostTags = qpostTagRepository.findByQpost(qpost);
-        for(QpostTag qt : originalQpostTags) {
+        for (QpostTag qt : originalQpostTags) {
             Optional<Tag> tag = tagRepository.findByTag(qt.getTag().getTag());
             Tag t = tag.get();
-            if(t.getTagUsageCnt() > 1)
+            if (t.getTagUsageCnt() > 1)
                 tagRepository.updateTagUsageCntMinus(t.getTagId()); //해당 태그가 1번 초과 쓰였으면 사용한 내용만 -1
             else if (t.getTagUsageCnt() == 1) { //해당 태그가 한 번밖에 쓰지 않았으면 그냥 태그 통째로 삭제
                 tagRepository.delete(t);

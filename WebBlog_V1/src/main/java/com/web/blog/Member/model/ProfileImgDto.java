@@ -13,7 +13,7 @@ public class ProfileImgDto {
     private String imgFullPath;
     private Long msrl;
 
-    public ProfileImg toEntity(){
+    public ProfileImg toEntity() {
         ProfileImg build = ProfileImg.builder()
                 .id(id)
                 .filePath(filePath)

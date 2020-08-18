@@ -14,6 +14,7 @@ import java.util.Optional;
 
 public interface TagRepository extends JpaRepository<Tag, Long> {
     List<Tag> findAll(Sort sort);
+
     List<OnlyTagMapping> findAllByOrderByTagUsageCntAsc();
 
     Optional<Tag> findByTag(String tag);

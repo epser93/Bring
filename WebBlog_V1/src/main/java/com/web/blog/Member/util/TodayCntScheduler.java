@@ -24,7 +24,7 @@ public class TodayCntScheduler {
     public void initializeTodayCnt() {
         List<Member> list = memberRepository.findAll();
         LocalDate date = LocalDate.now();
-        for(Member member : list) {
+        for (Member member : list) {
             todayDateRepository.save(TodayDate.builder()
                     .date(date)
                     .cnt(member.getTodayCnt())

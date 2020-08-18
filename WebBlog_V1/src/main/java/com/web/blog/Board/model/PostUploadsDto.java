@@ -14,7 +14,7 @@ public class PostUploadsDto {
     private Long postId;
     private int num;
 
-    public PostUploads toEntity(){
+    public PostUploads toEntity() {
         PostUploads build = PostUploads.builder()
                 .id(id)
                 .filePath(filePath)

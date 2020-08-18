@@ -39,17 +39,17 @@ public class QnaService {
     private final PostRepository postRepository;
 
     public boolean saveFiles(long qpostId, String nickname, MultipartFile[] files) throws IOException {
-        if(files != null) {
-            if(qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //질문에 사진이 한장이라도 존재하면~
+        if (files != null) {
+            if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //질문에 사진이 한장이라도 존재하면~
                 List<QpostUploads> beforeUpdate = qpostUploadsRepository.findAllByQpostId(qpostId);
                 qpostUploadsService.deleteImgs(qpostId); //해당하는 질문의 모든 사진 정보 db에서 삭제
-                for(QpostUploads upload : beforeUpdate) { //해당하는 질문의 모든 사진 s3에서 삭제
+                for (QpostUploads upload : beforeUpdate) { //해당하는 질문의 모든 사진 s3에서 삭제
                     s3Service.delete(upload.getFilePath());
                 }
             }
 
             int num = 0;
-            for(MultipartFile file : files) { //s3에 업로드하고 db에 파일 정보 저장
+            for (MultipartFile file : files) { //s3에 업로드하고 db에 파일 정보 저장
                 String imgPath = s3Service.upload(file, qpostId, num, nickname); //s3에 저장
                 QpostUploadsDto qpostUploadsDto = new QpostUploadsDto();
                 qpostUploadsDto.setFilePath(imgPath);
@@ -113,8 +113,8 @@ public class QnaService {
     //질문 삭제
     public boolean deleteQuestion(long qpost_id, Member member) {
         Qpost qpost = qpostRepository.findById(qpost_id).orElseThrow(CResourceNotExistException::new);
-        if(qpost.getAnswerCnt() > 0) throw new CAnsweredQuestionException();
-        if(!member.getMsrl().equals(qpost.getMember().getMsrl())) {
+        if (qpost.getAnswerCnt() > 0) throw new CAnsweredQuestionException();
+        if (!member.getMsrl().equals(qpost.getMember().getMsrl())) {
             throw new CNotOwnerException();
         } else {
             if (qpost.getAnswerCnt() == 0) {

@@ -19,14 +19,15 @@ import java.time.LocalDate;
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class)
 public class TodayDate implements Serializable {
     @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private LocalDate date;
 
     private int cnt;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})     //No serializer found for class org.hibernate.proxy.pojo.bytebuddy.ByteBuddyInterceptor and no properties discovered to create BeanSerializer //아마 LAZY 로딩으로 인한 오류같음. hibernateLazyInitializer로 수정.
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    //No serializer found for class org.hibernate.proxy.pojo.bytebuddy.ByteBuddyInterceptor and no properties discovered to create BeanSerializer //아마 LAZY 로딩으로 인한 오류같음. hibernateLazyInitializer로 수정.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "msrl")
     private Member member;

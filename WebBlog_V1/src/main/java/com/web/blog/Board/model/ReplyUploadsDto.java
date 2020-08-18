@@ -14,7 +14,7 @@ public class ReplyUploadsDto {
     private Long replyId;
     private int num;
 
-    public ReplyUploads toEntity(){
+    public ReplyUploads toEntity() {
         ReplyUploads build = ReplyUploads.builder()
                 .id(id)
                 .filePath(filePath)

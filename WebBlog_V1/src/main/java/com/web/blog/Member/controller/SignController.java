@@ -138,7 +138,7 @@ public class SignController {
         }
 
         MultipartFile multipartFile = new CommonsMultipartFile(fileItem);
-        String imgPath = s3Service.upload(multipartFile, newUser.get().getMsrl(),999, newUser.get().getNickname());
+        String imgPath = s3Service.upload(multipartFile, newUser.get().getMsrl(), 999, newUser.get().getNickname());
         ProfileImgDto profileImgDto = new ProfileImgDto();
         profileImgDto.setFilePath(imgPath);
         profileImgDto.setMsrl(newUser.get().getMsrl());

@@ -286,16 +286,16 @@ public class QuestionController {
         List<ListResult> results = new ArrayList<>();
         Cookie cookies[] = request.getCookies();
         Map map = new HashMap();
-        if(cookies != null) {
-            for(Cookie cookie : cookies) {
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
                 map.put(cookie.getName(), cookie.getValue());
             }
         }
         String cookieCnt = (String) map.get("view_count");
         String newCookieCnt = "|" + qpostId;
-        if(StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
+        if (StringUtils.indexOfIgnoreCase(cookieCnt, newCookieCnt) == -1) {
             Cookie cookie = new Cookie("view_count", cookieCnt + newCookieCnt);
-            cookie.setMaxAge(60*60); //1시간
+            cookie.setMaxAge(60 * 60); //1시간
             response.addCookie(cookie);
             this.qpostRepository.updateViewCnt(qpostId);
         }
