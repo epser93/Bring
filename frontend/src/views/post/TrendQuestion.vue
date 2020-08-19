@@ -9,7 +9,7 @@
             </div>
             <div class="contents">
               <h4>{{ question.subject }}</h4>
-              <p>{{ question.content }}</p>
+              <!-- <p>{{ question.content }}</p> -->
               <p class="comment-date">{{ question.createdAt.substring(0,10) }} · {{ question.answerCnt }}개의 답변</p>
             </div>
             <div class="writer-info">
@@ -149,13 +149,13 @@ h2 {
 }
 
 .contents {
-  height: 200px;
+  height: 100px;
   padding: 10px;
   border: 1px solid rgba(0,0,0,0.1);
   border-top: 0px; 
 }
 .contents h4 {
-  margin-bottom: 10px;
+  margin-bottom: 30px;
   height: 30px;
   overflow: hidden;
 }
