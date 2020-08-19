@@ -129,7 +129,7 @@ h2 {
 .card1 {
   box-sizing: border-box;
   width: 380px;
-  height: 450px;
+  height: 380px;
   margin-bottom: 30px;
   overflow: hidden;
   cursor: pointer;
