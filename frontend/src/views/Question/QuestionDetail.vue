@@ -1,118 +1,113 @@
 <template>
   <div id="app">
-     <b-container>
-         <div class="card rounded-lg shadow p-3 mb-5 bg-white rounded">
-         <div>
-            <h1>{{qPost.subject}}</h1>
-            <!-- 질문에 채택된 답변이 있으면 표시-->
-            <div v-if="selectedAnswer">
-                 <b-badge variant="success">채택</b-badge>
+      <div class="container">
+        <!-- 글쓴이 정보 -->
+        <div class="info text-center my-5">
+            <h1 class="mb-3">{{qPost.subject}}</h1>
+            <span class="text-muted">{{ qPost.createdAt }}</span>
+            <span class="vertical-line mx-3"></span>
+            <span class="mr-2"><strong>{{ qPost.member_nickname }}</strong></span>
+            <!-- 분기처리/ 작성자와 현재 사용자의 이름이 같으면 삭제표시되게끔-->
+            <div v-if="this.nickname===qPost.member_nickname" class="text-right">
+                <button class="btn btn-outline-danger btn-sm mx-1" @click="deleteQna(qpost_id)" ><b-icon icon="trash"></b-icon> 삭제</button>
+                <button class="btn btn-outline-warning btn-sm mx-1" @click="modifyQna(qpost_id)"><b-icon icon="pen"></b-icon>수정</button>
             </div>
-         </div>
-         <b-container>
-            <b-row>
-                <b-col></b-col>
-                <b-col></b-col>
-            <b-col>
-               
-                <!-- 태그부분 -->
-                <div class="tag">
-                    <span v-for="(tag,index) in this.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2">{{ tag }}</span>
-                </div>
-                {{qPost.qpostId}}
-                작성자: {{qPost.member_nickname}}
-                <span class="text-muted ">작성시간: {{qPost.createdAt}}</span>
-
-            </b-col>
-            </b-row>
-            </b-container>
-        </div>
-        <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded">
-             <!-- <p><b-badge pill variant="success" class="mr-3">#{{qPost.tag}}</b-badge>
-             </p> -->
-              <h5 class="card-text">{{qPost.content}}</h5>
-                  
-                  <br><br><br><br><br><br><br><br><br><br><br><br>
-                  <hr>
-                  <div class="row">
-                      <div class="col"></div>
-                      <div class="col"></div>
-                      <div class="col">
-                          
-                          <!-- 분기처리/ 작성자와 현재 사용자의 이름이 같으면 삭제표시되게끔-->
-                          <div v-if="this.nickname===qPost.member_nickname">
-                          <b-button @click="deleteQna(qpost_id)" class="mr-1" ><b-icon icon="trash"></b-icon> 삭제</b-button>
-                          <b-button @click="modifyQna(qpost_id)" variant="warning" class="ml-2">수정</b-button>
-                          </div>
-                      </div>
-                  </div>      
+            <!-- 태그부분 -->
+            <div class="tag">
+                <span v-for="(tag,index) in this.tags" :key="index" class="badge badge-pill badge-info mr-2">{{ tag }}</span>
+            </div>
         </div>
 
-        <!-- 답변 작성 -->
-        <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded">
-             <span v-if="writeComment">
-                 <div>
-                    <b-form-textarea
-                        id="textarea-rows"
-                        placeholder="Tall textarea"
-                        rows="8"
-                        v-model="answerData.answer"
-                    ></b-form-textarea>
-                </div>
-                <button class="btn btn-success btn-sm mx-1" v-if="!updateAnswer" @click='writeAnswer'>답변 작성</button>
-                <button class="btn btn-success btn-sm mx-1" v-if="updateAnswer" @click='modifyAnswer'>답변 수정</button>
-                <button class="btn btn-success btn-sm mx-1" @click='commentClose'>답변창 닫기</button>
-            </span>
-            <span v-else>
-                <button class="btn btn-success btn-sm mx-1" @click='commentOpen' >답변창 열기</button>
-            </span>
-        </div>
         
-        <!-- 채택된 답변-->
-            <div  v-for="(aArticle,index) in aPost"  :key="`A-${index}`"> <!--key 이렇게 안해주면 에러남 -->
-            <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded" v-if="aArticle.selected===true">
-            <p>글쓴이: {{aArticle.member_nickname}}
-                <span><b-icon icon="patch-check-fll" variant="info"></b-icon>채택된 답변</span>
-            </p> 
-                <hr>
-                <!--내용-->
-                {{aArticle.answer}}
-                <hr>
+        <hr>
+
+        <!-- 글 -->
+        <v-md-preview :text="qPost.content"></v-md-preview>
+        <!-- 조회수-->
+        <div class=" text-left" style="margin: 100px 0 50px;">
+            <i class="far fa-eye ml-1"></i> {{ qPost.views }}
+        </div>
+        <!-- 댓글 입력 부분 -->
+        <div id="commentTextArea">
+            <span v-if="writeComment">
+              <div>
+                  <b-form-textarea
+                      id="textarea-rows"
+                      placeholder="댓글을 작성해주세요!"
+                      rows="4"
+                      v-model="answerData.answer"
+                  ></b-form-textarea>
+              </div>
+                <div class="row">
+                    <div class="col-6"></div>
+                    <div class="col-4"></div>
+                    <div class="col-2 mt-2 pl-3">
+                        <button class="btn btn-success btn-sm ml-1" v-if="!updateAnswer" @click='writeAnswer'><b-icon icon="pencil-square"></b-icon> 답변 작성</button>
+                        <button class="btn btn-success btn-sm ml-2" v-if="updateAnswer" @click='modifyAnswer'>답변 수정</button>
+                        <button class="btn btn-secondary btn-sm ml-2" @click='commentClose'>닫기</button>
+                    </div>
+                </div>
+            </span>
+            <span v-else class="d-flex flex-row">
+                <a class="p-2" @click='commentOpen' >답변창 열기</a>
+            </span>
+        </div>
+
+        <!--채택된 답변 -->
+        
+        <h3 class="mt-5 mb-4 text-left">{{aPost.length}} 개의 답변</h3>
+        <div class="d-flex flex-row"> 
+        <div v-for="(aArticle,index) in aPost"  :key="`A-${index}`">
+            <div v-if="aArticle.selected===true">
+                <p class="text-left ml-1">
+                    <b-icon icon="patch-check-fll" variant="info"></b-icon>채택 |
+                    <strong class="">{{aArticle.member_nickname}}</strong>
+                </p>
+                <p class="my-3 text-left ml-1">{{aArticle.answer}}</p>
                 <!--좋아요-->
-                <span v-if="like[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="likeAnswer(aArticle, false)"><i class="fas fa-heart"></i></span>
-                <span v-if="!like[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="likeAnswer(aArticle, true)"><i class="fas fa-heart"></i></span>        
-                <small :ref="'like-count-' + aArticle.apostId">{{ aArticle.likes }}</small><small>개의 좋아요</small>
+                <div class="mr-5 pr-3">
+                    <b-icon icon="heart-fill" v-if="like[index]" class="d-inline ml-1" style="cursor:pointer; color: crimson;" @click="likeAnswer(aArticle, false)"></b-icon>
+                    <b-icon icon="heart" v-if="!like[index]" class="d-inline ml-1" style="cursor:pointer; color: black;" @click="likeAnswer(aArticle, true)"></b-icon> 
+                    <small :ref="'like-count-' + aArticle.apostId"> {{ aArticle.likes }}</small><small>개의 좋아요</small>
+                    <span class="vertical-line mx-3"></span>
+                    <span>{{ aArticle.createdAt.slice(0,10) }}</span>
+                    <button class="btn btn-outline-danger btn-sm mx-1" @click="deleteAnswer(aArticle.apostId)" v-if="selectedAnswer===false"><b-icon icon="trash"></b-icon>삭제</button>
+                    <button class="btn btn-outline-warning btn-sm mx-1" @click='modifyAnswerOpen(aArticle)' v-if="selectedAnswer===false"><b-icon icon="pen"></b-icon>수정</button>
+                </div>
             </div>
         </div>
-        
+        </div>
+        <hr>
 
-        <!-- 채택 되지 않은 답변 리스트-->
-        <div v-for="(aArticle,index) in aPost" :key="aArticle.apostId">
-            <div class="card rounded-lg mt-5 shadow p-3 mb-5 bg-white rounded" v-if="aArticle.selected===false">
-            <p>글쓴이: {{aArticle.member_nickname}}
-                <span v-if="aArticle.selected===false">
-                    <div v-if="(nickname===aArticle.member_nickname)">
-                        <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="selectedAnswer===false">삭제</b-button>
-                        <b-button variant="warning" @click='modifyAnswerOpen(aArticle)' v-if="selectedAnswer===false">수정</b-button>
-                    </div>
-                    <div v-else>
-                        <b-button variant="danger" @click="deleteAnswer(aArticle.apostId)" v-if="(nickname===aArticle.member_nickname)">삭제</b-button>
-                        <b-button variant="warning" @click='modifyAnswerOpen(aArticle)' v-if="nickname===aArticle.member_nickname ">수정</b-button>
-                        <b-button variant="primary" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false)">채택</b-button>
-                    </div>
+        <!--채택되지 않은 답변-->
+        <div class="row-12" v-for="(aArticle,index) in aPost" :key="aArticle.apostId">
+            <div v-if="aArticle.selected===false">
+                <p class="text-left ml-1"><strong>{{aArticle.member_nickname}}</strong></p>
+                <p class="text-left mb-3 mt-3 mr-5 pr-5">{{aArticle.answer}}</p>
+                <!-- 좋아요 -->
+                <p class="text-left">
+                <b-icon icon="heart-fill" v-if="like[index]" class="d-inline ml-1" style="cursor:pointer; color: crimson;" @click="likeAnswer(aArticle, false)"></b-icon>
+                <b-icon icon="heart" v-if="!like[index]" class="d-inline ml-1" style="cursor:pointer; color: black;" @click="likeAnswer(aArticle, true)"></b-icon> 
+                <small :ref="'like-count-' + aArticle.apostId"> {{ aArticle.likes }}</small><small>개의 좋아요</small>
+                <span class="vertical-line mx-3"></span>
+                <span>{{ aArticle.createdAt.slice(0,10) }}</span>
+                 <!-- 수정 삭제 버튼-->
+                <span v-if="(nickname===aArticle.member_nickname)" class="ml-1">
+                    <button class="btn btn-outline-danger btn-sm mx-1" @click="deleteAnswer(aArticle.apostId)" v-if="selectedAnswer===false"><b-icon icon="trash"></b-icon>삭제</button>
+                    <button class="btn btn-outline-warning btn-sm mx-1" @click='modifyAnswerOpen(aArticle)' v-if="selectedAnswer===false"><b-icon icon="pen"></b-icon>수정</button>
                 </span>
-            </p> 
+                <span v-else class="ml-1">
+                    <button class="btn btn-outline-danger btn-sm mx-1" @click="deleteAnswer(aArticle.apostId)" v-if="(nickname===aArticle.member_nickname)"><b-icon icon="trash"></b-icon>삭제</button>
+                    <button class="btn btn-outline-warning btn-sm mx-1" @click='modifyAnswerOpen(aArticle)' v-if="nickname===aArticle.member_nickname "><b-icon icon="pen"></b-icon>수정</button>
+                    <button class="btn btn-outline-primary btn-sm mx-1" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false)">채택</button>
+                </span>
+
+                </p>
                 <hr>
-                <!--내용-->
-                {{aArticle.answer}}
-                <hr>
-                <!--좋아요-->
-                <span v-if="like[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="likeAnswer(aArticle, false)"><i class="fas fa-heart"></i></span>
-                <span v-if="!like[index]" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="likeAnswer(aArticle, true)"><i class="fas fa-heart"></i></span>        
-                <small :ref="'like-count-' + aArticle.apostId">{{ aArticle.likes }}</small><small>개의 좋아요</small>
+               
             </div>
         </div>
-    </b-container>
+    </div>
   </div>
 
 </template>
@@ -155,7 +150,8 @@ export default {
             // 답변 채택
             selectedAnswer:false,
             // 태그
-            tags: ''
+            tags: '',
+            text : ''
         }
      },
     methods: {
@@ -359,6 +355,16 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+#commentTextArea a {
+    cursor: pointer;
+    text-decoration: none;
+    transition-duration: 0.3s;
+    border: 1px solid #e7e7e7;
+}
 
+#commentTextArea a:hover {
+    color: #56dbc9 !important;
+    border: 1px solid #99c9c2 !important;
+}
 </style>
