@@ -1,5 +1,5 @@
 <template>
-    <div id="mylist" class="row">
+    <div id="mylist" class="">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
         <!-- 컴포넌트 불러오기 -->
         <div class="container-fluid col-12">
@@ -7,8 +7,9 @@
         </div>
 
         <!-- 페이지네이션 -->
-        <BlogPagination :totalNum="totalNum" @pageNum="sendCurrentPage"/>
-
+        <div class="col-12">
+            <BlogPagination :totalNum="totalNum" @pageNum="sendCurrentPage"/>
+        </div>
         <!-- 사이드 바 -->
         <div id="nav-mylist" class="flex-column text-left p-3">
             <!-- 검색창 -->

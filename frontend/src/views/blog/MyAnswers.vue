@@ -3,22 +3,20 @@
         <!-- 글 리스트 -->  
         <div class="col-12">
             <h5>{{ nickname }}의 답변 목록</h5>
-            <hr class="ml-0" style="width:70%;">
+            <hr class="ml-0">
             <div v-for="(item, index) in answersList" :key="item.answerId" class="p-0 mb-5">
-                <a style="cursor: pointer;">
-                    <div class="card border-secondary mb-3" style="width: 70%;">
-                        <div class="card-header bg-transparent border-secondary"><strong>{{ answersQList[index] }}</strong><br><small>작성자: {{ answersWList[index] }}</small></div>
-                        <div class="card-body text-secondary">
-                            <p class="card-text">{{ item.content }}</p>
-                        </div>
-                        <div class="card-footer bg-transparent border-secondary">
-                            <!-- 좋아요 부분 -->
-                            <b-icon icon="heart-fill" v-if="answersLike1[index]" class="d-inline mr-1" style="color: crimson;"></b-icon>
-                            <b-icon icon="heart" v-if="!answersLike1[index]" class="d-inline mr-1" style="color: black;"></b-icon>
-                            <small :ref="'like-count-' + item.postId">{{ item.likes }}</small><small>개의 좋아요</small>
-                        </div>
+                <div class="card border-secondary mb-3" style="width: 70%;">
+                    <div class="card-header bg-transparent border-secondary"><strong>{{ answersQList[index] }}</strong><br><small>작성자: {{ answersWList[index] }}</small></div>
+                    <div class="card-body text-secondary">
+                        <p class="card-text">{{ item.content }}</p>
                     </div>
-                </a>
+                    <div class="card-footer bg-transparent border-secondary">
+                        <!-- 좋아요 부분 -->
+                        <b-icon icon="heart-fill" v-if="answersLike1[index]" class="d-inline mr-1" style="color: crimson;"></b-icon>
+                        <b-icon icon="heart" v-if="!answersLike1[index]" class="d-inline mr-1" style="color: black;"></b-icon>
+                        <small :ref="'like-count-' + item.postId">{{ item.likes }}</small><small>개의 좋아요</small>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
