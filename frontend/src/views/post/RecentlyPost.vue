@@ -10,7 +10,7 @@
               </div>
               <div class="contents">
                 <h4>{{ post.subject }}</h4>
-                <p>{{ post.content }}</p>
+                <!-- <p>{{ post.content }}</p> -->
                 <!-- <v-md-preview :text="post.content"></v-md-preview> -->
                 <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.replyCnt }}개의 댓글</p>
               </div>
@@ -138,13 +138,13 @@ h2 {
 }
 
 .contents {
-  height: 200px;
+  height: 100px;
   padding: 10px;
   border: 1px solid rgba(0,0,0,0.1);
   border-top: 0px; 
 }
 .contents h4 {
-  margin-bottom: 10px;
+  margin-bottom: 30px;
   height: 30px;
   overflow: hidden;
 }

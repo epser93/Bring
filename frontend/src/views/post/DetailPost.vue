@@ -8,7 +8,7 @@
             <h1 class="mb-3">{{subject}}</h1>
             <span class="text-muted">{{createdAt.slice(0, 10)}}</span>
             <span class="vertical-line mx-3"></span>
-            <span class="mr-2"><strong>{{ member_nickname }}</strong></span>
+            <span class="mr-2" @click="gotoProfile(member_nickname)" id="post_writer"><strong>{{ member_nickname }}</strong></span>
             <div class="text-right">
               <button class="btn btn-outline-warning btn-sm mx-1" v-if="(member_nickname === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="updatePost"><b-icon icon="trash"></b-icon> 수정</button>
               <button class="btn btn-outline-danger btn-sm mx-1" v-if="(member_nickname === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="deletePost"><b-icon icon="trash"></b-icon> 삭제</button>
@@ -44,14 +44,14 @@
               <button class="btn btn-success btn-sm mx-1" @click='commentClose'>답변창 닫기</button>
           </span>
           <span v-else>
-              <a class="p-2" @click='commentOpen'>답변창 열기</a>
+              <a class="p-2" v-if="this.$cookies.get('X-AUTH-TOKEN')" @click='commentOpen'>답변창 열기</a>
           </span>
         </div>
 
         <!-- 댓글 목록부분 -->
         <h3 class="mt-5 mb-4">{{ recentlyComments.length }} Comments</h3>
         <div class="ml-3" v-for="(comment,index) in recentlyComments" :key="comment.replyId">
-          <strong>{{ comment.member_nickname }}</strong>
+          <strong @click="gotoProfile(comment.member_nickname)" id="comment_writer">{{ comment.member_nickname }}</strong>
           <p class="my-3">{{ comment.reply }}</p>
           <!-- 좋아요 -->
           <b-icon icon="heart-fill" v-if="commentsLike[index]" class="d-inline mr-1" style="cursor:pointer; color: crimson;" @click="commentLike(comment.replyId, comment.member_nickname, false)"></b-icon>
@@ -255,6 +255,11 @@ export default {
 
         // 좋아요
         postLike(likeit) {
+          if (!this.$cookies.get('X-AUTH-TOKEN')) {
+            alert('비회원은 게시글 좋아요를 할 수 없어요~')
+          } else if (this.member_nickname === this.$cookies.get('nickname')) {
+            alert('본인이 쓴 글은 좋아요 할 수 없어요~') 
+          } else {
             const config = {
                 headers: {
                     'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
@@ -284,9 +289,13 @@ export default {
                         console.log(err)
                     })   
             }        
+          }
         },
         // 댓글 좋아요
-        commentLike(replyId, replyer, likeit) {          
+        commentLike(replyId, replyer, likeit) {
+          if (!this.$cookies.get('X-AUTH-TOKEN')) {
+            alert('비회원은 좋아요를 누를수 없어요~')
+          } else if (replyer !== this.$cookies.get('nickname')) {
             const config = {
                 headers: {
                     'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
@@ -313,6 +322,9 @@ export default {
                       console.log(err)
                   })
             }   
+          } else if (replyer === this.$cookies.get('nickname')) {
+            alert('본인 댓글에는 좋아요를 누를수 없어요~')
+          }
 
         },
         // 카테고리에 맞는 포스트만 가져오기
@@ -338,7 +350,11 @@ export default {
         // 태그 검색
         searchTag(tag) {
           this.$router.push({ name : 'TagSearch', params: { keyword : tag }})
-        } 
+        },
+        // 프로필 가기
+        gotoProfile(nickname) {
+          this.$router.push({ name : 'Profile', query: { nickname: nickname } })
+        }
     },
     created(){
        this.fetchPost(),
@@ -443,6 +459,14 @@ export default {
   } 
 
 .tag-cloud-link {
+  cursor: pointer;
+}
+
+#comment_writer {
+  cursor: pointer;
+}
+
+#post_writer {
   cursor: pointer;
 }
 </style>
