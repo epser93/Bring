@@ -6,10 +6,10 @@
         <CreateCategoryWarning />
       </div>
 
-      <h2 class="mb-5">글 작성</h2>
+      <h2 class="mb-5">글 작성<small><i class="fas fa-pencil-alt ml-3"></i></small></h2>
       
       <!-- 카테고리 부분 -->
-      <div class="">
+      <div class="mb-5">
         <h5 class="d-inline mr-4"><i class="fas fa-folder mr-3"></i>카테고리 선택</h5>
         <div class="d-inline">
           <select v-model="aboutText.boardName">
@@ -18,12 +18,6 @@
             </option>
           </select>
         </div>
-      </div>
-
-      <!-- 썸네일  -->
-      <div class="mt-4 mb-5">
-        <h5 class="d-inline mr-5"><i class="far fa-image mr-3"></i>썸네일 선택</h5>
-        <input @change="thumbnailSelect" type="file" ref="thumbnailImage" id="thumbnailInput">
       </div>
 
       <!-- 제목 부분 -->
@@ -45,7 +39,7 @@
       <input placeholder="태그를 입력해주세요" class="mb-5 tag-input" type="text" v-model="tag" @keydown.enter="postTag">
       
       <!-- 제출 버튼 -->
-      <a @click="postText" class="float-right">발행</a>
+      <a @click="postText" class="float-right">작성</a>
     </div>  
   </div>
 </template>
@@ -163,33 +157,6 @@ export default {
         this.modal = true 
       }
     },
-
-    // 썸네일 관련
-    thumbnailSelect() {
-      this.thumbnail = this.$refs.thumbnailImage.files[0]
-    },
-    
-    thumbnailPost() {
-      const formData = new FormData()
-      formData.append('files', this.thumbnail)
-
-      const config = {
-          headers: {
-            'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
-            'Content-Type' : 'multipart/form-data'
-          }
-        }
-        axios.post(
-          `${BACK_URL}/blog/${this.aboutText.nickname}/${this.aboutText.boardName}/uploads`, formData, config)
-
-          .then(() =>{
-            this.$router.go(-1)
-          })
-          .catch((err) => {
-            alert('카테고리를 선택해 주세요')
-            console.error(err)
-          })      
-    }
   },
   created() {
     this.getCategory(),

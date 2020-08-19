@@ -18,12 +18,12 @@
                         <h4>{{ post.subject }}</h4>
                         <!-- <p>{{ post.content }}</p> -->
                         <!-- <v-md-preview :text="post.content"></v-md-preview> -->
-                        <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.replyCnt }}개의 댓글</p>
+                        <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.answerCnt }}개의 댓글</p>
                     </div>
                     </div>
                     <div class="writer-info">
                     <button class="btn btn-sm" @click="gotoUserInfo(post.member_nickname)">{{ post.member_nickname }}</button>
-                    <p>♥ {{ post.likes }}</p>
+                    <p><i class="far fa-eye"></i> {{ post.views }}</p>
                     </div>
                 </div>
                 </div>
@@ -56,6 +56,7 @@ export default {
                         this.page += 1
                         this.postList.push(...res.data.list[0].list)
                         this.thumbnails.push(...res.data.list[1].list)
+                        console.log(this.postList)
                         $state.loaded()
                     } else {
                         $state.complete()
