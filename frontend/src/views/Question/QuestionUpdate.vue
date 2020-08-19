@@ -61,7 +61,7 @@ export default {
             'Content-Type' : 'multipart/form-data'
           }
         }
-        axios.post(`${BACK_URL}/questions/ask/uploads`, formData, config)
+        axios.post(`${BACK_URL}/questions/ask/${this.qpost_id}/uploads`, formData, config)
           .then(res => {
             console.log('업로드',res)
             this.imageServerUrl = res.data.list[0]
