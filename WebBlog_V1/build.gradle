@@ -53,6 +53,11 @@ dependencies {
     }
 }
 
+bootJar {
+    archiveBaseName = "BFD"
+    archiveFileName = "BFD.war"
+}
+
 test {
     useJUnitPlatform()
 }
