@@ -25,7 +25,7 @@ public class PostUploadsService {
     }
 
     public List<PostUploadsDto> getList(long postId) {
-        List<PostUploads> uploadsList = postUploadsRepository.findAllByPostId(postId);
+        List<PostUploads> uploadsList = postUploadsRepository.findByPostId(postId).get();
         List<PostUploadsDto> postUploadsDtoList = new ArrayList<>();
 
         for (PostUploads uploads : uploadsList) {
