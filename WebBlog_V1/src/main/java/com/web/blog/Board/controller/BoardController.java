@@ -886,15 +886,6 @@ public class BoardController {
         if (list.get().size() == 1) {
             long postId = list.get().get(0).getPostId() + 1;
             return responseService.getListResult(postService.saveFiles(postId, nickname, files));
-//            int size = list.get().size();
-//            for(int i = 0 ; i < size ; i++) {
-//                Post p = list.get().get(i);
-//                if(p.getSubject().equals("First!1!Post:2:On;3;New:4:Board")) {
-//                    list.get().remove(i);
-//                    size--;
-//                    i--;
-//                }
-//            }
         }
         else if(list.get().size() > 1){
             Post post = list.get().get(list.get().size() - 1);
