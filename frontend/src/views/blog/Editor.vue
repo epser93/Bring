@@ -6,7 +6,7 @@
         <CreateCategoryWarning />
       </div>
 
-      <h2 class="mb-5">글 작성</h2>
+      <h2 class="mb-5">글 작성<small><i class="fas fa-pencil-alt ml-3"></i></small></h2>
       
       <!-- 카테고리 부분 -->
       <div class="">

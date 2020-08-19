@@ -1,7 +1,8 @@
 <template>
     <div id="myquestions" class="row">
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
         <!-- 컴포넌트 불러오기 -->
-        <div class="container-fluid col-9">
+        <div class="container-fluid col-12">
             <router-view></router-view>
         </div>
 
@@ -67,7 +68,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 #myquestions {
     min-height: 1000px;
 }

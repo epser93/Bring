@@ -1,5 +1,5 @@
 <template>
-    <div id="mylist" class="">
+    <div id="mylist" class="row">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
         <!-- 컴포넌트 불러오기 -->
         <div class="container-fluid col-12">
@@ -110,10 +110,12 @@ export default {
         },
         // blogPosts.vue로 페이지 넘버 보내기(이벤트버스)
         sendCurrentPage(currentPage) {
+            console.log(currentPage)
             EventBus.$emit("paging", currentPage)
         },
         setTotalPageNum(num) {
             this.totalNum = num
+            console.log(this.totalNum)
         }       
     },
     

@@ -8,36 +8,36 @@
                 BD GISIK
             </router-link>
             
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"><i class="fas fa-sliders-h" style="color: gray;"></i></span>
-            </button>
+            <a class="navbar-toggler" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span><i class="fas fa-sliders-h"></i></span>
+            </a>
             <div class="collapse navbar-collapse m-0" id="navbarSupportedContent">
                 
                 <ul class="navbar-nav mr-auto text-left">
-                  <span class="vertical-line mx-3"></span>
-                    <li class="nav-item ml-4">
+                  <span class="vertical-line ml-3"></span>
+                    <li class="nav-item ml-5">
                         <a href='#' v-if="!isLogin" @click="$modal.show('demo-login')" class="nav-link">LOGIN</a>
                     </li>
 
-                    <li class="nav-item ml-4">
+                    <li class="nav-item ml-5">
                         <router-link v-if="isLogin" :to="{ name: 'Profile', query: { nickname: this.nickname }}" class="nav-link">PROFILE</router-link> 
                     </li>
 
-                    <li class="nav-item ml-4">
+                    <li class="nav-item ml-5">
                         <router-link v-if="isLogin" :to="{ name: 'MyBlog', params: { nickname: this.nickname }}" class="nav-link">BRING</router-link> 
                     </li>
 
-                    <li class="nav-item ml-4">
+                    <li class="nav-item ml-5">
                         <router-link v-if="isLogin" :to="{ name: 'Question' }" class="nav-link">지식인</router-link> 
                     </li>     
 
-                    <li class="nav-item ml-4" id="logout">
+                    <li class="nav-item ml-5" id="logout">
                         <p v-if="isLogin" @click="logout" class="nav-link">LOGOUT</p> 
                     </li>
                 </ul>
 
                 <!-- 검색창 -->
-                <div v-if="this.mode === 'Blog'" class="form-inline ml-4">
+                <div v-if="this.mode === 'Blog'" class="form-inline ml-5 my-2">
                     <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-secondary">{{ keywordType.name }}</button>
                     <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu">
                         <button type="button" tabindex="0" @click="dropdown(typeid, value)" class="dropdown-item" v-for="(value, typeid) in dropdownList" v-bind:key="typeid">
@@ -49,7 +49,7 @@
                 </div>
 
                 <!-- 질문 검색창 -->
-                <div v-if="this.mode === 'QnA'" class="form-inline ml-4">
+                <div v-if="this.mode === 'QnA'" class="form-inline ml-5 my-2">
                     <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-secondary">{{ keywordType.name }}</button>
                     <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu">
                         <button type="button" tabindex="0" @click="dropdown(typeid, value)" class="dropdown-item" v-for="(value, typeid) in dropdownList" v-bind:key="typeid">
@@ -180,6 +180,11 @@
   transition-duration: 0.3s;
 }
 
+.navbar a{
+  height: 100%;
+  color: gray;
+}
+
 input {
     width:210px;
     height: auto; /* 높이값 초기화 */ 
@@ -207,7 +212,12 @@ button {
     border-radius: 0; /* iSO 둥근모서리 제거 */ 
 }
 
+.dropdown-menu {
+  left:auto;
+}
+
 .navbar a:hover {
+  cursor: pointer;
   color: #56dbc9;
   text-decoration: none;
   transition-duration: 0.3s;
