@@ -155,7 +155,7 @@ export default {
 </script>
 
 <style scoped>
-@media only screen and (min-width: 768px) {
+@media only screen and (min-width: 1000px) {
     #mylist {
         position: relative;
     }

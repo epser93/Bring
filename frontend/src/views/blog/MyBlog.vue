@@ -124,7 +124,7 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Do+Hyeon&family=Noto+Serif+KR:wght@200;400&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@700&display=swap');
 
-@media only screen and (min-width: 768px) {
+@media only screen and (min-width: 1000px) {
     #blog {
         padding: 0 100px;
         font-family: 'Noto Serif KR', serif;

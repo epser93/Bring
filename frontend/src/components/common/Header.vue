@@ -15,29 +15,29 @@
                 
                 <ul class="navbar-nav mr-auto text-left">
                   <span class="vertical-line mx-3"></span>
-                    <li class="nav-item ml-3">
+                    <li class="nav-item ml-4">
                         <a href='#' v-if="!isLogin" @click="$modal.show('demo-login')" class="nav-link">LOGIN</a>
                     </li>
 
-                    <li class="nav-item ml-3">
+                    <li class="nav-item ml-4">
                         <router-link v-if="isLogin" :to="{ name: 'Profile', query: { nickname: this.nickname }}" class="nav-link">PROFILE</router-link> 
                     </li>
 
-                    <li class="nav-item ml-3">
+                    <li class="nav-item ml-4">
                         <router-link v-if="isLogin" :to="{ name: 'MyBlog', params: { nickname: this.nickname }}" class="nav-link">BRING</router-link> 
                     </li>
 
-                    <li class="nav-item ml-3">
+                    <li class="nav-item ml-4">
                         <router-link v-if="isLogin" :to="{ name: 'Question' }" class="nav-link">지식인</router-link> 
                     </li>     
 
-                    <li class="nav-item ml-3" id="logout">
+                    <li class="nav-item ml-4" id="logout">
                         <p v-if="isLogin" @click="logout" class="nav-link">LOGOUT</p> 
                     </li>
                 </ul>
 
                 <!-- 검색창 -->
-                <div v-if="this.mode === 'Blog'" class="form-inline mx-3">
+                <div v-if="this.mode === 'Blog'" class="form-inline ml-4">
                     <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-secondary">{{ keywordType.name }}</button>
                     <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu" style="left:auto">
                         <button type="button" tabindex="0" @click="dropdown(typeid, value)" class="dropdown-item" v-for="(value, typeid) in dropdownList" v-bind:key="typeid">
@@ -49,7 +49,7 @@
                 </div>
 
                 <!-- 질문 검색창 -->
-                <div v-if="this.mode === 'QnA'" class="form-inline mx-3">
+                <div v-if="this.mode === 'QnA'" class="form-inline ml-4">
                     <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-secondary">{{ keywordType.name }}</button>
                     <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu">
                         <button type="button" tabindex="0" @click="dropdown(typeid, value)" class="dropdown-item" v-for="(value, typeid) in dropdownList" v-bind:key="typeid">
