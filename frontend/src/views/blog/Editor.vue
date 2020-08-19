@@ -113,7 +113,6 @@ export default {
         console.log(files)
         console.log(files[0])
         this.uploadImageDirect(files[0], insertImage)
-        console.log(this.imageServerUrl + "하이")
       }
     },
     postText() {
