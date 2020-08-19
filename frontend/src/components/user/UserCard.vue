@@ -1,5 +1,5 @@
 <template>
-        <div class="card">
+        <div class="card mt-2">
             <div class="card-body">
                 <div class="row">
                     <div class="col-5 quote">
@@ -9,11 +9,11 @@
                         <div v-else>
                             <img class="rounded-circle mx-auto d-block" :src=userThumbnail alt="Card image cap" style="width:120px; height:120px;">
                         </div>
-                        <div class="d-flex justify-content-center mb-1">
+                        <div class="d-flex justify-content-center mb-2">
                             <h5 class="mt-1 mb-1"><b class="mr-3">{{ userInfo.nickname }}</b></h5>
                             <button class="btn btn-success btn-sm" id="homeBt" @click="gotoBlog"><i class="fas fa-home"></i></button>
                         </div>
-                        <div class="location text-sm-center"><i class="far fa-envelope"></i>  {{ userInfo.uid }}</div>
+                        <div class="location text-sm-center mb-1"><i class="far fa-envelope"></i>  {{ userInfo.uid }}</div>
                         <span><a href="/" data-toggle="modal" data-target="#staticBackdrop" style="color:gray" @click="seeFollower"><i class="fas fa-user-friends"></i> {{userInfo.followersCnt}} follower · {{userInfo.followingCnt}} following</a></span> 
                         <!-- 여기 위에 수정함 data-toggle & href 처리방법 연구필요 -->
                         <div v-if="loginNickname == userNickname"> 
@@ -140,7 +140,7 @@
 
                 <!--  TIL   -->
                 <h4><b>Today's Post</b></h4>
-                
+                <br>
                 <calendar-heatmap
                 :values="valPostList"
                 :end-date= "todays"
@@ -150,22 +150,21 @@
                 <!-- :range-color="['ebedf0', 'dae2ef', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']" -->
                 <hr>
 
-
-
                 <!-- Tag chart & Today visited chart -->
-                <!-- 
-                <div>
-                    <apexchart width="500" type="bar" :options="lineOptions" :series="lineSeries"></apexchart>
-                </div> -->
-
-                <div id="chart">
-                    <h4><b>Tag List</b></h4>
-                    <div v-if="checkTag == true">
-                        <apexchart type="donut" :options="donutOptions" :series="donutSeries" class="tag-list"></apexchart>                    
+                <div class="row row-cols-2" style="height:330px">
+                    <div class="quote-chart"  id="lineChart" >
+                        <apexchart type="line" height="330" :options="lineOptions" :series="lineSeries"></apexchart>
                     </div>
-                    <div v-else>
-                        <br><br>
-                        <h5>게시물을 등록해보세요!</h5>
+
+                    <div id="chart">
+                        <h4 class="tagList"><b>Tag List</b></h4>
+                        <div v-if="checkTag == true">
+                            <apexchart type="donut" :options="donutOptions" :series="donutSeries" class="tag-list"></apexchart>                    
+                        </div>
+                        <div v-else>
+                            <br><br>
+                            <h5>게시물을 등록해보세요!</h5>
+                        </div>
                     </div>
                 </div>
 
@@ -202,6 +201,8 @@ export default {
         userPostList:[], // mypage-user : 4번
         userThumbnail: null, // mypage-user : 5번
         userTodays: null, // mypage-user : 6번 [오늘 방문자, 토탈 방문자]
+        userVistDate:[], // mypage-user : 7번 [오늘 방문자(날짜) - '2020-08-19']
+        userVistCnt:[], // mypage-user : 8번 [오늘 방문자(cnt) - '3']
         userScore: '', // mypage-user : 스코어
         userRank: [], // 모든 회원들의 랭킹
         allUsers: '', // 회원가입한 전체 User 수
@@ -215,7 +216,8 @@ export default {
         userTagList:[], // mypage-user가 작성한 post의 tag list // 데이터 받아오는 용도
         userTagCnt:[], // mypage-user가 작성한 post의 tag cnt 
         checkTag:true,
-        // Tag 차트
+
+        // 도넛 차트(Tag)
         donutSeries: [],
         donutOptions: {
             chart: {
@@ -234,7 +236,8 @@ export default {
                 breakpoint: 480,
                 options: {
                     chart: {
-                        width: 200
+                        width: 200,
+                        height: 330
                     },
                   
                     legend: {
@@ -243,25 +246,44 @@ export default {
                     }
                 }]
             },
-
-        ////////////////////////////////////////////////////////////////
-        // cntToday:null,
-        // options: null,
-        // 일일 방문자 차트
-        // lineOptions: {
-        //     chart: {
-        //         id: 'vuechart-example'
-        //     },
-        //     xaxis: {
-        //         categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998]
-        //     }
-        // },
-        // lineSeries: [{
-        //     name: 'series-1',
-        //     data: [30, 40, 35, 50, 49, 60, 70, 91]
-        //     }],
-
-
+        // 라인 차트(Visited)
+        lineSeries: [{
+            name:"방문자",
+            data:[]
+        }],
+        lineOptions: {
+            chart: {
+              height: '330px',
+              type: 'line',
+              zoom: {
+                enabled: false
+              }
+            },
+            dataLabels: {
+              enabled: false
+            },
+            stroke: {
+              curve: 'straight'
+            },
+            title: {
+              text: 'Daily visitors',
+              align: 'center',
+              style: {
+                fontSize:  '25px',
+                fontWeight: 'bold',
+                fontFamily: '600 inherit'
+              }
+            },
+            grid: {
+              row: {
+                colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+                opacity: 0.1
+              },
+            },
+            xaxis: {
+              categories: [],
+            }
+        },
     };
   },
 
@@ -272,14 +294,14 @@ export default {
     },
   },
   
-  created() {
+  created() {   
   },
 
   watch: {
       '$route.params.query' : {
           handler : function () {
             this.Init()
-            this.tagFun()
+            this.tagFunc()
           },
         deep: true,
         immediate : true
@@ -410,7 +432,8 @@ export default {
     callFunction() {  
         var currentDateWithFormat = new Date().toJSON().slice(0,10);
         this.todays = currentDateWithFormat
-      },
+    },
+
     gotoEdit() {
           this.$router.push({ name : "Edit" })
       },
@@ -470,9 +493,10 @@ export default {
             this.userFerList = res.data.list[3].list
             this.userPostList = res.data.list[4].list
             this.userThumbnail = res.data.list[5].list[0]
-            this.userTodays = res.data.list[6].list
+            this.userTodays = res.data.list[6].list[0]
+            this.userVistDate = res.data.list[7].list
+            this.userVistCnt = res.data.list[8].list
             this.userScore = this.userInfo.score
-
             // TIL 찍기
             this.valPostList = [] // 초기화
             this.cntPostList = {} // 초기화
@@ -521,10 +545,43 @@ export default {
                 //console.log(this.followingUserImg)
             }
 
+            // Today 계산
+            var tmpToday = new Date().toJSON().slice(0,10)
+            var tmpDate = []
+            var tmpCnt = []
+            tmpDate.push(tmpToday)
+            tmpCnt.push(this.userTodays)
+            console.log(tmpDate + "/////////" + tmpCnt)
+            var dateLen = this.userVistDate.length
+            console.log(dateLen)
+
+
+            var dayAgo = new Date()
+            for(var z=1; z<5; z++){
+                dayAgo.setDate(dayAgo.getDate() - 1)
+                
+                tmpDate.push(dayAgo.toJSON().slice(0,10))
+                console.log(tmpDate)
+                if(dateLen - z >= 0){
+                    if(tmpDate[i] == this.userVistDate[dateLen - z]){
+                        tmpCnt.push(this.userVistCnt[dateLen - z])
+                    }
+                    else{
+                        tmpCnt.push(0)
+                    }
+                }
+                else{
+                    tmpCnt.push(0)
+                }
+            }
+            this.lineSeries[0].data = tmpCnt
+            this.lineOptions.xaxis.categories = tmpDate
+
         })
         .catch((err) => {
             console.error(err)
         }),
+
 
         // 유저 랭크 가져오기
         axios.get(`${BACK_URL}/member/rank`)
@@ -534,16 +591,12 @@ export default {
         })
         .catch((err) => {
             console.error(err)
-        })
-        
-        // 유저 tag 가져오기
+        })      
     },
 
-    tagFun(){
+    tagFunc(){
          axios.get(`${BACK_URL}/tags/blog/${this.userNickname}`)
         .then(res => {            
-            console.log(this.userNickname)
-            console.log("ddffffffffffffffffffffffffffffff")
             this.donutOptions.labels = []
             this.donutSeries = []
             this.userTagList = res.data.list[0].list  // 데이터 받아오는 용도
@@ -574,16 +627,13 @@ export default {
             else{
                 this.checkTag = false
             }
-            // console.log("새로운사람")
-            // console.log(this.userNickname)
-            // console.log(this.donutSeries)
             console.log(this.donutOptions.labels)
 
         })
         .catch((err) => {
             console.error(err)
         })
-    }   
+    },
   },
   mounted () {
       this.callFunction()
@@ -635,8 +685,8 @@ export default {
 }
 #chart{
     width:300px;
-    height: 250px;
-    margin:auto;
+    height:320px;
+    margin-top:3px;
 }
 .card-title{
     margin-top:10px;
@@ -650,6 +700,19 @@ export default {
 }
 #gameContent{
     text-align: -webkit-center;
+}
+.card-body{
+    margin:auto;
+    font-family:inherit;
+    padding-bottom: 0;
+}
+.tagList{
+    margin-bottom: 55px;
+}
+.quote-chart{
+    border-right: 0.1em solid whitesmoke;
+    padding: 0.5em;
+    height: 310px;
 }
 </style>
 
