@@ -1,52 +1,52 @@
 <template>
-  <div id="editor">
-    <div class="d-flex justify-content-between ml-3 mb-5">
-      <h2 class="">글 작성</h2>
-      <button type="button" @click="postText" class="btn btn-outline-success" style="width:80px;">발행</button>
-    </div>
-
-    <!-- 모달 -->
-    <div v-if="modal">
-      <CreateCategoryWarning />
-    </div>
-
-    <!-- 카테고리 부분 -->
-    <div class="row form-group">
-      <div class="col-2 text-left"><label for="multiple-select" class=" form-control-label">카테고리: </label></div>
-      <div class="col-10 text-left">
-        <select v-model="aboutText.boardName">
-          <option v-for="category in categoryList" v-bind:key="category.name">
-            {{ category.name }}
-          </option>
-        </select>
-
+  <div id="editor" class="row">
+    <div class="wrapper text-left my-5 p-5">
+      <!-- 모달 -->
+      <div v-if="modal">
+        <CreateCategoryWarning />
       </div>
-    </div>
 
-    <!-- 썸네일  -->
-    <div class="row ml-1 mt-5 mb-5">
-      <label for="thumbnailInput">썸네일 : </label>
-      <input @change="thumbnailSelect" type="file" ref="thumbnailImage" id="thumbnailInput">
-    </div>
-
-    <!-- 제목 부분 -->
-    <form class="row text-left">
-      <div class="col-12 form-group">
-        <label for="titleInput">제목 :</label>
-        <input type="text" class="form-control" v-model="aboutText.post.subject" id="titleInput" placeholder="제목을 입력하세요">
+      <h2 class="mb-5">글 작성</h2>
+      
+      <!-- 카테고리 부분 -->
+      <div class="">
+        <h5 class="d-inline mr-4"><i class="fas fa-folder mr-3"></i>카테고리 선택</h5>
+        <div class="d-inline">
+          <select v-model="aboutText.boardName">
+            <option v-for="category in categoryList" v-bind:key="category.name">
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
       </div>
-    </form>
 
-    <!-- 글 에디터 부분 -->
-    <v-md-editor class="text-left" v-model="aboutText.post.content" :disabled-menus="[]" @upload-image="handleUploadImage" height="600px"></v-md-editor>
-    <br>
+      <!-- 썸네일  -->
+      <div class="mt-4 mb-5">
+        <h5 class="d-inline mr-5"><i class="far fa-image mr-3"></i>썸네일 선택</h5>
+        <input @change="thumbnailSelect" type="file" ref="thumbnailImage" id="thumbnailInput">
+      </div>
 
-    <!-- 태그 -->
-    <div class="tag">
-      <span v-for="(tag,index) in aboutText.post.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2" @click="deleteTag(index)">{{ tag }}</span>
-    </div>
-    <input placeholder="태그를 입력해주세요" class="mb-5 tag-input" type="text" v-model="tag" @keydown.enter="postTag">
-    
+      <!-- 제목 부분 -->
+      <form class="row text-left">
+        <div class="col-12 form-group">
+          <h5>제목</h5> 
+          <input type="text" class="form-control" v-model="aboutText.post.subject" id="titleInput" placeholder="제목을 입력하세요">
+        </div>
+      </form>
+
+      <!-- 글 에디터 부분 -->
+      <v-md-editor class="text-left" v-model="aboutText.post.content" :disabled-menus="[]" @upload-image="handleUploadImage" height="600px"></v-md-editor>
+      <br>
+
+      <!-- 태그 -->
+      <div class="tag">
+        <span v-for="(tag,index) in aboutText.post.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2" @click="deleteTag(index)">{{ tag }}</span>
+      </div>
+      <input placeholder="태그를 입력해주세요" class="mb-5 tag-input" type="text" v-model="tag" @keydown.enter="postTag">
+      
+      <!-- 제출 버튼 -->
+      <a @click="postText" class="float-right">발행</a>
+    </div>  
   </div>
 </template>
 
@@ -203,6 +203,30 @@ export default {
 };
 </script>
 <style scoped>
+@media only screen and (min-width: 1000px) {
+  .wrapper {
+    width: 80% !important;
+    margin: 0 auto;
+    background-color: white;
+    border: 1px solid #e7e7e7;
+    margin-bottom: 200px;
+}
+}
+
+
+#editor {
+    min-height: 1000px;
+    background-color: #f4f4f4;
+}
+
+.wrapper {
+    width: 100%;
+    margin: 0 auto;
+    background-color: white;
+    border: 1px solid #e7e7e7;
+    margin-bottom: 200px;
+}
+
 .tag-input {
   width: 100%
 }
@@ -210,6 +234,21 @@ export default {
 .badge {
   cursor: pointer;
 }
+
+.wrapper a {
+    width: 80px;
+    text-align: center;
+    padding: 10px 20px;
+    cursor: pointer;
+    text-decoration: none;
+    transition-duration: 0.3s;
+    border: 1px solid #e7e7e7;
+}
+.wrapper a:hover {
+    color: #56dbc9 !important;
+    border: 1px solid #99c9c2 !important;
+}
+
 </style>
 
 

@@ -36,7 +36,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .css-typing {
     text-align:-webkit-center;
     margin-top: 50px;
