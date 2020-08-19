@@ -47,7 +47,7 @@
       <div class="p-5">
         <h4><i class="fas fa-minus-circle mr-3"></i>카테고리 삭제</h4>
 
-          <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-secondary">{{ categorySelected2 }}</button>
+          <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-secondary" style="margin-bottom:5px;">{{ categorySelected2 }}</button>
           <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu">
             <button type="button" @click="dropdown2(category.name)" tabindex="0" class="dropdown-item" v-for="category in categoryList" v-bind:key="category.name">
               {{ category.name }}
@@ -237,7 +237,7 @@ input:hover {
 button {
     height: auto; /* 높이값 초기화 */ 
     line-height : normal; /* line-height 초기화 */ 
-    padding: .7em .5em; /* 원하는 여백 설정, 상하단 여백으로 높이를 조절 */ 
+    padding: .65em .5em; /* 원하는 여백 설정, 상하단 여백으로 높이를 조절 */ 
     font-family: inherit; /* 폰트 상속 */ 
     border-radius: 0; /* iSO 둥근모서리 제거 */ 
 }

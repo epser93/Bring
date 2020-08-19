@@ -12,7 +12,7 @@
         </div>
 
         <!-- 사이드 바 -->
-        <div id="nav-mylist" class="flex-column text-left p-3">
+        <div id="nav-mylist" class="flex-column text-left px-3">
             <h5>태그</h5>
             <div class="tagcloud" style="width: 330px;">
                 <router-link @click.native="setTotalPageNum(numOfPosts)" :to="{ name: 'MyQuestions' , params: { nickname: this.nickname }}" class="tag-cloud-link">전체보기</router-link> 
@@ -20,17 +20,12 @@
                     <router-link @click.native="setTotalPageNum(tagNum[index])" :to="{ name: 'MyQuestions' , query : { q: tag }}" class="tag-cloud-link ">{{ tag }}</router-link>
                 </div>
             </div>
-            <!-- 지식인 답변 목록 -->
-            <MyAnswers />
         </div>
-
-
     </div>
 </template>
 
 <script>
 import axios from 'axios'
-import MyAnswers from '../blog/MyAnswers.vue'
 import BlogPagination from '../blog/BlogPagination.vue'
 import { EventBus } from '../../event-bus.js'
 
@@ -40,7 +35,6 @@ const BACK_URL = 'http://localhost:8080'
 export default {
     name: 'MyList',
     components: {
-        MyAnswers, 
         BlogPagination,
     }, 
     props: {
@@ -64,6 +58,7 @@ export default {
                 this.numOfPosts = this.numOfPosts + this.tagNum[item] 
             }
             this.totalNum = this.numOfPosts
+            console.log(this.totalNum)
         },
 
         // blogPosts.vue로 페이지 넘버 보내기(이벤트버스)
@@ -161,4 +156,8 @@ export default {
       transition-duration: 0.5s;
       border: 1px solid #000; }
 
+
+#nav-mylist {
+    max-width: 370px;
+}
 </style>

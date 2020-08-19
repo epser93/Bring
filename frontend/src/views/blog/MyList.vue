@@ -11,7 +11,7 @@
             <BlogPagination :totalNum="totalNum" @pageNum="sendCurrentPage"/>
         </div>
         <!-- 사이드 바 -->
-        <div id="nav-mylist" class="flex-column text-left p-3">
+        <div id="nav-mylist" class="flex-column text-left px-3">
             <!-- 검색창 -->
             <div class="my-5 text-center">
                 <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-secondary" style="margin-bottom:5px;">{{ keywordType.name }}</button>
@@ -167,6 +167,7 @@ export default {
         position: absolute;
         top: 200px;
         left: -420px;
+        max-width: 370px;
     }
 }
 

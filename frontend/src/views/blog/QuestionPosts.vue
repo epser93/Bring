@@ -7,7 +7,7 @@
         </div>
         <div class="row">
             <div class="new-article col-12" v-if="userNow === nickname">
-                <a type="button" @click="newArticle" class="mb-5 float-right" style="width:160px;"><i class="fas fa-pencil-alt mr-1"></i>새 글 작성</a>
+                <a type="button" @click="newArticle" class="mb-5 float-right" style="width:170px;"><i class="fas fa-pencil-alt mr-1"></i>새 질문 작성</a>
             </div>
             <div v-for="(item, index) in postList" :key="index" class="p-0 mb-5 col-12">
                 <div class="card-list">
@@ -22,10 +22,10 @@
                     </div>
 
                     <div class="card-list-body p-5">
-                        <div class="card-image">
+                        <div class="card-image mb-5">
                             <img :src="thumbnail1[index]" alt="Card image cap">
                         </div>
-                        <p class="card-list-text my-5">{{ item.content.slice(0, 200) }}</p>
+
 
                         <div class="d-flex justify-content-between">
                             <a class="py-3 px-5" @click="gotoDetail(item)">글 더보기</a>
@@ -52,7 +52,7 @@
         </div>
         <div class="row">
             <div class="new-article col-12" v-if="userNow === nickname">
-                <a type="button" @click="newArticle" class="mb-5 float-right" style="width:160px;"><i class="fas fa-pencil-alt mr-1"></i>새 글 작성</a>
+                <a type="button" @click="newArticle" class="mb-5 float-right" style="width:170px;"><i class="fas fa-pencil-alt mr-1"></i>새 질문 작성</a>
             </div>
             <div v-for="(item, index) in postListTag" :key="index" class="p-0 mb-5 col-12">
                 <div class="card-list">
@@ -67,10 +67,10 @@
                     </div>
 
                     <div class="card-list-body p-5">
-                        <div class="card-image">
+                        <div class="card-image mb-5">
                             <img :src="thumbnail2[index]" alt="Card image cap">
                         </div>
-                        <p class="card-list-text my-5">{{ item.content.slice(0, 200) }}</p>
+                        
 
                         <div class="d-flex justify-content-between">
                             <a class="py-3 px-5" @click="gotoDetail(item)">글 더보기</a>
@@ -207,6 +207,8 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+.card-image img{
+    height: 300px;
+}
 </style>
