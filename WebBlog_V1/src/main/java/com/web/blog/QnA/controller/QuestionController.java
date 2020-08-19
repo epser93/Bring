@@ -362,7 +362,6 @@ public class QuestionController {
         List<SingleResult> result = new ArrayList<>();
         Qpost qpost1 = qpostRepository.findById(qpostId).get();
         if (qpost1.getSelectOver()) throw new CSelectedAnswerException();
-        if (qpost1.getAnswerCnt() > 0) throw new CAnsweredQuestionException();
         Qpost qpost = qnaService.updateQuestion(member, qpostId, paramQpost);
         if (!tags.isEmpty()) {
             qTagService.deleteQtags(qpost);

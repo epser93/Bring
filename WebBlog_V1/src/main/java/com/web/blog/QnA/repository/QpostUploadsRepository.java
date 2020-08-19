@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface QpostUploadsRepository extends JpaRepository<QpostUploads, Long> {
     List<QpostUploads> findAllByQpostId(long qpost_id); //한 사진에 업로드 된 모든 사진들 리스트
 
-    Optional<QpostUploads> findByQpostId(long qpost_id);
+    Optional<List<QpostUploads>> findByQpostId(long qpost_id);
 
     void deleteByQpostId(long qpost_id);
 }

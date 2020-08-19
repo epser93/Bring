@@ -3,6 +3,7 @@ package com.web.blog.Board.controller;
 import com.web.blog.Board.entity.Board;
 import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.entity.PostMember;
+import com.web.blog.Board.entity.PostUploads;
 import com.web.blog.Board.model.*;
 import com.web.blog.Board.repository.BoardRepository;
 import com.web.blog.Board.repository.PostMemberRepository;
@@ -15,6 +16,7 @@ import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.response.SingleResult;
 import com.web.blog.Common.service.ResponseService;
+import com.web.blog.Common.service.S3Service;
 import com.web.blog.Member.entity.IpAddrForTodayCnt;
 import com.web.blog.Member.entity.IpAddrForViewCnt;
 import com.web.blog.Member.entity.Member;
@@ -67,6 +69,7 @@ public class BoardController {
     private final FollowService followService;
     private final IpAddrForTodayCntRepository ipAddrForTodayCntRepository;
     private final IpAddrForViewCntRepository ipAddrForViewCntRepository;
+    private final S3Service s3Service;
 
     @Transactional
     @ApiImplicitParams({
@@ -74,16 +77,22 @@ public class BoardController {
     })
     @ApiOperation(value = "게시판 카테고리 생성", notes = "게시판 카테고리 생성")
     @PostMapping(value = "/blog/{nickname}/create")
-    public SingleResult<Board> createB(@Valid @RequestBody ParamBoard paramBoard, @PathVariable String nickname) {
+    public void createB(@Valid @RequestBody ParamBoard paramBoard, @PathVariable String nickname) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Member member = (Member) principal;
         if (member.getNickname().equals(nickname)) {
             Optional<Board> board = Optional.ofNullable(boardRepository.findByNameAndMember(paramBoard.getName(), member));
             if (board.isPresent()) throw new CBoardExistException();
             String uid = member.getUid();
-            return responseService.getSingleResult(boardService.createBoard(uid, paramBoard.getName()));
+            Board board1 = boardService.createBoard(uid, paramBoard.getName());
+            ParamPost paramPost = new ParamPost();
+            paramPost.setSubject("First!1!Post:2:On;3;New:4:Board");
+            paramPost.setOriginal((long)-1);
+            paramPost.setContent("First!1!Post:2:On;3;New:4:Board");
+            paramPost.setTags(null);
+            Post post = postService.writePost(paramBoard.getName(), paramPost, member, "");
+            boardRepository.updatePostCntMinus(board1.getBoardId());
         }
-        return null;
     }
 
     @ApiOperation(value = "게시판 카테고리 목록", notes = "게시판 카테고리 리스트")
@@ -277,7 +286,7 @@ public class BoardController {
         List<ListResult> result = new ArrayList<>();
         List<Boolean> amIInTheList = new ArrayList<>();
         List<String> filePaths = new ArrayList<>();
-        List<OnlyPostMapping> list = postRepository.findAllByMember_NicknameAndBoard_NameNotLikeOrderByPostIdDesc(nickname, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<OnlyPostMapping> list = postRepository.findAllByMember_NicknameAndBoard_NameNotLikeAndSubjectNotLikeOrderByPostIdDesc(nickname, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         result.add(responseService.getListResult(list));
         int cnt = 0;
         if (logined.isPresent()) {
@@ -318,8 +327,8 @@ public class BoardController {
         }
 
         String ip = followService.getIpAddr(request);
-        Optional<IpAddrForTodayCnt> ipAddr = ipAddrForTodayCntRepository.findByIpAndNickname(ip,  member.getNickname());
-        if(!ipAddr.isPresent()) {
+        Optional<IpAddrForTodayCnt> ipAddr = ipAddrForTodayCntRepository.findByIpAndNickname(ip, member.getNickname());
+        if (!ipAddr.isPresent()) {
             IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
                     .ip(ip)
                     .nickname(member.getNickname())
@@ -381,7 +390,7 @@ public class BoardController {
                     List<PostUploadsDto> files = postUploadsService.getList(postId);
                     PostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
-                } else { //없으면~
+                } else {
                     ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
                     String filePath = profileImgDto.getImgFullPath();
                     filePaths.add(filePath);
@@ -409,7 +418,7 @@ public class BoardController {
 
         LocalDateTime date = LocalDateTime.now();
         date.minus(14, ChronoUnit.DAYS);
-        List<OnlyPostMapping> list = postRepository.findByCreatedAtLessThanEqualAndBoard_NameNotLikeOrderByCreatedAtDesc(date, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<OnlyPostMapping> list = postRepository.findByCreatedAtLessThanEqualAndBoard_NameNotLikeAndSubjectNotLikeOrderByPostIdDesc(date, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         result.add(responseService.getListResult(list));
         List<String> filePaths = new ArrayList<>();
         int cnt = 0;
@@ -471,7 +480,7 @@ public class BoardController {
         List<Boolean> amIInTheList = new ArrayList<>();
         LocalDateTime date = LocalDateTime.now();
         date.minus(14, ChronoUnit.DAYS);
-        List<OnlyPostMapping> list = postRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualAndBoard_NameNotLikeOrLikesGreaterThanEqualAndCreatedAtLessThanEqualAndBoard_NameNotLikeOrderByCreatedAtDesc(40, date, "나의 Answers", 20, date, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<OnlyPostMapping> list = postRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualAndBoard_NameNotLikeAndSubjectNotLikeOrLikesGreaterThanEqualAndCreatedAtLessThanEqualAndBoard_NameNotLikeAndSubjectNotLikeOrderByPostIdDesc(40, date, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", 20, date, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         result.add(responseService.getListResult(list));
         List<String> filePaths = new ArrayList<>();
         int cnt = 0;
@@ -502,7 +511,9 @@ public class BoardController {
                 long postId = pm.getPostId();
                 amIInTheList.add(false);
                 //파일 조회
+                System.out.println(postId);
                 if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
+                    System.out.println(postId);
                     List<PostUploadsDto> files = postUploadsService.getList(postId);
                     PostUploadsDto file = files.get(0);
                     filePaths.add(file.getImgFullPath());
@@ -598,6 +609,14 @@ public class BoardController {
         Post post = null;
         if (member.equals(member2)) { //블로그 주인과 로그인 한 사용자가 같으면~
             post = postService.writePost(boardName, paramPost, member, "");
+            List<PostUploads> list = postUploadsRepository.findAllByPostId(post.getPostId());
+            for(PostUploads pu : list) {
+                String filep = pu.getFilePath();
+                if(!postRepository.findByPostIdAndContentContaining(post.getPostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+                    s3Service.delete(filep);
+                    postUploadsRepository.deleteById(pu.getId());
+                }
+            }
         }
 
         if (!tags.isEmpty()) {
@@ -836,7 +855,7 @@ public class BoardController {
             }
             result.add(responseService.getSingleResult(share));
             result.add(responseService.getSingleResult(tags));
-            if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드 된 파일이 존재하면~
+            if (postUploadsRepository.findByPostId(postId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
                 int num = 0;
                 List<PostUploadsDto> files = postUploadsService.getList(postId); //해당 파일들 불러와서
                 for (PostUploadsDto postUploadsDto : files) { //각 파일들마다 DB에 저장!
@@ -864,9 +883,22 @@ public class BoardController {
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
         Board board = boardRepository.findByNameAndMember(boardName, logined);
         Optional<List<Post>> list = postRepository.findByBoard_BoardId(board.getBoardId());
-        if (list.isPresent()) {
+        if (list.get().size() == 1) {
+            long postId = list.get().get(0).getPostId() + 1;
+            return responseService.getListResult(postService.saveFiles(postId, nickname, files));
+//            int size = list.get().size();
+//            for(int i = 0 ; i < size ; i++) {
+//                Post p = list.get().get(i);
+//                if(p.getSubject().equals("First!1!Post:2:On;3;New:4:Board")) {
+//                    list.get().remove(i);
+//                    size--;
+//                    i--;
+//                }
+//            }
+        }
+        else if(list.get().size() > 1){
             Post post = list.get().get(list.get().size() - 1);
-            long postId = post.getPostId();
+            long postId = post.getPostId() + 1;
             return responseService.getListResult(postService.saveFiles(postId, nickname, files));
         } else return null;
     }

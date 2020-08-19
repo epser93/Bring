@@ -72,7 +72,7 @@ public class PostService {
                 postUploadsDto.setNum(num);
                 postUploadsDto.setImgFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + imgPath);
                 postUploadsService.savePost(postUploadsDto);
-                fileUrls.add(postUploadsDto.getImgFullPath());
+                fileUrls.add("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + imgPath);
                 num++;
             }
         }

@@ -121,7 +121,6 @@ public class QnaService {
             throw new CNotOwnerException();
         } else {
             if (qpost.getAnswerCnt() == 0) {
-//                qTagService.deleteQtags(qpost);
                 qpostRepository.delete(qpost);
                 return true;
             } else if (qpost.getAnswerCnt() > 0) throw new CAnsweredQuestionException();

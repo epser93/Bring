@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface ReplyUploadsRepository extends JpaRepository<ReplyUploads, Long> {
     List<ReplyUploads> findAllByReplyId(long reply_id); //한 사진에 업로드 된 모든 사진들 리스트
 
-    Optional<ReplyUploads> findByReplyId(long reply_id);
+    Optional<List<ReplyUploads>> findByReplyId(long reply_id);
 
     void deleteByReplyId(long reply_id);
 }

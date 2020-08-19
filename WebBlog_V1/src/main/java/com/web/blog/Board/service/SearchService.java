@@ -34,35 +34,35 @@ public class SearchService {
     //게시판 내 포스트 검색
     public List<OnlyPostMapping> CategoryPostSearch(int which, long board_id, String keyword, Paging paging) { //검색: which = 1~3
         if (which == 1) { //제목 검색
-            return postRepository.findByBoard_BoardIdAndSubjectContainingAndBoard_NameNotLikeOrderByPostIdDesc(board_id, keyword, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return postRepository.findByBoard_BoardIdAndContentContainingAndBoard_NameNotLikeAndSubjectNotLikeOrderByPostIdDesc(board_id, keyword, "나의 Answers", "First!1!Post:2:On;3;New:4:Board",PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         } else if (which == 2) { //내용 검색
-            return postRepository.findByBoard_BoardIdAndContentContainingAndBoard_NameNotLikeOrderByPostIdDesc(board_id, keyword, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return postRepository.findByBoard_BoardIdAndSubjectContainingAndBoard_NameNotLikeAndSubjectNotLikeOrderByPostIdDesc(board_id, keyword, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         } else { //통합검색
-            return postRepository.findDistinctByBoard_BoardIdAndSubjectContainingAndBoard_NameNotLikeOrBoard_BoardIdAndContentContainingAndBoard_NameNotLikeOrderByPostIdDesc(board_id, keyword, "나의 Answers", board_id, keyword, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return postRepository.findDistinctByBoard_BoardIdAndSubjectContainingAndBoard_NameNotLikeAndSubjectNotLikeOrBoard_BoardIdAndContentContainingAndBoard_NameNotLikeAndSubjectNotLikeOrderByPostIdDesc(board_id, keyword, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", board_id, keyword, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         }
     }
 
     //블로그 내 포스트 검색
     public List<OnlyPostMapping> BlogPostSearch(int which, String writer, String keyword, Paging paging) { //검색: which = 1~3
         if (which == 1) { //제목 검색
-            return postRepository.findByMember_NicknameAndSubjectContainingAndBoard_NameNotLikeOrderByPostIdDesc(writer, keyword, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return postRepository.findByMember_NicknameAndSubjectContainingAndBoard_NameNotLikeAndSubjectNotLikeOrderByPostIdDesc(writer, keyword, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         } else if (which == 2) { //내용 검색
-            return postRepository.findByMember_NicknameAndContentContainingAndBoard_NameNotLikeOrderByPostIdDesc(writer, keyword, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return postRepository.findByMember_NicknameAndContentContainingAndBoard_NameNotLikeAndSubjectNotLikeOrderByPostIdDesc(writer, keyword, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         } else { //통합검색
-            return postRepository.findDistinctByMember_NicknameAndSubjectContainingAndBoard_NameNotLikeOrMember_NicknameAndContentContainingAndBoard_NameNotLikeOrderByPostIdDesc(writer, keyword, "나의 Answers", writer, keyword, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return postRepository.findDistinctByMember_NicknameAndSubjectContainingAndBoard_NameNotLikeAndSubjectNotLikeOrMember_NicknameAndContentContainingAndBoard_NameNotLikeAndSubjectNotLikeOrderByPostIdDesc(writer, keyword, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", writer, keyword, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         }
     }
 
     //사이트 내 포스트 검색
     public List<OnlyPostMapping> SitePostSearch(int which, String keyword, Paging paging) { //검색: which = 1~4
         if (which == 1) { //제목 검색
-            return postRepository.findBySubjectContainingAndBoard_NameNotLikeOrderByPostIdDesc(keyword, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return postRepository.findBySubjectContainingAndBoard_NameNotLikeAndSubjectNotLikeOrderByPostIdDesc(keyword, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         } else if (which == 2) { //내용 검색
-            return postRepository.findByContentContainingAndBoard_NameNotLikeOrderByPostIdDesc(keyword, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return postRepository.findByContentContainingAndBoard_NameNotLikeAndSubjectNotLikeOrderByPostIdDesc(keyword, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         } else if (which == 3) { //작성자 검색
-            return postRepository.findByMember_NicknameContainingAndBoard_NameNotLikeOrderByPostIdDesc(keyword, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return postRepository.findByMember_NicknameContainingAndBoard_NameNotLikeAndSubjectNotLikeOrderByPostIdDesc(keyword, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         } else { //통합검색
-            return postRepository.findDistinctBySubjectContainingAndBoard_NameNotLikeOrContentContainingAndBoard_NameNotLikeOrMember_NicknameContainingAndBoard_NameNotLikeOrderByPostIdDesc(keyword, "나의 Answers", keyword, "나의 Answers", keyword, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+            return postRepository.findDistinctBySubjectContainingAndBoard_NameNotLikeAndSubjectNotLikeOrContentContainingAndBoard_NameNotLikeAndSubjectNotLikeOrMember_NicknameContainingAndBoard_NameNotLikeAndSubjectNotLikeOrderByPostIdDesc(keyword, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", keyword, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", keyword, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         }
     }
 
