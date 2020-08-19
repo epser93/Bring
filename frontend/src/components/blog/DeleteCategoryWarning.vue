@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="deleteCategoryWarning">
     <b-modal ref="my-modal" size="" hide-header hide-footer title="">
       <div class="d-block text-center mt-3 mb-5">
           <h4>삭제하면 모든 글이 전부 사라집니다</h4>
@@ -58,7 +58,7 @@ const BACK_URL = 'http://localhost:8080'
     }
   }
 </script>
-<style>
+<style scoped>
 
 
 </style>

@@ -1,12 +1,9 @@
 <template>
-<div class="container" style="width:650px; margin-top:100px;">
+<div id="editProfile">
   <div class="card">
-    <div class="card-header">
-      <strong>Edit Profile</strong>
-    </div>
     <div class="card-body card-block">
       <div id="innerCard">
-        
+        <h4 class="my-4">Edit Profile</h4>
         <!-- 이메일 정보 -->
         <div class="section">
           <h5 class="title"><b>이메일</b></h5>
@@ -77,13 +74,10 @@
             <img class="previewImg" :src="galleryData.filePath"> 
           </div> -->
         </div>
-
-
-
       </div>
     </div>
       <!-- 여기는 제출 -->
-    <div class="card-footer">
+    <div class="card-footer bg-transparent">
         <button type="submit" class="btn btn-success mx-2" @click="changeInfo">
           <i class="fa fa-dot-circle-o"></i> 완료
         </button>
@@ -242,7 +236,24 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+@media only screen and (min-width: 1000px) {
+  #editProfile {
+    background-color: #f4f4f4;
+    padding: 50px;
+    
+  }
+  .card {
+    width: 800px;
+    margin: auto;
+  }
+}
+
+#editProfile {
+    background-color: #f4f4f4;
+    padding: 50px;
+}
+
 .inputRange{
   width:100%;
   height:40px;

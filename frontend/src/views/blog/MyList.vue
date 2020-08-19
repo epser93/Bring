@@ -27,7 +27,11 @@
             </div>
 
             <!-- 카테고리 목록 -->
-            <h5>카테고리</h5>
+            <div class="category-manager d-flex justify-content-between">
+                <h5>카테고리</h5>
+                <!-- 카테고리 버튼 -->
+                <a v-if="userNow === nickname" @click="newCategory"><i class="fas fa-folder mr-2"></i>관리</a>   
+            </div>
             <hr class="mb-4">
             <div class="px-5">
                 <router-link @click.native="setTotalPageNum(numOfPosts)" :to="{ name: 'MyBlog' , params: { nickname: this.nickname }}">전체보기 <span class="float-right">({{ numOfPosts }})</span><hr></router-link> 
@@ -36,10 +40,6 @@
                 </div>
             </div>
             
-            <!-- 카테고리 버튼 -->
-            <div v-if="userNow === nickname">
-                <button type="button" @click="newCategory" class="btn btn-outline-dark mt-5" style="width:150px;">카테고리 관리</button>   
-            </div>
             
             <!-- 태그 리스트 -->
             <h5 class="mt-5">태그</h5>
@@ -217,6 +217,18 @@ button {
   color: #56dbc9;
   text-decoration: none;
   transition-duration: 0.3s;
+}
+
+.category-manager a {
+    padding: 10px 20px;
+    cursor: pointer;
+    text-decoration: none;
+    transition-duration: 0.3s;
+    border: 1px solid #7e7e7e;
+}
+.category-manager a:hover {
+    color: #56dbc9 !important;
+    border: 1px solid #99c9c2 !important;
 }
 
 </style>

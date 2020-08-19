@@ -1,12 +1,12 @@
 <template>
-  <div class="post">
-    <div id="nav" class="mt-4">
+  <div id="home">
+    <div id="nav" class="">
       <router-link v-if="this.mode==='Blog'" :to="{ name : 'RecentlyPost' }"><h4 class="d-inline ml-5">최신글</h4></router-link> 
       <router-link v-if="this.mode==='Blog'" :to="{ name: 'HotPost'}"><h4 class="d-inline ml-5"><b-icon class="mr-2" icon="graph-up" aria-hidden="true"></b-icon>트렌딩</h4></router-link> 
       <router-link v-if="this.mode==='QnA'" :to="{ name : 'RecentlyQuestion' }"><h4 class="d-inline ml-5">최신질문</h4></router-link> 
       <router-link v-if="this.mode==='QnA'" :to="{ name: 'TrendQuestion'}"><h4 class="d-inline ml-5">인기질문</h4></router-link>
     </div>
-    <hr>
+    <hr class="mt-0">
     <router-view  ></router-view>
     <div class="Buttons">
       <button id="modeToggler" @click="changeMode">{{ this.modeText }} 보러 가기</button>
@@ -69,9 +69,32 @@ export default {
 }
 </script>
 <style scoped>
+@media only screen and (min-width: 1000px) {
+    #home {
+        min-height: 1000px;
+        padding: 0 50px;
+        font-family: 'Noto Serif KR', serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #f4f4f4;
+    }
+}
+
+#home {
+    min-height: 1000px;
+    padding: 0 50px;
+    font-family: 'Noto Serif KR', serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #f4f4f4;
+}
+
 #nav {
+  font-family: 'Noto Serif KR', serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 20px 0;
   text-align: left;
-  padding: 0
 }
 
 #nav a {
@@ -81,13 +104,13 @@ export default {
 }
 
 #nav a.router-link-exact-active {
-  color: #42b983;
+  color: #56dbc9;
 }
 
 .Buttons {
   display: flex;
   justify-content: flex-end;
-  margin-right : 80px;
+  margin-right : 30px;
 }
 
 #modeToggler {
@@ -123,8 +146,8 @@ export default {
 }
 
 #modeToggler:hover,#upScroll:hover {
-  background-color: #2EE59D;
-  box-shadow: 0px 15px 20px rgba(46, 229, 157, 0.4);
+  background-color: #56dbc9;
+  box-shadow: 0px 10px 15px #2a6d64;
   color: #fff;
   transform: translateY(-7px);
 }

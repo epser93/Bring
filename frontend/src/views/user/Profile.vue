@@ -1,5 +1,5 @@
 <template>
-    <div style="padding-top: 10px;">
+    <div id="profile" style="padding-top: 10px;">
         <div class="profile container" style="width:650px">
             <UserCard class="mb-3"/>
         </div>    
@@ -30,6 +30,11 @@ export default {
 </script>
 
 <style>
+#profile{
+    min-height: 1000px;
+    background-color: #f4f4f4;
+}
+
 
 </style>
 

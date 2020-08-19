@@ -5,7 +5,7 @@
             <h5>{{ nickname }}의 답변 목록</h5>
             <hr class="ml-0">
             <div v-for="(item, index) in answersList" :key="item.answerId" class="p-0 mb-5">
-                <div class="card border-secondary mb-3" style="width: 70%;">
+                <div class="card border-secondary mb-3">
                     <div class="card-header bg-transparent border-secondary"><strong>{{ answersQList[index] }}</strong><br><small>작성자: {{ answersWList[index] }}</small></div>
                     <div class="card-body text-secondary">
                         <p class="card-text">{{ item.content }}</p>
