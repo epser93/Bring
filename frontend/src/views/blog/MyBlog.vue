@@ -20,6 +20,7 @@
       <div id="nav" class="col-12 col-lg-8 p-0">
           <router-link :to="{ name: 'MyBlog' , params: { nickname: this.nickname }}"><h3 :ref="'blog-word'" class="d-inline mr-5">포스트</h3></router-link> 
           <router-link :to="{ name: 'MyQuestions' , params: { nickname: this.nickname }}"><h3 :ref="'gisik-word'" class="d-inline mr-5">질문</h3></router-link> 
+          <router-link :to="{ name: 'MyAnswers' , params: { nickname: this.nickname }}"><h3 :ref="'answer-word'" class="d-inline mr-5">답변</h3></router-link> 
           <span v-if="userNow === nickname">
             <router-link :to="{ name: 'Myfeeds' , params: { nickname: this.nickname }}"><h3 class="d-inline">피드</h3></router-link>
           </span>
@@ -90,12 +91,19 @@ export default {
     if (this.$route.path.match('/blog/') && !this.$route.path.match('/blog/my')) {
       this.$refs['blog-word'].style.color = "#56dbc9"
       this.$refs['gisik-word'].style.color = "#2c3e50"
+      this.$refs['answer-word'].style.color = "#2c3e50"
     } else if (this.$route.path.match('/blog/myquestions/')) {
       this.$refs['gisik-word'].style.color = "#56dbc9"
       this.$refs['blog-word'].style.color = "#2c3e50"
+      this.$refs['answer-word'].style.color = "#2c3e50"
     } else if (this.$route.path.match('/blog/myfeeds')) {
       this.$refs['blog-word'].style.color = "#2c3e50"
       this.$refs['gisik-word'].style.color = "#2c3e50"
+      this.$refs['answer-word'].style.color = "#2c3e50"
+    } else if (this.$route.path.match('/blog/myanswer')) {
+      this.$refs['blog-word'].style.color = "#2c3e50"
+      this.$refs['gisik-word'].style.color = "#2c3e50"
+      this.$refs['answer-word'].style.color = "#56dbc9"      
     }
   },
   watch: {
@@ -107,12 +115,19 @@ export default {
       if (this.$route.path.match('/blog/') && !this.$route.path.match('/blog/my')) {
         this.$refs['blog-word'].style.color = "#56dbc9"
         this.$refs['gisik-word'].style.color = "#2c3e50"
+        this.$refs['answer-word'].style.color = "#2c3e50"
       } else if (this.$route.path.match('/blog/myquestions/')) {
         this.$refs['gisik-word'].style.color = "#56dbc9"
         this.$refs['blog-word'].style.color = "#2c3e50"
+        this.$refs['answer-word'].style.color = "#2c3e50"
       } else if (this.$route.path.match('/blog/myfeeds')) {
         this.$refs['blog-word'].style.color = "#2c3e50"
         this.$refs['gisik-word'].style.color = "#2c3e50"
+        this.$refs['answer-word'].style.color = "#2c3e50"
+      } else if (this.$route.path.match('/blog/myanswer')) {
+        this.$refs['blog-word'].style.color = "#2c3e50"
+        this.$refs['gisik-word'].style.color = "#2c3e50"
+        this.$refs['answer-word'].style.color = "#56dbc9"      
       }
     }
   }

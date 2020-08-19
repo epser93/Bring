@@ -15,7 +15,7 @@
       <form id="login" class="input-group">
         <input type="text" class="input-field" placeholder="User Id" v-model="loginData.id" required>
         <input type="password" class="input-field" placeholder="Enter Password" v-model="loginData.password" required>
-        <button type="submit" id="login-btn" class="submit-btn" @click.prevent="login">Login</button>
+        <button type="submit" id="login-btn" class="submit-btn mt-5" @click.prevent="login">Login</button>
       </form>
       <div id="register" class="input-group">
         <input type="email" class="input-field" placeholder="Email Id" v-model="signupData.uid" required>
@@ -48,6 +48,7 @@ export default {
     }
   },
   created() {
+    
   },
   computed: {
 
@@ -71,9 +72,20 @@ export default {
     },
     login() {
       this.$emit('submit-login-data', this.loginData)
+      this.loginData = {
+        id: '',
+        password: '',
+      }
     },
     signup() {
       this.$emit('submit-signup-data', this.signupData)
+      this.signupData = {
+        name: '',
+        uid : '',
+        nickname: '',
+        password1: '',
+        password2: ''
+      }
     },
   }
 }
@@ -103,7 +115,7 @@ export default {
   width: 220px;
   margin: 2px auto;
   position: relative;
-  box-shadow: 0 0 20px 9px #ff61241f;
+  box-shadow: 0px 0px 5px 2px #56dbc9;
   border-radius: 30px;
 }
 
@@ -122,7 +134,7 @@ export default {
   position: absolute;
   width: 110px;
   height: 100%;
-  background : linear-gradient(to right, #ff105f, #ffad06);
+  background : linear-gradient(to right, #4cbdb0, #a2ffe8);
   border-radius: 30px;
   transition: .5s;
 }
@@ -157,7 +169,7 @@ export default {
   cursor: pointer;
   display: block;
   margin: auto;
-  background: linear-gradient(to right, #ff105f, #ffad06);
+  background: linear-gradient(to right, #4cbdb0, #a2ffe8);
   border : 0;
   outline: none;
   border-radius: 30px;
@@ -198,7 +210,7 @@ span {
 }
 
 .input-field:focus {
-  border-bottom : 2px solid #ffad06;
+  border-bottom : 2px solid gray;
   transition: .3s;
 }
 </style>

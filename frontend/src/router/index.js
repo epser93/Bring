@@ -26,6 +26,8 @@ import BlogCategory from '../views/blog/BlogCategory.vue'
 import QuestionPosts from '../views/blog/QuestionPosts.vue'
 import BlogPosts from '../views/blog/BlogPosts.vue'
 import MyFeeds from '../views/blog/MyFeeds.vue'
+import MyAnswers from '../views/blog/MyAnswers.vue'
+
 
 // 스택오버플로우
 import Question from '../views/Question/Question.vue'
@@ -172,6 +174,12 @@ const routes = [{
                 path: 'myfeeds',
                 name: 'Myfeeds',
                 component: MyFeeds,
+
+            },
+            {
+                path: 'myanswers',
+                name: 'MyAnswers',
+                component: MyAnswers,
 
             }
 

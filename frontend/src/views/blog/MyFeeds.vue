@@ -3,7 +3,7 @@
     <!-- 글 리스트 -->
         <div class="col-12 p-0 m-0 container">
             <div class="text-center mt-5" v-if="postList.length == 0">
-                <h3>현재 등록된 글이 없습니다</h3>
+                <h3>팔로워의 최근 글이 없습니다</h3>
             </div>
             <div class="row">
                 <div v-for="(item, index) in postList" :key="index" class="p-0 mb-5 col-12">
@@ -103,8 +103,11 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 #myfeeds {
     min-height: 1000px;
+}
+.card-image img{
+    height: 300px;
 }
 </style>
