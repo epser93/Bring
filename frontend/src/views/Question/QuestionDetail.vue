@@ -4,7 +4,7 @@
         <!-- 글쓴이 정보 -->
         <div class="info text-center my-5">
             <h1 class="mb-3">{{qPost.subject}}</h1>
-            <span class="text-muted">{{ qPost.createdAt }}</span>
+            <span class="text-muted">{{ qPost.createdAt.slice(0,10) }}</span>
             <span class="vertical-line mx-3"></span>
             <span class="mr-2"><strong>{{ qPost.member_nickname }}</strong></span>
             <!-- 분기처리/ 작성자와 현재 사용자의 이름이 같으면 삭제표시되게끔-->
@@ -99,7 +99,7 @@
                 <span v-else class="ml-1">
                     <button class="btn btn-outline-danger btn-sm mx-1" @click="deleteAnswer(aArticle.apostId)" v-if="(nickname===aArticle.member_nickname)"><b-icon icon="trash"></b-icon>삭제</button>
                     <button class="btn btn-outline-warning btn-sm mx-1" @click='modifyAnswerOpen(aArticle)' v-if="nickname===aArticle.member_nickname "><b-icon icon="pen"></b-icon>수정</button>
-                    <button class="btn btn-outline-primary btn-sm mx-1" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false)">채택</button>
+                    <button class="btn btn-outline-primary btn-sm mx-1" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false)"><b-icon icon="check-circle" class="mb-1"></b-icon> 채택</button>
                 </span>
 
                 </p>
