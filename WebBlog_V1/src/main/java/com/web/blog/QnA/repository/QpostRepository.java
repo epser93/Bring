@@ -24,6 +24,8 @@ public interface QpostRepository extends JpaRepository<Qpost, Long> {
 
     Optional<List<Qpost>> findAllByMember_Nickname(String writer);
 
+    Optional<OnlyQpostMapping> findByQpostIdAndContentContaining(long qpostId, String content);
+
     @Modifying
     @Transactional
     @Query(value = "update qpost set select_over = true where qpost_id = :qpost_id", nativeQuery = true)
