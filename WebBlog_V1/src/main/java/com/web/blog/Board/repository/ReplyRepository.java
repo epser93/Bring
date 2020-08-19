@@ -25,6 +25,8 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
     List<OnlyReplyMapping> findByReplyId(long reply_id);
 
+    Optional<OnlyReplyMapping> findByReplyIdAndReplyContaining(long replyId, String reply);
+
     @Modifying
     @Transactional
     @Query(value = "update reply set selected = true where reply_id = :reply_id", nativeQuery = true)

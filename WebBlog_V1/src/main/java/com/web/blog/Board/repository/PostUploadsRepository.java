@@ -12,6 +12,4 @@ public interface PostUploadsRepository extends JpaRepository<PostUploads, Long> 
     Optional<List<PostUploads>> findByPostId(long post_id);
 
     void deleteByPostId(long post_id);
-
-    void deleteByFilePath(String filePath);
 }

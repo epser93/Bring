@@ -226,6 +226,14 @@ public class PostController {
         Post post = new Post();
         if (member.equals(member2)) { //블로그 주인과 로그인 한 사용자가 같으면~~
             post = postService.updatePost(boardName, postId, member.getMsrl(), paramPost);
+            List<PostUploads> list = postUploadsRepository.findAllByPostId(post.getPostId());
+            for(PostUploads pu : list) {
+                String filep = pu.getFilePath();
+                if(!postRepository.findByPostIdAndContentContaining(post.getPostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+                    s3Service.delete(filep);
+                    postUploadsRepository.deleteById(pu.getId());
+                }
+            }
         }
         if (!tags.isEmpty()) {
             tagService.deleteTags(post);
