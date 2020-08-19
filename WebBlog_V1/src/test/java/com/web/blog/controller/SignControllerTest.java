@@ -32,7 +32,7 @@ public class SignControllerTest {
     @Test
     public void signin() throws Exception {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("id", "aaaaa@aaaaa.com");
+        params.add("uid", "aaaaa@aaaaa.com");
         params.add("password", "aaaaaaa");
         mockMvc.perform(post("/sign/in").params(params))
                 .andDo(print())
@@ -47,7 +47,7 @@ public class SignControllerTest {
     public void signup() throws Exception {
         long epochTime = LocalDateTime.now().atZone(ZoneId.systemDefault()).toEpochSecond();
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("id", "aaaaa" + epochTime + "@aaaaa.com");
+        params.add("uid", "aaaaa" + epochTime + "@aaaaa.com");
         params.add("password1", "aaaaaaa");
         params.add("password2", "aaaaaaa");
         params.add("name", "aaa" + epochTime);
