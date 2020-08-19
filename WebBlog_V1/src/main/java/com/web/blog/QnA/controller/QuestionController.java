@@ -214,11 +214,15 @@ public class QuestionController {
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
         Optional<List<Qpost>> list = qpostRepository.findAllByMember_Nickname(logined.getNickname());
-        if (list.isPresent()) {
-            Qpost qpost = list.get().get(list.get().size() - 1); //찾은 리스트 중 마지막 댓글 가져오기
-            long qpostId = qpost.getQpostId();
+        if (list.get().size() == 1) {
+            long qpostId = list.get().get(0).getQpostId() + 1;
             return responseService.getListResult(qnaService.saveFiles(qpostId, logined.getNickname(), files));
-        } else return null;
+        } else if(list.get().size() > 1) {
+            Qpost qpost = list.get().get(list.get().size() - 1); //찾은 리스트 중 마지막 댓글 가져오기
+            long qpostId = qpost.getQpostId() + 1;
+            return responseService.getListResult(qnaService.saveFiles(qpostId, logined.getNickname(), files));
+        }
+        else return null;
     }
 
     @ApiImplicitParams({

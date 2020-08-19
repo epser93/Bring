@@ -12,5 +12,7 @@ public interface ReplyUploadsRepository extends JpaRepository<ReplyUploads, Long
     Optional<List<ReplyUploads>> findByReplyId(long reply_id);
 
     void deleteByReplyId(long reply_id);
+
+
 }
 

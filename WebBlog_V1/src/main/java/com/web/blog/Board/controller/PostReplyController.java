@@ -1,9 +1,9 @@
 package com.web.blog.Board.controller;
 
-import com.web.blog.Board.entity.Post;
-import com.web.blog.Board.entity.Reply;
-import com.web.blog.Board.entity.ReplyMember;
-import com.web.blog.Board.model.*;
+import com.web.blog.Board.entity.*;
+import com.web.blog.Board.model.OnlyReplyMapping;
+import com.web.blog.Board.model.ParamReply;
+import com.web.blog.Board.model.ReplyUploadsDto;
 import com.web.blog.Board.repository.*;
 import com.web.blog.Board.service.ReplyService;
 import com.web.blog.Board.service.ReplyUploadsService;
@@ -14,6 +14,7 @@ import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.response.SingleResult;
 import com.web.blog.Common.service.ResponseService;
+import com.web.blog.Common.service.S3Service;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.repository.MemberRepository;
 import io.swagger.annotations.Api;
@@ -42,7 +43,7 @@ public class PostReplyController {
     private final ReplyService replyService;
     private final ReplyRepository replyRepository;
     private final PostRepository postRepository;
-    private final BoardRepository boardRepository;
+    private final S3Service s3Service;
     private final ReplyUploadsService replyUploadsService;
     private final ReplyUploadsRepository replyUploadsRepository;
 
@@ -117,7 +118,16 @@ public class PostReplyController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> member = Optional.ofNullable(memberRepository.findAllByUid(uid));
-        return responseService.getSingleResult(replyService.writeReply(post.get(), member.get(), paramReply));
+        Reply reply = replyService.writeReply(post.get(), member.get(), paramReply);
+        List<ReplyUploads> list = replyUploadsRepository.findAllByReplyId(reply.getReplyId());
+        for(ReplyUploads ru : list) {
+            String filep = ru.getFilePath();
+            if(!replyRepository.findByReplyIdAndReplyContaining(reply.getReplyId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+                s3Service.delete(filep);
+                replyUploadsRepository.deleteById(ru.getId());
+            }
+        }
+        return responseService.getSingleResult(reply);
     }
 
     //댓글 수정
@@ -127,9 +137,16 @@ public class PostReplyController {
     @ApiOperation(value = "댓글 수정", notes = "댓글 수정")
     @PutMapping(value = "/reply/{replyId}")
     public SingleResult<Reply> updateAnswer(@Valid @RequestBody ParamReply paramReply, @PathVariable long replyId) throws IOException {
-        Optional<Reply> reply = replyRepository.findById(replyId);
-        Post post = reply.get().getPost();
-        return responseService.getSingleResult(replyService.updateReply(replyId, paramReply));
+        Reply reply = replyService.updateReply(replyId, paramReply);
+        List<ReplyUploads> list = replyUploadsRepository.findAllByReplyId(reply.getReplyId());
+        for(ReplyUploads ru : list) {
+            String filep = ru.getFilePath();
+            if(!replyRepository.findByReplyIdAndReplyContaining(reply.getReplyId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+                s3Service.delete(filep);
+                replyUploadsRepository.deleteById(ru.getId());
+            }
+        }
+        return responseService.getSingleResult(reply);
     }
 
     //댓글 삭제
