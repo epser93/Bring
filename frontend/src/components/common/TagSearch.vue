@@ -99,6 +99,9 @@ export default {
         // 포스트 디테일
         gotoDetail(post) {
             this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.member_nickname, post_id : post.postId }})
+        },
+        gotoUserInfo(userNickname) {
+            this.$router.push({ name : "Profile" , query: { nickname : userNickname }})
         },    
     },
     mounted() {
