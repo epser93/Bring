@@ -290,7 +290,7 @@ export default {
   props: {
     cardUserImage: {
       type: String,
-      default: require("@/assets/img/faces/no_img.jpg")
+      default: require("@/assets/img/faces/no_img.png")
     },
   },
   
@@ -574,6 +574,8 @@ export default {
                     tmpCnt.push(0)
                 }
             }
+            tmpCnt.reverse()
+            tmpDate.reverse()
             this.lineSeries[0].data = tmpCnt
             this.lineOptions.xaxis.categories = tmpDate
 

@@ -1,5 +1,5 @@
 <template>
-<div class="container" style="width:650px">
+<div class="container" style="width:650px; margin-top:100px;">
   <div class="card">
     <div class="card-header">
       <strong>Edit Profile</strong>
@@ -47,7 +47,6 @@
           </div>
 
         </div>
-        <h3 class="font-weight-light overflow-hidden mb-0">A smarter way to tell about<span class="typed-text font-weight-bold ml-1" data-typed-text='["new features.","product updates.","a new idea.","an announcment."]'></span></h3>
         <!-- 닉네임 -->
         <div class="section">
           <h5 class="title"><b>닉네임</b></h5>
