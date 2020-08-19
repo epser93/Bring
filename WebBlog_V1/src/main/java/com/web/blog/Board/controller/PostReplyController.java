@@ -32,10 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Api(tags = {"6. Blog - Post Reply"})
+@Api(tags = {"J. Post Reply"})
 @RequiredArgsConstructor
 @RestController
-public class ReplyController {
+public class PostReplyController {
     private final ResponseService responseService;
     private final MemberRepository memberRepository;
     private final ReplyMemberRepository replyMemberRepository;

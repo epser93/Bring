@@ -37,7 +37,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.*;
 
-@Api(tags = {"8. Answers"})
+@Api(tags = {"M. Answers"})
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "/answers")
