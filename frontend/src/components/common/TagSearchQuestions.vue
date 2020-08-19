@@ -67,6 +67,9 @@ export default {
         // 포스트 디테일
         gotoDetail(post) {
             this.$router.push({ name : "QuestionDetail" , params: { nickname : post.member_nickname, qpostId : post.qpostId }})
+        },
+        gotoUserInfo(userNickname) {
+            this.$router.push({ name : "Profile" , query: { nickname : userNickname }})
         },    
     },
     mounted() {

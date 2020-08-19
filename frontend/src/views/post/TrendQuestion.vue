@@ -3,17 +3,19 @@
     <section class="cards row">
       <div class="col-lg-10 row">
         <div v-for="(question, index) in list" :key="question.qpostId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-          <div class="cardwrap" @click="gotoQuestionDetail(question)">
-            <div class="img-section" :style="{ 'background-image' : `url(${thumbnails[index]})`}">
-              <a href=""></a>
-            </div>
-            <div class="contents">
-              <h4>{{ question.subject }}</h4>
-              <!-- <p>{{ question.content }}</p> -->
-              <p class="comment-date">{{ question.createdAt.substring(0,10) }} · {{ question.answerCnt }}개의 답변</p>
+          <div class="cardwrap">
+            <div class="card-body p-0" @click="gotoQuestionDetail(question)">
+              <div class="img-section" :style="{ 'background-image' : `url(${thumbnails[index]})`}">
+                <a href=""></a>
+              </div>
+              <div class="contents">
+                <h4>{{ question.subject }}</h4>
+                <!-- <p>{{ question.content }}</p> -->
+                <p class="comment-date">{{ question.createdAt.substring(0,10) }} · {{ question.answerCnt }}개의 답변</p>
+              </div>
             </div>
             <div class="writer-info">
-              <p>{{ question.member_nickname }}</p>
+              <button class="btn btn-sm" @click="gotoUserInfo(question.member_nickname)">{{ question.member_nickname }}</button>
               <p><i class="far fa-eye"></i> {{ question.views }}</p>
             </div>
           </div>

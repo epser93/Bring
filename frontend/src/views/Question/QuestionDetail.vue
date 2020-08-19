@@ -14,7 +14,7 @@
             </div>
             <!-- 태그부분 -->
             <div class="tag">
-                <span v-for="(tag,index) in this.tags" :key="index" class="badge badge-pill badge-info mr-2">{{ tag }}</span>
+                <span v-for="(tag,index) in this.tags" :key="index" class="badge badge-pill badge-info mr-2" @click="searchTag(tag)">{{ tag }}</span>
             </div>
         </div>
 
@@ -346,6 +346,9 @@ export default {
             this.answerData.answer=aArticle.answer
             this.answerData_id=aArticle.apostId
         },
+        searchTag(tag) {
+            this.$router.push({ name : 'TagSearchQuestions', params: { keyword : tag }})
+        }
     },
     created(){
         this.getQna()
@@ -366,5 +369,9 @@ export default {
 #commentTextArea a:hover {
     color: #56dbc9 !important;
     border: 1px solid #99c9c2 !important;
+}
+
+.tag {
+    cursor: pointer;
 }
 </style>

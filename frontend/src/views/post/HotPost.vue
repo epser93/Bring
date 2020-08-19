@@ -3,17 +3,19 @@
     <section class="cards row">
       <div class="col-lg-10 row">
         <div v-for="(post,index) in list" :key="post.postId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
-          <div class="cardwrap" @click="gotoDetail(post)">
-            <div class="img-section" :style="{ 'background-image' : `url(${hotThumbnail[index]})`}">
-              <a href=""></a>
-            </div>
-            <div class="contents">
-              <h4>{{ post.subject }}</h4>
-              <!-- <p>{{ post.content }}</p> -->
-              <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.replyCnt }}개의 댓글</p>
+          <div class="cardwrap">
+            <div class="card-body p-0" @click="gotoDetail(post)">
+              <div class="img-section" :style="{ 'background-image' : `url(${hotThumbnail[index]})`}">
+                <a href=""></a>
+              </div>
+              <div class="contents">
+                <h4>{{ post.subject }}</h4>
+                <!-- <p>{{ post.content }}</p> -->
+                <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.replyCnt }}개의 댓글</p>
+              </div>
             </div>
             <div class="writer-info">
-              <p>{{ post.member_nickname }}</p>
+              <button class="btn btn-sm" @click="gotoUserInfo(post.member_nickname)">{{ post.member_nickname }}</button>
               <p>♥ {{ post.likes}}</p>
             </div>
           </div>
@@ -102,7 +104,10 @@ export default {
     searchTags(tag) {
       console.log(tag)
       this.$router.push({ name : 'TagSearch', params : { keyword : tag }})
-    }
+    },
+    gotoUserInfo(userNickname) {
+      this.$router.push({ name : "Profile" , query: { nickname : userNickname }})
+    },
   },
   computed: {
   },
