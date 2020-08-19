@@ -55,7 +55,7 @@ dependencies {
 
 bootJar {
     archiveBaseName = "BFD"
-    archiveFileName = "BFD.war"
+    archiveFileName = "BFD.jar"
 }
 
 test {
