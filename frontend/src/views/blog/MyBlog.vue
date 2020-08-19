@@ -5,8 +5,7 @@
         <a class="" style="cursor:pointer;">
           <img @click="gotoProfile" class="rounded-circle mx-auto img-thumbnail mb-3" :src='cardUserImage' alt="Card image cap" style="width: 90px; height:90px;">
         </a>
-          <h3 class=""><strong>{{ this.userInfo.nickname }}</strong></h3>
-          <h4 class="mb-3">'s Blog</h4>
+          <h3 class=""><strong>{{ this.userInfo.nickname }}</strong> 's Blog</h3>
           <p class="card-list-text">{{ this.userInfo.nickname }}의 브링에 오신것을</p>
           <p class="card-list-text mb-5">환영합니다!</p>
 

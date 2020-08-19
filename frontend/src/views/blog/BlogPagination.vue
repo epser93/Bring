@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- 페이지네이션 -->
-    <div class="pagination mb-5">
+    <div v-if="totalNum != -1" class="pagination mb-5">
         <a @click="pageCount(-1)">&laquo;</a>
         <div class="d-inline">
             <div class="d-inline" v-if="one <= pageTotalc">
@@ -20,7 +20,7 @@
                 <a @click="pageSelect(four)" v-show="four != pageSelected">{{ four }}</a>
                 <a @click="pageSelect(four)" v-show="four === pageSelected" style="background-color: #56dbc9; color: white; border: 1px solid #56dbc9;">{{ four }}</a>
             </div>
-            <div class="d-inline" v-if="four <= pageTotalc">
+            <div class="d-inline" v-if="five <= pageTotalc">
                 <a @click="pageSelect(one)" v-show="five != pageSelected">{{ five }}</a>
                 <a @click="pageSelect(one)" v-show="five === pageSelected" style="background-color: #56dbc9; color: white; border: 1px solid #56dbc9;">{{ five }}</a>
             </div>
@@ -98,11 +98,16 @@ export default {
         }
     },
     created() {
-        this.pageTotal = parseInt(this.totalNum / 8) + 1
+
     },
     computed: {
         pageTotalc(){
-            return parseInt(this.totalNum/8) + 1
+            if (this.totalNum % 8 === 0) {
+                return parseInt(this.totalNum/8)
+            } else {
+                return parseInt(this.totalNum/8) + 1
+            }
+            
         }
     }
 }
