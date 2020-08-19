@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.data.redis.core.index.Indexed;
 
 import javax.persistence.GeneratedValue;
@@ -27,10 +28,14 @@ public class IpAddrForViewCnt implements Serializable {
     @Indexed
     private Long qpostId;
 
+    @TimeToLive
+    Long timeout;
+
     @Builder
-    public IpAddrForViewCnt(String ip, Long postId, Long qpostId) {
+    public IpAddrForViewCnt(String ip, Long postId, Long qpostId, Long timeout) {
         this.ip = ip;
         this.postId = postId;
         this.qpostId = qpostId;
+        this.timeout = timeout;
     }
 }

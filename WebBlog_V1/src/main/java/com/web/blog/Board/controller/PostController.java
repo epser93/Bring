@@ -11,7 +11,10 @@ import com.web.blog.Board.repository.BoardRepository;
 import com.web.blog.Board.repository.PostMemberRepository;
 import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Board.repository.PostUploadsRepository;
-import com.web.blog.Board.service.*;
+import com.web.blog.Board.service.PostService;
+import com.web.blog.Board.service.PostUploadsService;
+import com.web.blog.Board.service.ReplyService;
+import com.web.blog.Board.service.TagService;
 import com.web.blog.Common.advice.exception.*;
 import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
@@ -24,9 +27,7 @@ import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.repository.IpAddrForTodayCntRepository;
 import com.web.blog.Member.repository.IpAddrForViewCntRepository;
 import com.web.blog.Member.repository.MemberRepository;
-import com.web.blog.Member.repository.ProfileImgRepository;
 import com.web.blog.Member.service.FollowService;
-import com.web.blog.Member.service.ProfileImgService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -50,16 +51,12 @@ public class PostController {
 
     private final PostRepository postRepository;
     private final BoardRepository boardRepository;
-    private final BoardService boardService;
     private final PostService postService;
     private final TagService tagService;
-    private final SearchService searchService;
     private final ReplyService replyService;
     private final ResponseService responseService;
     private final MemberRepository memberRepository;
     private final PostMemberRepository postMemberRepository;
-    private final ProfileImgService profileImgService;
-    private final ProfileImgRepository profileImgRepository;
     private final PostUploadsService postUploadsService;
     private final PostUploadsRepository postUploadsRepository;
     private final FollowService followService;
@@ -143,6 +140,7 @@ public class PostController {
                     .ip(ip)
                     .postId(postId)
                     .qpostId((long) -1)
+                    .timeout((long)10800)
                     .build();
             ipAddrForViewCntRepository.save(checkCnt);
             postRepository.updateViewCnt(postId);
@@ -152,6 +150,7 @@ public class PostController {
             IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
                     .ip(ip)
                     .nickname(writer.get().getNickname())
+                    .timeout((long)86400)
                     .build();
             ipAddrForTodayCntRepository.save(checkCnt);
             memberRepository.updateTodayCnt(writer.get().getMsrl());

@@ -5,9 +5,7 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -76,6 +74,18 @@ public class S3Service {
                 .withCannedAcl(CannedAccessControlList.PublicRead));
 
         return fileName;
+    }
+
+    public String rename(String original, String fileName, long id, int num, String nickname) {
+        SimpleDateFormat format = new SimpleDateFormat ( "yyyy-MM-dd-HH-mm-ss");
+        Date date = new Date();
+        String time = format.format(date);
+        String rename = original.replace("___-100-", "___" + id + "-");
+        CopyObjectRequest copyObjRequest = new CopyObjectRequest(bucket,
+                original, bucket, rename);
+        s3Client.copyObject(copyObjRequest);
+        s3Client.deleteObject(new DeleteObjectRequest(bucket, original));
+        return rename;
     }
 
     public void delete(String fileName) {

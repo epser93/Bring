@@ -3,23 +3,20 @@ package com.web.blog.Board.controller;
 import com.web.blog.Board.entity.Board;
 import com.web.blog.Board.model.OnlyPostMapping;
 import com.web.blog.Board.model.PostUploadsDto;
-import com.web.blog.Board.repository.BoardRepository;
 import com.web.blog.Board.repository.PostMemberRepository;
 import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Board.repository.PostUploadsRepository;
-import com.web.blog.Board.service.*;
+import com.web.blog.Board.service.BoardService;
+import com.web.blog.Board.service.PostUploadsService;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
 import com.web.blog.Common.model.Paging;
 import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.service.ResponseService;
-import com.web.blog.Common.service.S3Service;
 import com.web.blog.Member.entity.IpAddrForTodayCnt;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.model.ProfileImgDto;
 import com.web.blog.Member.repository.IpAddrForTodayCntRepository;
-import com.web.blog.Member.repository.IpAddrForViewCntRepository;
 import com.web.blog.Member.repository.MemberRepository;
-import com.web.blog.Member.repository.ProfileImgRepository;
 import com.web.blog.Member.service.FollowService;
 import com.web.blog.Member.service.ProfileImgService;
 import io.swagger.annotations.Api;
@@ -49,23 +46,15 @@ import java.util.Optional;
 public class PostListController {
 
     private final PostRepository postRepository;
-    private final BoardRepository boardRepository;
     private final BoardService boardService;
-    private final PostService postService;
-    private final TagService tagService;
-    private final SearchService searchService;
-    private final ReplyService replyService;
     private final ResponseService responseService;
     private final MemberRepository memberRepository;
     private final PostMemberRepository postMemberRepository;
     private final ProfileImgService profileImgService;
-    private final ProfileImgRepository profileImgRepository;
     private final PostUploadsService postUploadsService;
     private final PostUploadsRepository postUploadsRepository;
     private final FollowService followService;
     private final IpAddrForTodayCntRepository ipAddrForTodayCntRepository;
-    private final IpAddrForViewCntRepository ipAddrForViewCntRepository;
-    private final S3Service s3Service;
 
     //게시판 포스트 리스트
     @ApiImplicitParams({
@@ -190,6 +179,7 @@ public class PostListController {
             IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
                     .ip(ip)
                     .nickname(member.getNickname())
+                    .timeout((long)86400)
                     .build();
             ipAddrForTodayCntRepository.save(checkCnt);
             memberRepository.updateTodayCnt(member.getMsrl());

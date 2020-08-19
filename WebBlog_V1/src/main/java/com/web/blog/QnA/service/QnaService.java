@@ -46,6 +46,8 @@ public class QnaService {
                 String imgPath = s3Service.upload(file, qpostId, num, nickname); //s3에 저장
                 QpostUploadsDto qpostUploadsDto = new QpostUploadsDto();
                 qpostUploadsDto.setFilePath(imgPath);
+                qpostUploadsDto.setFileName(file.getOriginalFilename());//
+                qpostUploadsDto.setNickname(nickname);//
                 qpostUploadsDto.setQpostId(qpostId);
                 qpostUploadsDto.setNum(num);
                 qpostUploadsDto.setImgFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + imgPath);

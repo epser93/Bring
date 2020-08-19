@@ -18,14 +18,21 @@ public class QpostUploads {
     @Column(columnDefinition = "TEXT")
     private String filePath;
 
+    @Column(columnDefinition = "TEXT")
+    private String fileName;
+
+    private String nickname;
+
     private Long qpostId;
 
     private int num;
 
     @Builder
-    public QpostUploads(Long id, String filePath, Long qpostId, int num) {
+    public QpostUploads(Long id, String filePath, String fileName, String nickname, Long qpostId, int num) {
         this.id = id;
         this.filePath = filePath;
+        this.fileName = fileName;
+        this.nickname = nickname;
         this.qpostId = qpostId;
         this.num = num;
     }

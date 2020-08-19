@@ -41,6 +41,11 @@ public interface QpostRepository extends JpaRepository<Qpost, Long> {
 
     @Modifying
     @Transactional
+    @Query(value = "update qpost set content = :content where qpost_id = :qpost_id", nativeQuery = true)
+    int updateContent(@Param("content") String content, @Param("qpost_id") long qpost_id);
+
+    @Modifying
+    @Transactional
     @Query(value = "update qpost set answer_cnt = answer_cnt - 1 where qpost_id = :qpost_id", nativeQuery = true)
     int updateAnswerCntMinus(@Param("qpost_id") long qpost_id);
 

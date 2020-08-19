@@ -184,6 +184,7 @@ public class MemberController {
             IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
                     .ip(ip)
                     .nickname(member.getNickname())
+                    .timeout((long)86400)
                     .build();
             ipAddrForTodayCntRepository.save(checkCnt);
             repository.updateTodayCnt(member.getMsrl());

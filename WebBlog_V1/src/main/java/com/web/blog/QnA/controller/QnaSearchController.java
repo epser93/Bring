@@ -1,27 +1,17 @@
 package com.web.blog.QnA.controller;
 
-import com.web.blog.Board.repository.PostRepository;
-import com.web.blog.Board.service.PostService;
 import com.web.blog.Board.service.SearchService;
-import com.web.blog.Board.service.TagService;
 import com.web.blog.Common.advice.exception.CUserNotFoundException;
 import com.web.blog.Common.model.Paging;
 import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.service.ResponseService;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.model.ProfileImgDto;
-import com.web.blog.Member.repository.IpAddrForTodayCntRepository;
-import com.web.blog.Member.repository.IpAddrForViewCntRepository;
 import com.web.blog.Member.repository.MemberRepository;
-import com.web.blog.Member.repository.ProfileImgRepository;
-import com.web.blog.Member.service.FollowService;
 import com.web.blog.Member.service.ProfileImgService;
 import com.web.blog.QnA.model.OnlyQpostMapping;
 import com.web.blog.QnA.model.QpostUploadsDto;
-import com.web.blog.QnA.repository.ApostRepository;
-import com.web.blog.QnA.repository.QpostRepository;
 import com.web.blog.QnA.repository.QpostUploadsRepository;
-import com.web.blog.QnA.service.QTagService;
 import com.web.blog.QnA.service.QnaService;
 import com.web.blog.QnA.service.QpostUploadsService;
 import io.swagger.annotations.Api;
@@ -44,23 +34,13 @@ import java.util.Optional;
 @RestController
 @RequestMapping(value = "/questions")
 public class QnaSearchController {
-    private final FollowService followService;
     private final ResponseService responseService;
     private final MemberRepository memberRepository;
-    private final QTagService qTagService;
     private final QnaService qnaService;
-    private final ApostRepository apostRepository;
-    private final QpostRepository qpostRepository;
-    private final PostRepository postRepository;
-    private final PostService postService;
-    private final TagService tagService;
     private final SearchService searchService;
     private final QpostUploadsRepository qpostUploadsRepository;
     private final QpostUploadsService qpostUploadsService;
-    private final ProfileImgRepository profileImgRepository;
     private final ProfileImgService profileImgService;
-    private final IpAddrForTodayCntRepository ipAddrForTodayCntRepository;
-    private final IpAddrForViewCntRepository ipAddrForViewCntRepository;
 
     //사이트의 모든 질문글 검색
     @ApiImplicitParams({
