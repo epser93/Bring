@@ -4,7 +4,6 @@ import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.model.ParamPost;
 import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Board.service.PostService;
-import com.web.blog.Board.service.SearchService;
 import com.web.blog.Board.service.TagService;
 import com.web.blog.Common.advice.exception.CResourceNotExistException;
 import com.web.blog.Common.advice.exception.CSelectedAnswerException;
@@ -14,6 +13,7 @@ import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.response.SingleResult;
 import com.web.blog.Common.service.ResponseService;
+import com.web.blog.Common.service.S3Service;
 import com.web.blog.Member.entity.IpAddrForTodayCnt;
 import com.web.blog.Member.entity.IpAddrForViewCnt;
 import com.web.blog.Member.entity.Member;
@@ -25,6 +25,7 @@ import com.web.blog.Member.repository.ProfileImgRepository;
 import com.web.blog.Member.service.FollowService;
 import com.web.blog.Member.service.ProfileImgService;
 import com.web.blog.QnA.entity.Qpost;
+import com.web.blog.QnA.entity.QpostUploads;
 import com.web.blog.QnA.model.OnlyApostMapping;
 import com.web.blog.QnA.model.ParamQpost;
 import com.web.blog.QnA.repository.ApostRepository;
@@ -64,7 +65,7 @@ public class QuestionController {
     private final PostRepository postRepository;
     private final PostService postService;
     private final TagService tagService;
-    private final SearchService searchService;
+    private final S3Service s3Service;
     private final QpostUploadsRepository qpostUploadsRepository;
     private final QpostUploadsService qpostUploadsService;
     private final ProfileImgRepository profileImgRepository;
@@ -127,6 +128,14 @@ public class QuestionController {
         Set<String> tags = paramQpost.getTags();
         List<SingleResult> result = new ArrayList<>();
         Qpost qpost = qnaService.writeQuestion(member.get(), paramQpost);
+        List<QpostUploads> list = qpostUploadsRepository.findAllByQpostId(qpost.getQpostId());
+        for(QpostUploads qu : list) {
+            String filep = qu.getFilePath();
+            if(!postRepository.findByPostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+                s3Service.delete(filep);
+                qpostUploadsRepository.deleteById(qu.getId());
+            }
+        }
         if (!tags.isEmpty()) {
             for (String tag : tags) {
                 qTagService.insertTags(qpost, tag);
@@ -153,6 +162,14 @@ public class QuestionController {
         Qpost qpost1 = qpostRepository.findById(qpostId).get();
         if (qpost1.getSelectOver()) throw new CSelectedAnswerException();
         Qpost qpost = qnaService.updateQuestion(member, qpostId, paramQpost);
+        List<QpostUploads> list = qpostUploadsRepository.findAllByQpostId(qpost.getQpostId());
+        for(QpostUploads qu : list) {
+            String filep = qu.getFilePath();
+            if(!postRepository.findByPostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+                s3Service.delete(filep);
+                qpostUploadsRepository.deleteById(qu.getId());
+            }
+        }
         if (!tags.isEmpty()) {
             qTagService.deleteQtags(qpost);
             for (String tag : tags) {
