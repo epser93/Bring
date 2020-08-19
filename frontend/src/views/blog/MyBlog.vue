@@ -144,7 +144,7 @@ export default {
 }
 
 #blog {
-  font-family: 'Noto Serif KR', serif;
+  font: 'Noto Serif KR', serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #f4f4f4;
