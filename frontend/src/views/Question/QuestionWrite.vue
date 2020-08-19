@@ -1,42 +1,31 @@
 <template>
-  <!--제목-->
-<div class="container mb-5 ">
-    <b-container class="mt-5">
-      <h2>글쓰기</h2>
-      <hr>
-  <div class="row ml-1 mt-5 mb-5">
-      <label for="thumbnailInput">썸네일 : </label>
-      <input @change="thumbnailSelect" type="file" ref="thumbnailImage" id="thumbnailInput">
-    </div>
+  <div id="editor" class="row">
+    <div class="wrapper text-left my-5 p-5">
 
-    <b-row class="my-1">
-      <b-col sm="3">
-        <label>제목</label>
-      </b-col>
-      <b-col sm="9">
-        <b-form-input v-model="questionData.subject"></b-form-input>
-      </b-col>
-    </b-row>
-  <v-md-editor class="text-left" v-model="questionData.content" height="600px"></v-md-editor>
+      <h2 class="mb-5">질문 작성</h2>
+      
+      <!-- 제목 부분 -->
+      <form class="row text-left">
+        <div class="col-12 form-group">
+          <h5>제목</h5> 
+          <input type="text" class="form-control" v-model="questionData.subject" id="titleInput" placeholder="제목을 입력하세요">
+        </div>
+      </form>
 
-<!-- 수빈태그 추가
-  <div>
-    
-    <b-form-tags input-id="tags-basic" v-model="questionData.tags" class="mb-2" label="파일 추가:" label-cols-sm="1"></b-form-tags>
-    
-  </div> -->
+      <!-- 글 에디터 부분 -->
+      <v-md-editor class="text-left" v-model="questionData.content" :disabled-menus="[]" @upload-image="handleUploadImage" height="600px"></v-md-editor>
+      <br>
 
-  <!--태그 추가-->
-  <div class="tag mt-3">
-    <span v-for="(tag,index) in questionData.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2" @click="deleteTag(index)">{{ tag }}</span>
+      <!-- 태그 -->
+      <div class="tag">
+        <span v-for="(tag,index) in questionData.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2" @click="deleteTag(index)">{{ tag }}</span>
+      </div>
+      <input placeholder="태그를 입력해주세요" class="mb-5 tag-input" type="text" v-model="tag" @keydown.enter="postTag">
+      
+      <!-- 제출 버튼 -->
+      <a @click="qnaWrite" class="float-right">작성</a>
+    </div>  
   </div>
-  <input placeholder="태그를 입력해주세요" class="mb-5 tag-input" type="text" v-model="tag" @keydown.enter="postTag">
-
-  <div>
-    <b-button @click="qnaWrite" variant="outline-primary">작성</b-button>
-  </div>
-  </b-container>
-</div>
 </template>
 <script>
 
@@ -52,12 +41,40 @@ export default {
           subject:"",       
           tags:[],
         },
-        thumbnail: '',
         // 태그
-        tag: ""
+        tag: "",
+        imageServerUrl : ''
       }
     },
     methods: {
+      // 바로 이미지를 서버에 업로드 업로드 된 장소의 url 받아오기
+      uploadImageDirect(file, insertImage) {
+        const formData = new FormData()
+        formData.append('files', file)
+        const config = {
+          headers: {
+            'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
+            'Content-Type' : 'multipart/form-data'
+          }
+        }
+        axios.post(`${BACK_URL}/questions/ask/uploads`, formData, config)
+          .then(res => {
+            console.log('업로드',res)
+            this.imageServerUrl = res.data.list[0]
+            insertImage({
+            // url : 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1269952892,3525182336&fm=26&gp=0.jpg',
+            url : this.imageServerUrl,
+            desc : '사진설명'
+          })
+          })
+          .catch(err => console.log(err))
+      },
+      // 이미지 업로드
+      handleUploadImage(event, insertImage, files) {
+          console.log(files)
+          console.log(files[0])
+          this.uploadImageDirect(files[0], insertImage)
+      },
       // 게시물 작성
       qnaWrite(){
         const config = {
@@ -68,37 +85,12 @@ export default {
         axios.post(`${BACK_URL}/questions/ask`,this.questionData,config)
         .then(res=>{
           console.log(res)
-          this.thumbnailPost()
           this.$router.push({name : 'Question'})
           this.$router.go(-2) // 이 부분 안해주면 question으로 돌아갈 때 썸네일이 안보임
         })
         .catch(err=>{
           console.log(err)
         })
-      },
-      // 썸네일
-      thumbnailSelect() {
-        this.thumbnail = this.$refs.thumbnailImage.files[0]
-      },
-      // 썸네일 게시
-      thumbnailPost() {
-        const formData = new FormData()
-        formData.append('files', this.thumbnail)
-
-        const config = {
-            headers: {
-              'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
-              'Content-Type' : 'multipart/form-data'
-            }
-          }
-          axios.post(
-            `${BACK_URL}/questions/ask/uploads`, formData, config)
-            .then((res) =>{
-              console.log(res)
-            })
-            .catch((err) => {
-              console.error(err)
-            })      
       },
       // 태그
       postTag() {
@@ -126,11 +118,49 @@ export default {
 </script>
 
 <style scoped>
-.badge {
-  cursor: pointer;
+@media only screen and (min-width: 1000px) {
+  .wrapper {
+    width: 80% !important;
+    margin: 0 auto;
+    background-color: white;
+    border: 1px solid #e7e7e7;
+    margin-bottom: 200px;
+}
+}
+
+
+#editor {
+    min-height: 1000px;
+    background-color: #f4f4f4;
+}
+
+.wrapper {
+    width: 100%;
+    margin: 0 auto;
+    background-color: white;
+    border: 1px solid #e7e7e7;
+    margin-bottom: 200px;
 }
 
 .tag-input {
   width: 100%
+}
+
+.badge {
+  cursor: pointer;
+}
+
+.wrapper a {
+    width: 80px;
+    text-align: center;
+    padding: 10px 20px;
+    cursor: pointer;
+    text-decoration: none;
+    transition-duration: 0.3s;
+    border: 1px solid #e7e7e7;
+}
+.wrapper a:hover {
+    color: #56dbc9 !important;
+    border: 1px solid #99c9c2 !important;
 }
 </style>
