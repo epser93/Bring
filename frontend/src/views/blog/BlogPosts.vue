@@ -136,6 +136,7 @@
                         </div>
                     </div>
                 </div>
+                <infinite-loading @infinite="infiniteHandler"></infinite-loading>
             </div>
         </div>
 
@@ -282,10 +283,12 @@ export default {
             axios.get(`${BACK_URL}/blog/${this.nickname}/search/blogPosts/${this.k}/${this.type}?no=${this.page}`, config)
                 .then(res => {
                 if (res.data.list[0].list.length) {
+                    if(this.page > 1){
+                        this.postListKeyword.push(...res.data.list[0].list)
+                        this.postLike3.push(...res.data.list[1].list)
+                        this.thumbnail3.push(...res.data.list[2].list)
+                    }
                     this.page += 1
-                    this.postListKeyword.push(...res.data.list[0].list)
-                    this.postLike3.push(...res.data.list[1].list)
-                    this.thumbnail3.push(...res.data.list[2].list)
                     $state.loaded()
                 } else {
                     $state.complete()
@@ -475,7 +478,7 @@ export default {
 
             // 페이지네이션
             numOfPage: 1,
-            page : 2,
+            page : 1,
         }
     },
 
