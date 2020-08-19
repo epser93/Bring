@@ -2,7 +2,7 @@
   <div id="detail" class="row">
 
     <!-- 중심 부분 -->
-    <div class="wrapper text-left col-12 col-lg-8 mt-5 px-5">
+    <div class="wrapper text-left col-12 col-lg-8 my-5 px-5">
         <!-- 글쓴이 정보 -->
         <div class="info text-center my-5">
             <h1 class="mb-3">{{subject}}</h1>

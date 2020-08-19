@@ -1,29 +1,47 @@
 <template>
   <div id="myfeeds">
     <!-- 글 리스트 -->
-    <div class="col-12">
-        <div class="text-left ml-5 mt-5" v-if="postList.length == 0">
-            <h3>팔로워들의 활동이 없습니다</h3>
-        </div>
-        <div class="row">
-            <div v-for="(item, index) in postList" :key="item.postId" class="p-0 mb-5 col-12 col-lg-3">
-                <div class="card" style="width: 75%;">
-                    <img class="card-img-top" :src="thumbnail1[index]" alt="Card image cap" style="height: 150px;">
-                    <div class="card-body pb-0">
-                        <h5 class="card-title">{{ item.subject.slice(0, 10) + '...'  }}</h5>
-                        <p class="card-text mb-3">{{ item.content.slice(0, 20) + '...' }}</p>
-                        <!-- 좋아요 부분 -->
-                        <b-icon icon="heart-fill" v-if="postLike1[index]" class="d-inline mr-1" style="color: crimson;" @click="postLike(item, false)"></b-icon>
-                        <b-icon icon="heart" v-if="!postLike1[index]" class="d-inline mr-1" style="color: black;" @click="postLike(item, true)"></b-icon>
-                        <small>{{ item.likes }}</small><small>개의 좋아요</small>
-                    </div>
-                    <div class="card-footer bg-transparent">
-                        <button class="btn btn-sm" @click="gotoDetail(item, index)">글 보기</button>
+        <div class="col-12 p-0 m-0 container">
+            <div class="text-center mt-5" v-if="postList.length == 0">
+                <h3>현재 등록된 글이 없습니다</h3>
+            </div>
+            <div class="row">
+                <div v-for="(item, index) in postList" :key="index" class="p-0 mb-5 col-12">
+                    <div class="card-list">
+                        <div class="card-header text-left bg-transparent p-5 d-flex justify-content-between">
+                            <h4 class="card-title m-0"><strong>{{ item.subject }}</strong></h4>
+                            <span class="vertical-line mx-3"></span>
+                            <div>
+                                <p>{{ item.createdAt.slice(0,10) }}</p> 
+                                
+                                <p>{{ item.member_nickname }}</p>
+                            </div>
+                        </div>
+
+                        <div class="card-list-body p-5">
+                            <div class="card-image">
+                                <img :src="thumbnail1[index]" alt="Card image cap">
+                            </div>
+                            <p class="card-list-text my-5">{{ item.content.slice(0, 200) }}</p>
+
+                            <div class="d-flex justify-content-between">
+                                <a class="py-3 px-5" @click="gotoDetail(item, index)">글 더보기</a>
+                                <div class="py-3 px-5">
+                                    <!-- 좋아요 부분 -->
+                                    <i class="far fa-eye"></i>{{ item.views }}
+                                    <span class="vertical-line mx-3"></span>
+                                    <i class="far fa-comment"></i>{{ item.replyCnt }}
+                                    <span class="vertical-line mx-3"></span>
+                                    <b-icon icon="heart-fill" v-if="postLike1[index]" class="d-inline mr-1" style="color: crimson;"></b-icon>
+                                    <b-icon icon="heart" v-if="!postLike1[index]" class="d-inline mr-1" style="color: black;"></b-icon>
+                                    <span :ref="'like-count-' + item.postId">{{ item.likes }}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-      </div>
   </div>
 </template>
 

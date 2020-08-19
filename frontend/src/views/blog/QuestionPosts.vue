@@ -2,12 +2,12 @@
   <div>
     <!-- 글 리스트 -->
     <div v-if="this.categoryOn === 1" class="col-12 p-0 m-0 container">
-        <div class="text-center ml-5 mt-5" v-if="postList.length == 0">
+        <div class="text-center mt-5" v-if="postList.length == 0">
             <h3>현재 등록된 글이 없습니다</h3>
         </div>
         <div class="row">
             <div class="new-article col-12" v-if="userNow === nickname">
-                <a type="button" @click="newArticle" class="mb-5 float-right" style="width:150px;">새 글 작성</a>
+                <a type="button" @click="newArticle" class="mb-5 float-right" style="width:160px;"><i class="fas fa-pencil-alt mr-1"></i>새 글 작성</a>
             </div>
             <div v-for="(item, index) in postList" :key="index" class="p-0 mb-5 col-12">
                 <div class="card-list">
@@ -47,12 +47,12 @@
 
     <!-- 글 리스트 카테고리 있는 경우 -->
     <div v-if="this.categoryOn === 2" class="col-12 p-0 m-0 container">
-        <div class="text-center ml-5 mt-5" v-if="postListTag.length == 0">
+        <div class="text-center mt-5" v-if="postListTag.length == 0">
             <h3>현재 등록된 글이 없습니다</h3>
         </div>
         <div class="row">
             <div class="new-article col-12" v-if="userNow === nickname">
-                <a type="button" @click="newArticle" class="mb-5 float-right" style="width:150px;">새 글 작성</a>
+                <a type="button" @click="newArticle" class="mb-5 float-right" style="width:160px;"><i class="fas fa-pencil-alt mr-1"></i>새 글 작성</a>
             </div>
             <div v-for="(item, index) in postListTag" :key="index" class="p-0 mb-5 col-12">
                 <div class="card-list">

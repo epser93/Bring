@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <b-modal class="modal" ref="my-modal" size="sm" hide-header hide-footer title="">
+  <div id="createCategoryWarning">
+    <b-modal class="modal" ref="my-modal"  hide-header hide-footer title="">
       <div class="d-block text-center mt-3 mb-5">
           <h4>먼저 카테고리를 만들어 보세요!</h4>
       </div>
@@ -34,6 +34,5 @@
   }
 </script>
 <style>
-
 
 </style>

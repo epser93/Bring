@@ -3,12 +3,12 @@
       <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
         <!-- 글 리스트 -->
         <div v-if="this.categoryOn === 1" class="col-12 p-0 m-0 container">
-            <div class="text-center ml-5 mt-5" v-if="postList.length == 0">
+            <div class="text-center mt-5" v-if="postList.length == 0">
                 <h3>현재 등록된 글이 없습니다</h3>
             </div>
             <div class="row">
                 <div class="new-article col-12" v-if="userNow === nickname">
-                    <a type="button" @click="newArticle('default')" class="mb-5 float-right" style="width:100px;">새 글 작성</a>
+                    <a type="button" @click="newArticle('default')" class="mb-5 float-right" style="width:160px;"><i class="fas fa-pencil-alt mr-1"></i>새 글 작성</a>
                 </div>
                 <div v-for="(item, index) in postList" :key="index" class="p-0 mb-5 col-12">
                     <div class="card-list">
@@ -49,12 +49,12 @@
 
         <!-- 글 리스트 카테고리 있는 경우 -->
         <div v-if="this.categoryOn === 2" class="col-12 p-0 m-0 container">
-            <div class="text-center ml-5 mt-5" v-if="postListCategory.length == 0">
+            <div class="text-center mt-5" v-if="postListCategory.length == 0">
                 <h3>현재 등록된 글이 없습니다</h3>
             </div>
             <div class="row">
                 <div class="new-article col-12" v-if="userNow === nickname">
-                    <a type="button" @click="newArticle(currentCategory)" class="mb-5 float-right" style="width:100px;">새 글 작성</a>
+                    <a type="button" @click="newArticle(currentCategory)" class="mb-5 float-right" style="width:160px;"><i class="fas fa-pencil-alt mr-1"></i>새 글 작성</a>
                 </div>
                 <div v-for="(item, index) in postListCategory" :key="index" class="p-0 mb-5 col-12">
                     <div class="card-list">
@@ -95,12 +95,12 @@
 
         <!-- 글 리스트 키워드 있는 경우 -->
         <div v-if="this.categoryOn === 3" class="col-12 p-0 m-0 container">
-            <div class="text-center ml-5 mt-5" v-if="postListKeyword.length == 0">
+            <div class="text-center mt-5" v-if="postListKeyword.length == 0">
                 <h3>현재 등록된 글이 없습니다</h3>
             </div>
             <div class="row">
                 <div class="new-article col-12" v-if="userNow === nickname">
-                    <a type="button" @click="newArticle('default')" class="mb-5 float-right" style="width:100px;">새 글 작성</a>
+                    <a type="button" @click="newArticle('default')" class="mb-5 float-right" style="width:160px;"><i class="fas fa-pencil-alt mr-1"></i>새 글 작성</a>
                 </div>
                 <div v-for="(item, index) in postListKeyword" :key="index" class="p-0 mb-5 col-12">
                     <div class="card-list">
@@ -142,12 +142,12 @@
 
         <!-- 태그로 검색한 경우 -->
         <div v-if="this.categoryOn === 4" class="col-12 p-0 m-0 container">
-            <div class="text-center ml-5 mt-5" v-if="postListTag.length == 0">
+            <div class="text-center mt-5" v-if="postListTag.length == 0">
                 <h3>현재 등록된 글이 없습니다</h3>
             </div>
             <div class="row">
                 <div class="new-article col-12" v-if="userNow === nickname">
-                    <a type="button" @click="newArticle('default')" class="mb-5 float-right" style="width:100px;">새 글 작성</a>
+                    <a type="button" @click="newArticle('default')" class="mb-5 float-right" style="width:160px;"><i class="fas fa-pencil-alt mr-1"></i>새 글 작성</a>
                 </div>
                 <div v-for="(item, index) in postListTag" :key="index" class="p-0 mb-5 col-12">
                     <div class="card-list">
@@ -321,52 +321,6 @@ export default {
         gotoDetail(post) {
             this.$router.push({ name : "DetailPost" , params: { boardName: post.board_name, nickname : post.member_nickname, post_id : post.postId }})
         },    
-
-        // 좋아요
-        postLike(post, likeit, num) {
-            const config = {
-                headers: {
-                    'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
-                    'Content-Type': 'application/json'
-                }
-            }
-            // 좋아요 현 상태로 구분
-            
-            if (likeit === false) {
-                axios.post(`${BACK_URL}/blog/${post.member_nickname}/like/${post.postId}`, likeit, config)
-                    .then(res => {
-                        // 좋아요 수 바꾸기(화면에서)
-                        this.$refs[`like-count-${post.postId}`][0].innerText = res.data.data    
-                        if (num === 1) {
-                            this.getAllPosts()  
-                        } else if (num === 2) {
-                            this.getSomePosts(this.c) 
-                        } else if (num === 3) {
-                            this.searchFor(this.k, this.type)
-                        }
-                                    
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })   
-            } else {
-                axios.post(`${BACK_URL}/blog/${post.member_nickname}/like/${post.postId}`, likeit, config)
-                    .then(res => {
-                        // 좋아요 수 바꾸기(화면에서)
-                        this.$refs[`like-count-${post.postId}`][0].innerText = res.data.data   
-                        if (num === 1) {
-                            this.getAllPosts()  
-                        } else if (num === 2) {
-                            this.getSomePosts(this.currentCategory) 
-                        } else if (num === 3)  {
-                            this.searchFor(this.k, this.type)
-                        }                   
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })   
-            }        
-        },
     },
     
     mounted() {
