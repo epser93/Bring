@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import org.springframework.data.redis.core.RedisHash;
+import org.springframework.data.redis.core.TimeToLive;
 import org.springframework.data.redis.core.index.Indexed;
 
 import javax.persistence.GeneratedValue;
@@ -25,9 +26,13 @@ public class IpAddrForTodayCnt implements Serializable {
     @Indexed
     private String nickname;
 
+    @TimeToLive
+    Long timeout;
+
     @Builder
-    public IpAddrForTodayCnt(String ip, String nickname) {
+    public IpAddrForTodayCnt(String ip, String nickname, Long timeout) {
         this.ip = ip;
         this.nickname = nickname;
+        this.timeout = timeout;
     }
 }

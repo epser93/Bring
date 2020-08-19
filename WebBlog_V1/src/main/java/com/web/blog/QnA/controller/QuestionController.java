@@ -80,16 +80,10 @@ public class QuestionController {
     @ApiOperation(value = "질문 조회", notes = "질문 조회")
     @GetMapping(value = "/{qpostId}")
     public ListResult<ListResult> questionDetail(@PathVariable long qpostId, HttpServletRequest request, HttpServletResponse response) {
-        List<ListResult> results = new ArrayList<>();
-        results.add(responseService.getListResult(qnaService.getOneQpost(qpostId)));
-        results.add(responseService.getListResult(qTagService.getTags(qpostId)));
-        results.add(responseService.getListResult(qnaService.getApostsofOneQpost(qpostId)));
-        Optional<Qpost> qpost = qpostRepository.findById(qpostId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
-        Optional<Member> logined = memberRepository.findByUid(uid);
+        Optional<Qpost> qpost = qpostRepository.findById(qpostId);
         Optional<Member> writer = memberRepository.findByNickname(qpost.get().getMember().getNickname());
-
         String ip = followService.getIpAddr(request);
         Optional<IpAddrForViewCnt> ipAddrQ = ipAddrForViewCntRepository.findByIpAndQpostId(ip, qpostId);
         if (!ipAddrQ.isPresent()) {
@@ -97,6 +91,7 @@ public class QuestionController {
                     .ip(ip)
                     .postId((long) -1)
                     .qpostId(qpostId)
+                    .timeout((long)10800)
                     .build();
             ipAddrForViewCntRepository.save(checkCnt);
             qpostRepository.updateViewCnt(qpostId);
@@ -106,11 +101,17 @@ public class QuestionController {
             IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
                     .ip(ip)
                     .nickname(writer.get().getNickname())
+                    .timeout((long)86400)
                     .build();
             ipAddrForTodayCntRepository.save(checkCnt);
             memberRepository.updateTodayCnt(writer.get().getMsrl());
             memberRepository.updateTotalCnt(writer.get().getMsrl());
         }
+
+        List<ListResult> results = new ArrayList<>();
+        results.add(responseService.getListResult(qnaService.getOneQpost(qpostId)));
+        results.add(responseService.getListResult(qTagService.getTags(qpostId)));
+        results.add(responseService.getListResult(qnaService.getApostsofOneQpost(qpostId)));
 
         return responseService.getListResult(results);
     }
@@ -128,14 +129,26 @@ public class QuestionController {
         Set<String> tags = paramQpost.getTags();
         List<SingleResult> result = new ArrayList<>();
         Qpost qpost = qnaService.writeQuestion(member.get(), paramQpost);
-        List<QpostUploads> list = qpostUploadsRepository.findAllByQpostId(qpost.getQpostId());
+        List<QpostUploads> list = qpostUploadsRepository.findAllByNickname(member.get().getNickname());
+        String content = qpost.getContent();
+        int num = 0;
         for(QpostUploads qu : list) {
             String filep = qu.getFilePath();
-            if(!qpostRepository.findByQpostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+            if(qu.getQpostId() == -100 && !qpostRepository.findByQpostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+                System.out.println("IF");
                 s3Service.delete(filep);
                 qpostUploadsRepository.deleteById(qu.getId());
+            } else if(qu.getQpostId() == -100 && qpostRepository.findByQpostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) {
+                String original = qu.getFilePath();
+                String rename = s3Service.rename(filep, qu.getFileName(), qpost.getQpostId(), num, member.get().getNickname());
+                qpostUploadsRepository.updateFilePath(rename, qu.getId());
+                qpostUploadsRepository.updateQpostId(qpost.getQpostId(), qu.getId());
+                content = content.replace(original, rename);
+                System.out.println(content);
+                num++;
             }
         }
+        qpostRepository.updateContent(content, qpost.getQpostId());
         if (!tags.isEmpty()) {
             for (String tag : tags) {
                 qTagService.insertTags(qpost, tag);
@@ -231,15 +244,7 @@ public class QuestionController {
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
         Optional<List<Qpost>> list = qpostRepository.findAllByMember_Nickname(logined.getNickname());
-        if (list.get().size() == 1) {
-            long qpostId = list.get().get(0).getQpostId() + 1;
-            return responseService.getListResult(qnaService.saveFiles(qpostId, logined.getNickname(), files));
-        } else if(list.get().size() > 1) {
-            Qpost qpost = list.get().get(list.get().size() - 1); //찾은 리스트 중 마지막 댓글 가져오기
-            long qpostId = qpost.getQpostId() + 1;
-            return responseService.getListResult(qnaService.saveFiles(qpostId, logined.getNickname(), files));
-        }
-        else return null;
+        return responseService.getListResult(qnaService.saveFiles(-100, logined.getNickname(), files));
     }
 
     @ApiImplicitParams({

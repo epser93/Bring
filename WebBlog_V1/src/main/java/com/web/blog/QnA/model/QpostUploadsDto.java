@@ -10,6 +10,8 @@ import lombok.*;
 public class QpostUploadsDto {
     private Long id;
     private String filePath;
+    private String fileName;//
+    private String nickname;//
     private String imgFullPath;
     private Long qpostId;
     private int num;
@@ -18,6 +20,8 @@ public class QpostUploadsDto {
         QpostUploads build = QpostUploads.builder()
                 .id(id)
                 .filePath(filePath)
+                .fileName(fileName)
+                .nickname(nickname)
                 .qpostId(qpostId)
                 .num(num)
                 .build();
@@ -25,9 +29,11 @@ public class QpostUploadsDto {
     }
 
     @Builder
-    public QpostUploadsDto(Long id, String filePath, String imgFullPath, Long qpostId, int num) {
+    public QpostUploadsDto(Long id, String filePath, String fileName, String nickname,String imgFullPath, Long qpostId, int num) {
         this.id = id;
         this.filePath = filePath;
+        this.fileName = fileName;
+        this.nickname = nickname;
         this.imgFullPath = imgFullPath;
         this.qpostId = qpostId;
         this.num = num;
