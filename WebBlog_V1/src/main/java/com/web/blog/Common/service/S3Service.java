@@ -18,6 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
@@ -61,10 +63,10 @@ public class S3Service {
 
     public String upload(MultipartFile file, long id, int num, String nickname) throws IOException {
         // 고유한 key 값을 갖기위해 현재 시간을 postfix로 붙여줌
-//        SimpleDateFormat format = new SimpleDateFormat ( "yyyy-MM-dd-HH-mm-ss");
-//        Date date = new Date();
-//        String time = format.format(date);
-        String fileName = nickname + "-" + id + "-" + num + "-" +file.getOriginalFilename();
+        SimpleDateFormat format = new SimpleDateFormat ( "yyyy-MM-dd-HH-mm-ss");
+        Date date = new Date();
+        String time = format.format(date);
+        String fileName = nickname + "-" + time + "___" + id + "-" + num + "___" +file.getOriginalFilename();
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         byte[] bytes = IOUtils.toByteArray(file.getInputStream());
