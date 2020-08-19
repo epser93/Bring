@@ -1,5 +1,5 @@
-<template>
-    <div>
+<template >
+    <div class="fontstyle">
     <b-jumbotron>
         <template v-slot:header>지식IN</template>
 
@@ -15,25 +15,21 @@
         
         </b-jumbotron>
         <hr>
-        <!-- 최신글 / 트랜드 -->
-        <!-- <div class= "mt-4 mb-4">
-            <b-button variant="outline-primary" class="mr-2" @click="getAllQna">최신글</b-button>
-            <b-button variant="outline-info" class="ml-2" @click="getHotQna">인기글</b-button>
-        </div> -->
 
         <div class="row">
             <div v-for="(qArticle,index) in qPost" :key="qArticle.qpostId" class="p-0 mb-5 col-12 col-lg-3">
                 <div class="card" style="width: 18rem;">
                     <img class="card-img-top" :src="thumbnail[index]" alt="Card image cap">
                     <div class="card-body pb-0">
-                        <h5 class="card-title">{{ qArticle.subject.slice(0, 10) + '...'  }}</h5>
-                        <p class="card-text mb-3">{{ qArticle.content.slice(0, 20) + '...' }}</p>
+                        <h4 class="card-title">{{ qArticle.subject.slice(0, 10) + '...'  }}</h4>
+                        <p class="card-text mb-3"></p>
+                        <b-card-text>{{ qArticle.content.slice(0, 20) + '...' }}</b-card-text>
                         <!-- 태그: {{qArticle.tags}} -->
                         <!-- 작성시간: {{qArticle.createdAt}} -->
                         <h5>글쓴이: {{qArticle.member_nickname}} / 조회수:{{qArticle.views}} </h5>
                     </div>
                     <div class="card-footer bg-transparent">
-                        <button class="btn btn-primary" @click="getQnaDetail(qArticle)">글 자세히</button>
+                        <b-button variant="info" @click="getQnaDetail(qArticle)">글 자세히</b-button>
                     </div>
                 </div>
             </div>
@@ -134,5 +130,7 @@ export default {
 </script>
 
 <style>
-
+.fontstyle{
+    font: 400 13.3333px Arial;
+}
 </style>
