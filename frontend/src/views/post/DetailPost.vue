@@ -108,8 +108,8 @@ export default {
 
             subject: null,
             member_nickname: null,
-            content: null,
-            createdAt: null,
+            content: '',
+            createdAt: '',
             views: null,
             likes: null,
             likeItOrNot: null,
@@ -233,7 +233,6 @@ export default {
               // 좋아요 했는지
               this.likeItOrNot = res.data.list[4].list[0]
               this.tags = res.data.list[1].list
-              console.log('fetch',res.data)
             })
             .catch(err => console.log(err))
         },
