@@ -51,7 +51,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Optional;
 
-@Api(tags = {"1. Sign"})
+@Api(tags = {"B. Sign"})
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/sign")

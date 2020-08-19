@@ -6,8 +6,10 @@ import com.web.blog.Board.repository.PostRepository;
 import com.web.blog.Board.service.PostService;
 import com.web.blog.Board.service.SearchService;
 import com.web.blog.Board.service.TagService;
-import com.web.blog.Common.advice.exception.*;
-import com.web.blog.Common.model.Paging;
+import com.web.blog.Common.advice.exception.CResourceNotExistException;
+import com.web.blog.Common.advice.exception.CSelectedAnswerException;
+import com.web.blog.Common.advice.exception.CUserExistException;
+import com.web.blog.Common.advice.exception.CUserNotFoundException;
 import com.web.blog.Common.response.CommonResult;
 import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.response.SingleResult;
@@ -16,7 +18,6 @@ import com.web.blog.Member.entity.IpAddrForTodayCnt;
 import com.web.blog.Member.entity.IpAddrForViewCnt;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.model.OnlyMemberMapping;
-import com.web.blog.Member.model.ProfileImgDto;
 import com.web.blog.Member.repository.IpAddrForTodayCntRepository;
 import com.web.blog.Member.repository.IpAddrForViewCntRepository;
 import com.web.blog.Member.repository.MemberRepository;
@@ -25,9 +26,7 @@ import com.web.blog.Member.service.FollowService;
 import com.web.blog.Member.service.ProfileImgService;
 import com.web.blog.QnA.entity.Qpost;
 import com.web.blog.QnA.model.OnlyApostMapping;
-import com.web.blog.QnA.model.OnlyQpostMapping;
 import com.web.blog.QnA.model.ParamQpost;
-import com.web.blog.QnA.model.QpostUploadsDto;
 import com.web.blog.QnA.repository.ApostRepository;
 import com.web.blog.QnA.repository.QpostRepository;
 import com.web.blog.QnA.repository.QpostUploadsRepository;
@@ -39,7 +38,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -49,11 +47,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-@Api(tags = {"7. Questions"})
+@Api(tags = {"L. Questions"})
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "/questions")
@@ -75,212 +71,6 @@ public class QuestionController {
     private final ProfileImgService profileImgService;
     private final IpAddrForTodayCntRepository ipAddrForTodayCntRepository;
     private final IpAddrForViewCntRepository ipAddrForViewCntRepository;
-
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
-    })
-    @ApiOperation(value = "QnA 전체 질문 리스트(최신글)", notes = "QnA의 모든 질문글 리스트(최신글)")
-    @GetMapping("/recent")
-    public ListResult<ListResult> listAllQpostsRecent(@RequestParam(required = false, defaultValue = "1") long no) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String uid = authentication.getName();
-        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
-        Paging paging = new Paging(no);
-        List<ListResult> result = new ArrayList<>();
-        List<String> filePaths = new ArrayList<>();
-        LocalDateTime date = LocalDateTime.now();
-        date.minus(30, ChronoUnit.DAYS);
-        List<OnlyQpostMapping> list = qpostRepository.findByCreatedAtLessThanEqualOrderByCreatedAtDesc(date, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
-        result.add(responseService.getListResult(list));
-        if (logined.isPresent()) {
-            for (OnlyQpostMapping qm : list) {
-                Member member = memberRepository.findByNickname(qm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
-                long qpostId = qm.getQpostId();
-                //파일 조회
-                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
-                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
-                    QpostUploadsDto file = files.get(0);
-                    filePaths.add(file.getImgFullPath());
-                } else {
-                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                    String filePath = profileImgDto.getImgFullPath();
-                    filePaths.add(filePath);
-                }
-            }
-        } else {
-            for (OnlyQpostMapping qm : list) {
-                Member member = memberRepository.findByNickname(qm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
-                long qpostId = qm.getQpostId();
-                //파일 조회
-                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
-                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
-                    QpostUploadsDto file = files.get(0);
-                    filePaths.add(file.getImgFullPath());
-                } else {
-                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                    String filePath = profileImgDto.getImgFullPath();
-                    filePaths.add(filePath);
-                }
-            }
-        }
-        result.add(responseService.getListResult(filePaths));
-        return responseService.getListResult(result);
-    }
-
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
-    })
-    @ApiOperation(value = "QnA 전체 질문 리스트(인기글)", notes = "QnA의 모든 질문글 리스트(인기글)")
-    @GetMapping("/trend")
-    public ListResult<ListResult> listAllQpostsTrend(@RequestParam(required = false, defaultValue = "1") long no) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String uid = authentication.getName();
-        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
-        Paging paging = new Paging(no);
-        List<ListResult> result = new ArrayList<>();
-        List<String> filePaths = new ArrayList<>();
-        LocalDateTime date = LocalDateTime.now();
-        date.minus(30, ChronoUnit.DAYS);
-        List<OnlyQpostMapping> list = qpostRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualOrAnswerCntGreaterThanEqualAndCreatedAtLessThanEqualOrderByCreatedAtDesc(20, date, 1, date, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
-        result.add(responseService.getListResult(list));
-        if (logined.isPresent()) {
-            for (OnlyQpostMapping qm : list) {
-                Member member = memberRepository.findByNickname(qm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
-                long qpostId = qm.getQpostId();
-                //파일 조회
-                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
-                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
-                    QpostUploadsDto file = files.get(0);
-                    filePaths.add(file.getImgFullPath());
-                } else {
-                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                    String filePath = profileImgDto.getImgFullPath();
-                    filePaths.add(filePath);
-                }
-            }
-        } else {
-            for (OnlyQpostMapping qm : list) {
-                Member member = memberRepository.findByNickname(qm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
-                long qpostId = qm.getQpostId();
-                //파일 조회
-                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
-                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
-                    QpostUploadsDto file = files.get(0);
-                    filePaths.add(file.getImgFullPath());
-                } else {
-                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                    String filePath = profileImgDto.getImgFullPath();
-                    filePaths.add(filePath);
-                }
-            }
-        }
-        result.add(responseService.getListResult(filePaths));
-        return responseService.getListResult(result);
-    }
-
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
-    })
-    @ApiOperation(value = "QnA 특정 유저 질문 리스트", notes = "한 유저의 모든 질문글 리스트")
-    @GetMapping("/{nickname}/qlist")
-    public ListResult<ListResult> listUserQposts(@PathVariable String nickname, @RequestParam(required = false, defaultValue = "1") long no) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String uid = authentication.getName();
-        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
-        Paging paging = new Paging(no);
-        List<ListResult> result = new ArrayList<>();
-        List<String> filePaths = new ArrayList<>();
-        LocalDateTime date = LocalDateTime.now();
-        date.minus(30, ChronoUnit.DAYS);
-        List<OnlyQpostMapping> list = qpostRepository.findByMember_NicknameOrderByQpostIdDesc(nickname, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
-        result.add(responseService.getListResult(list));
-        if (logined.isPresent()) {
-            for (OnlyQpostMapping qm : list) {
-                Member member = memberRepository.findByNickname(qm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
-                long qpostId = qm.getQpostId();
-                //파일 조회
-                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
-                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
-                    QpostUploadsDto file = files.get(0);
-                    filePaths.add(file.getImgFullPath());
-                } else {
-                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                    String filePath = profileImgDto.getImgFullPath();
-                    filePaths.add(filePath);
-                }
-            }
-        } else {
-            for (OnlyQpostMapping qm : list) {
-                Member member = memberRepository.findByNickname(qm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
-                long qpostId = qm.getQpostId();
-                //파일 조회
-                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
-                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
-                    QpostUploadsDto file = files.get(0);
-                    filePaths.add(file.getImgFullPath());
-                } else {
-                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                    String filePath = profileImgDto.getImgFullPath();
-                    filePaths.add(filePath);
-                }
-            }
-        }
-        result.add(responseService.getListResult(filePaths));
-        return responseService.getListResult(result);
-    }
-
-    //사이트의 모든 질문글 검색
-    @ApiImplicitParams({
-            @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = false, dataType = "String", paramType = "header")
-    })
-    @ApiOperation(value = "모든 질문글 검색 ", notes = "type 1: 제목 검색, type 2: 내용 검색, type 3: 작성자 검색, type 4: 통합검색, ")
-    @GetMapping(value = "/search/all_questions/{keyword}/{type}")
-    public ListResult<ListResult> searchAlgorithm(@PathVariable int type, @PathVariable(required = false) String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String uid = authentication.getName();
-        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
-        Paging paging = new Paging(no);
-        List<ListResult> result = new ArrayList<>();
-
-        List<OnlyQpostMapping> list = qnaService.QuestionSearch(type, keyword, paging);
-        result.add(responseService.getListResult(list));
-        List<String> filePaths = new ArrayList<>();
-        int cnt = 0;
-        if (logined.isPresent()) {
-            for (OnlyQpostMapping pm : list) {
-                Member member = memberRepository.findByNickname(pm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
-                long qpostId = pm.getQpostId();
-                //파일 조회
-                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
-                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
-                    QpostUploadsDto file = files.get(0);
-                    filePaths.add(file.getImgFullPath());
-                } else {
-                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                    String filePath = profileImgDto.getImgFullPath();
-                    filePaths.add(filePath);
-                }
-                cnt++;
-            }
-        } else {
-            for (OnlyQpostMapping pm : list) {
-                long qpostId = pm.getQpostId();
-                Member member = memberRepository.findByNickname(pm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
-                //파일 조회
-                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
-                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
-                    QpostUploadsDto file = files.get(0);
-                    filePaths.add(file.getImgFullPath());
-                } else {
-                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                    String filePath = profileImgDto.getImgFullPath();
-                    filePaths.add(filePath);
-                }
-            }
-        }
-        result.add(responseService.getListResult(filePaths));
-        return responseService.getListResult(result);
-    }
 
     //질문 조회
     @ApiImplicitParams({
@@ -441,101 +231,5 @@ public class QuestionController {
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
         return responseService.getListResult(qnaService.saveFiles(qpostId, logined.getNickname(), files));
-    }
-
-    @ApiOperation(value = "전체 질문글 태그 검색", notes = "전체 질문글 태그로 검색")
-    @PostMapping(value = "/search/tags/{keyword}")
-    public ListResult<ListResult> searchAllQuestionssByTag(@PathVariable String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String uid = authentication.getName();
-        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
-        Paging paging = new Paging(no);
-        List<ListResult> result = new ArrayList<>();
-        List<String> filePaths = new ArrayList<>();
-        LocalDateTime date = LocalDateTime.now();
-        date.minus(30, ChronoUnit.DAYS);
-        List<OnlyQpostMapping> list = searchService.AllQnaTagSearch(keyword, paging);
-        result.add(responseService.getListResult(list));
-        if (logined.isPresent()) {
-            for (OnlyQpostMapping qm : list) {
-                Member member = memberRepository.findByNickname(qm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
-                long qpostId = qm.getQpostId();
-                //파일 조회
-                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
-                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
-                    QpostUploadsDto file = files.get(0);
-                    filePaths.add(file.getImgFullPath());
-                } else {
-                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                    String filePath = profileImgDto.getImgFullPath();
-                    filePaths.add(filePath);
-                }
-            }
-        } else {
-            for (OnlyQpostMapping qm : list) {
-                Member member = memberRepository.findByNickname(qm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
-                long qpostId = qm.getQpostId();
-                //파일 조회
-                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
-                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
-                    QpostUploadsDto file = files.get(0);
-                    filePaths.add(file.getImgFullPath());
-                } else {
-                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                    String filePath = profileImgDto.getImgFullPath();
-                    filePaths.add(filePath);
-                }
-            }
-        }
-        result.add(responseService.getListResult(filePaths));
-        return responseService.getListResult(result);
-    }
-
-    @ApiOperation(value = "특정 유저 질문글 태그 검색", notes = "특정 유저의 질문글 태그로 검색")
-    @PostMapping(value = "/{nickname}/search/tags/{keyword}")
-    public ListResult<ListResult> searchOnesQuestionsByTag(@PathVariable String nickname, @PathVariable String keyword, @RequestParam(required = false, defaultValue = "1") long no) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String uid = authentication.getName();
-        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
-        Paging paging = new Paging(no);
-        List<ListResult> result = new ArrayList<>();
-        List<String> filePaths = new ArrayList<>();
-        LocalDateTime date = LocalDateTime.now();
-        date.minus(30, ChronoUnit.DAYS);
-        List<OnlyQpostMapping> list = searchService.OnesQnaTagSearch(nickname, keyword, paging);
-        result.add(responseService.getListResult(list));
-        if (logined.isPresent()) {
-            for (OnlyQpostMapping qm : list) {
-                Member member = memberRepository.findByNickname(qm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
-                long qpostId = qm.getQpostId();
-                //파일 조회
-                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
-                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
-                    QpostUploadsDto file = files.get(0);
-                    filePaths.add(file.getImgFullPath());
-                } else {
-                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                    String filePath = profileImgDto.getImgFullPath();
-                    filePaths.add(filePath);
-                }
-            }
-        } else {
-            for (OnlyQpostMapping qm : list) {
-                Member member = memberRepository.findByNickname(qm.getMember_nickname()).orElseThrow(CUserNotFoundException::new);
-                long qpostId = qm.getQpostId();
-                //파일 조회
-                if (qpostUploadsRepository.findByQpostId(qpostId).isPresent()) { //업로드한 파일이 하나라도 존재하면~
-                    List<QpostUploadsDto> files = qpostUploadsService.getList(qpostId);
-                    QpostUploadsDto file = files.get(0);
-                    filePaths.add(file.getImgFullPath());
-                } else {
-                    ProfileImgDto profileImgDto = profileImgService.getOneImg(member.getMsrl());
-                    String filePath = profileImgDto.getImgFullPath();
-                    filePaths.add(filePath);
-                }
-            }
-        }
-        result.add(responseService.getListResult(filePaths));
-        return responseService.getListResult(result);
     }
 }

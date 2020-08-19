@@ -9,7 +9,6 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.util.IOUtils;
-import com.web.blog.Member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,7 +23,6 @@ import java.util.Date;
 @Service
 @RequiredArgsConstructor
 public class S3Service {
-    private final MemberRepository memberRepository; //lawliet0521.s3.amazonaws.com
     public static final String CLOUD_FRONT_DOMAIN_NAME = "dp02rmdt3p3bw.cloudfront.net";
 //    public static final String CLOUD_FRONT_DOMAIN_NAME = "lawliet0521.s3.amazonaws.com";
 

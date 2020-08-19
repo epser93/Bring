@@ -34,7 +34,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-@Api(tags = {"3. Subscribe"})
+@Api(tags = {"D. Subscribe"})
 @RequiredArgsConstructor
 @RestController
 public class FollowController {

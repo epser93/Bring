@@ -55,7 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Api(tags = {"2. Member"})
+@Api(tags = {"C. Member"})
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "/member")
