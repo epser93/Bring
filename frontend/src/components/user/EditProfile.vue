@@ -44,7 +44,6 @@
           </div>
 
         </div>
-        <h3 class="font-weight-light overflow-hidden mb-0">A smarter way to tell about<span class="typed-text font-weight-bold ml-1" data-typed-text='["new features.","product updates.","a new idea.","an announcment."]'></span></h3>
         <!-- 닉네임 -->
         <div class="section">
           <h5 class="title"><b>닉네임</b></h5>

@@ -14,7 +14,7 @@
         <div id="nav-mylist" class="flex-column text-left p-3">
             <!-- 검색창 -->
             <div class="my-5 text-center">
-                <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-secondary">{{ keywordType.name }}</button>
+                <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-secondary" style="margin-bottom:5px;">{{ keywordType.name }}</button>
                 <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu">
                     <button type="button" tabindex="0" @click="dropdown(typeid, value)" class="dropdown-item" v-for="(value, typeid) in dropdownList" v-bind:key="typeid">
                         {{ value }}
