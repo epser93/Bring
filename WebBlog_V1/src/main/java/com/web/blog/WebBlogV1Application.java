@@ -2,6 +2,7 @@ package com.web.blog;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
@@ -26,7 +27,9 @@ public class WebBlogV1Application {
 
     public static void main(String[] args) {
         System.setProperty("user.timezone", "UTC+9");
-        SpringApplication.run(WebBlogV1Application.class, args);
+        SpringApplication app = new SpringApplication(WebBlogV1Application.class);
+        app.addListeners(new ApplicationPidFileWriter());
+        app.run(args);
     }
 
     @Bean
