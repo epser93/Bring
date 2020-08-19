@@ -76,7 +76,7 @@ export default {
     }
   },
   methods: {
-    // 바로 이미지를 서버에 업로드 업로드 된 장소의 url 받아오기
+    // 바로 이미지를 서버에 업로드 업로드 된 장소의 url 받아오기!!
     uploadImageDirect(file, insertImage) {
       const formData = new FormData()
       formData.append('files', file)
@@ -115,12 +115,9 @@ export default {
             'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
           }
         }
-        axios.post(
-          `${BACK_URL}/blog/${this.aboutText.nickname}/${this.aboutText.boardName}`, this.aboutText.post, config)
-
-          .then(() =>{
-            // 글 작성 완료 후, 썸네일 포스트 요청 
-            this.thumbnailPost()
+        axios.post(`${BACK_URL}/blog/${this.aboutText.nickname}/${this.aboutText.boardName}`, this.aboutText.post, config)
+          .then((res) =>{
+            this.$router.push({ name : 'DetailPost', params: { nickname: this.aboutText.nickname, boardName: this.aboutText.boardName, post_id: res.data.list[0].data.postId}})
           })
           .catch((err) => {
             alert('필수 항목을 모두 입력해 주세요')
