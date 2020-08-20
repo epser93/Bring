@@ -10,10 +10,7 @@ import com.web.blog.QnA.entity.Apost;
 import com.web.blog.QnA.entity.Qpost;
 import com.web.blog.QnA.entity.QpostUploads;
 import com.web.blog.QnA.model.*;
-import com.web.blog.QnA.repository.ApostMemberRepository;
-import com.web.blog.QnA.repository.ApostRepository;
-import com.web.blog.QnA.repository.QpostRepository;
-import com.web.blog.QnA.repository.QpostUploadsRepository;
+import com.web.blog.QnA.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -32,7 +29,7 @@ public class QnaService {
     private final ApostMemberRepository apostMemberRepository;
     private final ApostRepository apostRepository;
     private final QpostRepository qpostRepository;
-    private final QTagService qTagService;
+    private final QpostTagRepository qpostTagRepository;
     private final QpostUploadsService qpostUploadsService;
     private final QpostUploadsRepository qpostUploadsRepository;
     private final S3Service s3Service;
@@ -115,9 +112,10 @@ public class QnaService {
             throw new CNotOwnerException();
         } else {
             if (qpost.getAnswerCnt() == 0) {
+                qpostTagRepository.deleteAllByQpost_QpostId(qpost_id);
                 qpostRepository.delete(qpost);
                 return true;
-            } else if (qpost.getAnswerCnt() > 0) throw new CAnsweredQuestionException();
+            }
         }
 
         if (qpostUploadsRepository.findByQpostId(qpost_id).isPresent()) { //질문에 사진이 한장이라도 존재하면~
@@ -152,7 +150,9 @@ public class QnaService {
                 .postId(postId)
                 .build();
 
-        qpostRepository.updateAnswerCnt(qpost.getQpostId());
+        if(postId != -1) {
+            qpostRepository.updateAnswerCnt(qpost.getQpostId());
+        }
         return apostRepository.save(apost);
     }
 
