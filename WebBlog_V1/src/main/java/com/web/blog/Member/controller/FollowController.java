@@ -125,7 +125,7 @@ public class FollowController {
         date.minus(3, ChronoUnit.DAYS);
         for (long userNo : followings) {
             Member following = memberRepository.findById(userNo).get();
-            List<Post> list = postRepository.findAllByMember_NicknameAndBoard_NameNotLikeAndSubjectNotLikeAndCreatedAtLessThanEqualOrderByPostIdDesc(following.getNickname(), "나의 Answers", "First!1!Post:2:On;3;New:4:Board", date);
+            List<Post> list = postRepository.findAllByMember_NicknameAndBoard_NameNotLikeAndCreatedAtLessThanEqualOrderByPostIdDesc(following.getNickname(), "나의 Answers", date);
             for (Post opm : list) {
                 semiFinalList.add(opm);
             }

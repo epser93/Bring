@@ -1,9 +1,7 @@
 package com.web.blog.Board.controller;
 
 import com.web.blog.Board.entity.Board;
-import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.model.ParamBoard;
-import com.web.blog.Board.model.ParamPost;
 import com.web.blog.Board.repository.BoardRepository;
 import com.web.blog.Board.service.BoardService;
 import com.web.blog.Board.service.PostService;
@@ -53,14 +51,7 @@ public class BoardController {
             Optional<Board> board = Optional.ofNullable(boardRepository.findByNameAndMember(paramBoard.getName(), member));
             if (board.isPresent()) throw new CBoardExistException();
             String uid = member.getUid();
-            Board board1 = boardService.createBoard(uid, paramBoard.getName());
-            ParamPost paramPost = new ParamPost();
-            paramPost.setSubject("First!1!Post:2:On;3;New:4:Board");
-            paramPost.setOriginal((long)-1);
-            paramPost.setContent("First!1!Post:2:On;3;New:4:Board");
-            paramPost.setTags(null);
-            Post post = postService.writePost(paramBoard.getName(), paramPost, member, "");
-            boardRepository.updatePostCntMinus(board1.getBoardId());
+            boardService.createBoard(uid, paramBoard.getName());
         }
     }
 
