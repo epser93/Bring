@@ -11,7 +11,6 @@
               </div>
               <div class="contents">
                 <h4>{{ question.subject }}</h4>
-                <!-- <p>{{ question.content }}</p> -->
                 <p class="comment-date">{{ question.createdAt.substring(0,10) }} · {{ question.answerCnt }}개의 답변</p>
               </div>
             </div>

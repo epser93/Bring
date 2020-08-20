@@ -16,9 +16,6 @@
 </template>
  
 <script>
-// const BACK_URL = 'http://i3c206.p.ssafy.io/api'
-// import axios from 'axios'
-
 export default {
   name:"Home",
   components:{
@@ -48,12 +45,10 @@ export default {
         this.mode = 'Blog'
         // 에러 헨들링
         this.$router.push({ name: 'RecentlyQuestion' }).catch(()=>{})
-        // this.getAllPost()
       } else {
         this.$cookies.set('mode',"Blog")
         this.mode = 'QnA'
         this.$router.push({ name: 'RecentlyPost' }).catch(()=>{})
-        // this.getAllPost()
       }
     },
     upScroll () {
