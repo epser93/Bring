@@ -6,7 +6,7 @@
             <h1 class="mb-3">{{qPost.subject}}</h1>
             <span class="text-muted">{{ qPost.createdAt.slice(0,10) }}</span>
             <span class="vertical-line mx-3"></span>
-            <span class="mr-2"><strong>{{ qPost.member_nickname }}</strong></span>
+            <span class="mr-2" @click="gotoProfile(qPost.member_nickname)"><strong>{{ qPost.member_nickname }}</strong></span>
             <!-- 분기처리/ 작성자와 현재 사용자의 이름이 같으면 삭제표시되게끔-->
             <div v-if="this.nickname===qPost.member_nickname" class="text-right">
                 <button class="btn btn-outline-danger btn-sm mx-1" @click="deleteQna(qpost_id)" ><b-icon icon="trash"></b-icon> 삭제</button>
@@ -28,7 +28,7 @@
             <i class="far fa-eye ml-1"></i> {{ qPost.views }}
         </div>
         <!-- 댓글 입력 부분 -->
-        <div id="commentTextArea">
+        <div id="commentTextArea" v-if="!qPost.selectOver">
             <span v-if="writeComment">
               <div>
                   <b-form-textarea
@@ -56,16 +56,16 @@
         <!--채택된 답변 -->
         
         <h3 class="mt-5 mb-4 text-left">{{aPost.length}} 개의 답변</h3>
-        <div class="d-flex flex-row"> 
-        <div v-for="(aArticle,index) in aPost"  :key="`A-${index}`">
-            <div v-if="aArticle.selected===true">
+        <div v-for="(aArticle,index) in aPost" :key="`A-${index}`">
+            <div class="d-flex flex-row"> 
+            <div v-if="aArticle.selected===true" id="selected-answer">
                 <p class="text-left ml-1">
                     <b-icon icon="patch-check-fll" variant="info"></b-icon>채택 |
-                    <strong class="">{{aArticle.member_nickname}}</strong>
+                    <strong class="" @click="gotoProfile(aArticle.member_nickname)">{{aArticle.member_nickname}}</strong>
                 </p>
                 <p class="my-3 text-left ml-1">{{aArticle.answer}}</p>
                 <!--좋아요-->
-                <div class="mr-5 pr-3">
+                <div class="mr-5 pr-3 text-left">
                     <b-icon icon="heart-fill" v-if="like[index]" class="d-inline ml-1" style="cursor:pointer; color: crimson;" @click="likeAnswer(aArticle, false)"></b-icon>
                     <b-icon icon="heart" v-if="!like[index]" class="d-inline ml-1" style="cursor:pointer; color: black;" @click="likeAnswer(aArticle, true)"></b-icon> 
                     <small :ref="'like-count-' + aArticle.apostId"> {{ aArticle.likes }}</small><small>개의 좋아요</small>
@@ -82,7 +82,7 @@
         <!--채택되지 않은 답변-->
         <div class="row-12" v-for="(aArticle,index) in aPost" :key="aArticle.apostId">
             <div v-if="aArticle.selected===false">
-                <p class="text-left ml-1"><strong>{{aArticle.member_nickname}}</strong></p>
+                <p class="text-left ml-1" @click="gotoProfile(aArticle.member_nickname)"><strong>{{aArticle.member_nickname}}</strong></p>
                 <p class="text-left mb-3 mt-3 mr-5 pr-5">{{aArticle.answer}}</p>
                 <!-- 좋아요 -->
                 <p class="text-left">
@@ -348,6 +348,10 @@ export default {
         },
         searchTag(tag) {
             this.$router.push({ name : 'TagSearchQuestions', params: { keyword : tag }})
+        },
+        // 프로필 가기
+        gotoProfile(nickname) {
+          this.$router.push({ name : 'Profile', query: { nickname: nickname } })
         }
     },
     created(){
@@ -359,6 +363,16 @@ export default {
 </script>
 
 <style scoped>
+#selected-answer{
+    border : 5px solid #99c9c2;
+    border-radius: 10px;
+    padding: 20px;
+    width: 100%;
+}
+
+strong {
+    cursor: pointer;
+}
 #commentTextArea a {
     cursor: pointer;
     text-decoration: none;

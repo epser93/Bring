@@ -69,19 +69,8 @@ export default {
 }
 </script>
 <style scoped>
-@media only screen and (min-width: 1000px) {
-    #home {
-        min-height: 1000px;
-        padding: 0 50px;
-        font-family: 'Noto Serif KR', serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        background-color: #f4f4f4;
-    }
-}
-
 #home {
-    min-height: 1000px;
+    min-height: 100vh;
     padding: 0 50px;
     font-family: 'Noto Serif KR', serif;
     -webkit-font-smoothing: antialiased;

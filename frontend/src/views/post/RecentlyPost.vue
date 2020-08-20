@@ -125,6 +125,7 @@ h2 {
 .cardwrap {
   box-shadow: 10px 0px 60px -40px black;
   background-color: white;
+  position: relative;
 }
 
 .img-section {

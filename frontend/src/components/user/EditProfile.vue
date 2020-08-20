@@ -185,21 +185,72 @@ export default {
               password2 : this.changeData.password2,
               password3 : this.changeData.password3,
         }
-        console.log(paramMember)
-        axios.put(`${BACK_URL}/member/update`,paramMember, config)
-          .then(() => {
-                console.log("수정완료")
-                this.$cookies.set('nickname', this.changeData.nickname)
-                //this.$router.go(-1)
-                this.$router.push({ name: 'Profile', query: {nickname: this.changeData.nickname}})    
-                location.reload()  // 여기
-          })
-          .catch((err) => {
-            console.log('에러보기')
-            console.error(err)
-            alert('비밀번호가 다릅니다.')
-          })
-
+        const nicknamechk = /^[가-힣a-zA-Z0-9]{2,15}$/;
+        const passwordchk = /^.*(?=^.{8,15}$)(?=.*\d)(?=.*[a-zA-Z])(?=.*[!@#$%^&+=]).*$/;
+        // 비밀번호를 안 적고 확인만 누르는 경우
+        console.log(this.changeData.password1)
+        console.log(this.changeData.nickname)
+        if (!this.changeData.password3) {
+          alert('현재 비밀번호를 입력해주세요')
+        } 
+        // 닉네임 변경이 없을 경우
+        else if (this.$cookies.get('nickname') === this.changeData.nickname) {
+          if (!this.changeData.password1 && !this.changeData.password2) {
+            alert('닉네임을 변경해주세요')
+          } else if (!this.changeData.password1) {
+            alert('새 비밀번호를 입력해주세요')
+          } else if (!passwordchk.test(this.changeData.password1)) {
+            alert("비밀번호는 문자+숫자+특수문자 8~20 자리입니다.")
+          } else if (this.changeData.password1 !== this.changeData.password2) {
+            alert('새 비밀번호와 확인란이 서로 다릅니다.')
+          } else {
+            axios.put(`${BACK_URL}/member/update`,paramMember, config)
+              .then(() => {
+                    this.$cookies.set('nickname', this.changeData.nickname)
+                    this.$router.push({ name: 'Profile', query: {nickname: this.changeData.nickname}})    
+                    location.reload()  // 여기
+              })
+              .catch((err) => {
+                console.error(err)
+                console.log('여기 들어옴')
+                alert('비밀번호가 다릅니다.')
+              })
+          }
+        }
+        // 닉네임 변경이 일어난 경우
+        else {
+          if (!nicknamechk.test(this.changeData.nickname)) {
+            alert('닉네임은 2~15자 이내여야 합니다.')
+          }
+          // 새 비밀번호 , 확인란 공란 == 순수 닉네임만 변경하려는 경우
+          else if (!this.changeData.password1 && !this.changeData.password2) {
+            axios.put(`${BACK_URL}/member/update`,paramMember, config)
+              .then(() => {
+                    this.$cookies.set('nickname', this.changeData.nickname)
+                    this.$router.push({ name: 'Profile', query: {nickname: this.changeData.nickname}})    
+                    location.reload()  // 여기
+              })
+              .catch((err) => {
+                console.error(err)
+                alert('비밀번호가 다릅니다.')
+              })
+          } else if (!passwordchk.test(this.changeData.password1)) {
+            alert("비밀번호는 문자+숫자+특수문자 8~20 자리입니다.")
+          } else if (this.changeData.password1 !== this.changeData.password2) {
+            alert('새 비밀번호와 확인란이 서로 다릅니다.')
+          } else {
+            axios.put(`${BACK_URL}/member/update`,paramMember, config)
+              .then(() => {
+                    this.$cookies.set('nickname', this.changeData.nickname)
+                    this.$router.push({ name: 'Profile', query: {nickname: this.changeData.nickname}})    
+                    location.reload()  // 여기
+              })
+              .catch((err) => {
+                console.error(err)
+                alert('비밀번호가 다릅니다.')
+              })
+          }
+        }
       },
 
       uploadImage(){
