@@ -4,6 +4,7 @@
       <div class="col-lg-10 row">
         <div v-for="(post, index) in list" :key="index" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
           <div class=cardwrap>
+            <div v-if="post.selectOver" id="solved">solved!</div>
             <div class="card-body p-0" @click="gotoQuestionDetail(post)">
               <div class="img-section" :style="{ 'background-image' : `url(${thumbnails[index]})`}">
                 <a href=""></a>
@@ -114,6 +115,16 @@ export default {
 </script>
 
 <style>
+#solved{
+  transform: rotate(-30deg);
+  width: 70px;
+  background: #a2ffe8;
+  border-radius: 10px;
+  position: absolute;
+  left: -20px;
+  top: -10px;
+}
+
 h2 {
   width:100%;
   margin-bottom: 30px;
