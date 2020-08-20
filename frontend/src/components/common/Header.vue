@@ -40,7 +40,7 @@
                             {{ value }}
                         </button>
                     </div>
-                    <input class="form-control" type="search" v-model="keyword" placeholder="키워드 입력" aria-label="Search">
+                    <input class="form-control" type="search" v-model="keyword" placeholder="키워드 입력" @keydown.enter="gotoSearch" aria-label="Search">
                     <a class="mx-3" @click="gotoSearch"><i class="fas fa-search"></i></a>
                 </div>
 
@@ -52,7 +52,7 @@
                             {{ value }}
                         </button>
                     </div>
-                    <input class="form-control" type="search" v-model="keyword" placeholder="키워드 입력" aria-label="Search">
+                    <input class="form-control" type="search" v-model="keyword" placeholder="키워드 입력" @keydown.enter="gotoSearchQuestions" aria-label="Search">
                     <a class="mx-3" @click="gotoSearchQuestions"><i class="fas fa-search"></i></a>
                 </div>                
             </div>
@@ -117,6 +117,7 @@
           gotoSearch() {
             if (this.keyword.length !== 0){
               this.$router.push({name : 'Search', query: { q: this.keyword, type: this.keywordType.keyid }})
+              this.keyword = ''
             } 
           },
 
@@ -124,6 +125,7 @@
           gotoSearchQuestions() {
             if (this.keyword.length !== 0){
               this.$router.push({name : 'SearchQuestions', query: { q: this.keyword, type: this.keywordType.keyid }})
+              this.keyword = ''
             } 
           },
 
