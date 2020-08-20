@@ -87,8 +87,6 @@ public class SignController {
         ObjectMapper mapper = new ObjectMapper();
         String Json = "";
         Json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getMapResult(jwtTokenProvider.createToken(String.valueOf(member.getMsrl()), member.getRoles()), member));
-        HttpSession session = request.getSession();
-        session.setAttribute("member", member.getMsrl());
         return Json;
     }
 
