@@ -50,7 +50,7 @@ public class Qpost extends CommonDateEntity implements Serializable {
     }
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @OneToMany(mappedBy = "qpost", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "qpost", cascade = CascadeType.REMOVE)
     private List<Apost> aposts;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -59,7 +59,7 @@ public class Qpost extends CommonDateEntity implements Serializable {
     private Member member;
 
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @OneToMany(mappedBy = "tag", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "tag", cascade = {CascadeType.REMOVE, CascadeType.PERSIST})
     private List<QpostTag> qpostTags = new ArrayList<>();
 
     public Qpost setUpdate(String subject, String content) {

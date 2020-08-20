@@ -21,6 +21,8 @@ public interface QpostTagRepository extends JpaRepository<QpostTag, Long> {
 
     int deleteByIdEquals(long id);
 
+    void deleteAllByQpost_QpostId(long qpost_id);
+
     @Modifying
     @Transactional
     @Query(value = "insert into qpost_tag (qpost_id, tag_id, in_where) values (:qpost_id, :tag_id, 2)", nativeQuery = true)

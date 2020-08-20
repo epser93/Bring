@@ -94,6 +94,8 @@ public class TagService {
     public List<ListResult> getOnesQuestionTags(String nickname) {
         Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
         List<OnlyQpostMapping> listq = qpostRepository.findByMember_Nickname(member.getNickname()); //질문글
+        List<Integer> count = new ArrayList<>();
+        count.add(listq.size());
         List<String> tagsS = new ArrayList<>(); //태그 목록
         List<Integer> tagsC = new ArrayList<>(); //태그 카운트 목록
         List<QpostTag> qpostTags = new ArrayList<>();
@@ -125,6 +127,7 @@ public class TagService {
         List<ListResult> result = new ArrayList<>();
         result.add(responseService.getListResult(tagsS));
         result.add(responseService.getListResult(tagsC));
+        result.add(responseService.getListResult(count));
         return result;
     }
 
