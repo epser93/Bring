@@ -44,6 +44,10 @@ import TagSearchQuestions from '../components/common/TagSearchQuestions.vue'
 // about
 import About from '../components/common/About.vue'
 
+// 404 페이지
+import PageNotFound from '../components/common/PageNotFound.vue'
+
+
 Vue.use(VueRouter)
 
 const routes = [{
@@ -213,6 +217,16 @@ const routes = [{
         path: '/about',
         name: 'About',
         component: About
+    },
+    // 404 처리
+    {
+        path: '*',
+        redirect: '/404'
+    },
+    {
+        path: '/404',
+        name: 'PageNotFound',
+        component: PageNotFound
     }
 
 ]
