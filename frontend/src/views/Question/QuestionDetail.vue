@@ -222,7 +222,6 @@ export default {
             }
             axios.get(`${BACK_URL}/answers/${this.qpost_id}/answers`,config)
             .then(res=>{
-                console.log(res.data)
                 this.aPost=res.data.list[0].list
                 // 좋아요 불리언 값
                 this.like=res.data.list[1].list
@@ -240,7 +239,6 @@ export default {
         },
         // 답변 삭제
         deleteAnswer(aPostId){
-            console.log(aPostId)
             const config = {
               headers: {
                 'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
