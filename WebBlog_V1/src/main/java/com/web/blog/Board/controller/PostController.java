@@ -240,20 +240,21 @@ public class PostController {
         }
         List<PostUploads> list = postUploadsRepository.findAllByNickname(logined.get().getNickname());
         String content = post.getContent();
-        int num = 0;
+//        int num = 0;
         for (PostUploads pu : list) {
             String filep = pu.getFilePath();
             if (!postRepository.findByPostIdAndContentContaining(post.getPostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
                 s3Service.delete(filep);
                 postUploadsRepository.deleteById(pu.getId());
-            } else if (postRepository.findByPostIdAndContentContaining(post.getPostId(), filep).isPresent()) {
-                String original = pu.getFilePath();
-                String rename = s3Service.rename(filep, pu.getFileName(), post.getPostId(), num, logined.get().getNickname());
-                postUploadsRepository.updateFilePath(rename, pu.getId());
-                postUploadsRepository.updatePostId(post.getPostId(), pu.getId());
-                content = content.replace(original, rename);
-                num++;
             }
+//            else if (postRepository.findByPostIdAndContentContaining(post.getPostId(), filep).isPresent()) {
+//                String original = pu.getFilePath();
+//                String rename = s3Service.rename(filep, pu.getFileName(), post.getPostId(), num, logined.get().getNickname());
+//                postUploadsRepository.updateFilePath(rename, pu.getId());
+//                postUploadsRepository.updatePostId(post.getPostId(), pu.getId());
+//                content = content.replace(original, rename);
+//                num++;
+//            }
         }
         postRepository.updateContent(content, post.getPostId());
 
