@@ -1,19 +1,21 @@
 <template>
     <div id="blog" class= "row">
       <!-- 프로필 -->
-      <div class="info col-12 col-lg-4 px-5 py-4 mt-3">
-        <a class="" style="cursor:pointer;">
-          <img @click="gotoProfile" class="rounded-circle mx-auto img-thumbnail mb-3" :src='cardUserImage' alt="Card image cap" style="width: 90px; height:90px;">
-        </a>
-          <h3 class=""><strong>{{ this.userInfo.nickname }}</strong> 's Blog</h3>
-          <p class="card-list-text">{{ this.userInfo.nickname }}의 브링에 오신것을</p>
-          <p class="card-list-text mb-5">환영합니다!</p>
+      <div class="col-12 col-lg-4 px-5 py-4 mt-3">
+        <div class="info">
+          <a class="" style="cursor:pointer;">
+            <img @click="gotoProfile" class="rounded-circle mx-auto img-thumbnail mb-3" :src='cardUserImage' alt="Card image cap" style="width: 90px; height:90px;">
+          </a>
+            <h3 class=""><strong>{{ this.userInfo.nickname }}</strong> 's Blog</h3>
+            <p class="card-list-text">{{ this.userInfo.nickname }}의 브링에 오신것을</p>
+            <p class="card-list-text mb-5">환영합니다!</p>
 
-          <!-- 조회수 -->
-          <small>TODAY: {{ todayViewers }}</small>
-          <span class="vertical-line mx-3"></span>
-          <small>TOTAL: {{ totalViewers }}</small>
-          <hr>
+            <!-- 조회수 -->
+            <small>TODAY: {{ todayViewers }}</small>
+            <span class="vertical-line mx-3"></span>
+            <small>TOTAL: {{ totalViewers }}</small>
+            <hr>
+        </div>
       </div>
     
       <!-- 네비게이션 -->
