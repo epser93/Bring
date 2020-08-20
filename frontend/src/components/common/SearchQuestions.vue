@@ -62,7 +62,6 @@ export default {
                     if (res.data.list[0].list.length) {
                         this.page += 1
                         this.postList.push(...res.data.list[0].list)
-                        console.log(this.postList)
                         this.thumbnails.push(...res.data.list[1].list)
                         $state.loaded()
                     } else {

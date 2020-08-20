@@ -416,6 +416,7 @@ export default {
     border: 1px solid #ccc;
     font-size: 11px; }
     .tagcloud a:hover {
+      color: #56dbc9;
       transition-duration: 0.5s;
       border: 1px solid #000; }
 

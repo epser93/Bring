@@ -40,7 +40,7 @@
                             {{ value }}
                         </button>
                     </div>
-                    <input class="form-control" type="search" v-model="keyword" placeholder="키워드 입력" @keydown.enter="gotoSearch" aria-label="Search">
+                    <input type="search" v-model="keyword" placeholder="전체 글 검색" @keydown.enter="gotoSearch" aria-label="Search">
                     <a class="mx-3" @click="gotoSearch"><i class="fas fa-search"></i></a>
                 </div>
 
@@ -52,7 +52,7 @@
                             {{ value }}
                         </button>
                     </div>
-                    <input class="form-control" type="search" v-model="keyword" placeholder="키워드 입력" @keydown.enter="gotoSearchQuestions" aria-label="Search">
+                    <input type="search" v-model="keyword" placeholder="전체 질문 검색" @keydown.enter="gotoSearchQuestions" aria-label="Search">
                     <a class="mx-3" @click="gotoSearchQuestions"><i class="fas fa-search"></i></a>
                 </div>                
             </div>
@@ -189,7 +189,7 @@ input {
     line-height : normal; /* line-height 초기화 */ 
     padding: .7em .5em; /* 원하는 여백 설정, 상하단 여백으로 높이를 조절 */ 
     font-family: inherit; /* 폰트 상속 */ 
-    border: 1px solid #999; 
+    border: 1px solid rgb(202, 202, 202); 
     border-radius: 0; /* iSO 둥근모서리 제거 */ 
     outline-style: none; /* 포커스시 발생하는 효과 제거를 원한다면 */ 
     -webkit-appearance: none; /* 브라우저별 기본 스타일링 제거 */ 
@@ -208,6 +208,17 @@ button {
     padding: .7em .5em; /* 원하는 여백 설정, 상하단 여백으로 높이를 조절 */ 
     font-family: inherit; /* 폰트 상속 */ 
     border-radius: 0; /* iSO 둥근모서리 제거 */ 
+
+}
+
+button:hover {
+  background-color: #56dbc9;
+  border: 1px solid #56dbc9;
+}
+
+button:focus {
+  background-color: #56dbc9 !important;
+  border: 1px solid #56dbc9 !important;
 }
 
 .dropdown-menu {
