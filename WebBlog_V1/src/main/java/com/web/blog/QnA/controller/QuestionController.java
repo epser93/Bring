@@ -96,7 +96,7 @@ public class QuestionController {
                     .ip(ip)
                     .nickname(writer.get().getNickname())
                     .build();
-            checkCnt.setTimeout(86400L);
+            checkCnt.setTimeout(43200L);
             ipAddrForTodayCntRepository.save(checkCnt);
             memberRepository.updateTodayCnt(writer.get().getMsrl());
             memberRepository.updateTotalCnt(writer.get().getMsrl());

@@ -162,20 +162,26 @@ public class PostController {
                         .ip(ip)
                         .nickname(writer.get().getNickname())
                         .build();
-                checkCnt.setTimeout(86400L);
+                checkCnt.setTimeout(43200L);
                 ipAddrForTodayCntRepository.save(checkCnt);
                 memberRepository.updateTodayCnt(writer.get().getMsrl());
                 memberRepository.updateTotalCnt(writer.get().getMsrl());
                 System.out.println("Im Post");
             }
         }
-
-        results.add(responseService.getListResult(postService.getPost(postId)));
+        List<OnlyPostMapping> post = postService.getPost(postId);
+        OnlyPostMapping p = post.get(0);
+        List<Boolean> isShared = new ArrayList<>();
+        if(p.getOriginal() != -1) {
+            isShared.add(true);
+        } else isShared.add(false);
+        results.add(responseService.getListResult(post);
         results.add(responseService.getListResult(tagService.getTags(postId)));
         results.add(responseService.getListResult(replyService.getRepliesofOnePost(postId)));
         results.add(responseService.getListResult(likes));
         results.add(responseService.getListResult(like));
         results.add(responseService.getListResult(filePaths));
+        results.add(responseService.getListResult(isShared));
         return responseService.getListResult(results);
     }
 

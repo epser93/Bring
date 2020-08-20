@@ -164,7 +164,7 @@ public class PostListController {
                             .ip(ip)
                             .nickname(member.getNickname())
                             .build();
-                    checkCnt.setTimeout(86400L);
+                    checkCnt.setTimeout(43200L);
                     ipAddrForTodayCntRepository.save(checkCnt);
                     memberRepository.updateTodayCnt(member.getMsrl());
                     memberRepository.updateTotalCnt(member.getMsrl());
@@ -193,7 +193,7 @@ public class PostListController {
                         .ip(ip)
                         .nickname(member.getNickname())
                         .build();
-                checkCnt.setTimeout(86400L);
+                checkCnt.setTimeout(43200L);
                 ipAddrForTodayCntRepository.save(checkCnt);
                 memberRepository.updateTodayCnt(member.getMsrl());
                 memberRepository.updateTotalCnt(member.getMsrl());
