@@ -133,7 +133,7 @@ public class PostListController {
         List<ListResult> result = new ArrayList<>();
         List<Boolean> amIInTheList = new ArrayList<>();
         List<String> filePaths = new ArrayList<>();
-        List<OnlyPostMapping> list = postRepository.findAllByMember_NicknameAndBoard_NameNotLikeAndSubjectNotLikeOrderByPostIdDesc(nickname, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<OnlyPostMapping> list = postRepository.findAllByMember_NicknameAndBoard_NameNotLikeOrderByPostIdDesc(nickname, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         result.add(responseService.getListResult(list));
         int cnt = 0;
         if (logined.isPresent()) {
@@ -156,6 +156,21 @@ public class PostListController {
                 }
                 cnt++;
             }
+            if(logined.get().getMsrl() != member.getMsrl()) {
+                String ip = followService.getIpAddr(request);
+                Optional<IpAddrForTodayCnt> ipAddr = ipAddrForTodayCntRepository.findByIpAndNickname(ip, member.getNickname());
+                if (!ipAddr.isPresent()) {
+                    IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
+                            .ip(ip)
+                            .nickname(member.getNickname())
+                            .build();
+                    checkCnt.setTimeout(86400L);
+                    ipAddrForTodayCntRepository.save(checkCnt);
+                    memberRepository.updateTodayCnt(member.getMsrl());
+                    memberRepository.updateTotalCnt(member.getMsrl());
+                    System.out.println("Im PostList");
+                }
+            }
         } else {
             for (OnlyPostMapping pm : list) {
                 long postId = pm.getPostId();
@@ -171,19 +186,19 @@ public class PostListController {
                     filePaths.add(filePath);
                 }
             }
-        }
-
-        String ip = followService.getIpAddr(request);
-        Optional<IpAddrForTodayCnt> ipAddr = ipAddrForTodayCntRepository.findByIpAndNickname(ip, member.getNickname());
-        if (!ipAddr.isPresent()) {
-            IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
-                    .ip(ip)
-                    .nickname(member.getNickname())
-                    .build();
-            checkCnt.setTimeout(86400L);
-            ipAddrForTodayCntRepository.save(checkCnt);
-            memberRepository.updateTodayCnt(member.getMsrl());
-            memberRepository.updateTotalCnt(member.getMsrl());
+            String ip = followService.getIpAddr(request);
+            Optional<IpAddrForTodayCnt> ipAddr = ipAddrForTodayCntRepository.findByIpAndNickname(ip, member.getNickname());
+            if (!ipAddr.isPresent()) {
+                IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
+                        .ip(ip)
+                        .nickname(member.getNickname())
+                        .build();
+                checkCnt.setTimeout(86400L);
+                ipAddrForTodayCntRepository.save(checkCnt);
+                memberRepository.updateTodayCnt(member.getMsrl());
+                memberRepository.updateTotalCnt(member.getMsrl());
+                System.out.println("Im PostList");
+            }
         }
 
         result.add(responseService.getListResult(amIInTheList));
@@ -207,7 +222,7 @@ public class PostListController {
 
         LocalDateTime date = LocalDateTime.now();
         date.minus(14, ChronoUnit.DAYS);
-        List<OnlyPostMapping> list = postRepository.findByCreatedAtLessThanEqualAndBoard_NameNotLikeAndSubjectNotLikeOrderByPostIdDesc(date, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<OnlyPostMapping> list = postRepository.findByCreatedAtLessThanEqualAndBoard_NameNotLikeOrderByPostIdDesc(date, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         result.add(responseService.getListResult(list));
         List<String> filePaths = new ArrayList<>();
         int cnt = 0;
@@ -269,7 +284,7 @@ public class PostListController {
         List<Boolean> amIInTheList = new ArrayList<>();
         LocalDateTime date = LocalDateTime.now();
         date.minus(14, ChronoUnit.DAYS);
-        List<OnlyPostMapping> list = postRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualAndBoard_NameNotLikeAndSubjectNotLikeOrLikesGreaterThanEqualAndCreatedAtLessThanEqualAndBoard_NameNotLikeAndSubjectNotLikeOrderByPostIdDesc(40, date, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", 20, date, "나의 Answers", "First!1!Post:2:On;3;New:4:Board", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<OnlyPostMapping> list = postRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualAndBoard_NameNotLikeOrLikesGreaterThanEqualAndCreatedAtLessThanEqualAndBoard_NameNotLikeOrderByPostIdDesc(40, date, "나의 Answers", 20, date, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         result.add(responseService.getListResult(list));
         List<String> filePaths = new ArrayList<>();
         int cnt = 0;

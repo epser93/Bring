@@ -100,6 +100,7 @@ public class QuestionController {
             ipAddrForTodayCntRepository.save(checkCnt);
             memberRepository.updateTodayCnt(writer.get().getMsrl());
             memberRepository.updateTotalCnt(writer.get().getMsrl());
+            System.out.println("Im Question");
         }
 
         List<ListResult> results = new ArrayList<>();
