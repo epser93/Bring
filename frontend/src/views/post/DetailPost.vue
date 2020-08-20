@@ -76,7 +76,7 @@
       </div>
 
       <!-- 카테고리 글(카테고리 내부에서 또 글 번호 매겨져야?) -->
-      <h4 class="mb-3">{{ member_nickname }}의 다른 글</h4>
+      <h4 class="mb-3">"{{ board_name }}" 의 다른 글</h4>
       <hr>
       <div v-for="(item, index) in postListCategory" :key="index" class="">
         <div v-if="item.postId != post_id" class="category-posts mb-4 p-0">
@@ -236,7 +236,11 @@ export default {
               this.likeItOrNot = res.data.list[4].list[0]
               this.tags = res.data.list[1].list
             })
-            .catch(err => console.log(err))
+            .catch(err => {
+              if (err) {
+                this.$router.push({name:'PageNotFound'})
+              }
+            })
         },
         deletePost() {
           const config = {

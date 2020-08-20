@@ -41,6 +41,9 @@ import SearchQuestions from '../components/common/SearchQuestions.vue'
 import TagSearch from '../components/common/TagSearch.vue'
 import TagSearchQuestions from '../components/common/TagSearchQuestions.vue'
 
+// 404 페이지
+import PageNotFound from '../components/common/PageNotFound.vue'
+
 Vue.use(VueRouter)
 
 const routes = [{
@@ -48,7 +51,7 @@ const routes = [{
         name: 'Index',
         component: Index,
         meta: {
-            header:1
+            header: 1
         },
     },
     {
@@ -205,6 +208,16 @@ const routes = [{
         name: 'QuestionUpdate',
         component: QuestionUpdate
     },
+    // 404 처리
+    {
+        path: '*',
+        redirect: '/404'
+    },
+    {
+        path: '/404',
+        name: 'PageNotFound',
+        component: PageNotFound
+    }
 
 ]
 
