@@ -1,8 +1,10 @@
 <template>
   <div id="blogCategory" class="row">
     <div class="wrapper text-left col-12 col-lg-8 mt-5 px-5">
-      <h2 class="mt-5">카테고리 관리</h2>
-
+      <div class="d-flex" style="padding-left: 40px; padding-right: 40px; padding-top: 20px;">
+        <h2 class="mt-4">카테고리 관리</h2>
+        <button type="button" class="btn btn-light" id="backBtn" @click="backBlog"><i class="fas fa-arrow-left"></i>뒤로가기</button>
+      </div>
       <!-- 카테고리 목록 -->
       <div class="p-5">
         <h4><i class="fas fa-stream mr-3"></i>카테고리 목록</h4>
@@ -99,6 +101,9 @@ export default {
   },  
 
   methods: {
+    backBlog(){
+          this.$router.push({ name: 'MyBlog', params: { nickname: this.nickname }})
+      },
     dropdown(newBoardName) {
       this.categorySelected = newBoardName
     }, 
@@ -240,5 +245,10 @@ button {
     padding: .65em .5em; /* 원하는 여백 설정, 상하단 여백으로 높이를 조절 */ 
     font-family: inherit; /* 폰트 상속 */ 
     border-radius: 0; /* iSO 둥근모서리 제거 */ 
+}
+#backBtn{
+  height: 45px;
+  width: 110px;
+  align-self: center;
 }
 </style>
