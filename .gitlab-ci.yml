@@ -1,0 +1,60 @@
+stages:
+    - build
+    - deploy
+
+build-back:
+    stage: build
+    only : 
+        - master 
+        - develop
+    script :
+        # Java를 sdkman 으로 설치한 경우 JAVA_HOME 설정을 위해서만 필요
+        - cd $CI_PROJECT_DIR/WebBlog_V1
+        - chmod +x gradlew
+        - ./gradlew build
+        - cp build/libs/*.jar ~/app1.jar
+    tags :
+        # !! tag 값이 동일하게 설정된 Runner만 파이프라인을 동작시킴
+        # 여러 서버에 배포할때 서버별 runner 태그로도 활용(dev, stg, prd)
+        - i3c206
+
+build-front:
+    stage: build
+    cache:
+        key: ${CI_COMMIT_REF_SLUG}
+        paths:
+            - frontend/node_modules
+    only : 
+        - master 
+        - develop
+    script :
+        # Node.js를 nvm 으로 설치한 경우만 필요
+        - source "/home/ubuntu/.nvm/nvm.sh"
+        - cd $CI_PROJECT_DIR/frontend
+        - npm install
+        - yarn build
+        - rm -rf ~/s03p13c206/frontend/dist
+        - cp -rf dist ~/s03p13c206/frontend/
+    tags :
+        - i3c206
+
+deploy-back:
+    stage: deploy
+    only : 
+        - master 
+        - develop
+    script :
+        - cd $HOME
+        - ~/restart_backend1.sh
+    tags :
+        - i3c206
+
+deploy-front:
+    stage: deploy
+    only : 
+        - master
+        - develop
+    script :
+        - ls -al ~/s03p13c206/frontend/dist
+    tags :
+        - i02prf6
