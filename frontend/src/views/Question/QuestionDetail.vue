@@ -162,7 +162,9 @@ export default {
                 this.tags = res.data.list[1].list
             })
             .catch(err => {
-                console.log(err)
+              if (err) {
+                this.$router.push({name:'PageNotFound'})
+              }
             })
         },
         // 게시물 삭제

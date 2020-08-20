@@ -51,7 +51,7 @@ const routes = [{
         name: 'Index',
         component: Index,
         meta: {
-            header:1
+            header: 1
         },
     },
     {
