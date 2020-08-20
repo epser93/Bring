@@ -18,9 +18,9 @@
 
       <!-- 태그 -->
       <div class="tag">
-        <span v-for="(tag,index) in questionData.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2" @click="deleteTag(index)">{{ tag }}</span>
+        <span v-for="(tag,index) in questionData.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2" @click="deleteTag(index)">{{ tag }}<span id="closeTag">  x</span></span>
       </div>
-      <input placeholder="태그를 입력해주세요" class="mb-5 tag-input" type="text" v-model="tag" @keydown.enter="postTag">
+      <input placeholder="태그를 입력후 enter키를 눌러주세요" class="mt-3 mb-5 tag-input" type="text" v-model="tag" @keydown.enter="postTag">
       
       <!-- 제출 버튼 -->
       <a @click="qnaWrite" class="float-right">작성</a>
@@ -84,9 +84,7 @@ export default {
             }
         axios.post(`${BACK_URL}/questions/ask`,this.questionData,config)
         .then(res=>{
-          console.log(res)
-          this.$router.push({name : 'Question'})
-          this.$router.go(-2) // 이 부분 안해주면 question으로 돌아갈 때 썸네일이 안보임
+          this.$router.push({name : 'QuestionDetail', params:{ nickname: this.$cookies.get('nickname'), qpostId : res.data.list[0].data.qpostId}})
         })
         .catch(err=>{
           console.log(err)
@@ -118,6 +116,9 @@ export default {
 </script>
 
 <style scoped>
+#closeTag {
+  opacity: 0.5;
+}
 @media only screen and (min-width: 1000px) {
   .wrapper {
     width: 80% !important;

@@ -133,7 +133,8 @@ h2 {
   height: 200px;
   background-image: url(https://picsum.photos/600/300/?image=25);
   background-repeat : no-repeat;
-	background-size : 100% 100%;
+	background-size : contain;
+  background-position: center center;
   border-top-right-radius: 6px;
   border-top-left-radius: 6px;
   border: 1px solid rgba(0,0,0,0.1);

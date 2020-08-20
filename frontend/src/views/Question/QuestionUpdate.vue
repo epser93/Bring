@@ -18,9 +18,9 @@
 
       <!-- 태그 -->
       <div class="tag">
-        <span v-for="(tag,index) in questionData.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2" @click="deleteTag(index)">{{ tag }}</span>
+        <span v-for="(tag,index) in questionData.tags" :key="index" class="badge badge-pill badge-light mr-2 p-2" @click="deleteTag(index)">{{ tag }}<span id="closeTag">  x</span></span>
       </div>
-      <input placeholder="태그를 입력해주세요" class="mb-5 tag-input" type="text" v-model="tag" @keydown.enter="postTag">
+      <input placeholder="태그를 입력후 enter키를 눌러주세요" class="mt-3 mb-5 tag-input" type="text" v-model="tag" @keydown.enter="postTag">
       
       <!-- 제출 버튼 -->
       <a @click="modifyQuestion" class="float-right">수정</a>
@@ -89,7 +89,7 @@ export default {
             axios.put(`${BACK_URL}/questions/${this.qpost_id}`,this.questionData,config)
             .then(res=>{
                 console.log(res)
-                this.$router.push({name:'QuestionDetail'})
+                this.$router.push({name:'QuestionDetail', params:{ nickname: this.$cookies.get('nickname'), qpostId : this.qpost_id }})
             })
             .catch(err=>{
                 console.log(err)
@@ -138,6 +138,9 @@ export default {
 </script>
 
 <style scoped>
+#closeTag {
+  opacity: 0.5;
+}
 @media only screen and (min-width: 1000px) {
   .wrapper {
     width: 80% !important;
