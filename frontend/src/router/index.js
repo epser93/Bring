@@ -13,8 +13,6 @@ import RecentlyQuestion from '../views/post/RecentlyQuestion.vue'
 import TrendQuestion from '../views/post/TrendQuestion.vue'
 
 // 유저
-import Login from '../views/user/Login.vue' // 곧 사라질 예정 모달로 처리함
-import Signup from '../views/user/Signup.vue'
 import Profile from '../views/user/Profile.vue'
 import Edit from '../components/user/EditProfile.vue'
 
@@ -30,12 +28,11 @@ import MyAnswers from '../views/blog/MyAnswers.vue'
 
 
 // 스택오버플로우
-import Question from '../views/Question/Question.vue'
 import QuestionWrite from '../views/Question/QuestionWrite.vue'
 import QuestionDetail from '../views/Question/QuestionDetail.vue'
 import QuestionUpdate from '../views/Question/QuestionUpdate.vue'
 
-// 에디터(임시)
+// 에디터
 import Editor from '../views/blog/Editor.vue'
 
 // 검색
@@ -126,16 +123,6 @@ const routes = [{
 
     // 유저 관련
     {
-        path: '/user/login', // 곧 사라질 예정 로그인 모달로 처리함
-        name: 'Login',
-        component: Login
-    },
-    {
-        path: '/user/signup',
-        name: 'Signup',
-        component: Signup
-    },
-    {
         path: '/user/profile',
         name: 'Profile',
         component: Profile
@@ -203,11 +190,6 @@ const routes = [{
     },
 
     // 지식인
-    {
-        path: '/questions/qlist',
-        name: 'Question',
-        component: Question
-    },
     {
         path: '/questions/ask',
         name: 'QuestionWrite',
