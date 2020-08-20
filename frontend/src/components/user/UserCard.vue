@@ -2,35 +2,34 @@
         <div class="card mt-2">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-5 quote">
-                        <div v-if="userThumbnail == null">
-                            <img class="rounded-circle mx-auto d-block" :src=cardUserImage alt="Card image cap" style="width:120px; height:120px;">
+                    <div class="col-6 quote">
+                        <div>
+                            <img class="rounded-circle mx-auto d-block" :src=userThumbnail alt="Card image cap" style="width:120px; height:120px; padding:4px; border:1px solid darkgrey">
                         </div>
-                        <div v-else>
-                            <img class="rounded-circle mx-auto d-block" :src=userThumbnail alt="Card image cap" style="width:120px; height:120px;">
-                        </div>
-                        <div class="d-flex justify-content-center mb-2">
-                            <h5 class="mt-1 mb-1"><b class="mr-3">{{ userInfo.nickname }}</b></h5>
-                            <button class="btn btn-success btn-sm" id="homeBt" @click="gotoBlog"><i class="fas fa-home"></i></button>
+                        <div class="mb-2">
+                            <h5 class="mt-1 mb-1"><b>{{ userInfo.nickname }}</b></h5>
                         </div>
                         <div class="location text-sm-center mb-1"><i class="far fa-envelope"></i>  {{ userInfo.uid }}</div>
                         <span><a href="/" data-toggle="modal" data-target="#staticBackdrop" style="color:gray" @click="seeFollower"><i class="fas fa-user-friends"></i> {{userInfo.followersCnt}} follower · {{userInfo.followingCnt}} following</a></span> 
                         <!-- 여기 위에 수정함 data-toggle & href 처리방법 연구필요 -->
-                        <div v-if="loginNickname == userNickname"> 
-                            <button class="btn btn-outline-info btn-sm mx-1 mt-2" @click="gotoEdit">
-                                <i class="fas fa-user-tie"></i> Edit profile
-                            </button>
-                        </div>
-                        <div v-else>
-                            <div v-if="userFCheck==false">
-                                <button class="btn btn-outline-success btn-sm mx-1 mt-2" @click="doFollow">
-                                    <i class="fas fa-user-tie"></i> 팔로우 하기
+                        <div class="d-flex justify-content-center mb-2" style="align-items: flex-end;">
+                            <button class="btn btn-outline-success btn-sm" id="homeBt" @click="gotoBlog"><i class="fas fa-home"></i> 블로그 가기</button>
+                            <div v-if="loginNickname == userNickname"> 
+                                <button class="btn btn-outline-info btn-sm mx-1 mt-2" @click="gotoEdit">
+                                    <i class="fas fa-user-tie"></i> Edit profile
                                 </button>
                             </div>
                             <div v-else>
-                                <button class="btn btn-outline-danger btn-sm mx-1 mt-2" @click="unFollow">
-                                    <i class="fas fa-user-tie"></i> 팔로우 취소
-                                </button>
+                                <div v-if="userFCheck==false">
+                                    <button class="btn btn-outline-success btn-sm mx-1 mt-2" @click="doFollow">
+                                        <i class="fas fa-user-tie"></i> 팔로우 하기
+                                    </button>
+                                </div>
+                                <div v-else>
+                                    <button class="btn btn-outline-danger btn-sm mx-1 mt-2" @click="unFollow">
+                                        <i class="fas fa-user-tie"></i> 팔로우 취소
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -100,7 +99,7 @@
 
 
                     <!-- 육성게임  -->
-                    <div class="col-6 mx-3" id="gameContent"> 
+                    <div class="col-5 mx-3" id="gameContent"> 
                         <h3 class="card-title"><b>My Level</b> </h3>
                         <div v-if="computedGrade === 'bronze'" class="mb-3">
                             <img class="grade-img" src="../../assets/img/브론즈.png" alt="">
@@ -127,28 +126,33 @@
                             <p>Master</p>
                         </div>
 
-                        <h5>다음 등급까지: ({{userScore}}/{{computedNext}})</h5>
-
                         <p>{{allUsers}}명중 {{computedRank}}위</p> 
-                        
-                        <div class="progress m-t-20">
-                            <div class="progress-bar bg-warning progress-bar-striped" aria-valuemin="0" aria-valuemax="100" :style="{ width: computedScore + '%' }" role="progressbar"> <span>{{computedScore}}%</span> </div>
+                        <div style="text-align: justify;">
+                            <div class="d-flex">
+                                <button type="button" class="btn btn-sm" id="expBtn"><b>EXP</b></button>
+                                <p style="margin-left: 10px; padding-top:3px"> ({{userScore}}/{{computedNext}})</p>
+                            </div>
+                            <div class="progress m-t-20">
+                                <div class="progress-bar bg-warning progress-bar-striped" aria-valuemin="0" aria-valuemax="100" :style="{ width: computedScore + '%' }" role="progressbar"> <span>{{computedScore}}%</span> </div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <hr>
 
                 <!--  TIL   -->
-                <h4><b>Today's Post</b></h4>
-                <br>
-                <calendar-heatmap
-                :values="valPostList"
-                :end-date= "todays"
-                tooltip-unit="posts"
-                :max="10"
-                :range-color="['ebedf0', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']" />
-                <!-- :range-color="['ebedf0', 'dae2ef', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']" -->
-                <hr>
+                <div>
+                    <h4><b>Today's Post</b></h4>
+                    <br>
+                    <calendar-heatmap
+                    :values="valPostList"
+                    :end-date= "todays"
+                    tooltip-unit="posts"
+                    :max="10"
+                    :range-color="['ebedf0', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']" />
+                    <!-- :range-color="['ebedf0', 'dae2ef', '#c0ddf9', '#73b3f3', '#3886e1', '#17459e']" -->
+                </div>
+                    <hr>
 
                 <!-- Tag chart & Today visited chart -->
                 <div class="row row-cols-2" style="height:330px">
@@ -645,6 +649,16 @@ export default {
 </script>
 
 <style scoped>
+/* @media only screen and (min-width: 400px) {
+    #home {
+        min-height: 1000px;
+        padding: 0 50px;
+        font-family: 'Noto Serif KR', serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #f4f4f4;
+    }
+} */
 .quote {
     border-right: 0.1em solid whitesmoke;
     padding: 0.5em;
@@ -698,7 +712,8 @@ export default {
     text-transform: uppercase;
 }
 .grade-img{
-    height: 70px;
+    height: 80px;
+    width: 80px;
 }
 #gameContent{
     text-align: -webkit-center;
@@ -715,6 +730,14 @@ export default {
     border-right: 0.1em solid whitesmoke;
     padding: 0.5em;
     height: 310px;
+}
+#chart{
+    margin-top:10px;
+}
+#expBtn{
+    background-color: gray;
+    height: 30px;
+    color: white;
 }
 </style>
 

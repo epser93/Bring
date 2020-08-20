@@ -32,6 +32,7 @@ export default {
 <style>
 #profile{
     min-height: 1000px;
+    min-width: 400px;
     background-color: #f4f4f4;
 }
 
