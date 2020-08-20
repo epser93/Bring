@@ -18,6 +18,7 @@
       },
       hideModal() {
         this.$refs['my-modal'].hide()
+        this.$router.go(-1)
       },
       gotoCategory() {
         this.$router.push(`/blog-category/${this.nickname}`)
