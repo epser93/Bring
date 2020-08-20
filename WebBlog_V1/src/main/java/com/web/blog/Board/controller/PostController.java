@@ -243,7 +243,7 @@ public class PostController {
 //        int num = 0;
         for (PostUploads pu : list) {
             String filep = pu.getFilePath();
-            if (!postRepository.findByPostIdAndContentContaining(post.getPostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+            if (pu.getPostId() == postId && !postRepository.findByPostIdAndContentContaining(postId, filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
                 s3Service.delete(filep);
                 postUploadsRepository.deleteById(pu.getId());
             }
@@ -256,7 +256,6 @@ public class PostController {
 //                num++;
 //            }
         }
-        postRepository.updateContent(content, post.getPostId());
 
         if (!tags.isEmpty()) {
             tagService.deleteTags(post);
