@@ -21,14 +21,13 @@ public class TodayCntScheduler {
         this.todayDateRepository = todayDateRepository;
     }
 
-    @Scheduled(cron = "0 10 1 * * ?")
+    @Scheduled(cron = "0 30 1 * * ?")
     public void initializeTodayCnt() {
         List<Member> list = memberRepository.findAll();
         LocalDate date = LocalDate.now();
-        date.minus(Period.ofDays(1));
         for (Member member : list) {
             todayDateRepository.save(TodayDate.builder()
-                    .date(date)
+                    .date(date.minus(Period.ofDays(1)))
                     .cnt(member.getTodayCnt())
                     .member(member)
                     .build());
