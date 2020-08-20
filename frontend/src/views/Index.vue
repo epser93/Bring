@@ -1,5 +1,5 @@
 <template>
-  <div id="index" style="height: 1000px; display: flex;align-items: center;">
+  <div id="index" style="height:100vh; display: flex;align-items: center;">
     <!-- <a href="http://localhost:8081/postqna/recentlypost">시작하기2</a> -->
     <div style="width:100%">
       <div class="css-typing">
@@ -180,6 +180,9 @@ export default {
   border-radius: 50%;
   text-align: center;
   margin: 20px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .circle {
