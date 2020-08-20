@@ -15,6 +15,8 @@ public interface OnlyMemberMapping {
 
     String getNickname();
 
+    String getTechStack();
+
     int getLikedpost();
 
     int getScore();

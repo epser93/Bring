@@ -23,6 +23,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<OnlyMemberMapping> findAllByNickname(String nickname);
 
+    Optional<Member> findByTechStack(String techstack);
+
     @Modifying
     @Transactional
     @Query(value = "update userinfo set today_cnt = 0 where msrl = :msrl", nativeQuery = true)
