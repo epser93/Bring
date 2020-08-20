@@ -11,7 +11,6 @@
               </div>
               <div class="contents">
                 <h4>{{ question.subject }}</h4>
-                <!-- <p>{{ question.content }}</p> -->
                 <p class="comment-date">{{ question.createdAt.substring(0,10) }} · {{ question.answerCnt }}개의 답변</p>
               </div>
             </div>
@@ -48,7 +47,7 @@
 <script>
 import axios from 'axios'
 import _ from 'lodash'
-const BACK_URL = 'http://localhost:8080'
+const BACK_URL = 'http://i3c206.p.ssafy.io/api'
 export default {
   name: 'HotPost',
   props: {

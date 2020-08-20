@@ -16,9 +16,6 @@
 </template>
  
 <script>
-// const BACK_URL = 'http://localhost:8080'
-// import axios from 'axios'
-
 export default {
   name:"Home",
   components:{
@@ -48,12 +45,10 @@ export default {
         this.mode = 'Blog'
         // 에러 헨들링
         this.$router.push({ name: 'RecentlyQuestion' }).catch(()=>{})
-        // this.getAllPost()
       } else {
         this.$cookies.set('mode',"Blog")
         this.mode = 'QnA'
         this.$router.push({ name: 'RecentlyPost' }).catch(()=>{})
-        // this.getAllPost()
       }
     },
     upScroll () {
@@ -69,19 +64,8 @@ export default {
 }
 </script>
 <style scoped>
-@media only screen and (min-width: 1000px) {
-    #home {
-        min-height: 1000px;
-        padding: 0 50px;
-        font-family: 'Noto Serif KR', serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        background-color: #f4f4f4;
-    }
-}
-
 #home {
-    min-height: 1000px;
+    min-height: 100vh;
     padding: 0 50px;
     font-family: 'Noto Serif KR', serif;
     -webkit-font-smoothing: antialiased;

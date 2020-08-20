@@ -16,8 +16,6 @@
                     </div>
                     <div class="contents">
                         <h4>{{ post.subject }}</h4>
-                        <!-- <p>{{ post.content }}</p> -->
-                        <!-- <v-md-preview :text="post.content"></v-md-preview> -->
                         <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.replyCnt }}개의 댓글</p>
                     </div>
                     </div>
@@ -37,7 +35,7 @@
 <script>
 import axios from 'axios'
 
-const BACK_URL = 'http://localhost:8080'
+const BACK_URL = 'http://i3c206.p.ssafy.io/api'
 
 export default {
     data() {

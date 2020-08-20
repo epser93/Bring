@@ -1,4 +1,4 @@
-!<template>
+<template>
   <div class="wrapB container-fluid">
     <section class="cards row">
       <div class="col-lg-10 row">
@@ -10,7 +10,6 @@
               </div>
               <div class="contents">
                 <h4>{{ post.subject }}</h4>
-                <!-- <p>{{ post.content }}</p> -->
                 <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.replyCnt }}개의 댓글</p>
               </div>
             </div>
@@ -39,8 +38,7 @@
 
 <script>
 import axios from 'axios'
-// import _ from 'lodash'
-const BACK_URL = 'http://localhost:8080'
+const BACK_URL = 'http://i3c206.p.ssafy.io/api'
 export default {
   name: 'HotPost',
   props: {
@@ -55,13 +53,10 @@ export default {
     }
   },
   created() {
-    // this.getHotPost()
-    // this.getRanking()
     this.getTags()
   },
   methods: {
     infiniteHandler ($state) {
-      console.log($state)
       axios.get(`${BACK_URL}/blog/trend?no=${this.page}`)
         .then (res => {
           if (res.data.list[0].list.length) {
@@ -90,7 +85,6 @@ export default {
         axios.get(`${BACK_URL}/questions/trend`)
           .then (res=> {
             this.postings = res.data.list[0].list
-            console.log(this.postings)
           })
           .catch (err => console.log(err))
       }
@@ -103,7 +97,6 @@ export default {
         .catch(err => console.log(err))
     },
     searchTags(tag) {
-      console.log(tag)
       this.$router.push({ name : 'TagSearch', params : { keyword : tag }})
     },
     gotoUserInfo(userNickname) {

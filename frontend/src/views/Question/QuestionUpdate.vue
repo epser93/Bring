@@ -31,7 +31,7 @@
 <script>
 
 import axios from 'axios'
-const BACK_URL = 'http://localhost:8080'
+const BACK_URL = 'http://i3c206.p.ssafy.io/api'
 
 export default {
     name:'QuestionUpdate',
@@ -63,10 +63,8 @@ export default {
         }
         axios.post(`${BACK_URL}/questions/ask/${this.qpost_id}/uploads`, formData, config)
           .then(res => {
-            console.log('업로드',res)
             this.imageServerUrl = res.data.list[0]
             insertImage({
-            // url : 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1269952892,3525182336&fm=26&gp=0.jpg',
             url : this.imageServerUrl,
             desc : '사진설명'
           })
@@ -75,8 +73,6 @@ export default {
       },
       // 이미지 업로드
       handleUploadImage(event, insertImage, files) {
-          console.log(files)
-          console.log(files[0])
           this.uploadImageDirect(files[0], insertImage)
       },
         // 질문 수정
@@ -87,8 +83,7 @@ export default {
               }
             }
             axios.put(`${BACK_URL}/questions/${this.qpost_id}`,this.questionData,config)
-            .then(res=>{
-                console.log(res)
+            .then(()=>{
                 this.$router.push({name:'QuestionDetail', params:{ nickname: this.$cookies.get('nickname'), qpostId : this.qpost_id }})
             })
             .catch(err=>{
@@ -97,7 +92,6 @@ export default {
         },
         // 기존 질문 내용 호출
         getQna() {
-          console.log(this.qpost_id)
             axios.get(`${BACK_URL}/questions/${this.qpost_id}`)
             .then(res => {
                 this.questionData.subject=res.data.list[0].list[0].subject
@@ -111,8 +105,12 @@ export default {
         },
         // 태그
         postTag() {
+          const chkpatterns = /[~!@#$%^&*()_+|<>?:{}]/;
           if (this.tag === null || this.tag.replace(/^\s*|\s*$/g, '').length === 0) {
             alert('빈칸은 태그로 입력 불가능합니다.')
+            this.tag = ""
+          } else if (chkpatterns.test(this.tag)) {
+            alert('특수문자는 입력할 수 없습니다.')
             this.tag = ""
           } else if (!this.questionData.tags.includes(this.tag)) {
             this.questionData.tags.push(this.tag)
@@ -128,7 +126,6 @@ export default {
     },
      created(){
         this.getQna()
-        
         }
     }
 

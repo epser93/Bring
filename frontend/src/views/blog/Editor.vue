@@ -48,7 +48,7 @@
 import CreateCategoryWarning from '@/components/blog/CreateCategoryWarning.vue'
 import axios from 'axios'
 
-const BACK_URL = 'http://localhost:8080'
+const BACK_URL = 'http://i3c206.p.ssafy.io/api'
 
 export default {
   name: 'Editor',
@@ -121,8 +121,13 @@ export default {
           })
     },
     postTag() {
+      const chkpatterns = /[~!@#$%^&*()_+|<>?:{}]/;
+      console.log('ggg')
       if (this.tag === null || this.tag.replace(/^\s*|\s*$/g, '').length === 0) {
         alert('빈칸은 태그로 입력 불가능합니다.')
+        this.tag = ""
+      } else if (chkpatterns.test(this.tag)) {
+        alert('특수문자는 입력할 수 없습니다.')
         this.tag = ""
       } else if (!this.aboutText.post.tags.includes(this.tag)) {
         this.aboutText.post.tags.push(this.tag)
