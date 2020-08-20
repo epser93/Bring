@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = {"A. Exception"})
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/exception")
+@RequestMapping("/api/exception")
 public class ExceptionController {
 
     @GetMapping("/entrypoint")
