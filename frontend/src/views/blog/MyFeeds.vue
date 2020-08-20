@@ -19,10 +19,10 @@
                         </div>
 
                         <div class="card-list-body p-5">
-                            <div class="card-image">
+                            <div class="card-image mb-5">
                                 <img :src="thumbnail1[index]" alt="Card image cap">
                             </div>
-                            <p class="card-list-text my-5">{{ item.content.slice(0, 200) }}</p>
+                            
 
                             <div class="d-flex justify-content-between">
                                 <a class="py-3 px-5" @click="gotoDetail(item, index)">글 더보기</a>

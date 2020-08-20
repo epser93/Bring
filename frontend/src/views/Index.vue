@@ -14,7 +14,7 @@
     </div>
 
     <!-- 이동 버튼 부분 -->
-    <router-link :to="{ name : 'RecentlyPost' }"><div class="circle">start</div></router-link>
+    <router-link :to="{ name : 'RecentlyPost' }"><div class="circle"><h4>start</h4></div></router-link>
   </div>
 </template>
 
@@ -177,7 +177,6 @@ export default {
   border: 3px solid rgb(94, 94, 94);
   border-radius: 50%;
   text-align: center;
-  line-height: 85px;
   margin: 20px auto;
 }
 
@@ -203,6 +202,14 @@ export default {
   -moz-transform: scale(1.1);
   -ms-transform: scale(1.1);
   -o-transform: scale(1.1);
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+h4 {
+  margin-top: 25px;
 }
 
 </style>

@@ -71,6 +71,10 @@ export default {
 </script>
 
 <style>
+#myanswers {
+    min-height: 1000px;
+}
+
 .card-wrapper{
     background-color: white;
     border: 1px solid #e7e7e7
