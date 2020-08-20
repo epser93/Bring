@@ -39,9 +39,8 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 v-if="selectFollow == true" class="modal-title" id="staticBackdropLabel">{{ userInfo.nickname }}'s</h5>
-
                                     <h5 v-else class="modal-title" id="staticBackdropLabel">{{ userInfo.nickname }}'s</h5>
-                                   
+                        
                                     <toggle-button v-model="selectFollow"
                                         :value="true"
                                         :color="{checked: '#82C7EB', unchecked: '#A6D608'}"
@@ -63,8 +62,8 @@
                                             <div v-else class="row row-cols-2">
                                                 <li v-for="user in followerUserImg" v-bind:key="user.nickname" class="listFollow col">
                                                     <div class="d-flex" id="modalFollow">
-                                                        <img class="rounded-circle" :src=user.img alt="Card image cap" style="width:50px; height:50px; border-style: outset;">
-                                                        <a :href="$router.resolve({name: 'Profile', query: { nickname: user.nickname }}).href">{{ user.nickname }}</a>                                                        
+                                                        <img class="rounded-circle" :src=user.img alt="Card image cap" id="mFollow1">
+                                                        <a :href="$router.resolve({name: 'Profile', query: { nickname: user.nickname }}).href"> {{ user.nickname }}</a>                                                        
                                                         <!-- <router-link :to="{ name: 'Profile', query: { nickname: user.nickname }}" data-dismiss="modal">{{ user.nickname }}</router-link> -->
                                                     </div>
                                                 </li>
@@ -78,8 +77,8 @@
                                             <div v-else class="row row-cols-2">
                                                 <li v-for="user in followingUserImg" v-bind:key="user.nickname" class="listFollow col">
                                                     <div class="d-flex" id="modalFollow">
-                                                        <img class="rounded-circle" :src=user.img alt="Card image cap" style="width:50px; height:50px; border-style: outset;">
-                                                        <a :href="$router.resolve({name: 'Profile', query: { nickname: user.nickname }}).href">{{ user.nickname }}</a>
+                                                        <img class="rounded-circle" :src=user.img alt="Card image cap" id="mFollow2">
+                                                        <a :href="$router.resolve({name: 'Profile', query: { nickname: user.nickname }}).href"> {{ user.nickname }}</a>
                                                         <!-- <router-link :to="{ name: 'Profile', query: { nickname: user.nickname }}" data-dismiss="modal">{{ user.nickname }}</router-link> -->
                                                     </div>
                                                 </li>
@@ -673,7 +672,7 @@ export default {
     list-style: none;
     padding: 5px 0px 5px 5px;
     margin-bottom: 5px;
-    border-bottom: 1px solid #efefef;
+    /* border-bottom: 1px solid #efefef; */
     font-size: 18px;
 }
 .listGroup{
@@ -682,7 +681,7 @@ export default {
 }
 #modalFollow{
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: left;
 }
 #chart{
     width:300px;
@@ -733,6 +732,25 @@ export default {
     padding: 0;
     color: white;
     width: 20%;
+}
+#mFollow1{
+    width:55px; 
+    height:55px; 
+    padding:2px;
+    border:1px solid darkgrey; 
+    margin-right:10px;
+    margin-left:10px;
+}
+#mFollow2{
+    width:55px; 
+    height:55px; 
+    padding:2px;
+    border:1px solid darkgrey; 
+    margin-right:10px;
+    margin-left:10px;
+}
+.modal-title{
+    margin-right: 5px;
 }
 </style>
 

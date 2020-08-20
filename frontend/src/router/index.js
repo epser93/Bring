@@ -41,6 +41,9 @@ import SearchQuestions from '../components/common/SearchQuestions.vue'
 import TagSearch from '../components/common/TagSearch.vue'
 import TagSearchQuestions from '../components/common/TagSearchQuestions.vue'
 
+// about
+import About from '../components/common/About.vue'
+
 Vue.use(VueRouter)
 
 const routes = [{
@@ -205,6 +208,12 @@ const routes = [{
         name: 'QuestionUpdate',
         component: QuestionUpdate
     },
+    // about
+    {
+        path: '/about',
+        name: 'About',
+        component: About
+    }
 
 ]
 

@@ -26,7 +26,9 @@
                     <li class="nav-item ml-5">
                         <router-link v-if="isLogin" :to="{ name: 'MyBlog', params: { nickname: this.nickname }}" class="nav-link">BRING</router-link> 
                     </li>  
-
+                    <li class="nav-item ml-5">
+                        <router-link v-if="isLogin" :to="{ name: 'About' }" class="nav-link">ABOUT</router-link> 
+                    </li>  
                     <li class="nav-item ml-5" id="logout">
                         <p v-if="isLogin" @click="logout" class="nav-link">LOGOUT</p> 
                     </li>
