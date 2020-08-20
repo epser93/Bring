@@ -57,4 +57,4 @@ deploy-front:
     script :
         - ls -al ~/s03p13c206/frontend/dist
     tags :
-        - i02prf6
+        - i3c206
