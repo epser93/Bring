@@ -23,11 +23,12 @@
         </div>
       </div>
 
-      <div class="tag-list-wrap col-lg-2">
-        <h4>인기 태그</h4>
-        <ul class="tag-list text-left">
-          <li @click="searchTags(tag)" v-for="(tag, index) in tags.slice(0,10)" :key="index" class="mb-3 pl-5 trendtags">
-              # {{ tag }}
+      <div class="tag-list-wrap col-lg-2 p-0 ml-4">
+        <h4 class="mb-2">인기 태그</h4>
+        <h5>TOP 30</h5>
+        <ul class="tagcloud text-left mt-3">
+          <li @click="searchTags(tag)" v-for="(tag, index) in tags.slice(0,30)" :key="index" class="tag-cloud-link">
+              {{ tag }}
           </li> 
         </ul>
       </div>
@@ -175,5 +176,28 @@ p {
 }
 .trendtags {
   cursor: pointer;
+}
+
+.tagcloud {
+  padding: 0; }
+  .tagcloud li {
+    cursor: pointer;
+    text-transform: uppercase;
+    display: inline-block;
+    padding: 4px 10px;
+    margin-bottom: 7px;
+    margin-right: 4px;
+    border-radius: 4px;
+    color: #000000;
+    border: 1px solid #ccc;
+    font-size: 11px; }
+    .tagcloud a:hover {
+      transition-duration: 0.5s;
+      border: 1px solid #000; }
+
+.tagcloud li:hover {
+  color: #56dbc9;
+  text-decoration: none;
+  transition-duration: 0.3s;
 }
 </style>

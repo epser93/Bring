@@ -4,7 +4,6 @@
       <div class="col-lg-10 row">
         <div v-for="(post, index) in list" :key="index" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
           <div class=cardwrap>
-            <div v-if="post.selectOver" id="solved">solved!</div>
             <div class="card-body p-0" @click="gotoQuestionDetail(post)">
               <div class="img-section" :style="{ 'background-image' : `url(${thumbnails[index]})`}">
                 <a href=""></a>
@@ -23,21 +22,22 @@
         </div>
       </div>
 
-      <div class="tag-list-wrap col-lg-2">
+      <div class="tag-list-wrap col-lg-2 p-0 ml-4">
         <h4>명예의전당</h4>
-        <ul class="tag-list">
+        <ul class="tag-list text-left px-3">
           <li v-for="(ranker, index) in sortRanking.slice(0,5)" :key="index" @click="gotoUserInfo(ranker.nickname)" id="ranker">
-              {{ index + 1 }}등 : {{ranker.nickname}}({{ ranker.score}}점)
+              <span class="mr-2" style="color: gray;">{{ index + 1 }}위</span>{{ranker.nickname}}<span class="float-right">{{ ranker.score}}점</span>
           </li> 
         </ul>
-
-        <h4 class="mt-5">인기 태그</h4>
-        <ul class="tag-list text-left">
-          <li @click="searchTags(tag)" v-for="(tag, index) in tags.slice(0,5)" :key="index" class="mb-3 pl-5 trendtags">
-              # {{ tag }}
+        
+        <h4 class="mt-5 mb-2">인기 태그</h4>
+        <h5>TOP 20</h5>
+        <ul class="tagcloud text-left mt-3">
+          <li @click="searchTags(tag)" v-for="(tag, index) in tags.slice(0,20)" :key="index" class="tag-cloud-link">
+              {{ tag }}
           </li> 
         </ul>
-      </div>
+      </div>   
     </section>
     <infinite-loading @infinite="infiniteHandler"></infinite-loading>   
   </div>
@@ -68,7 +68,6 @@ export default {
             this.page += 1
             this.list.push(...res.data.list[0].list)
             this.thumbnails.push(...res.data.list[1].list)
-            console.log(this.list)
             $state.loaded()
           } else {
             $state.complete()
@@ -115,15 +114,6 @@ export default {
 </script>
 
 <style>
-#solved{
-  transform: rotate(-30deg);
-  width: 70px;
-  background: #a2ffe8;
-  border-radius: 10px;
-  position: absolute;
-  left: -20px;
-  top: -10px;
-}
 h2 {
   width:100%;
   margin-bottom: 30px;
@@ -147,8 +137,7 @@ h2 {
 }
 
 .cardwrap {
-  box-shadow: 10px 0px 60px -40px black;
-  position: relative;
+  box-shadow: 10px 0px 60px -40px black
 }
 
 .img-section {

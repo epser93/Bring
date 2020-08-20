@@ -120,6 +120,7 @@ export default {
             this.categoryOn = 1
             axios.get(`${BACK_URL}/questions/${this.nickname}/qlist?no=${this.numOfPage}`, config)
                 .then(res => {
+                    this.totalNum = res.data.list[2].list
                     // 포스트 정보
                     this.postList = res.data.list[0].list
                     // 썸네일
@@ -202,6 +203,7 @@ export default {
 
             // 페이지네이션 관련
             numOfPage: 1,
+            totalNum : 0,
         }
     },
 }

@@ -58,12 +58,10 @@ export default {
                 this.numOfPosts = this.numOfPosts + this.tagNum[item] 
             }
             this.totalNum = this.numOfPosts
-            console.log(this.totalNum)
         },
 
         // blogPosts.vue로 페이지 넘버 보내기(이벤트버스)
         sendCurrentPage(currentPage) {
-            console.log(currentPage)
             EventBus.$emit("paging2", currentPage)
         },
         setTotalPageNum(num) {

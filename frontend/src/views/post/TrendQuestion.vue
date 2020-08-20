@@ -23,18 +23,19 @@
         </div>
       </div>
 
-      <div class="tag-list-wrap col-lg-2">
+      <div class="tag-list-wrap col-lg-2 p-0 ml-4">
         <h4>명예의전당</h4>
-        <ul class="tag-list">
+        <ul class="tag-list text-left px-3">
           <li v-for="(ranker, index) in sortRanking.slice(0,5)" :key="index" @click="gotoUserInfo(ranker.nickname)" id="ranker">
-              {{ index + 1 }}등 : {{ranker.nickname}}({{ ranker.score}}점)
+              <span class="mr-2" style="color: gray;">{{ index + 1 }}위</span>{{ranker.nickname}}<span class="float-right">{{ ranker.score}}점</span>
           </li> 
         </ul>
-
-        <h4 class="mt-5">인기 태그</h4>
-        <ul class="tag-list text-left">
-          <li @click="searchTags(tag)" v-for="(tag, index) in tags.slice(0,5)" :key="index" class="mb-3 pl-5 trendtags">
-              # {{ tag }}
+        
+        <h4 class="mt-5 mb-2">인기 태그</h4>
+        <h5>TOP 20</h5>
+        <ul class="tagcloud text-left mt-3">
+          <li @click="searchTags(tag)" v-for="(tag, index) in tags.slice(0,20)" :key="index" class="tag-cloud-link">
+              {{ tag }}
           </li> 
         </ul>
       </div>   
