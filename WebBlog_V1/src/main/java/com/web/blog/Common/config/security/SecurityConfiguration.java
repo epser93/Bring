@@ -40,7 +40,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/*/in/**", "/*/up/**", "/*/in", "/*/up", "/*/register/**", "*/social/**", "/*/kakao/**", "/api/**").permitAll()
                 .antMatchers("/exception/**", "/search/**", "/blog/**", "/reply/**", "/tags/**","/questions/**", "/answers/**", "/follow/**", "/*/search/**", "/favicon.ico", "/*/rank/**", "/member/user/*", "/**/profile/", "/member/**", "/**/likedposts/").permitAll()
                 .antMatchers("/*/users").hasRole("ADMIN")
-                .antMatchers(HttpMethod.POST, "/sign/out/**", "/sign/out/").authenticated()
+                .antMatchers(HttpMethod.POST, "/api/sign/out/**", "/api/sign/out/").authenticated()
                 .anyRequest().hasRole("USER")
                 .and()
                 .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
