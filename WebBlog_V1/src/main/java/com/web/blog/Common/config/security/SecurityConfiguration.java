@@ -37,10 +37,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/*/in/**", "/*/up/**", "/*/out/**", "/*/out/", "/*/in", "/*/up", "/*/register/**", "*/social/**", "/*/kakao/**", "/api/**").permitAll()
-                .antMatchers("/exception/**", "/search/**", "/blog/**", "/reply/**", "/tags/**","/questions/**", "/answers/**", "/follow/**", "/*/search/**", "/favicon.ico", "/*/rank/**", "/member/user/*", "/**/profile/", "/member/**", "/**/likedposts/").permitAll()
-                .antMatchers("/*/users").hasRole("ADMIN")
-                .antMatchers(HttpMethod.POST, "/api/sign/out/**", "/api/sign/out/").authenticated()
+                .antMatchers("/*/in/**", "/*/up/**", "/*/out/**", "/*/out/", "/*/in", "/*/up", "/*/register/**", "*/social/**", "/*/kakao/**").permitAll()
+                .antMatchers("/*/exception/**", "/*/search/**", "/*/blog/**", "/*/reply/**", "/*/tags/**","/*/questions/**", "/*/answers/**", "/*/follow/**", "/*/search/**", "/*/favicon.ico", "/*/rank/**", "/*/member/user/*", "/**/profile/", "/*/member/**", "/**/likedposts/").permitAll()
+                .antMatchers("/**/users").hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST, "/*/sign/out/**", "/*/sign/out/").authenticated()
                 .anyRequest().hasRole("USER")
                 .and()
                 .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
@@ -65,7 +65,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers("/*/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/swagger/**");
+        web.ignoring().antMatchers("/**/api-docs", "/*/swagger-resources/**", "/*/swagger-ui.html", "/*/webjars/**", "/*/swagger/**");
         web.httpFirewall(defaultHttpFirewall());
     }
 
