@@ -48,7 +48,7 @@
 import CreateCategoryWarning from '@/components/blog/CreateCategoryWarning.vue'
 import axios from 'axios'
 
-const BACK_URL = 'http://i3c206.p.ssafy.io'
+const BACK_URL = 'http://i3c206.p.ssafy.io:80'
 
 export default {
   name: 'Editor',
