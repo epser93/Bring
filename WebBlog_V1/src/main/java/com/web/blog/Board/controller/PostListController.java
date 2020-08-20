@@ -156,7 +156,7 @@ public class PostListController {
                 }
                 cnt++;
             }
-            if(logined.get().getMsrl() != member.getMsrl()) {
+            if (logined.get().getMsrl() != member.getMsrl()) {
                 String ip = followService.getIpAddr(request);
                 Optional<IpAddrForTodayCnt> ipAddr = ipAddrForTodayCntRepository.findByIpAndNickname(ip, member.getNickname());
                 if (!ipAddr.isPresent()) {

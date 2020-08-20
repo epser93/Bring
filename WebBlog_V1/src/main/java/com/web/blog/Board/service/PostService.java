@@ -37,8 +37,6 @@ public class PostService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final BoardService boardService;
-    private final TagService tagService;
-    private final ReplyService replyService;
     private final PostUploadsRepository postUploadsRepository;
     private final PostUploadsService postUploadsService;
     private final S3Service s3Service;
@@ -242,9 +240,4 @@ public class PostService {
         }
         return true;
     }
-
-//    @CachePut(value = "post-count", key = "#ip + '|' + #postId")
-//    public String getIpForCnt(String ip, long postId) {
-//
-//    }
 }

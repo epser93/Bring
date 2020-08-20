@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Board extends CommonDateEntity implements Serializable{
+public class Board extends CommonDateEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long boardId;
@@ -22,7 +22,8 @@ public class Board extends CommonDateEntity implements Serializable{
     @Column(nullable = false, length = 100)
     private String name;
 
-    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})     //No serializer found for class org.hibernate.proxy.pojo.bytebuddy.ByteBuddyInterceptor and no properties discovered to create BeanSerializer //아마 LAZY 로딩으로 인한 오류같음. hibernateLazyInitializer로 수정.
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    //No serializer found for class org.hibernate.proxy.pojo.bytebuddy.ByteBuddyInterceptor and no properties discovered to create BeanSerializer //아마 LAZY 로딩으로 인한 오류같음. hibernateLazyInitializer로 수정.
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "msrl")
     private Member member;

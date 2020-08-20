@@ -122,12 +122,12 @@ public class PostReplyController {
         List<ReplyUploads> list = replyUploadsRepository.findAllByNickname(logined.get().getNickname());
         String content = reply.getReply();
         int num = 0;
-        for(ReplyUploads ru : list) {
+        for (ReplyUploads ru : list) {
             String filep = ru.getFilePath();
-            if(ru.getReplyId() == -100 && !replyRepository.findByReplyIdAndReplyContaining(reply.getReplyId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+            if (ru.getReplyId() == -100 && !replyRepository.findByReplyIdAndReplyContaining(reply.getReplyId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
                 s3Service.delete(filep);
                 replyUploadsRepository.deleteById(ru.getId());
-            } else if(ru.getReplyId() == -100 && postRepository.findByPostIdAndContentContaining(reply.getReplyId(), filep).isPresent()) {
+            } else if (ru.getReplyId() == -100 && postRepository.findByPostIdAndContentContaining(reply.getReplyId(), filep).isPresent()) {
                 String original = ru.getFilePath();
                 String rename = s3Service.rename(filep, ru.getFileName(), reply.getReplyId(), num, logined.get().getNickname());
                 replyUploadsRepository.updateFilePath(rename, ru.getId());
@@ -154,12 +154,12 @@ public class PostReplyController {
         List<ReplyUploads> list = replyUploadsRepository.findAllByNickname(logined.get().getNickname());
         String content = reply.getReply();
         int num = 0;
-        for(ReplyUploads ru : list) {
+        for (ReplyUploads ru : list) {
             String filep = ru.getFilePath();
-            if(ru.getReplyId() == -100 && !replyRepository.findByReplyIdAndReplyContaining(reply.getReplyId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+            if (ru.getReplyId() == -100 && !replyRepository.findByReplyIdAndReplyContaining(reply.getReplyId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
                 s3Service.delete(filep);
                 replyUploadsRepository.deleteById(ru.getId());
-            } else if(ru.getReplyId() == -100 && postRepository.findByPostIdAndContentContaining(reply.getReplyId(), filep).isPresent()) {
+            } else if (ru.getReplyId() == -100 && postRepository.findByPostIdAndContentContaining(reply.getReplyId(), filep).isPresent()) {
                 String original = ru.getFilePath();
                 String rename = s3Service.rename(filep, ru.getFileName(), reply.getReplyId(), num, logined.get().getNickname());
                 replyUploadsRepository.updateFilePath(rename, ru.getId());

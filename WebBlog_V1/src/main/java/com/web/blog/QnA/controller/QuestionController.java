@@ -127,12 +127,12 @@ public class QuestionController {
         List<QpostUploads> list = qpostUploadsRepository.findAllByNickname(member.get().getNickname());
         String content = qpost.getContent();
         int num = 0;
-        for(QpostUploads qu : list) {
+        for (QpostUploads qu : list) {
             String filep = qu.getFilePath();
-            if(qu.getQpostId() == -100 && !qpostRepository.findByQpostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+            if (qu.getQpostId() == -100 && !qpostRepository.findByQpostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
                 s3Service.delete(filep);
                 qpostUploadsRepository.deleteById(qu.getId());
-            } else if(qu.getQpostId() == -100 && qpostRepository.findByQpostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) {
+            } else if (qu.getQpostId() == -100 && qpostRepository.findByQpostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) {
                 String original = qu.getFilePath();
                 String rename = s3Service.rename(filep, qu.getFileName(), qpost.getQpostId(), num, member.get().getNickname());
                 qpostUploadsRepository.updateFilePath(rename, qu.getId());
@@ -171,12 +171,12 @@ public class QuestionController {
         List<QpostUploads> list = qpostUploadsRepository.findAllByNickname(member.get().getNickname());
         String content = qpost.getContent();
         int num = 0;
-        for(QpostUploads qu : list) {
+        for (QpostUploads qu : list) {
             String filep = qu.getFilePath();
-            if(qu.getQpostId() == -100 && !qpostRepository.findByQpostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+            if (qu.getQpostId() == -100 && !qpostRepository.findByQpostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
                 s3Service.delete(filep);
                 qpostUploadsRepository.deleteById(qu.getId());
-            } else if(qu.getQpostId() == -100 && qpostRepository.findByQpostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) {
+            } else if (qu.getQpostId() == -100 && qpostRepository.findByQpostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) {
                 String original = qu.getFilePath();
                 String rename = s3Service.rename(filep, qu.getFileName(), qpost.getQpostId(), num, member.get().getNickname());
                 qpostUploadsRepository.updateFilePath(rename, qu.getId());
