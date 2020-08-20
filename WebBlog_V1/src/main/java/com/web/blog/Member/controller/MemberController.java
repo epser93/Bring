@@ -187,9 +187,12 @@ public class MemberController {
             localDates.add(td.getDate());
             counts.add(td.getCnt());
         }
+        List<String> techStacks = new ArrayList<>();
+        techStacks.add(profile.get(0).getTechStack());
         result.add(responseService.getListResult(visitorCnt));
         result.add(responseService.getListResult(localDates)); //투데이 반영 (00시00분에 업로드, 즉 전날까지의 데이터만!)
         result.add(responseService.getListResult(counts)); //투데이 카운트 (00시00분에 업로드, 즉 전날까지의 데이터만!)
+        result.add(responseService.getListResult(techStacks));
         //유저가 좋아요 한 글 개수
         repository.updateLikeCnt(postMemberRepository.likedPostCnt(member.getMsrl()), member.getMsrl());
 
