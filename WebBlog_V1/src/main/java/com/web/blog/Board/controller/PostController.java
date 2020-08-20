@@ -293,16 +293,16 @@ public class PostController {
             @ApiImplicitParam(name = "X-AUTH-TOKEN", value = "로그인 성공 후 access_token", required = true, dataType = "String", paramType = "header")
     })
     @ApiOperation(value = "게시글 공유", notes = "게시글 공유")
-    @PostMapping(value = "/blog/{nickname}/{boardName}/share/{postId}")
-    public ListResult<SingleResult> sharePost(@PathVariable String nickname, @PathVariable String boardName, @PathVariable long postId) throws IOException {
+    @PostMapping(value = "/blog/{boardName}/share/{postId}")
+    public ListResult<SingleResult> sharePost(@PathVariable String boardName, @PathVariable long postId) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new); //로그인 한 사용자
-        Member member2 = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new); //공유할 블로그의 주인
         ParamPost paramPost = new ParamPost();
 
         //postId 는 공유할 포스트의 아이디!
         Optional<OnlyPostMapping> post = postRepository.findAllByPostId(postId); //공유할 포스트 정보 불러오기
+        Member member2 = memberRepository.findByNickname(post.get().getMember_nickname()).orElseThrow(CUserNotFoundException::new); //공유할 블로그의 주인
         long post_id = post.get().getPostId();
         Optional<Member> writer = memberRepository.findByNickname(post.get().getMember_nickname()); //공유된 포스트의 작성자
         if (post.get().getOriginal() != -1) throw new CSharedPostException();
