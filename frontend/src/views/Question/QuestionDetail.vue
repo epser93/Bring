@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="questionDetail">
       <div class="container">
         <!-- 글쓴이 정보 -->
         <div class="info text-center my-5">
@@ -9,8 +9,8 @@
             <span class="mr-2" @click="gotoProfile(qPost.member_nickname)"><strong>{{ qPost.member_nickname }}</strong></span>
             <!-- 분기처리/ 작성자와 현재 사용자의 이름이 같으면 삭제표시되게끔-->
             <div v-if="this.nickname===qPost.member_nickname" class="text-right">
-                <button class="btn btn-outline-danger btn-sm mx-1" @click="deleteQna(qpost_id)" ><b-icon icon="trash"></b-icon> 삭제</button>
-                <button class="btn btn-outline-warning btn-sm mx-1" @click="modifyQna(qpost_id)"><b-icon icon="pen"></b-icon>수정</button>
+                <a class="mx-1" @click="deleteQna(qpost_id)" ><b-icon icon="trash"></b-icon> 삭제</a>
+                <a class="mx-1" @click="modifyQna(qpost_id)"><b-icon icon="pen"></b-icon>수정</a>
             </div>
             <!-- 태그부분 -->
             <div class="tag">
@@ -27,26 +27,23 @@
         <div class=" text-left" style="margin: 100px 0 50px;">
             <i class="far fa-eye ml-1"></i> {{ qPost.views }}
         </div>
+
+        <!--답변 -->       
+        <h3 class="mt-5 mb-4 text-left">{{aPost.length}} 개의 답변</h3>
         <!-- 댓글 입력 부분 -->
         <div id="commentTextArea" v-if="!qPost.selectOver">
             <span v-if="writeComment">
-              <div>
-                  <b-form-textarea
-                      id="textarea-rows"
-                      placeholder="댓글을 작성해주세요!"
-                      rows="4"
-                      v-model="answerData.answer"
-                  ></b-form-textarea>
-              </div>
-                <div class="row">
-                    <div class="col-6"></div>
-                    <div class="col-4"></div>
-                    <div class="col-2 mt-2 pl-3">
-                        <button class="btn btn-success btn-sm ml-1" v-if="!updateAnswer" @click='writeAnswer'><b-icon icon="pencil-square"></b-icon> 답변 작성</button>
-                        <button class="btn btn-success btn-sm ml-2" v-if="updateAnswer" @click='modifyAnswer'>답변 수정</button>
-                        <button class="btn btn-secondary btn-sm ml-2" @click='commentClose'>닫기</button>
-                    </div>
+                <div>
+                    <b-form-textarea
+                        id="textarea-rows"
+                        placeholder="댓글을 작성해주세요!"
+                        rows="4"
+                        v-model="answerData.answer"
+                    ></b-form-textarea>
                 </div>
+                <a class="float-right" v-if="!updateAnswer" @click='writeAnswer'><b-icon icon="pencil-square"></b-icon> 작성</a>
+                <a class="float-right" v-if="updateAnswer" @click='modifyAnswer'>수정</a>
+                <a class="float-right" @click='commentClose'>닫기</a>
             </span>
             <span v-else class="d-flex flex-row">
                 <a class="p-2" @click='commentOpen' >답변창 열기</a>
@@ -76,9 +73,7 @@
                 </div>
             </div>
         </div>
-        </div>
-        <hr>
-
+        
         <!--채택되지 않은 답변-->
         <div class="row-12" v-for="(aArticle,index) in aPost" :key="aArticle.apostId">
             <div v-if="aArticle.selected===false">
@@ -93,18 +88,16 @@
                 <span>{{ aArticle.createdAt.slice(0,10) }}</span>
                  <!-- 수정 삭제 버튼-->
                 <span v-if="(nickname===aArticle.member_nickname)" class="ml-1">
-                    <button class="btn btn-outline-danger btn-sm mx-1" @click="deleteAnswer(aArticle.apostId)" v-if="selectedAnswer===false"><b-icon icon="trash"></b-icon>삭제</button>
-                    <button class="btn btn-outline-warning btn-sm mx-1" @click='modifyAnswerOpen(aArticle)' v-if="selectedAnswer===false"><b-icon icon="pen"></b-icon>수정</button>
+                    <a class="mx-1" @click="deleteAnswer(aArticle.apostId)" v-if="selectedAnswer===false"><b-icon icon="trash"></b-icon>삭제</a>
+                    <a class="mx-1" @click='modifyAnswerOpen(aArticle)' v-if="selectedAnswer===false"><b-icon icon="pen"></b-icon>수정</a>
                 </span>
                 <span v-else class="ml-1">
-                    <button class="btn btn-outline-danger btn-sm mx-1" @click="deleteAnswer(aArticle.apostId)" v-if="(nickname===aArticle.member_nickname)"><b-icon icon="trash"></b-icon>삭제</button>
-                    <button class="btn btn-outline-warning btn-sm mx-1" @click='modifyAnswerOpen(aArticle)' v-if="nickname===aArticle.member_nickname "><b-icon icon="pen"></b-icon>수정</button>
-                    <button class="btn btn-outline-primary btn-sm mx-1" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false)"><b-icon icon="check-circle" class="mb-1"></b-icon> 채택</button>
+                    <a class="mx-1" @click="deleteAnswer(aArticle.apostId)" v-if="(nickname===aArticle.member_nickname)"><b-icon icon="trash"></b-icon>삭제</a>
+                    <a class="mx-1" @click='modifyAnswerOpen(aArticle)' v-if="nickname===aArticle.member_nickname "><b-icon icon="pen"></b-icon>수정</a>
+                    <a class="mx-1" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false)"><b-icon icon="check-circle" class="mb-1"></b-icon> 채택</a>
                 </span>
-
-                </p>
-                <hr>
-               
+                </p> 
+                <hr>             
             </div>
         </div>
     </div>
@@ -179,7 +172,6 @@ export default {
         },
         // 게시물 삭제
         deleteQna(qpost_id){
-            console.log(qpost_id)
             const config = {
               headers: {
                 'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
@@ -188,11 +180,10 @@ export default {
             const questionDelete = confirm("질문을 삭제 하시겠습니까?")
             if (questionDelete===true) {
             axios.delete(`${BACK_URL}/questions/${qpost_id}`,config)
-            .then(res=>{
-                console.log(res)
-                alert('삭제가 완료 되었습니다.')
+            .then(
+                alert('삭제가 완료 되었습니다.'),
                 this.$router.push({ name: 'MyQuestions', params: { nickname : this.nickname } })
-            })
+            )
             .catch(err=>{
                 alert('답변이 달린 질문은 수정이나 삭제할 수 없습니다.')
                 console.log(err)
@@ -201,7 +192,6 @@ export default {
         },
         // 게시물 수정
         modifyQna(qpost_id){
-            console.log(this.qpost_id)
             this.$router.push({name:'QuestionUpdate', params:{qpostId: qpost_id}})
         },
         // 답변 작성
@@ -212,12 +202,11 @@ export default {
               }
             }
             axios.post(`${BACK_URL}/answers/${this.qpost_id}`,this.answerData,config)
-            .then(res=>{
-                this.writeComment = false
-                this.answerData.answer=""
+            .then(
+                this.writeComment = false,
+                this.answerData.answer="",
                 this.getAnswer() // 페이지 리로딩
-                console.log(res)
-            })
+            )
             .catch(err=>{
                 alert("더 이상 답변을 작성 할 수 없습니다")
                 console.log(err)
@@ -251,7 +240,6 @@ export default {
         },
         // 답변 삭제
         deleteAnswer(aPostId){
-            console.log(aPostId)
             const config = {
               headers: {
                 'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
@@ -260,11 +248,10 @@ export default {
             const askDelete = confirm("답변을 삭제 하시겠습니까?")
             if (askDelete===true) {
             axios.delete(`${BACK_URL}/answers/${aPostId}`,config)
-            .then(res=>{
-                alert('삭제가 완료 되었습니다.')
+            .then(
+                alert('삭제가 완료 되었습니다.'),
                 this.getAnswer()
-                console.log(res)
-            })
+            )
             .catch(err=>{
                 alert('권한이 없습니다.')
                 console.log(err)
@@ -311,11 +298,10 @@ export default {
             const askAdopt = confirm("답변을 채택 하시겠습니까?")
             if (askAdopt===true) {
             axios.post(`${BACK_URL}/answers/select/${aPostId}`,this.answerData,config)
-            .then(res=>{
-                alert("채택 되었습니다")
+            .then(
+                alert("채택 되었습니다"),
                 this.getAnswer()
-                console.log(res)
-            })
+            )
             .catch(()=>{
                 this.getAnswer()
             })
@@ -329,12 +315,11 @@ export default {
                 }
             }
             axios.put(`${BACK_URL}/answers/${this.answerData_id}`,this.answerData,config)
-            .then(res=>{
-                this.getAnswer()
-                this.updateAnswer=false
+            .then(
+                this.getAnswer(),
+                this.updateAnswer=false,
                 this.writeComment=false
-                console.log(res)
-            })
+            )
             .catch(err=>{
                 console.log(err)
             })
@@ -357,7 +342,6 @@ export default {
     created(){
         this.getQna()
         this.getAnswer()
-        
         }
 }
 </script>
@@ -387,5 +371,27 @@ strong {
 
 .tag {
     cursor: pointer;
+}
+
+#questionDetail a {
+    padding: 5px 10px;
+    cursor: pointer;
+    text-decoration: none;
+    transition-duration: 0.3s;
+    border: 1px solid #e7e7e7;
+}
+
+#questionDetail a:hover {
+    color: #56dbc9 !important;
+    border: 1px solid #99c9c2 !important;
+}
+
+#textarea-rows {
+  border: 1px solid #c0c0c0;
+  border-radius: 0;
+}
+
+#textarea-rows:focus {
+  border: 1px solid #56dbc9 !important;
 }
 </style>
