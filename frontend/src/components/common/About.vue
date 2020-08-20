@@ -1,6 +1,6 @@
 <template>
   <div class="aboutTem">
-      <div class="container">
+      <div class="container-about">
           <div class="content-section">
             <div class="">
                 <img src="../../assets/img/aboutUs.png" id="logoImg" alt="">
@@ -40,8 +40,8 @@ export default {
     height:25%;
     margin:5px;
 }
-.container{
-    padding:6em
+.container-about{
+    padding:4em
 }
 .content-section{
     background-color: white;
