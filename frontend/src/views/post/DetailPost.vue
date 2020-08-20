@@ -94,7 +94,7 @@
 <script>
 import axios from 'axios'
 import _ from 'lodash'
-const BACK_URL = 'http://localhost:8080'
+const BACK_URL = 'http://i3c206.p.ssafy.io'
 
 export default {
     name:'DetailPost',
