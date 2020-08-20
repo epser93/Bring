@@ -16,7 +16,7 @@
 </template>
  
 <script>
-// const BACK_URL = 'http://localhost:8080'
+// const BACK_URL = 'http://i3c206.p.ssafy.io/api'
 // import axios from 'axios'
 
 export default {

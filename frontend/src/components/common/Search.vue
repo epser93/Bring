@@ -37,7 +37,7 @@
 <script>
 import axios from 'axios'
 
-const BACK_URL = 'http://localhost:8080'
+const BACK_URL = 'http://i3c206.p.ssafy.io/api'
 
 export default {
     data() {
@@ -61,7 +61,6 @@ export default {
                     if (res.data.list[0].list.length) {
                         this.page += 1
                         this.postList.push(...res.data.list[0].list)
-                        console.log(this.postList)
                         this.thumbnails.push(...res.data.list[2].list)
                         $state.loaded()
                     } else {

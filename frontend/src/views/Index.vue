@@ -1,6 +1,6 @@
 <template>
   <div id="index" style="height:100vh; display: flex;align-items: center;">
-    <!-- <a href="http://localhost:8081/postqna/recentlypost">시작하기2</a> -->
+    <!-- <a href="http://i3c206.p.ssafy.io/postqna/recentlypost">시작하기2</a> -->
     <div style="width:100%">
       <div class="css-typing">
         <p>

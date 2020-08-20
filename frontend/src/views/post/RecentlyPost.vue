@@ -39,7 +39,7 @@
 
 <script>
 import axios from 'axios'
-const BACK_URL = 'http://localhost:8080'
+const BACK_URL = 'http://i3c206.p.ssafy.io/api'
 
 export default {
   name: 'RecentlyPost',
@@ -89,7 +89,6 @@ export default {
         .catch(err => console.log(err))
     },
     searchTags(tag) {
-
       this.$router.push({ name : 'TagSearch', params : { keyword : tag }})
     }
   },

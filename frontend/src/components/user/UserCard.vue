@@ -35,7 +35,7 @@
                     </div>
 
                     <div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-scrollable modal-sm">
+                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-sm">
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 v-if="selectFollow == true" class="modal-title" id="staticBackdropLabel">{{ userInfo.nickname }}'s</h5>
@@ -101,38 +101,42 @@
                     <!-- 육성게임  -->
                     <div class="col-5 mx-3" id="gameContent"> 
                         <h3 class="card-title"><b>My Level</b> </h3>
-                        <div v-if="computedGrade === 'bronze'" class="mb-3">
+                        <div v-if="computedGrade === 'bronze'" class="mb-4">
                             <img class="grade-img" src="../../assets/img/브론즈.png" alt="">
                             <p>Bronze</p>
                         </div>
-                        <div v-else-if="computedGrade === 'silver'" class="mb-3">
+                        <div v-else-if="computedGrade === 'silver'" class="mb-4">
                             <img class="grade-img" src="../../assets/img/실버.png" alt="">
                             <p>Silver</p>
                         </div>
-                        <div v-else-if="computedGrade === 'gold'" class="mb-3">
+                        <div v-else-if="computedGrade === 'gold'" class="mb-4">
                             <img class="grade-img" src="../../assets/img/골드.png" alt="">
                             <p>Gold</p>
                         </div>
-                        <div v-else-if="computedGrade === 'platinum'" class="mb-3">
+                        <div v-else-if="computedGrade === 'platinum'" class="mb-4">
                             <img class="grade-img" src="../../assets/img/플래티넘.png" alt="">
                             <p>Platinum</p>
                         </div>
-                        <div v-else-if="computedGrade === 'diamond'" class="mb-3">
+                        <div v-else-if="computedGrade === 'diamond'" class="mb-4">
                             <img class="grade-img" src="../../assets/img/다이아.png" alt="">
                             <p>Diamond</p>
                         </div>
-                        <div v-else class="mb-3">
+                        <div v-else class="mb-4">
                             <img class="grade-img" src="../../assets/img/마스터.png" alt="">
                             <p>Master</p>
                         </div>
-
-                        <p>{{allUsers}}명중 {{computedRank}}위</p> 
                         <div style="text-align: justify;">
                             <div class="d-flex">
-                                <button type="button" class="btn btn-sm" id="expBtn"><b>EXP</b></button>
-                                <p style="margin-left: 10px; padding-top:3px"> ({{userScore}}/{{computedNext}})</p>
+                                <button type="button" class="btn btn-sm" id="expBtn1"><b>EXP</b></button>
+                                <span style="background-color: whitesmoke; width:40%;">
+                                    <p style="padding-top:3px; text-align-last: center; font-size:15px">({{userScore}}/{{computedNext}})</p>
+                                </span>
+                                 <button type="button" class="btn btn-sm" id="expBtn2"><b>RANK</b></button>
+                                <span style="background-color: whitesmoke; width:20%;">
+                                    <p style="padding-top:3px; text-align-last: center; font-size:15px"><b>{{computedRank}}위</b></p>
+                                </span>
                             </div>
-                            <div class="progress m-t-20">
+                            <div class="progress m-t-20" style="height: 20px;">
                                 <div class="progress-bar bg-warning progress-bar-striped" aria-valuemin="0" aria-valuemax="100" :style="{ width: computedScore + '%' }" role="progressbar"> <span>{{computedScore}}%</span> </div>
                             </div>
                         </div>
@@ -183,7 +187,7 @@ import moment from 'moment'
 import { CalendarHeatmap } from 'vue-calendar-heatmap'
 import VueApexCharts from 'vue-apexcharts'
 
-const BACK_URL = 'http://127.0.0.1:8080'
+const BACK_URL = 'http://i3c206.p.ssafy.io/api'
 
 
 
@@ -712,11 +716,12 @@ export default {
     text-transform: uppercase;
 }
 .grade-img{
-    height: 80px;
-    width: 80px;
+    height: 100px;
+    width: 100px;
 }
 #gameContent{
     text-align: -webkit-center;
+    padding:0;
 }
 .card-body{
     margin:auto;
@@ -734,10 +739,19 @@ export default {
 #chart{
     margin-top:10px;
 }
-#expBtn{
+#expBtn1{
     background-color: gray;
     height: 30px;
+    padding: 0;
     color: white;
+    width: 20%;
+}
+#expBtn2{
+    background-color: gray;
+    height: 30px;
+    padding: 0;
+    color: white;
+    width: 20%;
 }
 </style>
 

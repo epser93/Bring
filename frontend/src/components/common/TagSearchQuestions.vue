@@ -37,7 +37,7 @@
 <script>
 import axios from 'axios'
 
-const BACK_URL = 'http://localhost:8080'
+const BACK_URL = 'http://i3c206.p.ssafy.io/api'
 
 export default {
     data() {

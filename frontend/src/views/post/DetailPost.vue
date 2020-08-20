@@ -94,7 +94,7 @@
 <script>
 import axios from 'axios'
 import _ from 'lodash'
-const BACK_URL = 'http://localhost:8080'
+const BACK_URL = 'http://i3c206.p.ssafy.io/api'
 
 export default {
     name:'DetailPost',
@@ -416,6 +416,7 @@ export default {
     border: 1px solid #ccc;
     font-size: 11px; }
     .tagcloud a:hover {
+      color: #56dbc9;
       transition-duration: 0.5s;
       border: 1px solid #000; }
 

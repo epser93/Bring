@@ -20,7 +20,7 @@
                         {{ value }}
                     </button>
                 </div>
-                <input v-model="keyword" placeholder="키워드 입력" aria-label="Search">
+                <input v-model="keyword" placeholder="블로그 내 검색" aria-label="Search">
                 <a class="mx-2">
                     <router-link @click.native="setTotalPageNum(-1)"  :to="{ name: 'MyBlog' , query : { k: keyword, type: this.keywordType.keyid }}"><i class="fas fa-search"></i></router-link>
                 </a>
@@ -40,7 +40,6 @@
                 </div>
             </div>
             
-            
             <!-- 태그 리스트 -->
             <h5 class="mt-5">태그</h5>
             <div class="tagcloud" style="width: 330px;">
@@ -57,7 +56,7 @@ import axios from 'axios'
 import BlogPagination from '../blog/BlogPagination.vue'
 import { EventBus } from '../../event-bus.js'
 
-const BACK_URL = 'http://localhost:8080'
+const BACK_URL = 'http://i3c206.p.ssafy.io/api'
 
 export default {
     name: 'MyList',
@@ -111,12 +110,10 @@ export default {
         },
         // blogPosts.vue로 페이지 넘버 보내기(이벤트버스)
         sendCurrentPage(currentPage) {
-            console.log(currentPage)
             EventBus.$emit("paging", currentPage)
         },
         setTotalPageNum(num) {
             this.totalNum = num
-            console.log(this.totalNum)
         }       
     },
     
@@ -177,7 +174,7 @@ input {
     line-height : normal; /* line-height 초기화 */ 
     padding: .7em .5em; /* 원하는 여백 설정, 상하단 여백으로 높이를 조절 */ 
     font-family: inherit; /* 폰트 상속 */ 
-    border: 1px solid #999; 
+    border: 1px solid rgb(202, 202, 202); 
     border-radius: 0; /* iSO 둥근모서리 제거 */ 
     outline-style: none; /* 포커스시 발생하는 효과 제거를 원한다면 */ 
     -webkit-appearance: none; /* 브라우저별 기본 스타일링 제거 */ 
@@ -196,6 +193,16 @@ button {
     padding: .7em .5em; /* 원하는 여백 설정, 상하단 여백으로 높이를 조절 */ 
     font-family: inherit; /* 폰트 상속 */ 
     border-radius: 0; /* iSO 둥근모서리 제거 */ 
+}
+
+button:hover {
+  background-color: #56dbc9;
+  border: 1px solid #56dbc9;
+}
+
+button:focus {
+  background-color: #56dbc9 !important;
+  border: 1px solid #56dbc9 !important;
 }
 
 .tagcloud {

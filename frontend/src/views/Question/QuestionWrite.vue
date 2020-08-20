@@ -30,12 +30,13 @@
 <script>
 
 import axios from 'axios'
-const BACK_URL = 'http://localhost:8080'
+const BACK_URL = 'http://i3c206.p.ssafy.io/api'
 
 export default {
    name: 'QuestionWrite',
     data() {
       return {
+        nickname: this.$cookies.get('nickname'),
         questionData:{
           content:"",
           subject:"",       
@@ -59,7 +60,6 @@ export default {
         }
         axios.post(`${BACK_URL}/questions/ask/uploads`, formData, config)
           .then(res => {
-            console.log('업로드',res)
             this.imageServerUrl = res.data.list[0]
             insertImage({
             // url : 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1269952892,3525182336&fm=26&gp=0.jpg',
@@ -71,8 +71,6 @@ export default {
       },
       // 이미지 업로드
       handleUploadImage(event, insertImage, files) {
-          console.log(files)
-          console.log(files[0])
           this.uploadImageDirect(files[0], insertImage)
       },
       // 게시물 작성
@@ -83,8 +81,9 @@ export default {
               }
             }
         axios.post(`${BACK_URL}/questions/ask`,this.questionData,config)
-        .then(res=>{
-          this.$router.push({name : 'QuestionDetail', params:{ nickname: this.$cookies.get('nickname'), qpostId : res.data.list[0].data.qpostId}})
+        .then(res => {
+          console.log(res.data)
+          this.$router.push({ name : 'QuestionDetail', params: { nickname: this.nickname, qpostId: res.data.list[0].data.qpostId}})
         })
         .catch(err=>{
           console.log(err)
@@ -106,12 +105,8 @@ export default {
       deleteTag(index) {
         this.questionData.tags.splice(index,1)
       },
-        
-
-        
-
     }
-      }
+}
 
 </script>
 
