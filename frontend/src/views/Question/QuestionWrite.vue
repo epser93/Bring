@@ -116,19 +116,9 @@ export default {
 #closeTag {
   opacity: 0.5;
 }
-@media only screen and (min-width: 1000px) {
-  .wrapper {
-    width: 80% !important;
-    margin: 0 auto;
-    background-color: white;
-    border: 1px solid #e7e7e7;
-    margin-bottom: 200px;
-}
-}
-
 
 #editor {
-    min-height: 1000px;
+    min-height: 100vh;
     background-color: #f4f4f4;
 }
 

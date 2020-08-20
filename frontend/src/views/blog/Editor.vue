@@ -90,7 +90,6 @@ export default {
         .then(res => {
           this.imageServerUrl = res.data.list[0]
           insertImage({
-          // url : 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1269952892,3525182336&fm=26&gp=0.jpg',
           url : this.imageServerUrl,
           desc : '사진설명'
         })
@@ -122,7 +121,6 @@ export default {
     },
     postTag() {
       const chkpatterns = /[~!@#$%^&*()_+|<>?:{}]/;
-      console.log('ggg')
       if (this.tag === null || this.tag.replace(/^\s*|\s*$/g, '').length === 0) {
         alert('빈칸은 태그로 입력 불가능합니다.')
         this.tag = ""
@@ -172,19 +170,9 @@ export default {
 #closeTag {
   opacity: 0.5;
 }
-@media only screen and (min-width: 1000px) {
-  .wrapper {
-    width: 80% !important;
-    margin: 0 auto;
-    background-color: white;
-    border: 1px solid #e7e7e7;
-    margin-bottom: 200px;
-}
-}
-
 
 #editor {
-    min-height: 1000px;
+    min-height: 100vh;
     background-color: #f4f4f4;
 }
 
