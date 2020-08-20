@@ -7,11 +7,11 @@
         <button type="button" class="toggle-btn" @click="loginToggle">Login</button>
         <button type="button" class="toggle-btn" @click="registerToggle">Register</button>
       </div>
-      <div class="social-icons">
+      <!-- <div class="social-icons">
         <i class="fab fa-github fa-3x"></i>
         <i class="fab fa-facebook-square fa-3x"></i>
         <i class="fab fa-google fa-3x"></i>
-      </div>
+      </div> -->
       <form id="login" class="input-group">
         <input type="text" class="input-field" placeholder="User Id" v-model="loginData.id" required>
         <input type="password" class="input-field" placeholder="Enter Password" v-model="loginData.password" required>
@@ -113,7 +113,7 @@ export default {
 
 .button-box {
   width: 220px;
-  margin: 2px auto;
+  margin: 50px auto;
   position: relative;
   box-shadow: 0px 0px 5px 2px #56dbc9;
   border-radius: 30px;

@@ -87,13 +87,11 @@ export default {
       }
       axios.post(`${BACK_URL}/blog/${this.nickname}/${this.boardName}/${this.post_id}/uploads`, formData, config)
         .then(res => {
-          console.log('업로드',res)
           this.imageServerUrl = res.data.list[0]
           insertImage({
-          // url : 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1269952892,3525182336&fm=26&gp=0.jpg',
-          url : this.imageServerUrl,
-          desc : '사진설명'
-        })
+            url : this.imageServerUrl,
+            desc : '사진설명'
+          })
         })
         .catch(err => console.log(err))
     },
@@ -102,11 +100,7 @@ export default {
       if (this.boardName === "default" || this.boardName === null) {
         alert('카테고리 먼저 정해주세요')
       } else {
-        console.log(this.boardName)
-        console.log(files)
-        console.log(files[0])
         this.uploadImageDirect(files[0], insertImage)
-        console.log(this.imageServerUrl + "하이")
       }
     },
     updatePost () {
@@ -117,8 +111,6 @@ export default {
       }
       axios.put(`${BACK_URL}/blog/${this.nickname}/${this.boardName}/${this.post_id}`, this.postData, config)
         .then(() => {
-
-          console.log('포스트데이터',this.postData)
           this.$router.go(-1)
         })
         .catch(err => console.log(err))
@@ -145,8 +137,12 @@ export default {
     },
 
     postTag() {
+      const chkpatterns = /[~!@#$%^&*()_+|<>?:{}]/;
       if (this.tag === null || this.tag.replace(/^\s*|\s*$/g, '').length === 0) {
         alert('빈칸은 태그로 입력 불가능합니다.')
+        this.tag = ""
+      } else if (chkpatterns.test(this.tag)) {
+        alert('특수문자는 입력할 수 없습니다.')
         this.tag = ""
       } else if (!this.postData.tags.includes(this.tag)) {
         this.postData.tags.push(this.tag)
@@ -155,7 +151,6 @@ export default {
         alert('중복된 태그입니다.')
         this.tag= ""
       }
-      console.log('태그추가', this.postData.tags)
     },
     deleteTag(index) {
       this.postData.tags.splice(index,1)

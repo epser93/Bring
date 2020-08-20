@@ -10,8 +10,6 @@
               </div>
               <div class="contents">
                 <h4>{{ post.subject }}</h4>
-                <!-- <p>{{ post.content }}</p> -->
-                <!-- <v-md-preview :text="post.content"></v-md-preview> -->
                 <p class="comment-date">{{ post.createdAt.substring(0,10) }} · {{ post.replyCnt }}개의 댓글</p>
               </div>
             </div>
@@ -93,7 +91,6 @@ export default {
     }
   },
   created() {
-    // this.Init()
     this.getTags()
   },
 }
