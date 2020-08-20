@@ -408,7 +408,6 @@ export default {
         const myNick = this.userInfo.nickname
         const lenUserList = this.allUsers
         let ranks = this.userRank
-        //console.log(ranks)
         let rank = 0
         ranks.sort(compareSecondColumn);
 
@@ -451,10 +450,8 @@ export default {
                 'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
                 }
         }
-        //console.log(this.userInfo.msrl)
         axios.post(`${BACK_URL}/follow/${this.userInfo.msrl}`, {msrl:this.userInfo.msrl}, config)
             .then(() => {
-                //console.log("팔로우완료")
                 this.Init()
             })
             .catch((err) => {
@@ -469,7 +466,6 @@ export default {
             }
         axios.delete(`${BACK_URL}/follow/${this.userInfo.msrl}`, config)
             .then(() => {
-                //console.log("팔로우취소")
                 this.Init()
             })
             .catch((err) => {
@@ -481,7 +477,6 @@ export default {
       },
 
     Init() {
-        console.log('init')
         const config = {
             headers: {
             'X-AUTH-TOKEN': this.$cookies.get('X-AUTH-TOKEN')
@@ -489,12 +484,10 @@ export default {
         }
     
         this.userNickname = this.$route.query.nickname
-        //console.log(this.loginNickname)
         this.loginNickname = this.$cookies.get('nickname')
 
         axios.get(`${BACK_URL}/member/${this.userNickname}/profile`,config)
         .then(res => {
-            console.log(res)
             this.userInfo = res.data.list[0].list[0]
             this.userFCheck = res.data.list[1].list[0]
             this.userFingList = res.data.list[2].list
@@ -534,7 +527,6 @@ export default {
                 for(var j=0; j<lenFer; j++){
                     tmpFerUser = {nickname:this.userFerList[0][j], img:this.userFerList[1][j]}
                     getFerUser.push(tmpFerUser)
-                    console.log(getFerUser)
                 }
 
                 this.followerUserImg = getFerUser
@@ -546,11 +538,9 @@ export default {
                 for(var p=0; p<lenFing; p++){
                     tmpFingUser = {nickname:this.userFingList[0][p], img:this.userFingList[1][p]}
                     getFingUser.push(tmpFingUser)
-                    // console.log(getFingUser)
                 }
 
                 this.followingUserImg = getFingUser
-                //console.log(this.followingUserImg)
             }
 
             // Today 계산
@@ -559,17 +549,11 @@ export default {
             var tmpCnt = []
             tmpDate.push(tmpToday)
             tmpCnt.push(this.userTodays)
-            console.log(tmpDate + "/////////" + tmpCnt)
             var dateLen = this.userVistDate.length
-            console.log(dateLen)
-
-
             var dayAgo = new Date()
             for(var z=1; z<5; z++){
                 dayAgo.setDate(dayAgo.getDate() - 1)
-                
                 tmpDate.push(dayAgo.toJSON().slice(0,10))
-                console.log(tmpDate)
                 if(dateLen - z >= 0){
                     if(tmpDate[i] == this.userVistDate[dateLen - z]){
                         tmpCnt.push(this.userVistCnt[dateLen - z])
@@ -614,8 +598,6 @@ export default {
             var tmpTagList = []
             var tmpTagCnt = []
             var sumETC = 0
-            console.log(tmpTagList)
-            console.log(tmpTagCnt)
             for(var i=0; i<this.userTagList.length; i++){
                 if(i >= 4){
                     sumETC += this.userTagCnt[i]
@@ -637,7 +619,6 @@ export default {
             else{
                 this.checkTag = false
             }
-            console.log(this.donutOptions.labels)
 
         })
         .catch((err) => {
