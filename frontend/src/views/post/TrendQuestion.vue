@@ -4,6 +4,7 @@
       <div class="col-lg-10 row">
         <div v-for="(question, index) in list" :key="question.qpostId" class="card1 col-lg-3 col-md-4 col-sm-6 col-12">
           <div class="cardwrap">
+            <div v-if="question.selectOver" id="solved">solved!</div>
             <div class="card-body p-0" @click="gotoQuestionDetail(question)">
               <div class="img-section" :style="{ 'background-image' : `url(${thumbnails[index]})`}">
                 <a href=""></a>
