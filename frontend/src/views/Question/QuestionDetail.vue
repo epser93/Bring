@@ -191,7 +191,7 @@ export default {
             .then(res=>{
                 console.log(res)
                 alert('삭제가 완료 되었습니다.')
-                this.$router.push({ name: 'Question' })
+                this.$router.push({ name: 'MyQuestions', params: { nickname : this.nickname } })
             })
             .catch(err=>{
                 alert('답변이 달린 질문은 수정이나 삭제할 수 없습니다.')

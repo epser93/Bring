@@ -10,7 +10,7 @@
             <span class="vertical-line mx-3"></span>
             <span class="mr-2" @click="gotoProfile(member_nickname)" id="post_writer"><strong>{{ member_nickname }}</strong></span>
             <div class="text-right">
-              <button class="btn btn-outline-warning btn-sm mx-1" v-if="(member_nickname === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="updatePost"><b-icon icon="trash"></b-icon> 수정</button>
+              <button class="btn btn-outline-warning btn-sm mx-1" v-if="(member_nickname === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="updatePost"><b-icon icon="pen"></b-icon> 수정</button>
               <button class="btn btn-outline-danger btn-sm mx-1" v-if="(member_nickname === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="deletePost"><b-icon icon="trash"></b-icon> 삭제</button>
           </div>
         </div>
@@ -247,7 +247,7 @@ export default {
             axios.delete(`${BACK_URL}/blog/${this.nickname}/${this.board_name}/${this.post_id}`,config)
               .then(() =>{
                 alert('삭제되었습니다!')
-                this.$router.push({ name : 'Home' })
+                this.$router.push({ name: 'MyBlog', params: { nickname : this.nickname } })
               })
           }
         },
