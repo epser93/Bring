@@ -32,10 +32,9 @@ public class IpAddrForViewCnt implements Serializable {
     Long timeout;
 
     @Builder
-    public IpAddrForViewCnt(String ip, Long postId, Long qpostId, Long timeout) {
+    public IpAddrForViewCnt(String ip, Long postId, Long qpostId) {
         this.ip = ip;
         this.postId = postId;
         this.qpostId = qpostId;
-        this.timeout = timeout;
     }
 }

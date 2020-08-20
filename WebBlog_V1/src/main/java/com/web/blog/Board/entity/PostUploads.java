@@ -18,14 +18,21 @@ public class PostUploads {
     @Column(columnDefinition = "TEXT")
     private String filePath;
 
+    @Column(columnDefinition = "TEXT")
+    private String fileName;
+
+    private String nickname;
+
     private Long postId;
 
     private int num;
 
     @Builder
-    public PostUploads(Long id, String filePath, Long postId, int num) {
+    public PostUploads(Long id, String filePath, String fileName, String nickname, Long postId, int num) {
         this.id = id;
         this.filePath = filePath;
+        this.fileName = fileName;
+        this.nickname = nickname;
         this.postId = postId;
         this.num = num;
     }
