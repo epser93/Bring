@@ -318,5 +318,8 @@ export default {
   background-color: whitesmoke;
   height: 180px;
 }
+#editProfile{
+  min-height: 1000px;
+}
 
 </style>
