@@ -19,7 +19,7 @@
 
 ###  ERD 다이어그램
 
-![KakaoTalk_20200720_134050036](C:\Users\multicampus\Desktop\2학기 ssafy\2주차\s03p12c206\README.assets\KakaoTalk_20200720_134050036.png)
+![ERD_Diagram](https://dp02rmdt3p3bw.cloudfront.net/ERD_Diagram.PNG)
 
 > **필수**
 >
