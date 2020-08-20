@@ -26,7 +26,7 @@ public class WebBlogV1Application {
     }
 
     public static void main(String[] args) {
-        System.setProperty("user.timezone", "UTC+9");
+        System.setProperty("user.timezone", "UTC+9"); 
         SpringApplication app = new SpringApplication(WebBlogV1Application.class);
         app.addListeners(new ApplicationPidFileWriter());
         app.run(args);
