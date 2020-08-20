@@ -49,7 +49,10 @@ Vue.use(VueRouter)
 const routes = [{
         path: '/',
         name: 'Index',
-        component: Index
+        component: Index,
+        meta: {
+            header:1
+        },
     },
     {
         path: '/postqna',
