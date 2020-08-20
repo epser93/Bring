@@ -72,8 +72,6 @@ public class SignController {
     @ApiOperation(value = "로그인", notes = "이메일을 이용한 로그인")
     @PostMapping("/in")
     public String login(@Valid @RequestBody LoginParam user, HttpServletRequest request) throws JsonProcessingException {
-//        LocalDateTime dateTime = LocalDateTime.now();
-//        System.out.println(dateTime.toString());
         Calendar calendar = Calendar.getInstance();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -89,8 +87,8 @@ public class SignController {
         ObjectMapper mapper = new ObjectMapper();
         String Json = "";
         Json = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(responseService.getMapResult(jwtTokenProvider.createToken(String.valueOf(member.getMsrl()), member.getRoles()), member));
-//        HttpSession session = request.getSession();
-//        session.setAttribute("member", member);
+        HttpSession session = request.getSession();
+        session.setAttribute("member", member.getMsrl());
         return Json;
     }
 

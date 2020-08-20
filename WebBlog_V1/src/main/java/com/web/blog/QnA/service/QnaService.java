@@ -150,7 +150,7 @@ public class QnaService {
                 .postId(postId)
                 .build();
 
-        if(postId != -1) {
+        if (postId != -1) {
             qpostRepository.updateAnswerCnt(qpost.getQpostId());
         }
         return apostRepository.save(apost);

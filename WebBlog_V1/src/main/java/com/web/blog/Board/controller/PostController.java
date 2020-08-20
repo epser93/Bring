@@ -143,7 +143,7 @@ public class PostController {
                 filePaths.add(ud.getImgFullPath());
             }
         }
-        if(logined.isPresent() && logined.get().getMsrl() != writer.get().getMsrl()) {
+        if (logined.isPresent() && logined.get().getMsrl() != writer.get().getMsrl()) {
             String ip = followService.getIpAddr(request);
             Optional<IpAddrForViewCnt> ipAddrQ = ipAddrForViewCntRepository.findByIpAndPostId(ip, postId);
             if (!ipAddrQ.isPresent()) {
