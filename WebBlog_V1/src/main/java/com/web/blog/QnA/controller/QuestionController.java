@@ -21,9 +21,7 @@ import com.web.blog.Member.model.OnlyMemberMapping;
 import com.web.blog.Member.repository.IpAddrForTodayCntRepository;
 import com.web.blog.Member.repository.IpAddrForViewCntRepository;
 import com.web.blog.Member.repository.MemberRepository;
-import com.web.blog.Member.repository.ProfileImgRepository;
 import com.web.blog.Member.service.FollowService;
-import com.web.blog.Member.service.ProfileImgService;
 import com.web.blog.QnA.entity.Qpost;
 import com.web.blog.QnA.entity.QpostUploads;
 import com.web.blog.QnA.model.OnlyApostMapping;
@@ -33,7 +31,6 @@ import com.web.blog.QnA.repository.QpostRepository;
 import com.web.blog.QnA.repository.QpostUploadsRepository;
 import com.web.blog.QnA.service.QTagService;
 import com.web.blog.QnA.service.QnaService;
-import com.web.blog.QnA.service.QpostUploadsService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -67,9 +64,6 @@ public class QuestionController {
     private final TagService tagService;
     private final S3Service s3Service;
     private final QpostUploadsRepository qpostUploadsRepository;
-    private final QpostUploadsService qpostUploadsService;
-    private final ProfileImgRepository profileImgRepository;
-    private final ProfileImgService profileImgService;
     private final IpAddrForTodayCntRepository ipAddrForTodayCntRepository;
     private final IpAddrForViewCntRepository ipAddrForViewCntRepository;
 
@@ -91,8 +85,8 @@ public class QuestionController {
                     .ip(ip)
                     .postId((long) -1)
                     .qpostId(qpostId)
-                    .timeout((long)10800)
                     .build();
+            checkCnt.setTimeout(10800L);
             ipAddrForViewCntRepository.save(checkCnt);
             qpostRepository.updateViewCnt(qpostId);
         }
@@ -101,8 +95,8 @@ public class QuestionController {
             IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
                     .ip(ip)
                     .nickname(writer.get().getNickname())
-                    .timeout((long)86400)
                     .build();
+            checkCnt.setTimeout(86400L);
             ipAddrForTodayCntRepository.save(checkCnt);
             memberRepository.updateTodayCnt(writer.get().getMsrl());
             memberRepository.updateTotalCnt(writer.get().getMsrl());
@@ -135,7 +129,6 @@ public class QuestionController {
         for(QpostUploads qu : list) {
             String filep = qu.getFilePath();
             if(qu.getQpostId() == -100 && !qpostRepository.findByQpostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
-                System.out.println("IF");
                 s3Service.delete(filep);
                 qpostUploadsRepository.deleteById(qu.getId());
             } else if(qu.getQpostId() == -100 && qpostRepository.findByQpostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) {
@@ -144,7 +137,6 @@ public class QuestionController {
                 qpostUploadsRepository.updateFilePath(rename, qu.getId());
                 qpostUploadsRepository.updateQpostId(qpost.getQpostId(), qu.getId());
                 content = content.replace(original, rename);
-                System.out.println(content);
                 num++;
             }
         }
@@ -166,23 +158,33 @@ public class QuestionController {
     @ApiOperation(value = "질문 수정", notes = "질문 수정")
     @PutMapping(value = "/{qpostId}")
     public ListResult<SingleResult> updateQuestion(@Valid @RequestBody ParamQpost paramQpost, @PathVariable long qpostId) throws IOException {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Member member = (Member) principal;
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> member = Optional.ofNullable(memberRepository.findAllByUid(uid));
         ParamPost paramPost = new ParamPost();
-
         Set<String> tags = paramQpost.getTags();
         List<SingleResult> result = new ArrayList<>();
         Qpost qpost1 = qpostRepository.findById(qpostId).get();
         if (qpost1.getSelectOver()) throw new CSelectedAnswerException();
-        Qpost qpost = qnaService.updateQuestion(member, qpostId, paramQpost);
-        List<QpostUploads> list = qpostUploadsRepository.findAllByQpostId(qpost.getQpostId());
+        Qpost qpost = qnaService.updateQuestion(member.get(), qpostId, paramQpost);
+        List<QpostUploads> list = qpostUploadsRepository.findAllByNickname(member.get().getNickname());
+        String content = qpost.getContent();
+        int num = 0;
         for(QpostUploads qu : list) {
             String filep = qu.getFilePath();
-            if(!qpostRepository.findByQpostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+            if(qu.getQpostId() == -100 && !qpostRepository.findByQpostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
                 s3Service.delete(filep);
                 qpostUploadsRepository.deleteById(qu.getId());
+            } else if(qu.getQpostId() == -100 && qpostRepository.findByQpostIdAndContentContaining(qpost.getQpostId(), filep).isPresent()) {
+                String original = qu.getFilePath();
+                String rename = s3Service.rename(filep, qu.getFileName(), qpost.getQpostId(), num, member.get().getNickname());
+                qpostUploadsRepository.updateFilePath(rename, qu.getId());
+                qpostUploadsRepository.updateQpostId(qpost.getQpostId(), qu.getId());
+                content = content.replace(original, rename);
+                num++;
             }
         }
+        qpostRepository.updateContent(content, qpost.getQpostId());
         if (!tags.isEmpty()) {
             qTagService.deleteQtags(qpost);
             for (String tag : tags) {
@@ -243,7 +245,6 @@ public class QuestionController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
-        Optional<List<Qpost>> list = qpostRepository.findAllByMember_Nickname(logined.getNickname());
         return responseService.getListResult(qnaService.saveFiles(-100, logined.getNickname(), files));
     }
 

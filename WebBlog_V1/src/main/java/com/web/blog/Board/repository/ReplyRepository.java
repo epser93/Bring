@@ -29,6 +29,11 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
 
     @Modifying
     @Transactional
+    @Query(value = "update reply set reply = :reply where reply_id = :reply_id", nativeQuery = true)
+    int updateReply(@Param("reply") String reply, @Param("reply_id") long reply_id);
+
+    @Modifying
+    @Transactional
     @Query(value = "update reply set selected = true where reply_id = :reply_id", nativeQuery = true)
     int select(@Param("reply_id") long reply_id);
 

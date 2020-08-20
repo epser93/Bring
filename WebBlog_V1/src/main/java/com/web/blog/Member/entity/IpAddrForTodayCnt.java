@@ -30,9 +30,8 @@ public class IpAddrForTodayCnt implements Serializable {
     Long timeout;
 
     @Builder
-    public IpAddrForTodayCnt(String ip, String nickname, Long timeout) {
+    public IpAddrForTodayCnt(String ip, String nickname) {
         this.ip = ip;
         this.nickname = nickname;
-        this.timeout = timeout;
     }
 }

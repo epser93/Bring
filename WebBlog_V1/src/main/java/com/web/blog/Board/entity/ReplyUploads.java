@@ -18,14 +18,21 @@ public class ReplyUploads {
     @Column(columnDefinition = "TEXT")
     private String filePath;
 
+    @Column(columnDefinition = "TEXT")
+    private String fileName;
+
+    private String nickname;
+
     private Long replyId;
 
     private int num;
 
     @Builder
-    public ReplyUploads(Long id, String filePath, Long replyId, int num) {
+    public ReplyUploads(Long id, String filePath, String fileName, String nickname, Long replyId, int num) {
         this.id = id;
         this.filePath = filePath;
+        this.fileName = fileName;
+        this.nickname = nickname;
         this.replyId = replyId;
         this.num = num;
     }

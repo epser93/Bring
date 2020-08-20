@@ -72,25 +72,35 @@ public class PostController {
     public ListResult<SingleResult> post(@PathVariable String boardName, @Valid @RequestBody ParamPost paramPost, @PathVariable String nickname) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
-        Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
-        Member member2 = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
+        Optional<Member> logined = memberRepository.findByUid(uid);
+        Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
         Set<String> tagSet = paramPost.getTags();
         List<String> tags = new ArrayList<>(tagSet);
         List<SingleResult> result = new ArrayList<>();
 
         paramPost.setOriginal((long) -1); //공유출처 없이 내가 직접 작성한 것
         Post post = null;
-        if (member.equals(member2)) { //블로그 주인과 로그인 한 사용자가 같으면~
-            post = postService.writePost(boardName, paramPost, member, "");
-            List<PostUploads> list = postUploadsRepository.findAllByPostId(post.getPostId());
-            for(PostUploads pu : list) {
-                String filep = pu.getFilePath();
-                if(!postRepository.findByPostIdAndContentContaining(post.getPostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
-                    s3Service.delete(filep);
-                    postUploadsRepository.deleteById(pu.getId());
-                }
+        if (logined.get().getMsrl() == member.getMsrl()) {
+            post = postService.writePost(boardName, paramPost, logined.get(), "");
+        }
+        List<PostUploads> list = postUploadsRepository.findAllByNickname(logined.get().getNickname());
+        String content = post.getContent();
+        int num = 0;
+        for (PostUploads pu : list) {
+            String filep = pu.getFilePath();
+            if (pu.getPostId() == -100 && !postRepository.findByPostIdAndContentContaining(post.getPostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+                s3Service.delete(filep);
+                postUploadsRepository.deleteById(pu.getId());
+            } else if (pu.getPostId() == -100 && postRepository.findByPostIdAndContentContaining(post.getPostId(), filep).isPresent()) {
+                String original = pu.getFilePath();
+                String rename = s3Service.rename(filep, pu.getFileName(), post.getPostId(), num, logined.get().getNickname());
+                postUploadsRepository.updateFilePath(rename, pu.getId());
+                postUploadsRepository.updatePostId(post.getPostId(), pu.getId());
+                content = content.replace(original, rename);
+                num++;
             }
         }
+        postRepository.updateContent(content, post.getPostId());
 
         if (!tags.isEmpty()) {
             for (String tag : tags) {
@@ -140,8 +150,8 @@ public class PostController {
                     .ip(ip)
                     .postId(postId)
                     .qpostId((long) -1)
-                    .timeout((long)10800)
                     .build();
+            checkCnt.setTimeout(10800L);
             ipAddrForViewCntRepository.save(checkCnt);
             postRepository.updateViewCnt(postId);
         }
@@ -150,8 +160,8 @@ public class PostController {
             IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
                     .ip(ip)
                     .nickname(writer.get().getNickname())
-                    .timeout((long)86400)
                     .build();
+            checkCnt.setTimeout(86400L);
             ipAddrForTodayCntRepository.save(checkCnt);
             memberRepository.updateTodayCnt(writer.get().getMsrl());
             memberRepository.updateTotalCnt(writer.get().getMsrl());
@@ -216,24 +226,35 @@ public class PostController {
     public ListResult<SingleResult> post(@PathVariable String boardName, @PathVariable long postId, @Valid @RequestBody ParamPost paramPost, @PathVariable String nickname) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
-        Member member = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
-        Member member2 = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
+        Optional<Member> logined = memberRepository.findByUid(uid);
+        Member member = memberRepository.findByNickname(nickname).orElseThrow(CUserNotFoundException::new);
         Set<String> tag1 = paramPost.getTags();
         List<String> tags = new ArrayList<>(tag1);
         List<SingleResult> result = new ArrayList<>();
 
         Post post = new Post();
-        if (member.equals(member2)) { //블로그 주인과 로그인 한 사용자가 같으면~~
-            post = postService.updatePost(boardName, postId, member.getMsrl(), paramPost);
-            List<PostUploads> list = postUploadsRepository.findAllByPostId(post.getPostId());
-            for(PostUploads pu : list) {
-                String filep = pu.getFilePath();
-                if(!postRepository.findByPostIdAndContentContaining(post.getPostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
-                    s3Service.delete(filep);
-                    postUploadsRepository.deleteById(pu.getId());
-                }
+        if (logined.get().getMsrl() == member.getMsrl()) {
+            post = postService.updatePost(boardName, postId, logined.get().getMsrl(), paramPost);
+        }
+        List<PostUploads> list = postUploadsRepository.findAllByNickname(logined.get().getNickname());
+        String content = post.getContent();
+        int num = 0;
+        for (PostUploads pu : list) {
+            String filep = pu.getFilePath();
+            if (pu.getPostId() == -100 && !postRepository.findByPostIdAndContentContaining(post.getPostId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+                s3Service.delete(filep);
+                postUploadsRepository.deleteById(pu.getId());
+            } else if (pu.getPostId() == -100 && postRepository.findByPostIdAndContentContaining(post.getPostId(), filep).isPresent()) {
+                String original = pu.getFilePath();
+                String rename = s3Service.rename(filep, pu.getFileName(), post.getPostId(), num, logined.get().getNickname());
+                postUploadsRepository.updateFilePath(rename, pu.getId());
+                postUploadsRepository.updatePostId(post.getPostId(), pu.getId());
+                content = content.replace(original, rename);
+                num++;
             }
         }
+        postRepository.updateContent(content, post.getPostId());
+
         if (!tags.isEmpty()) {
             tagService.deleteTags(post);
             for (String tag : tags) {
@@ -317,20 +338,7 @@ public class PostController {
     @ApiOperation(value = "파일 등록", notes = "새로운 포스트 작성 시, 또는 공유 할 시 파일 등록")
     @PostMapping(value = "/blog/{nickname}/{boardName}/uploads")
     public ListResult<String> upload(@PathVariable String nickname, @PathVariable String boardName, @RequestPart MultipartFile[] files) throws IOException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String uid = authentication.getName();
-        Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
-        Board board = boardRepository.findByNameAndMember(boardName, logined);
-        Optional<List<Post>> list = postRepository.findByBoard_BoardId(board.getBoardId());
-        if (list.get().size() == 1) {
-            long postId = list.get().get(0).getPostId() + 1;
-            return responseService.getListResult(postService.saveFiles(postId, nickname, files));
-        }
-        else if(list.get().size() > 1){
-            Post post = list.get().get(list.get().size() - 1);
-            long postId = post.getPostId() + 1;
-            return responseService.getListResult(postService.saveFiles(postId, nickname, files));
-        } else return null;
+        return responseService.getListResult(postService.saveFiles(-100, nickname, files));
     }
 
     @ApiImplicitParams({
@@ -339,9 +347,6 @@ public class PostController {
     @ApiOperation(value = "파일 수정 등록", notes = "기존 포스트 수정 할 때, 필요시 파일 수정")
     @PostMapping(value = "/blog/{nickname}/{boardName}/{postId}/uploads")
     public ListResult<String> uploadUpdate(@PathVariable String nickname, @PathVariable String boardName, @PathVariable long postId, @RequestPart MultipartFile[] files) throws IOException {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String uid = authentication.getName();
-        Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
         return responseService.getListResult(postService.saveFiles(postId, nickname, files));
     }
 }
