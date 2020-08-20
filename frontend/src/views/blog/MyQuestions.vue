@@ -44,29 +44,22 @@ export default {
         getTags() {
             axios.get(`${BACK_URL}/tags/qna/${this.nickname}`)
                 .then(res => {
+                    this.numOfPosts = res.data.list[2].list[0]
                     this.tagList = res.data.list[0].list
                     this.tagNum = res.data.list[1].list
-                    this.calPostsSum()
+                    this.setTotalPageNum(this.numOfPosts)
                 })
                 .catch(err => {
                     console.log(err)
                 })
         },
         
-        calPostsSum() {
-            for (const item in this.tagNum) {
-                this.numOfPosts = this.numOfPosts + this.tagNum[item] 
-            }
-            this.totalNum = this.numOfPosts
-        },
-
         // blogPosts.vue로 페이지 넘버 보내기(이벤트버스)
         sendCurrentPage(currentPage) {
             EventBus.$emit("paging2", currentPage)
         },
         setTotalPageNum(num) {
             this.totalNum = num
-            console.log(this.totalNum)
         }     
     },
 

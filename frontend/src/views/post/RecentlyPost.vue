@@ -89,7 +89,6 @@ export default {
         .catch(err => console.log(err))
     },
     searchTags(tag) {
-      console.log(tag)
       this.$router.push({ name : 'TagSearch', params : { keyword : tag }})
     }
   },

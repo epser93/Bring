@@ -88,7 +88,6 @@ export default {
       }
       axios.post(`${BACK_URL}/blog/${this.aboutText.nickname}/${this.aboutText.boardName}/uploads`, formData, config)
         .then(res => {
-          console.log('업로드',res)
           this.imageServerUrl = res.data.list[0]
           insertImage({
           // url : 'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1269952892,3525182336&fm=26&gp=0.jpg',
@@ -103,9 +102,6 @@ export default {
       if (this.aboutText.boardName === "default" || this.aboutText.boardName === null) {
         alert('카테고리 먼저 정해주세요')
       } else {
-        console.log(this.aboutText.boardName)
-        console.log(files)
-        console.log(files[0])
         this.uploadImageDirect(files[0], insertImage)
       }
     },
