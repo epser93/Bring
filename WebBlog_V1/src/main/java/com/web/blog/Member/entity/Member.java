@@ -69,6 +69,8 @@ public class Member extends CommonDateEntity implements UserDetails, Serializabl
     @Column(columnDefinition = "integer default 0")
     private int followingCnt;
 
+    private String techStack;
+
     private int todayCnt;
 
     private int totalCnt;

@@ -214,6 +214,7 @@ public class MemberController {
         Optional<String> newPassword = Optional.ofNullable(paramMember.getPassword1());
         Optional<String> newPasswordChk = Optional.ofNullable(paramMember.getPassword2());
         Optional<String> nickname = Optional.ofNullable(paramMember.getNickname());
+        Optional<String> techStack = Optional.ofNullable(paramMember.getTechStack());
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String id = authentication.getName();
@@ -238,6 +239,11 @@ public class MemberController {
             if (nickname.isPresent()) {
                 if (!repository.findByNickname(nickname.get()).isPresent()) member.setNickname(nickname.get());
                 else throw new CNicknameExistException();
+            }
+
+            //tech stack
+            if (techStack.isPresent()) {
+                member.setTechStack(techStack.get());
             }
         }
         ObjectMapper mapper = new ObjectMapper();

@@ -25,5 +25,8 @@ public class ParamPassword {
 
     @ApiModelProperty(value = "닉네임")
     private String nickname;
+
+    @ApiModelProperty(value = "닉네임")
+    private String techStack;
 }
 
