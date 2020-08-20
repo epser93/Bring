@@ -45,7 +45,7 @@ import axios from 'axios'
 
 
 
-const BACK_URL = 'http://i3c206.p.ssafy.io:80'
+const BACK_URL = 'http://i3c206.p.ssafy.io/api'
 
 export default {
   name: 'UpdateForm',

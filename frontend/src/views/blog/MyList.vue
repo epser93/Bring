@@ -56,7 +56,7 @@ import axios from 'axios'
 import BlogPagination from '../blog/BlogPagination.vue'
 import { EventBus } from '../../event-bus.js'
 
-const BACK_URL = 'http://i3c206.p.ssafy.io:80'
+const BACK_URL = 'http://i3c206.p.ssafy.io/api'
 
 export default {
     name: 'MyList',
