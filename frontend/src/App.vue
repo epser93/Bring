@@ -1,10 +1,19 @@
 <template>
   <div id="app">
-    <Header :isLogin="isLogin" :nickname="userNickname" @logout-state="updateLogout"/>
-    <demo-login-modal @submit-login-data="login" @submit-signup-data="validateSignupData"/>
-    <div class="container-fluid p-0">
-    <router-view />
+    <div v-if="$route.meta.header === 1">
     </div>
+    <div v-else>
+      <Header :isLogin="isLogin" :nickname="userNickname" @logout-state="updateLogout"/>
+    </div>
+    <div class="container-fluid p-0">
+      <router-view />
+    </div>
+    <demo-login-modal @submit-login-data="login" @submit-signup-data="validateSignupData"/>
+      
+
+
+     
+
   </div>
 </template>
 

@@ -1,20 +1,22 @@
 <template>
-  <div id="index">
+  <div id="index" style="height: 1000px; display: flex;align-items: center;">
     <!-- <a href="http://localhost:8081/postqna/recentlypost">시작하기2</a> -->
-    <div class="css-typing">
-      <p>
-        'Bring'
-      </p>
-      <p>
-        for
-      </p>
-      <p>
-        Developers.
-      </p>
-    </div>
+    <div style="width:100%">
+      <div class="css-typing">
+        <p>
+          'Bring'
+        </p>
+        <p>
+          for
+        </p>
+        <p>
+          Developers.
+        </p>
+      </div>
 
-    <!-- 이동 버튼 부분 -->
-    <router-link :to="{ name : 'RecentlyPost' }"><div class="circle"><h4>start</h4></div></router-link>
+      <!-- 이동 버튼 부분 -->
+      <router-link :to="{ name : 'RecentlyPost' }"><div class="circle">start</div></router-link>
+    </div>
   </div>
 </template>
 
