@@ -29,7 +29,7 @@ public class QpostUploadsDto {
     }
 
     @Builder
-    public QpostUploadsDto(Long id, String filePath, String fileName, String nickname,String imgFullPath, Long qpostId, int num) {
+    public QpostUploadsDto(Long id, String filePath, String fileName, String nickname, String imgFullPath, Long qpostId, int num) {
         this.id = id;
         this.filePath = filePath;
         this.fileName = fileName;

@@ -10,6 +10,8 @@ import lombok.*;
 public class PostUploadsDto {
     private Long id;
     private String filePath;
+    private String fileName;//
+    private String nickname;//
     private String imgFullPath;
     private Long postId;
     private int num;
@@ -18,6 +20,8 @@ public class PostUploadsDto {
         PostUploads build = PostUploads.builder()
                 .id(id)
                 .filePath(filePath)
+                .fileName(fileName)
+                .nickname(nickname)
                 .postId(postId)
                 .num(num)
                 .build();
@@ -25,9 +29,11 @@ public class PostUploadsDto {
     }
 
     @Builder
-    public PostUploadsDto(Long id, String filePath, String imgFullPath, Long postId, int num) {
+    public PostUploadsDto(Long id, String filePath, String fileName, String nickname, String imgFullPath, Long postId, int num) {
         this.id = id;
         this.filePath = filePath;
+        this.fileName = fileName;
+        this.nickname = nickname;
         this.imgFullPath = imgFullPath;
         this.postId = postId;
         this.num = num;

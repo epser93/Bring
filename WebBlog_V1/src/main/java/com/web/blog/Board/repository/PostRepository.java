@@ -33,6 +33,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Modifying
     @Transactional
+    @Query(value = "update post set content = :content where post_id = :post_id", nativeQuery = true)
+    int updateContent(@Param("content") String content, @Param("post_id") long post_id);
+
+    @Modifying
+    @Transactional
     @Query(value = "update post set select_over = true where post_id = :post_id", nativeQuery = true)
     void changeSelectedReplyExist(@Param("post_id") long post_id);
 

@@ -117,16 +117,26 @@ public class PostReplyController {
         Optional<Post> post = postRepository.findById(postId);
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
-        Optional<Member> member = Optional.ofNullable(memberRepository.findAllByUid(uid));
-        Reply reply = replyService.writeReply(post.get(), member.get(), paramReply);
-        List<ReplyUploads> list = replyUploadsRepository.findAllByReplyId(reply.getReplyId());
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
+        Reply reply = replyService.writeReply(post.get(), logined.get(), paramReply);
+        List<ReplyUploads> list = replyUploadsRepository.findAllByNickname(logined.get().getNickname());
+        String content = reply.getReply();
+        int num = 0;
         for(ReplyUploads ru : list) {
             String filep = ru.getFilePath();
-            if(!replyRepository.findByReplyIdAndReplyContaining(reply.getReplyId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+            if(ru.getReplyId() == -100 && !replyRepository.findByReplyIdAndReplyContaining(reply.getReplyId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
                 s3Service.delete(filep);
                 replyUploadsRepository.deleteById(ru.getId());
+            } else if(ru.getReplyId() == -100 && postRepository.findByPostIdAndContentContaining(reply.getReplyId(), filep).isPresent()) {
+                String original = ru.getFilePath();
+                String rename = s3Service.rename(filep, ru.getFileName(), reply.getReplyId(), num, logined.get().getNickname());
+                replyUploadsRepository.updateFilePath(rename, ru.getId());
+                replyUploadsRepository.updateReplyId(reply.getReplyId(), ru.getId());
+                content = content.replace(original, rename);
+                num++;
             }
         }
+        replyRepository.updateReply(content, reply.getReplyId());
         return responseService.getSingleResult(reply);
     }
 
@@ -137,15 +147,28 @@ public class PostReplyController {
     @ApiOperation(value = "댓글 수정", notes = "댓글 수정")
     @PutMapping(value = "/reply/{replyId}")
     public SingleResult<Reply> updateAnswer(@Valid @RequestBody ParamReply paramReply, @PathVariable long replyId) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String uid = authentication.getName();
+        Optional<Member> logined = Optional.ofNullable(memberRepository.findAllByUid(uid));
         Reply reply = replyService.updateReply(replyId, paramReply);
-        List<ReplyUploads> list = replyUploadsRepository.findAllByReplyId(reply.getReplyId());
+        List<ReplyUploads> list = replyUploadsRepository.findAllByNickname(logined.get().getNickname());
+        String content = reply.getReply();
+        int num = 0;
         for(ReplyUploads ru : list) {
             String filep = ru.getFilePath();
-            if(!replyRepository.findByReplyIdAndReplyContaining(reply.getReplyId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
+            if(ru.getReplyId() == -100 && !replyRepository.findByReplyIdAndReplyContaining(reply.getReplyId(), filep).isPresent()) { //db에 저장된 파일 경로가 해당 포스트의 내용에 포함되어 있지 않으면~
                 s3Service.delete(filep);
                 replyUploadsRepository.deleteById(ru.getId());
+            } else if(ru.getReplyId() == -100 && postRepository.findByPostIdAndContentContaining(reply.getReplyId(), filep).isPresent()) {
+                String original = ru.getFilePath();
+                String rename = s3Service.rename(filep, ru.getFileName(), reply.getReplyId(), num, logined.get().getNickname());
+                replyUploadsRepository.updateFilePath(rename, ru.getId());
+                replyUploadsRepository.updateReplyId(reply.getReplyId(), ru.getId());
+                content = content.replace(original, rename);
+                num++;
             }
         }
+        replyRepository.updateReply(content, reply.getReplyId());
         return responseService.getSingleResult(reply);
     }
 
@@ -207,12 +230,7 @@ public class PostReplyController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Member logined = memberRepository.findByUid(uid).orElseThrow(CUserExistException::new);
-        Optional<List<Reply>> list = replyRepository.findByMember_NicknameAndPost_PostId(logined.getNickname(), postId); //해당 포스트의 댓글 작성자가 쓴 모든 댓글 리스트를 불러옴
-        if (list.isPresent()) {
-            Reply reply = list.get().get(list.get().size() - 1); //찾은 리스트 중 마지막 댓글 가져오기
-            long replyId = reply.getReplyId();
-            return responseService.getListResult(replyService.saveFiles(replyId, logined.getNickname(), files));
-        } else return null;
+        return responseService.getListResult(replyService.saveFiles(-100, logined.getNickname(), files));
     }
 
     @ApiImplicitParams({

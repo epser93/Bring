@@ -61,6 +61,8 @@ public class PostService {
                 String imgPath = s3Service.upload(file, postId, num, nickname); //s3에 저장
                 PostUploadsDto postUploadsDto = new PostUploadsDto();
                 postUploadsDto.setFilePath(imgPath);
+                postUploadsDto.setFileName(file.getOriginalFilename());//
+                postUploadsDto.setNickname(nickname);//
                 postUploadsDto.setPostId(postId);
                 postUploadsDto.setNum(num);
                 postUploadsDto.setImgFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + imgPath);

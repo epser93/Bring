@@ -54,6 +54,8 @@ public class ReplyService {
                 String imgPath = s3Service.upload(file, replyId, num, nickname); //s3에 저장
                 ReplyUploadsDto replyUploadsDto = new ReplyUploadsDto();
                 replyUploadsDto.setFilePath(imgPath);
+                replyUploadsDto.setFileName(file.getOriginalFilename());//
+                replyUploadsDto.setNickname(nickname);//
                 replyUploadsDto.setReplyId(replyId);
                 replyUploadsDto.setNum(num);
                 replyUploadsDto.setImgFullPath("https://" + s3Service.CLOUD_FRONT_DOMAIN_NAME + "/" + imgPath);
