@@ -28,8 +28,11 @@
             <i class="far fa-eye"></i>{{ views }}
         </div>
 
+        <!-- 댓글 목록부분 -->
+        <h3 class="mt-5 mb-4">{{ recentlyComments.length }} Comments</h3>
+        
         <!-- 댓글 입력 부분 -->
-        <div id="commentTextArea">
+        <div id="commentTextArea" class="mb-5">
             <span v-if="writeComment">
               <div>
                   <b-form-textarea
@@ -39,9 +42,9 @@
                       v-model = "comment_content"
                   ></b-form-textarea>
               </div>
-              <button class="btn btn-success btn-sm mx-1" v-if="!commentUpdateToggle" @click='commentWrite'>답변 달기</button>
-              <button class="btn btn-success btn-sm mx-1" v-if="commentUpdateToggle" @click='commentUpdate'>답변 수정</button>
-              <button class="btn btn-success btn-sm mx-1" @click='commentClose'>답변창 닫기</button>
+              <a class="float-right " v-if="!commentUpdateToggle" @click='commentWrite'>작성</a>
+              <a class="float-right " v-if="commentUpdateToggle" @click='commentUpdate'>수정</a>
+              <a class="float-right " @click='commentClose'>닫기</a>
           </span>
           <span v-else>
               <a class="p-2" v-if="this.$cookies.get('X-AUTH-TOKEN')" @click='commentOpen'>답변창 열기</a>
@@ -49,7 +52,6 @@
         </div>
 
         <!-- 댓글 목록부분 -->
-        <h3 class="mt-5 mb-4">{{ recentlyComments.length }} Comments</h3>
         <div class="ml-3" v-for="(comment,index) in recentlyComments" :key="comment.replyId">
           <strong @click="gotoProfile(comment.member_nickname)" id="comment_writer">{{ comment.member_nickname }}</strong>
           <p class="my-3">{{ comment.reply }}</p>
@@ -59,8 +61,8 @@
           <span :ref="'like-comment-' + comment.replyId">{{ comment.likes }}</span>
           <span class="vertical-line mx-3"></span>
           <span>{{ comment.createdAt.slice(0,10) }}</span>
-          <a class="btn btn-outline-success btn-sm ml-4" v-if="$cookies.get('nickname') === comment.member_nickname" @click="commentDelete(comment)">삭제</a>
-          <a class="btn btn-outline-success btn-sm" v-if="$cookies.get('nickname') === comment.member_nickname" @click="openCommentUpdate(comment), setXY($event)">수정</a>
+          <a class="ml-4 mr-2" v-if="$cookies.get('nickname') === comment.member_nickname" @click="commentDelete(comment)">삭제</a>
+          <a class="" v-if="$cookies.get('nickname') === comment.member_nickname" @click="openCommentUpdate(comment), setXY($event)">수정</a>
           <hr>
         </div>
     </div>
@@ -382,6 +384,7 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #f4f4f4;
+  min-height:100vh
 }
 
 .wrapper {
@@ -390,17 +393,26 @@ export default {
   min-height: 700px;
 }
 
-
-#commentTextArea a {
+#detail a {
+    padding: 5px 10px;
     cursor: pointer;
     text-decoration: none;
     transition-duration: 0.3s;
     border: 1px solid #e7e7e7;
 }
 
-#commentTextArea a:hover {
+#detail a:hover {
     color: #56dbc9 !important;
     border: 1px solid #99c9c2 !important;
+}
+
+#textarea-rows {
+  border: 1px solid #c0c0c0;
+  border-radius: 0;
+}
+
+#textarea-rows:focus {
+  border: 1px solid #56dbc9 !important;
 }
 
 .tagcloud {

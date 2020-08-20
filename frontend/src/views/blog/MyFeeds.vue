@@ -1,12 +1,12 @@
 <template>
   <div id="myfeeds">
     <!-- 글 리스트 -->
-        <div class="col-12 p-0 m-0 container">
-            <div class="text-center mt-5" v-if="postList.length == 0">
-                <h3>팔로워의 최근 글이 없습니다</h3>
-            </div>
+        <div class="col-12 p-0 container">
             <div class="row">
-                <div v-for="(item, index) in postList" :key="index" class="p-0 mb-5 col-12">
+                <div class="text-center mt-5" v-if="postList.length == 0">
+                    <h3>팔로워의 최근 글이 없습니다</h3>
+                </div>
+                <div v-for="(item, index) in postList" :key="index" class="p-0 mb-5 col-12 mt-5">
                     <div class="card-list">
                         <div class="card-header text-left bg-transparent p-5 d-flex justify-content-between">
                             <h4 class="card-title m-0"><strong>{{ item.subject }}</strong></h4>

@@ -3,7 +3,7 @@
     <div class="wrapper text-left col-12 col-lg-8 mt-5 px-5">
       <div class="d-flex" style="padding-left: 40px; padding-right: 40px; padding-top: 20px;">
         <h2 class="mt-4">카테고리 관리</h2>
-        <button type="button" class="btn btn-light" id="backBtn" @click="backBlog"><i class="fas fa-arrow-left"></i>뒤로가기</button>
+        <a id="backBtn" @click="backBlog"><i class="fas fa-arrow-left mr-2"></i>뒤로가기</a>
       </div>
       <!-- 카테고리 목록 -->
       <div class="p-5">
@@ -248,7 +248,7 @@ button {
 }
 #backBtn{
   height: 45px;
-  width: 110px;
+  width: 150px;
   align-self: center;
 }
 </style>

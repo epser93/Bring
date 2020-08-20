@@ -1,25 +1,25 @@
 <template>
-    <div id="myquestions" class="">
+    <div id="myquestions" class="row">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
         <!-- 컴포넌트 불러오기 -->
-        <div class="container-fluid col-12">
+        <div class="container-fluid col-12 col-lg-7 mr-5">
             <router-view></router-view>
         </div>
 
-        <!-- 페이지네이션 -->
-        <div class="col-12">
-            <BlogPagination :totalNum="totalNum" @pageNum="sendCurrentPage"/>
-        </div>
-
         <!-- 사이드 바 -->
-        <div id="nav-mylist" class="flex-column text-left px-3">
-            <h5>태그</h5>
-            <div class="tagcloud" style="width: 330px;">
+        <div id="nav-mylist" class="col-12 col-lg-4 flex-column text-left px-3 mt-5">
+            <h5 class="mt-5">태그</h5>
+            <div class="tagcloud mt-3">
                 <router-link @click.native="setTotalPageNum(numOfPosts)" :to="{ name: 'MyQuestions' , params: { nickname: this.nickname }}" class="tag-cloud-link">전체보기</router-link> 
                 <div v-for="(tag,index) in this.tagList" :key="index" class="d-inline">
                     <router-link @click.native="setTotalPageNum(tagNum[index])" :to="{ name: 'MyQuestions' , query : { q: tag }}" class="tag-cloud-link ">{{ tag }}</router-link>
                 </div>
             </div>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div class="col-12">
+            <BlogPagination :totalNum="totalNum" @pageNum="sendCurrentPage"/>
         </div>
     </div>
 </template>
@@ -85,22 +85,6 @@ export default {
 </script>
 
 <style scoped>
-@media only screen and (min-width: 1000px) {
-    #myquestions {
-        position: relative;
-    }
-
-    #nav-mylist{
-        position: absolute;
-        top: 260px;
-        left: -420px;
-    }
-}
-
-#myquestions {
-    min-height: 1000px;
-}
-
 #category-menu button{
     text-decoration: none;
     color: black;
@@ -121,15 +105,6 @@ export default {
     color: #42b983;
 }
 
-/* 트렌지션 */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 1s;
-}
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
 
 .tagcloud {
   padding: 0; }
@@ -147,8 +122,4 @@ export default {
       transition-duration: 0.5s;
       border: 1px solid #000; }
 
-
-#nav-mylist {
-    max-width: 370px;
-}
 </style>
