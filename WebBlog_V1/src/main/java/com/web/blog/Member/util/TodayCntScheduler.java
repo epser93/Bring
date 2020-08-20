@@ -21,7 +21,7 @@ public class TodayCntScheduler {
         this.todayDateRepository = todayDateRepository;
     }
 
-    @Scheduled(cron = "0 30 1 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void initializeTodayCnt() {
         List<Member> list = memberRepository.findAll();
         LocalDate date = LocalDate.now();
