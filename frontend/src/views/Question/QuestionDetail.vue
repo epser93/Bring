@@ -162,6 +162,7 @@ export default {
         // 답변창 닫기
         commentClose() {
             this.writeComment = false
+            this.answerData.answer = ""
         },
         // 게시물 호출
         getQna() {
@@ -170,8 +171,6 @@ export default {
                 this.qPost = res.data.list[0].list[0]
                 // 태그
                 this.tags = res.data.list[1].list
-
-                
             })
             .catch(err => {
                 console.log(err)
@@ -179,7 +178,6 @@ export default {
         },
         // 게시물 삭제
         deleteQna(qpost_id){
-            console.log(qpost_id)
             const config = {
               headers: {
                 'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN')
@@ -188,8 +186,7 @@ export default {
             const questionDelete = confirm("질문을 삭제 하시겠습니까?")
             if (questionDelete===true) {
             axios.delete(`${BACK_URL}/questions/${qpost_id}`,config)
-            .then(res=>{
-                console.log(res)
+            .then(()=>{
                 alert('삭제가 완료 되었습니다.')
                 this.$router.push({ name: 'MyQuestions', params: { nickname : this.nickname } })
             })
@@ -201,8 +198,11 @@ export default {
         },
         // 게시물 수정
         modifyQna(qpost_id){
-            console.log(this.qpost_id)
-            this.$router.push({name:'QuestionUpdate', params:{qpostId: qpost_id}})
+            if (this.qPost.selectOver) {
+                alert('답변이 채택된 질문은 수정할 수 없습니다.')
+            } else {
+                this.$router.push({name:'QuestionUpdate', params:{qpostId: qpost_id}})
+            }
         },
         // 답변 작성
         writeAnswer(){
@@ -212,11 +212,10 @@ export default {
               }
             }
             axios.post(`${BACK_URL}/answers/${this.qpost_id}`,this.answerData,config)
-            .then(res=>{
+            .then(()=>{
                 this.writeComment = false
                 this.answerData.answer=""
                 this.getAnswer() // 페이지 리로딩
-                console.log(res)
             })
             .catch(err=>{
                 alert("더 이상 답변을 작성 할 수 없습니다")
@@ -260,10 +259,9 @@ export default {
             const askDelete = confirm("답변을 삭제 하시겠습니까?")
             if (askDelete===true) {
             axios.delete(`${BACK_URL}/answers/${aPostId}`,config)
-            .then(res=>{
+            .then(()=>{
                 alert('삭제가 완료 되었습니다.')
                 this.getAnswer()
-                console.log(res)
             })
             .catch(err=>{
                 alert('권한이 없습니다.')
@@ -311,10 +309,9 @@ export default {
             const askAdopt = confirm("답변을 채택 하시겠습니까?")
             if (askAdopt===true) {
             axios.post(`${BACK_URL}/answers/select/${aPostId}`,this.answerData,config)
-            .then(res=>{
+            .then(()=>{
                 alert("채택 되었습니다")
                 this.getAnswer()
-                console.log(res)
             })
             .catch(()=>{
                 this.getAnswer()
@@ -329,11 +326,11 @@ export default {
                 }
             }
             axios.put(`${BACK_URL}/answers/${this.answerData_id}`,this.answerData,config)
-            .then(res=>{
+            .then(()=>{
                 this.getAnswer()
                 this.updateAnswer=false
                 this.writeComment=false
-                console.log(res)
+                this.answerData.answer=""
             })
             .catch(err=>{
                 console.log(err)
