@@ -6,7 +6,6 @@ import com.web.blog.Board.entity.Post;
 import com.web.blog.Board.model.OnlyPostMapping;
 import com.web.blog.Board.repository.PostMemberRepository;
 import com.web.blog.Board.repository.PostRepository;
-import com.web.blog.Board.service.BoardService;
 import com.web.blog.Board.service.PostService;
 import com.web.blog.Common.advice.exception.CNicknameExistException;
 import com.web.blog.Common.advice.exception.CPasswordDoesntMatch;
@@ -18,7 +17,6 @@ import com.web.blog.Common.response.ListResult;
 import com.web.blog.Common.response.SingleResult;
 import com.web.blog.Common.service.ResponseService;
 import com.web.blog.Common.service.S3Service;
-import com.web.blog.Member.entity.IpAddrForTodayCnt;
 import com.web.blog.Member.entity.Member;
 import com.web.blog.Member.entity.ProfileImg;
 import com.web.blog.Member.entity.TodayDate;
@@ -62,7 +60,6 @@ import java.util.Optional;
 public class MemberController {
     private final PostMemberRepository postMemberRepository;
     private final MemberRepository repository;
-    private final BoardService boardService;
     private final ResponseService responseService;
     private final PasswordEncoder passwordEncoder;
     private final PostService postService;
@@ -108,7 +105,6 @@ public class MemberController {
         List<Boolean> amIInTheList = new ArrayList<>(); //불린 값
         Boolean amIIn = false;
         List<OnlyMemberMapping> profile = new ArrayList<>(); //조회하려는 회원 정보
-        profile.add(omm.get());
         List<String> img = new ArrayList<>();
         List<LocalDateTime> createdAt = new ArrayList<>();
         List<OnlyPostMapping> posts = postRepository.findAllByMember_Nickname(member.getNickname());
@@ -129,6 +125,7 @@ public class MemberController {
             if (logined.get().getMsrl() != member.getMsrl()) { //프로필 주인이 아니면~
                 amIIn = followService.isFollowed(logined.get(), member); //로그인 사용자가 조회하려는 유저를 팔로우했으면 true, 아니면 false
                 amIInTheList.add(amIIn);
+                profile.add(omm.get());
                 result.add(responseService.getListResult(profile)); //조회하려는 멤버와 불린값 맵 설정
                 result.add(responseService.getListResult(amIInTheList));
                 result.add(responseService.getListResult(followService.followingList(member))); //팔로잉 리스트(조회하려는 멤버가 구독중인 멤버 리스트)
@@ -144,6 +141,7 @@ public class MemberController {
                     result.add(responseService.getListResult(img)); //프로필 사진
                 }
             } else { //프로필 본인이면~(마이페이지)
+                profile.add(omm.get());
                 result.add(responseService.getListResult(profile)); //내 정보
                 amIInTheList.add(false);
                 result.add(responseService.getListResult(amIInTheList));
@@ -161,6 +159,7 @@ public class MemberController {
                 }
             }
         } else {
+            profile.add(omm.get());
             result.add(responseService.getListResult(profile)); //조회하려는 멤버 설정
             amIInTheList.add(false);
             result.add(responseService.getListResult(amIInTheList));
@@ -176,19 +175,6 @@ public class MemberController {
                 img.add(filePath);
                 result.add(responseService.getListResult(img)); //프로필 사진
             }
-        }
-
-        String ip = followService.getIpAddr(request);
-        Optional<IpAddrForTodayCnt> ipAddr = ipAddrForTodayCntRepository.findByIpAndNickname(ip, member.getNickname());
-        if (!ipAddr.isPresent()) {
-            IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
-                    .ip(ip)
-                    .nickname(member.getNickname())
-                    .build();
-            checkCnt.setTimeout(86400L);
-            ipAddrForTodayCntRepository.save(checkCnt);
-            repository.updateTodayCnt(member.getMsrl());
-            repository.updateTotalCnt(member.getMsrl());
         }
 
         List<Integer> visitorCnt = new ArrayList<>();
