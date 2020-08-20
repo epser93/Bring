@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="questionDetail">
       <div class="container">
         <!-- 글쓴이 정보 -->
         <div class="info text-center my-5">
@@ -9,16 +9,14 @@
             <span class="mr-2" @click="gotoProfile(qPost.member_nickname)"><strong>{{ qPost.member_nickname }}</strong></span>
             <!-- 분기처리/ 작성자와 현재 사용자의 이름이 같으면 삭제표시되게끔-->
             <div v-if="this.nickname===qPost.member_nickname" class="text-right">
-                <button class="btn btn-outline-danger btn-sm mx-1" @click="deleteQna(qpost_id)" ><b-icon icon="trash"></b-icon> 삭제</button>
-                <button class="btn btn-outline-warning btn-sm mx-1" @click="modifyQna(qpost_id)"><b-icon icon="pen"></b-icon>수정</button>
+                <a class="float-right mx-1" @click="deleteQna(qpost_id)" ><b-icon icon="trash"></b-icon> 삭제</a>
+                <a class="float-right mx-1" @click="modifyQna(qpost_id)"><b-icon icon="pen"></b-icon>수정</a>
             </div>
             <!-- 태그부분 -->
             <div class="tag">
                 <span v-for="(tag,index) in this.tags" :key="index" class="badge badge-pill badge-info mr-2" @click="searchTag(tag)">{{ tag }}</span>
             </div>
         </div>
-
-        
         <hr>
 
         <!-- 글 -->
@@ -30,23 +28,17 @@
         <!-- 댓글 입력 부분 -->
         <div id="commentTextArea" v-if="!qPost.selectOver">
             <span v-if="writeComment">
-              <div>
-                  <b-form-textarea
-                      id="textarea-rows"
-                      placeholder="댓글을 작성해주세요!"
-                      rows="4"
-                      v-model="answerData.answer"
-                  ></b-form-textarea>
-              </div>
-                <div class="row">
-                    <div class="col-6"></div>
-                    <div class="col-4"></div>
-                    <div class="col-2 mt-2 pl-3">
-                        <button class="btn btn-success btn-sm ml-1" v-if="!updateAnswer" @click='writeAnswer'><b-icon icon="pencil-square"></b-icon> 답변 작성</button>
-                        <button class="btn btn-success btn-sm ml-2" v-if="updateAnswer" @click='modifyAnswer'>답변 수정</button>
-                        <button class="btn btn-secondary btn-sm ml-2" @click='commentClose'>닫기</button>
-                    </div>
+                <div>
+                    <b-form-textarea
+                        id="textarea-rows"
+                        placeholder="댓글을 작성해주세요!"
+                        rows="4"
+                        v-model="answerData.answer"
+                    ></b-form-textarea>
                 </div>
+                <a class="float-right " v-if="!updateAnswer" @click='writeAnswer'><b-icon icon="pencil-square"></b-icon> 답변 작성</a>
+                <a class="float-right " v-if="updateAnswer" @click='modifyAnswer'>답변 수정</a>
+                <a class="float-right " @click='commentClose'>닫기</a>
             </span>
             <span v-else class="d-flex flex-row">
                 <a class="p-2" @click='commentOpen' >답변창 열기</a>
@@ -54,7 +46,6 @@
         </div>
 
         <!--채택된 답변 -->
-        
         <h3 class="mt-5 mb-4 text-left">{{aPost.length}} 개의 답변</h3>
         <div v-for="(aArticle,index) in aPost" :key="`A-${index}`">
             <div class="d-flex flex-row"> 
@@ -71,8 +62,8 @@
                     <small :ref="'like-count-' + aArticle.apostId"> {{ aArticle.likes }}</small><small>개의 좋아요</small>
                     <span class="vertical-line mx-3"></span>
                     <span>{{ aArticle.createdAt.slice(0,10) }}</span>
-                    <button class="btn btn-outline-danger btn-sm mx-1" @click="deleteAnswer(aArticle.apostId)" v-if="selectedAnswer===false"><b-icon icon="trash"></b-icon>삭제</button>
-                    <button class="btn btn-outline-warning btn-sm mx-1" @click='modifyAnswerOpen(aArticle)' v-if="selectedAnswer===false"><b-icon icon="pen"></b-icon>수정</button>
+                    <a class="ml-4 mr-2" @click="deleteAnswer(aArticle.apostId)" v-if="selectedAnswer===false"><b-icon icon="trash"></b-icon>삭제</a>
+                    <a class="" @click='modifyAnswerOpen(aArticle)' v-if="selectedAnswer===false"><b-icon icon="pen"></b-icon>수정</a>
                 </div>
             </div>
         </div>
@@ -93,18 +84,16 @@
                 <span>{{ aArticle.createdAt.slice(0,10) }}</span>
                  <!-- 수정 삭제 버튼-->
                 <span v-if="(nickname===aArticle.member_nickname)" class="ml-1">
-                    <button class="btn btn-outline-danger btn-sm mx-1" @click="deleteAnswer(aArticle.apostId)" v-if="selectedAnswer===false"><b-icon icon="trash"></b-icon>삭제</button>
-                    <button class="btn btn-outline-warning btn-sm mx-1" @click='modifyAnswerOpen(aArticle)' v-if="selectedAnswer===false"><b-icon icon="pen"></b-icon>수정</button>
+                    <a class="ml-4 mr-2" @click="deleteAnswer(aArticle.apostId)" v-if="selectedAnswer===false"><b-icon icon="trash"></b-icon>삭제</a>
+                    <a class="" @click='modifyAnswerOpen(aArticle)' v-if="selectedAnswer===false"><b-icon icon="pen"></b-icon>수정</a>
                 </span>
                 <span v-else class="ml-1">
-                    <button class="btn btn-outline-danger btn-sm mx-1" @click="deleteAnswer(aArticle.apostId)" v-if="(nickname===aArticle.member_nickname)"><b-icon icon="trash"></b-icon>삭제</button>
-                    <button class="btn btn-outline-warning btn-sm mx-1" @click='modifyAnswerOpen(aArticle)' v-if="nickname===aArticle.member_nickname "><b-icon icon="pen"></b-icon>수정</button>
-                    <button class="btn btn-outline-primary btn-sm mx-1" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false)"><b-icon icon="check-circle" class="mb-1"></b-icon> 채택</button>
+                    <a class="ml-4 mr-2" @click="deleteAnswer(aArticle.apostId)" v-if="(nickname===aArticle.member_nickname)"><b-icon icon="trash"></b-icon>삭제</a>
+                    <a class="" @click='modifyAnswerOpen(aArticle)' v-if="nickname===aArticle.member_nickname "><b-icon icon="pen"></b-icon>수정</a>
+                    <a class="" @click="selectAnswer(aArticle.apostId)" v-if="(nickname===qPost.member_nickname && selectedAnswer===false)"><b-icon icon="check-circle" class="mb-1"></b-icon> 채택</a>
                 </span>
-
                 </p>
                 <hr>
-               
             </div>
         </div>
     </div>
@@ -234,6 +223,7 @@ export default {
             }
             axios.get(`${BACK_URL}/answers/${this.qpost_id}/answers`,config)
             .then(res=>{
+                console.log(res.data)
                 this.aPost=res.data.list[0].list
                 // 좋아요 불리언 값
                 this.like=res.data.list[1].list
@@ -373,14 +363,15 @@ export default {
 strong {
     cursor: pointer;
 }
-#commentTextArea a {
+#questionDetail a {
+    padding: 5px 10px;
     cursor: pointer;
     text-decoration: none;
     transition-duration: 0.3s;
     border: 1px solid #e7e7e7;
 }
 
-#commentTextArea a:hover {
+#questionDetail a:hover {
     color: #56dbc9 !important;
     border: 1px solid #99c9c2 !important;
 }
