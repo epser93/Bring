@@ -31,9 +31,9 @@
                                 <a class="py-3 px-5" @click="gotoDetail(item)">글 더보기</a>
                                 <div class="py-3 px-5">
                                     <!-- 좋아요 부분 -->
-                                    <i class="far fa-eye"></i>{{ item.views }}
+                                    <i class="far fa-eye mr-1"></i>{{ item.views }}
                                     <span class="vertical-line mx-3"></span>
-                                    <i class="far fa-comment"></i>{{ item.replyCnt }}
+                                    <i class="far fa-comment mr-1"></i>{{ item.replyCnt }}
                                     <span class="vertical-line mx-3"></span>
                                     <b-icon icon="heart-fill" v-if="postLike1[index]" class="d-inline mr-1" style="color: crimson;"></b-icon>
                                     <b-icon icon="heart" v-if="!postLike1[index]" class="d-inline mr-1" style="color: black;"></b-icon>
@@ -71,15 +71,13 @@
                             <div class="card-image mb-5">
                                 <img :src="thumbnail2[index]" alt="Card image cap">
                             </div>
-                            
-
                             <div class="d-flex justify-content-between">
                                 <a class="py-3 px-5" @click="gotoDetail(item)">글 더보기</a>
                                 <div class="py-3 px-5">
                                     <!-- 좋아요 부분 -->
-                                    <i class="far fa-eye"></i>{{ item.views }}
+                                    <i class="far fa-eye mr-1"></i>{{ item.views }}
                                     <span class="vertical-line mx-3"></span>
-                                    <i class="far fa-comment"></i>{{ item.replyCnt }}
+                                    <i class="far fa-comment mr-1"></i>{{ item.replyCnt }}
                                     <span class="vertical-line mx-3"></span>
                                     <b-icon icon="heart-fill" v-if="postLike2[index]" class="d-inline mr-1" style="color: crimson;"></b-icon>
                                     <b-icon icon="heart" v-if="!postLike2[index]" class="d-inline mr-1" style="color: black;"></b-icon>
@@ -108,7 +106,6 @@
                             <span class="vertical-line mx-3"></span>
                             <div>
                                 <p>{{ item.createdAt.slice(0,10) }}</p> 
-                                
                                 <p>{{ item.member_nickname }}</p>
                             </div>
                         </div>
@@ -117,15 +114,13 @@
                             <div class="card-image mb-5">
                                 <img :src="thumbnail3[index]" alt="Card image cap">
                             </div>
-
-
                             <div class="d-flex justify-content-between">
                                 <a class="py-3 px-5" @click="gotoDetail(item)">글 더보기</a>
                                 <div class="py-3 px-5">
                                     <!-- 좋아요 부분 -->
-                                    <i class="far fa-eye"></i>{{ item.views }}
+                                    <i class="far fa-eye mr-1"></i>{{ item.views }}
                                     <span class="vertical-line mx-3"></span>
-                                    <i class="far fa-comment"></i>{{ item.replyCnt }}
+                                    <i class="far fa-comment mr-1"></i>{{ item.replyCnt }}
                                     <span class="vertical-line mx-3"></span>
                                     <b-icon icon="heart-fill" v-if="postLike3[index]" class="d-inline mr-1" style="color: crimson;"></b-icon>
                                     <b-icon icon="heart" v-if="!postLike3[index]" class="d-inline mr-1" style="color: black;"></b-icon>
@@ -170,9 +165,9 @@
                                 <a class="py-3 px-5" @click="gotoDetail(item)">글 더보기</a>
                                 <div class="py-3 px-5">
                                     <!-- 좋아요 부분 -->
-                                    <i class="far fa-eye"></i>{{ item.views }}
+                                    <i class="far fa-eye mr-1"></i>{{ item.views }}
                                     <span class="vertical-line mx-3"></span>
-                                    <i class="far fa-comment"></i>{{ item.replyCnt }}
+                                    <i class="far fa-comment mr-1"></i>{{ item.replyCnt }}
                                     <span class="vertical-line mx-3"></span>
                                     <b-icon icon="heart-fill" v-if="postLike4[index]" class="d-inline mr-1" style="color: crimson;"></b-icon>
                                     <b-icon icon="heart" v-if="!postLike4[index]" class="d-inline mr-1" style="color: black;"></b-icon>

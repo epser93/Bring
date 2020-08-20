@@ -10,8 +10,8 @@
             <span class="vertical-line mx-3"></span>
             <span class="mr-2" @click="gotoProfile(member_nickname)" id="post_writer"><strong>{{ member_nickname }}</strong></span>
             <div class="text-right">
-              <button class="btn btn-outline-warning btn-sm mx-1" v-if="(member_nickname === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="updatePost"><b-icon icon="pen"></b-icon> 수정</button>
-              <button class="btn btn-outline-danger btn-sm mx-1" v-if="(member_nickname === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="deletePost"><b-icon icon="trash"></b-icon> 삭제</button>
+              <a class="mx-1" v-if="(member_nickname === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="deletePost"><b-icon icon="trash"></b-icon> 삭제</a>
+              <a class="mx-1" v-if="(member_nickname === this.$cookies.get('nickname')) && this.$cookies.get('nickname')" @click="updatePost"><b-icon icon="pen"></b-icon> 수정</a>
           </div>
         </div>
         <hr>
@@ -25,7 +25,7 @@
             <b-icon icon="heart" v-if="!likeItOrNot" class="d-inline mr-1" style="cursor:pointer; color: black;" @click="postLike(true)"></b-icon>          
             <span :ref="'like-count-' + post_id">{{ likes }}</span>
             <span class="vertical-line mx-3"></span>
-            <i class="far fa-eye"></i>{{ views }}
+            <i class="far fa-eye mr-1"></i>{{ views }}
         </div>
 
         <!-- 댓글 목록부분 -->
@@ -42,7 +42,7 @@
                       v-model = "comment_content"
                   ></b-form-textarea>
               </div>
-              <a class="float-right " v-if="!commentUpdateToggle" @click='commentWrite'>작성</a>
+              <a class="float-right " v-if="!commentUpdateToggle" @click='commentWrite'><b-icon icon="pencil-square"></b-icon>작성</a>
               <a class="float-right " v-if="commentUpdateToggle" @click='commentUpdate'>수정</a>
               <a class="float-right " @click='commentClose'>닫기</a>
           </span>
@@ -61,8 +61,8 @@
           <span :ref="'like-comment-' + comment.replyId">{{ comment.likes }}</span>
           <span class="vertical-line mx-3"></span>
           <span>{{ comment.createdAt.slice(0,10) }}</span>
-          <a class="ml-4 mr-2" v-if="$cookies.get('nickname') === comment.member_nickname" @click="commentDelete(comment)">삭제</a>
-          <a class="" v-if="$cookies.get('nickname') === comment.member_nickname" @click="openCommentUpdate(comment), setXY($event)">수정</a>
+          <a class="ml-4 mr-2" v-if="$cookies.get('nickname') === comment.member_nickname" @click="commentDelete(comment)"><b-icon icon="trash"></b-icon>삭제</a>
+          <a class="" v-if="$cookies.get('nickname') === comment.member_nickname" @click="openCommentUpdate(comment), setXY($event)"><b-icon icon="pen"></b-icon>수정</a>
           <hr>
         </div>
     </div>
@@ -78,7 +78,7 @@
       <!-- 카테고리 글(카테고리 내부에서 또 글 번호 매겨져야?) -->
       <h4 class="mb-3">{{ member_nickname }}의 다른 글</h4>
       <hr>
-      <div v-for="(item, index) in postListCategory" :key="item.postId" class="list-group">
+      <div v-for="(item, index) in postListCategory" :key="index" class="">
         <div v-if="item.postId != post_id" class="category-posts mb-4 p-0">
           <div class="card-wrapper">
             <div class="category-post-img" @click="gotoDetail(item)"><img class="mr-3" :src="thumbnail2[index]" style="height: 180px; width:100%;"></div>
@@ -335,10 +335,10 @@ export default {
                     'X-AUTH-TOKEN' : this.$cookies.get('X-AUTH-TOKEN'),
                 }
             }
-            axios.get(`${BACK_URL}/blog/${this.nickname}/${this.board_name}/post_list`, config)
+            axios.get(`${BACK_URL}/blog/${this.nickname}/${this.board_name}/post_list?no=1`, config)
                 .then(res => {
-                    this.postListCategory = res.data.list[0].list.reverse().slice(0,6)
-                    this.thumbnail2 = res.data.list[2].list.reverse().slice(0,6)
+                    this.postListCategory = res.data.list[0].list.slice(0,6)
+                    this.thumbnail2 = res.data.list[2].list.slice(0,6)
                 })
                 .catch(err => {
                     console.log(err)
