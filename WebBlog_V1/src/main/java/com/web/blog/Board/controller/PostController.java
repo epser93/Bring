@@ -175,7 +175,7 @@ public class PostController {
         if(p.getOriginal() != -1) {
             isShared.add(true);
         } else isShared.add(false);
-        results.add(responseService.getListResult(post);
+        results.add(responseService.getListResult(post));
         results.add(responseService.getListResult(tagService.getTags(postId)));
         results.add(responseService.getListResult(replyService.getRepliesofOnePost(postId)));
         results.add(responseService.getListResult(likes));
