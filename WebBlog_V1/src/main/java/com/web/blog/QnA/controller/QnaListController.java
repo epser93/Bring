@@ -158,6 +158,8 @@ public class QnaListController {
         LocalDateTime date = LocalDateTime.now();
         date.minus(30, ChronoUnit.DAYS);
         List<OnlyQpostMapping> list = qpostRepository.findByMember_NicknameOrderByQpostIdDesc(nickname, PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<Integer> count = new ArrayList<>();
+        count.add(list.size());
         result.add(responseService.getListResult(list));
         if (logined.isPresent()) {
             for (OnlyQpostMapping qm : list) {
@@ -191,6 +193,7 @@ public class QnaListController {
             }
         }
         result.add(responseService.getListResult(filePaths));
+        result.add(responseService.getListResult(count));
         return responseService.getListResult(result);
     }
 }

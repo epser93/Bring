@@ -179,7 +179,6 @@ export default {
   border: 3px solid rgb(94, 94, 94);
   border-radius: 50%;
   text-align: center;
-  line-height: 85px;
   margin: 20px auto;
 }
 
@@ -205,6 +204,14 @@ export default {
   -moz-transform: scale(1.1);
   -ms-transform: scale(1.1);
   -o-transform: scale(1.1);
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+h4 {
+  margin-top: 25px;
 }
 
 </style>

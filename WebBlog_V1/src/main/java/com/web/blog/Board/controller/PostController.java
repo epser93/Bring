@@ -143,30 +143,32 @@ public class PostController {
                 filePaths.add(ud.getImgFullPath());
             }
         }
-        String ip = followService.getIpAddr(request);
-        Optional<IpAddrForViewCnt> ipAddrQ = ipAddrForViewCntRepository.findByIpAndPostId(ip, postId);
-        if (!ipAddrQ.isPresent()) {
-            IpAddrForViewCnt checkCnt = IpAddrForViewCnt.builder()
-                    .ip(ip)
-                    .postId(postId)
-                    .qpostId((long) -1)
-                    .build();
-            checkCnt.setTimeout(10800L);
-            ipAddrForViewCntRepository.save(checkCnt);
-            postRepository.updateViewCnt(postId);
+        if(logined.isPresent() && logined.get().getMsrl() != writer.get().getMsrl()) {
+            String ip = followService.getIpAddr(request);
+            Optional<IpAddrForViewCnt> ipAddrQ = ipAddrForViewCntRepository.findByIpAndPostId(ip, postId);
+            if (!ipAddrQ.isPresent()) {
+                IpAddrForViewCnt checkCnt = IpAddrForViewCnt.builder()
+                        .ip(ip)
+                        .postId(postId)
+                        .qpostId((long) -1)
+                        .build();
+                checkCnt.setTimeout(10800L);
+                ipAddrForViewCntRepository.save(checkCnt);
+                postRepository.updateViewCnt(postId);
+            }
+            Optional<IpAddrForTodayCnt> ipAddr = ipAddrForTodayCntRepository.findByIpAndNickname(ip, writer.get().getNickname());
+            if (!ipAddr.isPresent()) {
+                IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
+                        .ip(ip)
+                        .nickname(writer.get().getNickname())
+                        .build();
+                checkCnt.setTimeout(86400L);
+                ipAddrForTodayCntRepository.save(checkCnt);
+                memberRepository.updateTodayCnt(writer.get().getMsrl());
+                memberRepository.updateTotalCnt(writer.get().getMsrl());
+                System.out.println("Im Post");
+            }
         }
-        Optional<IpAddrForTodayCnt> ipAddr = ipAddrForTodayCntRepository.findByIpAndNickname(ip, writer.get().getNickname());
-        if (!ipAddr.isPresent()) {
-            IpAddrForTodayCnt checkCnt = IpAddrForTodayCnt.builder()
-                    .ip(ip)
-                    .nickname(writer.get().getNickname())
-                    .build();
-            checkCnt.setTimeout(86400L);
-            ipAddrForTodayCntRepository.save(checkCnt);
-            memberRepository.updateTodayCnt(writer.get().getMsrl());
-            memberRepository.updateTotalCnt(writer.get().getMsrl());
-        }
-
 
         results.add(responseService.getListResult(postService.getPost(postId)));
         results.add(responseService.getListResult(tagService.getTags(postId)));
