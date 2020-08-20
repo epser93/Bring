@@ -1,7 +1,7 @@
 <template>
     <div id="blog" class= "row">
       <!-- 프로필 -->
-      <div class="col-12 col-lg-4 px-5 py-4 mt-3">
+      <div class="col-12 px-5 py-4 mt-3">
         <div class="info">
           <a class="" style="cursor:pointer;">
             <img @click="gotoProfile" class="rounded-circle mx-auto img-thumbnail mb-3" :src='cardUserImage' alt="Card image cap" style="width: 90px; height:90px;">
@@ -19,7 +19,7 @@
       </div>
     
       <!-- 네비게이션 -->
-      <div id="nav" class="col-12 col-lg-8 p-0">
+      <div id="nav" class="col-12 p-0">
           <router-link :to="{ name: 'MyBlog' , params: { nickname: this.nickname }}"><h3 :ref="'blog-word'" class="d-inline mr-5">포스트</h3></router-link> 
           <router-link :to="{ name: 'MyQuestions' , params: { nickname: this.nickname }}"><h3 :ref="'gisik-word'" class="d-inline mr-5">질문</h3></router-link> 
           <router-link :to="{ name: 'MyAnswers' , params: { nickname: this.nickname }}"><h3 :ref="'answer-word'" class="d-inline mr-5">답변</h3></router-link> 
@@ -143,20 +143,9 @@ export default {
 @media only screen and (min-width: 1000px) {
     #blog {
         padding: 0 100px;
-        font-family: 'Noto Serif KR', serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        background-color: #f4f4f4;
+
     }
 
-    #nav {
-      padding: 30px;
-      margin: 50px 0 0 0;
-    }
-
-    .info {
-      text-align: left;
-    }
 }
 
 #blog {
@@ -164,6 +153,7 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #f4f4f4;
+  min-height:100vh
 }
 
 #nav {

@@ -82,7 +82,6 @@ export default {
             }
         axios.post(`${BACK_URL}/questions/ask`,this.questionData,config)
         .then(res => {
-          console.log(res.data)
           this.$router.push({ name : 'QuestionDetail', params: { nickname: this.nickname, qpostId: res.data.list[0].data.qpostId}})
         })
         .catch(err=>{

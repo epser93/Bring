@@ -21,8 +21,8 @@
                 <a @click="pageSelect(four)" v-show="four === pageSelected" style="background-color: #56dbc9; color: white; border: 1px solid #56dbc9;">{{ four }}</a>
             </div>
             <div class="d-inline" v-if="five <= pageTotalc">
-                <a @click="pageSelect(one)" v-show="five != pageSelected">{{ five }}</a>
-                <a @click="pageSelect(one)" v-show="five === pageSelected" style="background-color: #56dbc9; color: white; border: 1px solid #56dbc9;">{{ five }}</a>
+                <a @click="pageSelect(five)" v-show="five != pageSelected">{{ five }}</a>
+                <a @click="pageSelect(five)" v-show="five === pageSelected" style="background-color: #56dbc9; color: white; border: 1px solid #56dbc9;">{{ five }}</a>
             </div>
         </div>
         <a @click="pageCount(1)">&raquo;</a>
@@ -64,7 +64,7 @@ export default {
         // 페이지네이션 양 옆 이동
         pageCount(num) {
             if (num === 1) {
-                if (this.five < this.pageTotal) {
+                if (this.five < this.pageTotalc) {
                     this.one ++
                     this.two ++
                     this.three ++

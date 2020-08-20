@@ -1,19 +1,16 @@
 <template>
-    <div id="mylist" class="">
+    <div id="mylist" class="row">
         <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css">
+ 
         <!-- 컴포넌트 불러오기 -->
-        <div class="container-fluid col-12">
+        <div class="container-fluid col-12 col-lg-7 mr-5">
             <router-view></router-view>
         </div>
 
-        <!-- 페이지네이션 -->
-        <div class="col-12">
-            <BlogPagination :totalNum="totalNum" @pageNum="sendCurrentPage"/>
-        </div>
         <!-- 사이드 바 -->
-        <div id="nav-mylist" class="flex-column text-left px-3">
+        <div id="nav-mylist" class="col-12 col-lg-4 flex-column text-left px-3">
             <!-- 검색창 -->
-            <div class="my-5 text-center">
+            <div class="mb-5 text-center">
                 <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" class="dropdown-toggle btn btn-outline-secondary" style="margin-bottom:5px;">{{ keywordType.name }}</button>
                 <div tabindex="-1" aria-hidden="true" role="menu" class="dropdown-menu">
                     <button type="button" tabindex="0" @click="dropdown(typeid, value)" class="dropdown-item" v-for="(value, typeid) in dropdownList" v-bind:key="typeid">
@@ -42,11 +39,16 @@
             
             <!-- 태그 리스트 -->
             <h5 class="mt-5">태그</h5>
-            <div class="tagcloud" style="width: 330px;">
+            <div class="tagcloud mt-3">
                 <div v-for="(tag,index) in this.tagList" :key="index" class="d-inline">
                     <router-link @click.native="setTotalPageNum(tagNum[index])" :to="{ name: 'MyBlog' , query : { t: tag }}" class="tag-cloud-link ">{{ tag }}</router-link>
                 </div>
             </div>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div class="col-12">
+            <BlogPagination :totalNum="totalNum" @pageNum="sendCurrentPage"/>
         </div>
     </div>
 </template>
@@ -155,18 +157,7 @@ export default {
 </script>
 
 <style scoped>
-@media only screen and (min-width: 1000px) {
-    #mylist {
-        position: relative;
-    }
 
-    #nav-mylist{
-        position: absolute;
-        top: 200px;
-        left: -420px;
-        max-width: 370px;
-    }
-}
 
 input {
     width:210px;

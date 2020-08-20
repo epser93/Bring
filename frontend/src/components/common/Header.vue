@@ -160,9 +160,6 @@
 #logout {
   cursor: pointer;
 }
-.navbar{
-  height:7.5vh;
-}
 
 .navbar a:visited{
     color: #494949;

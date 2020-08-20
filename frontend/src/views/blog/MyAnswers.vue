@@ -1,7 +1,7 @@
 <template>
     <div id="myanswers" class="row mt-5">
         <!-- 글 리스트 -->  
-        <div class="col-12">
+        <div class="col-12 mt-5">
             <div v-for="(item, index) in answersList.slice(0,6)" :key="item.answerId" class="p-0 mb-5">
                 <div class="card-wrapper mb-3">
                     <div class="p-3"><h4 class="mb-2">{{ answersQList[index] }}</h4><small>{{ item.createdAt.slice(0,10)}}</small></div>
