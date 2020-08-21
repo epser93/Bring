@@ -321,8 +321,8 @@ public class AnswerController {
             ParamPost paramPost = new ParamPost();
             StringBuilder sb = new StringBuilder();
             sb.append("[채택]\n" + post.get().getContent());
-            paramPost.setSubject(sb.toString());
-            paramPost.setContent(post.get().getContent());
+            paramPost.setSubject(post.get().getSubject());
+            paramPost.setContent(sb.toString());
             postService.updatePost("나의 Answers", post.get().getPostId(), answerer.getMsrl(), paramPost);
             System.out.println("성공");
         } else throw new CNotOwnerException();
