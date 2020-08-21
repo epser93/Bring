@@ -81,7 +81,9 @@
       <div v-for="(item, index) in postListCategory" :key="index" class="">
         <div v-if="item.postId != post_id" class="category-posts mb-4 p-0">
           <div class="card-wrapper">
-            <div class="category-post-img" @click="gotoDetail(item)"><img class="mr-3" :src="thumbnail2[index]" style="height: 180px; width:100%;"></div>
+              <div @click="gotoDetail(item)" class="img-section" :style="{ 'background-image' : `url(${thumbnail2[index]})`}">
+                
+              </div>
           </div>
           <div class="text-left ml-2 p-3">
             <p @click="gotoDetail(item)"><strong>{{ item.subject }}</strong></p>
@@ -450,7 +452,7 @@ export default {
     color: #56dbc9 !important;
 }
 
-.category-post-img {
+.img-section {
   transform: scale(1);
   -webkit-transform: scale(1);
   -moz-transform: scale(1);
@@ -459,7 +461,18 @@ export default {
   transition: all 0.3s ease-in-out;
 }
 
-.category-post-img:hover {
+.img-section {
+  width: 100%;
+  height: 180px;
+  background-repeat : no-repeat;
+	background-size : contain;
+  background-position: center center;
+  border-top-right-radius: 0px;
+  border-top-left-radius: 0px;
+  border: none;
+}
+
+.img-section:hover {
   transform: scale(1.1);
   -webkit-transform: scale(1.1);
   -moz-transform: scale(1.1);
@@ -473,6 +486,11 @@ export default {
   overflow:hidden;
   cursor: pointer;
   } 
+
+.card-wrapper img {
+  height: 180px; 
+  width:100%;
+}
 
 .tag-cloud-link {
   cursor: pointer;
