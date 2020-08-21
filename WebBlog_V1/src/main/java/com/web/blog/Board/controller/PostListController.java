@@ -221,8 +221,7 @@ public class PostListController {
         List<Boolean> amIInTheList = new ArrayList<>();
 
         LocalDateTime date = LocalDateTime.now();
-        date.minus(14, ChronoUnit.DAYS);
-        List<OnlyPostMapping> list = postRepository.findByCreatedAtLessThanEqualAndBoard_NameNotLikeOrderByPostIdDesc(date, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<OnlyPostMapping> list = postRepository.findByCreatedAtLessThanEqualAndBoard_NameNotLikeOrderByPostIdDesc(date.minus(14, ChronoUnit.DAYS), "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         result.add(responseService.getListResult(list));
         List<String> filePaths = new ArrayList<>();
         int cnt = 0;
@@ -283,8 +282,7 @@ public class PostListController {
         List<ListResult> result = new ArrayList<>();
         List<Boolean> amIInTheList = new ArrayList<>();
         LocalDateTime date = LocalDateTime.now();
-        date.minus(14, ChronoUnit.DAYS);
-        List<OnlyPostMapping> list = postRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualAndBoard_NameNotLikeOrLikesGreaterThanEqualAndCreatedAtLessThanEqualAndBoard_NameNotLikeOrderByPostIdDesc(40, date, "나의 Answers", 20, date, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
+        List<OnlyPostMapping> list = postRepository.findDistinctByViewsGreaterThanEqualAndCreatedAtLessThanEqualAndBoard_NameNotLikeOrLikesGreaterThanEqualAndCreatedAtLessThanEqualAndBoard_NameNotLikeOrderByPostIdDesc(40, date.minus(14, ChronoUnit.DAYS), "나의 Answers", 20, date, "나의 Answers", PageRequest.of(paging.getPageNo() - 1, Paging.COUNT_OF_PAGING_CONTENTS));
         result.add(responseService.getListResult(list));
         List<String> filePaths = new ArrayList<>();
         int cnt = 0;
