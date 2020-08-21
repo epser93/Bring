@@ -63,7 +63,7 @@
                                                 <li v-for="user in followerUserImg" v-bind:key="user.nickname" class="listFollow col">
                                                     <div class="d-flex" id="modalFollow">
                                                         <img class="rounded-circle" :src=user.img alt="Card image cap" id="mFollow1">
-                                                        <a :href="$router.resolve({name: 'Profile', query: { nickname: user.nickname }}).href"> {{ user.nickname }}</a>                                                        
+                                                        <a :href="$router.resolve({name: 'Profile', query: { nickname: user.nickname }}).href" class="nickFollow"> {{ user.nickname }}</a>                                                        
                                                         <!-- <router-link :to="{ name: 'Profile', query: { nickname: user.nickname }}" data-dismiss="modal">{{ user.nickname }}</router-link> -->
                                                     </div>
                                                 </li>
@@ -78,7 +78,7 @@
                                                 <li v-for="user in followingUserImg" v-bind:key="user.nickname" class="listFollow col">
                                                     <div class="d-flex" id="modalFollow">
                                                         <img class="rounded-circle" :src=user.img alt="Card image cap" id="mFollow2">
-                                                        <a :href="$router.resolve({name: 'Profile', query: { nickname: user.nickname }}).href"> {{ user.nickname }}</a>
+                                                        <a :href="$router.resolve({name: 'Profile', query: { nickname: user.nickname }}).href" class="nickFollow"> {{ user.nickname }}</a>
                                                         <!-- <router-link :to="{ name: 'Profile', query: { nickname: user.nickname }}" data-dismiss="modal">{{ user.nickname }}</router-link> -->
                                                     </div>
                                                 </li>
@@ -734,16 +734,16 @@ export default {
     width: 20%;
 }
 #mFollow1{
-    width:55px; 
-    height:55px; 
+    width:50px; 
+    height:50px; 
     padding:2px;
     border:1px solid darkgrey; 
     margin-right:10px;
     margin-left:10px;
 }
 #mFollow2{
-    width:55px; 
-    height:55px; 
+    width:50px; 
+    height:50px; 
     padding:2px;
     border:1px solid darkgrey; 
     margin-right:10px;
@@ -751,6 +751,10 @@ export default {
 }
 .modal-title{
     margin-right: 5px;
+}
+.nickFollow{
+    font-size:15px;
+    
 }
 </style>
 
