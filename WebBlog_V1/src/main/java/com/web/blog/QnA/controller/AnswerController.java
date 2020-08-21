@@ -164,7 +164,7 @@ public class AnswerController {
             }
             apost = qnaService.writeAnswer(qpost.get(), logined.get(), paramApost, answer.getPostId());
         } else { //질문자가 답변달면~
-            apost = qnaService.writeAnswer(qpost.get(), logined.get(), paramApost, -1); //
+            apost = qnaService.writeAnswer(qpost.get(), logined.get(), paramApost, -1);
         }
         if (qpostRepository.isSelectedAnswerExist(qpostId)) return null;
         return responseService.getSingleResult(apost);
