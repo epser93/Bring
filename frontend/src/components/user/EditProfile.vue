@@ -93,7 +93,7 @@
 
 import axios from 'axios'
 
-const BACK_URL = 'http://i3c206.p.ssafy.io/api'
+const BACK_URL = 'http://i3c206.p.ssafy.io:8080/api'
 
 
 export default {

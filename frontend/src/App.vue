@@ -17,7 +17,7 @@ import Header from './components/common/Header.vue'
 import axios from 'axios'
 import DemoLoginModal from './components/user/Modal_Login.vue'
 
-const BACK_URL = 'http://i3c206.p.ssafy.io/api'
+const BACK_URL = 'http://i3c206.p.ssafy.io:8080/api'
 
 export default {
   name: 'App',
