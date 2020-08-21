@@ -186,7 +186,7 @@ import moment from 'moment'
 import { CalendarHeatmap } from 'vue-calendar-heatmap'
 import VueApexCharts from 'vue-apexcharts'
 
-const BACK_URL = 'http://i3c206.p.ssafy.io:8080/api'
+const BACK_URL = 'http://i3c206.p.ssafy.io/api'
 
 
 
