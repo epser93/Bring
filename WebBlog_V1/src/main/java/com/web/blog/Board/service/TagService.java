@@ -203,6 +203,9 @@ public class TagService {
             long postId = opm.getPostId();
             postTags = postTagRepository.findByPost_PostId(postId);
             for (PostTag tag : postTags) {
+                if(tag.getPost().getBoard().getName().equals("나의 Answers")) {
+                    continue;
+                }
                 Tag t = tag.getTag();
                 if (tagsS.contains(t.getTag())) { //이미 존재하면 카운팅 + 1
                     int idx = tagsS.indexOf(t.getTag());
