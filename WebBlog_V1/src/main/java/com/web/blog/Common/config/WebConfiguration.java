@@ -13,11 +13,6 @@ public class WebConfiguration implements WebMvcConfigurer {
                 .allowedOrigins("http://localhost:8081")
                 .allowedOrigins("http://localhost:8080")
                 .allowedOrigins("http://i3c206.p.ssafy.io")
-                .allowedOrigins("http://i3c206.p.ssafy.io:8080")
-                .allowedOrigins("http://i3c206.p.ssafy.io:8081")
-                .allowedOrigins("http://i3c206.p.ssafy.io:8080/api")
-                .allowedOrigins("http://i3c206.p.ssafy.io:8081/api")
-                .allowedOrigins("http://i3c206.p.ssafy.io:80")
                 .allowedOrigins("http://i3c206.p.ssafy.io/blog")
                 .allowedOrigins("localhost/:1");
     }

@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
-import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Component
@@ -27,7 +27,7 @@ public class TodayCntScheduler {
         LocalDate date = LocalDate.now();
         for (Member member : list) {
             todayDateRepository.save(TodayDate.builder()
-                    .date(date.minus(Period.ofDays(1)))
+                    .date(date.minus(1, ChronoUnit.DAYS))
                     .cnt(member.getTodayCnt())
                     .member(member)
                     .build());

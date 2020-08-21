@@ -37,8 +37,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/*/in/**", "/api/*/up/**", "/api/*/out/**", "/api/*/out/", "/api/*/in", "/api/*/up", "/api/*/register/**", "/api/*/social/**", "/api/*/kakao/**").permitAll() //, "/api/**"
-                .antMatchers("/api/exception/**", "/api/search/**", "/api/blog/**", "/api/reply/**", "/api/tags/**","/api/questions/**", "/api/answers/**", "/api/follow/**", "/api/*/search/**", "/api/favicon.ico", "/api/*/rank/**", "/api/member/user/*", "/**/profile/", "/api/member/**", "/**/likedposts/").permitAll()
+                .antMatchers("/*/in/**", "/*/up/**", "/*/out/**", "/*/out/", "/*/in", "/*/up", "/*/register/**", "*/social/**", "/*/kakao/**", "/api/**").permitAll()
+                .antMatchers("/exception/**", "/search/**", "/blog/**", "/reply/**", "/tags/**","/questions/**", "/answers/**", "/follow/**", "/*/search/**", "/favicon.ico", "/*/rank/**", "/member/user/*", "/**/profile/", "/member/**", "/**/likedposts/").permitAll()
                 .antMatchers("/*/users").hasRole("ADMIN")
                 .antMatchers(HttpMethod.POST, "/api/sign/out/**", "/api/sign/out/").authenticated()
                 .anyRequest().hasRole("USER")
