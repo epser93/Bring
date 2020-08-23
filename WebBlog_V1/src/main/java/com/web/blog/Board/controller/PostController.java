@@ -117,7 +117,7 @@ public class PostController {
     })
     @ApiOperation(value = "게시글 상세정보 조회", notes = "게시글 상세정보 비회원 조회")
     @GetMapping(value = "/blog/{nickname}/{boardName}/{postId}")
-    public ListResult<ListResult> post(@PathVariable String boardName, @PathVariable long postId, @PathVariable String nickname, HttpServletRequest request, HttpServletResponse response) {
+    public ListResult<ListResult> post(@PathVariable String boardName, @PathVariable long postId, @PathVariable String nickname, HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = memberRepository.findByUid(uid);

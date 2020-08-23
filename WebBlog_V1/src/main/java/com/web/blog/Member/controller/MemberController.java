@@ -41,8 +41,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -95,7 +93,7 @@ public class MemberController {
     })
     @ApiOperation(value = "회원 프로필 조회", notes = "닉네임으로 회원을 조회한다")
     @GetMapping(value = "/{nickname}/profile")
-    public ListResult<ListResult> findUserById(@PathVariable String nickname, HttpServletResponse response, HttpServletRequest request) throws JsonProcessingException {
+    public ListResult<ListResult> findUserById(@PathVariable String nickname) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String uid = authentication.getName();
         Optional<Member> logined = repository.findByUid(uid); //로그인 한 사용자
