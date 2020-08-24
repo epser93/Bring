@@ -2,7 +2,8 @@
 
 ## 배포
 
-- i3c206.p.ssafy.io
+- http://i3c206.p.ssafy.io
+- API Docs(Swagger): http://i3c206.p.ssay.io/api/swagger-ui.html
 
 ## 주요 기술스택
 
