@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Optional;
@@ -112,6 +113,8 @@ public class SignController {
         Optional<Member> member2 = repository.findByNickname(String.valueOf(nickname));
         if (member2.isPresent()) throw new CUserExistException();
 
+        LocalDateTime localDateTime = LocalDateTime.now();
+        System.out.println(localDateTime);
 //        UploadFile fileName = fileService.uploadFile(file);
         repository.save(Member.builder()
                 .uid(id)

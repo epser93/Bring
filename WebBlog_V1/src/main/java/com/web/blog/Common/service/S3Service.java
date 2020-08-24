@@ -62,7 +62,12 @@ public class S3Service {
         SimpleDateFormat format = new SimpleDateFormat ( "yyyy-MM-dd-HH-mm-ss");
         Date date = new Date();
         String time = format.format(date);
-        String fileName = nickname + "-" + time + "___" + id + "-" + num + "___" +file.getOriginalFilename();
+        String ofileName = file.getOriginalFilename();
+        ofileName = ofileName.replaceAll(" ", "");
+        ofileName = ofileName.replaceAll("\\p{Z}", "");
+        ofileName = ofileName.trim();
+        ofileName = ofileName.replaceAll("(^\\p{Z}+|\\p{Z}+$)", "");
+        String fileName = nickname + "-" + time + "___" + id + "-" + num + "___" + ofileName;
 
         ObjectMetadata objectMetadata = new ObjectMetadata();
         byte[] bytes = IOUtils.toByteArray(file.getInputStream());

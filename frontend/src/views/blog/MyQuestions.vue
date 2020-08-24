@@ -30,7 +30,7 @@ import BlogPagination from '../blog/BlogPagination.vue'
 import { EventBus } from '../../event-bus.js'
 
 
-const BACK_URL = 'http://i3c206.p.ssafy.io/api'
+const BACK_URL = 'http://lawliet0521.com/api'
 
 export default {
     name: 'MyList',

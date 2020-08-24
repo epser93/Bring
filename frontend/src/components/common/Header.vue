@@ -65,7 +65,7 @@
 </template>   
 
 <script> 
-    const BACK_URL = 'http://i3c206.p.ssafy.io/api'
+    const BACK_URL = 'http://lawliet0521.com/api'
     import axios from 'axios'
 
     export default {
