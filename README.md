@@ -2,13 +2,13 @@
 
 ## 배포
 
-- http://lawliet0521.com
-- API Docs(Swagger): http://lawliet0521.com/api/swagger-ui.html
+- http://i3c206.p.ssafy.io
+- API Docs(Swagger): http://i3c206.p.ssay.io/api/swagger-ui.html
 
 ## 주요 기술스택
 
-- CI/CD: Nginx, GitLab CI/CD(Jenkins initially)
-- Server: GCP VM(Ubuntu 18.04), Docker
+- CI/CD: Nginx, GitLab CI/CD
+- Server: AWS EC2, Docker
 - Storage: AWS S3(CloudFront)
 - DB: Mariadb(Docker), Reids(Docker), JPA
 - Back-end Framework: Spring Boot
