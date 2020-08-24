@@ -6,7 +6,8 @@
 
 ## 주요 기술스택
 
-- Server: AWS EC2, Docker, Nginx, GitLab CI/CD
+- CI/CD: Nginx, GitLab CI/CD
+- Server: AWS EC2, Docker
 - DB: Mariadb(Docker), Reids(Docker)
 - Back-end Framework: Spring Boot
 - Front-end: Vue js, axios
