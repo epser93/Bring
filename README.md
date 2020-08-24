@@ -1,5 +1,9 @@
 # WebBlog : RELEASE Version 1.00
 
+## 배포
+
+- i3c206.p.ssafy.io
+
 ## 주요 기술스택
 
 - Server: AWS EC2, Docker, Nginx, GitLab CI/CD
