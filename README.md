@@ -8,6 +8,7 @@
 
 - CI/CD: Nginx, GitLab CI/CD
 - Server: AWS EC2, Docker
+- Storage: AWS S3
 - DB: Mariadb(Docker), Reids(Docker)
 - Back-end Framework: Spring Boot
 - Front-end: Vue js, axios
