@@ -1,8 +1,8 @@
 cloud:
   aws:
     credentials:
-      accessKey: AKIAJQTEW2CZS2DF65KQ
-      secretKey: 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
+      accessKey: AKIAJTLKD4ETKHNC6TPA
+      secretKey: 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
     s3:
       bucket: lawliet0521
     region:
