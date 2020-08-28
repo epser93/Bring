@@ -543,13 +543,16 @@ export default {
             }
 
             // Today 계산
-            var tmpToday = new Date().toJSON().slice(0,10)
+            var tmpToday = new Date()
+            tmpToday.setHours(tmpToday.getHours()+9)
+            tmpToday = tmpToday.toJSON().slice(0,10)
             var tmpDate = []
             var tmpCnt = []
             tmpDate.push(tmpToday)
             tmpCnt.push(this.userTodays)
             var dateLen = this.userVistDate.length
             var dayAgo = new Date()
+            dayAgo.setHours(dayAgo.getHours()+9)
             for(var z=1; z<5; z++){
                 dayAgo.setDate(dayAgo.getDate() - 1)
                 tmpDate.push(dayAgo.toJSON().slice(0,10))
