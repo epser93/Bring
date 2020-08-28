@@ -93,7 +93,7 @@
 
 import axios from 'axios'
 
-const BACK_URL = 'http://lawliet0521.com/api'
+const BACK_URL = 'http://i3c206.p.ssafy.io/api'
 
 
 export default {
