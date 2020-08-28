@@ -554,7 +554,7 @@ export default {
                 dayAgo.setDate(dayAgo.getDate() - 1)
                 tmpDate.push(dayAgo.toJSON().slice(0,10))
                 if(dateLen - z >= 0){
-                    if(tmpDate[i] == this.userVistDate[dateLen - z]){
+                    if(tmpDate[z] == this.userVistDate[dateLen - z]){
                         tmpCnt.push(this.userVistCnt[dateLen - z])
                     }
                     else{
