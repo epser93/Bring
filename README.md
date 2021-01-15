@@ -2,6 +2,8 @@
 > 팀원 : 송은석, 장주환, 권도현, 김수빈, 한정연
 >
 > 개발기간 : 20.07.13 ~ 20.08.21
+>
+> 시연영상 : https://youtu.be/YyN6cWgXAaw
 
 
 
@@ -19,6 +21,20 @@
 개발자들이 각자의 지식을 정리하며 성장 할 수 있는 자신만의 블로그 기능과
 
 스택오버플로우와 같이 질문을 올리고 답을 얻을 수 있는 기능을 합친 서비스를 개발하였습니다.
+
+![1](README.assets/1.JPG)
+
+![2](README.assets/2-1610673824865.JPG)
+
+![3](README.assets/3.png)
+
+![4](README.assets/4.JPG)
+
+
+
+## 시연영상
+
+https://youtu.be/YyN6cWgXAaw
 
 
 
