@@ -32,12 +32,6 @@
 
 
 
-## 시연영상
-
-https://youtu.be/YyN6cWgXAaw
-
-
-
 ##  기술스택
 
 - CI/CD: Nginx, GitLab CI/CD
